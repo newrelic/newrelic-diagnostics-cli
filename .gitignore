@@ -1,0 +1,10 @@
+.vscode
+.DS_Store
+core
+nr-diagnostics*
+nrdiag*
+bin
+nrdiag*
+integrationDockerfile
+temp/*
+test_results*
