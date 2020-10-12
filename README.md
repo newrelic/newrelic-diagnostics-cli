@@ -1,6 +1,6 @@
 [![Community Project header](https://github.com/newrelic/opensource-website/raw/master/src/images/categories/Community_Project.png)](https://opensource.newrelic.com/oss-category/#community-project)
 
-# [NR Diag] [https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/troubleshooting/new-relic-diagnostics]
+# [NR Diag] (https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/troubleshooting/new-relic-diagnostics)
 
 NR Diag is a troubleshooting and data collection tool used to find common issues with NR installations and problems on client systems, and collect relevant files that the Support team will use to figure out the issue.
 
