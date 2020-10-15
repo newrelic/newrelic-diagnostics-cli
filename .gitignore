@@ -1,10 +1,12 @@
 .vscode
 .DS_Store
 core
+integrationDockerfile
+integration/temp/*
+test_results*
+#to ignore the binary builds
 nr-diagnostics*
 nrdiag*
 bin
-nrdiag*
-integrationDockerfile
-temp/*
-test_results*
+integration/bin
+NrDiag*

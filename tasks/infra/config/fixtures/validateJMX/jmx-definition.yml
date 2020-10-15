@@ -1,0 +1,10 @@
+name: com.newrelic.jmx
+description: Reports status and metrics for jmx service
+protocol_version: 2
+os: linux
+
+commands:
+  all_data:
+    command:
+      - ./bin/nr-jmx
+    interval: 15

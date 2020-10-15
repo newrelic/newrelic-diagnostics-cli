@@ -1,0 +1,5 @@
+export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/app/newrelic.jar"
+export CATALINA_OPTS="$CATALINA_OPTS -Dnewrelic.logfile=newrelic_agent.log"
+export CATALINA_OPTS="$CATALINA_OPTS -Dnewrelic.config.log_file_path=/usr/local/tomcat/logs"
+export CATALINA_OPTS="$CATALINA_OPTS -Dnewrelic.tempdir=/usr/local/tomcat/temp"
+export CATALINA_OPTS="$CATALINA_OPTS -Dnewrelic.config.file=/app/PermissionsTestConfig.yml"

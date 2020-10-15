@@ -1,0 +1,13 @@
+{
+	"success":true,
+	"data":[
+		{
+      "licenseKey": "08a2ad66c637a29c3982469a3fe8d1982d002c4a",
+			"result": true
+        },
+        {
+			"licenseKey": "bad_key",
+			"result": false
+		}
+	]
+}

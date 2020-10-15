@@ -1,0 +1,20 @@
+ -  test_name: RegistrationCheck
+    log_entry_not_expected: 
+     - "No valid tasks found" # Checks to ensure this doesn't show up, essentially an invalid dependency
+ -  test_name: RegistrationTaskByName
+    docker_cmd: ./nrdiag -t Base/Config/Collect
+    log_entry_expected: 
+     - Failure.*Base/Config/Collect
+    log_entry_not_expected: 
+     - No valid tasks found
+     - Base/Config/Validate
+ -  test_name: RegistrationMultipleTasksByName
+    docker_cmd: ./nrdiag -t Base/Config/* -filter all
+    log_entry_expected: 
+     - Info.*Base/Env/CollectEnvVars
+     - Failure.*Base/Config/Collect
+     - Base/Config/Validate
+     - Base/Config/ProxyDetect
+    log_entry_not_expected: 
+     - No valid tasks found
+

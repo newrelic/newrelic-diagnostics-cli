@@ -1,0 +1,11 @@
+.vscode
+.DS_Store
+core
+nr-diagnostics*
+debug*
+nrdiag
+NrDiag
+Dockerfile
+.dockerignore
+integrationDockerfile
+.git

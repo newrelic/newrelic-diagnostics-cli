@@ -1,0 +1,7 @@
+#{{private-location-settings-full.json ../../fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/} 1 /hsm: false
+/hsmPwd: VSEPA55WORD
+/key: 76bcacae-a98a-4f4e-a3ed-0a6f43179fa5
+/proxy: my.horde.proxy.url:8000
+/proxyAcceptSelfSigned: true
+/proxyAuth: proxyUsername:proxyPassword
+ }

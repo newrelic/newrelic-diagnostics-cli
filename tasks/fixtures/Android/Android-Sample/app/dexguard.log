@@ -1,0 +1,181 @@
+This is a freaking vanilla build.
+Chocolate rain! Some stay dry and others feel the pain.
+Incremental java compilation is an incubating feature.
+The TaskInputs.source(Object) method has been deprecated and is scheduled to be removed in Gradle 4.0. Please use TaskInputs.file(Object).skipWhenEmpty() instead.
+[newrelic.warn] Not supported for library builds. groovy.lang.MissingPropertyException: Could not get unknown property 'applicationVariants' for object of type com.android.build.gradle.LibraryExtension.
+:clean
+:app:clean
+:complexify:clean
+:app:preBuild UP-TO-DATE
+:app:extractProguardFiles
+:app:preChocolateReleaseBuild
+:app:checkChocolateReleaseManifest
+:app:preChocolateDebugBuild UP-TO-DATE
+:app:preChocolateSonoBuild UP-TO-DATE
+:app:preVanillaDebugBuild UP-TO-DATE
+:app:preVanillaReleaseBuild
+:app:preVanillaSonoBuild UP-TO-DATE
+:complexify:preBuild UP-TO-DATE
+:complexify:extractProguardFiles
+:complexify:preReleaseBuild
+:complexify:checkReleaseManifest
+:complexify:preDebugAndroidTestBuild UP-TO-DATE
+:complexify:preDebugBuild UP-TO-DATE
+:complexify:preDebugUnitTestBuild UP-TO-DATE
+:complexify:preReleaseUnitTestBuild UP-TO-DATE
+:complexify:prepareComAndroidSupportAnimatedVectorDrawable2511Library
+:complexify:prepareComAndroidSupportAppcompatV72511Library
+:complexify:prepareComAndroidSupportSupportCompat2511Library
+:complexify:prepareComAndroidSupportSupportCoreUi2511Library
+:complexify:prepareComAndroidSupportSupportCoreUtils2511Library
+:complexify:prepareComAndroidSupportSupportFragment2511Library
+:complexify:prepareComAndroidSupportSupportMediaCompat2511Library
+:complexify:prepareComAndroidSupportSupportV42511Library
+:complexify:prepareComAndroidSupportSupportVectorDrawable2511Library
+:complexify:prepareReleaseDependencies
+:complexify:compileReleaseAidl
+:complexify:compileReleaseNdk UP-TO-DATE
+:complexify:compileLint
+:complexify:copyReleaseLint UP-TO-DATE
+:complexify:compileReleaseRenderscript
+:complexify:generateReleaseBuildConfig
+:complexify:generateReleaseResValues
+:complexify:generateReleaseResources
+:complexify:mergeReleaseResources
+:complexify:processReleaseManifest
+:complexify:processReleaseResources
+:complexify:generateReleaseSources
+:complexify:incrementalReleaseJavaCompilationSafeguard
+:complexify:compileReleaseJavaWithJavac
+:complexify:compileReleaseJavaWithJavac - is not incremental (e.g. outputs have changed, no previous execution, etc.).
+:complexify:extractReleaseAnnotations
+:complexify:mergeReleaseShaders
+:complexify:compileReleaseShaders
+:complexify:generateReleaseAssets
+:complexify:mergeReleaseAssets
+:complexify:mergeReleaseProguardFiles
+:complexify:packageReleaseRenderscript UP-TO-DATE
+:complexify:packageReleaseResources
+:complexify:processReleaseJavaRes UP-TO-DATE
+:complexify:transformResourcesWithMergeJavaResForRelease
+:complexify:transformClassesAndResourcesWithProguardForRelease
+ProGuard, version 5.2.1
+Reading input...
+Reading program directory [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/classes/release] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-compat/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.6.0/69edde9fc4b01c9fd51d25b83428837478c27254/okhttp-3.6.0.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.11.0/840897fcd7223a8143f1d9b6f69714e7be34fd50/okio-1.11.0.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/converter-gson/2.2.0/a09926806199499a20b2f5168779499abfa33342/converter-gson-2.2.0.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-fragment/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/25.1.1/support-annotations-25.1.1.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.2.0/41e67dba73c3347e4503761642c39d0e06ca1f2/retrofit-2.2.0.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/adapter-rxjava/2.2.0/d80514b6f44f0c4c6234e2d67fea783a25e77275/adapter-rxjava-2.2.0.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/support-v4/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.1.1/jars/classes.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.7/751f548c85fa49f330cecbb1875893f971b33c4e/gson-2.7.jar] (filtered)
+Reading library jar [/Users/nromike/.gradle/caches/modules-2/files-2.1/io.reactivex/rxjava/1.2.4/522cfb00b6c015b72c64ee60054b4f6338880858/rxjava-1.2.4.jar] (filtered)
+Reading library jar [/Users/nromike/Library/Android/sdk/platforms/android-25/android.jar]
+Reading library jar [/Users/nromike/Library/Android/sdk/platforms/android-25/optional/org.apache.http.legacy.jar]
+Note: duplicate definition of library class [org.apache.http.params.HttpConnectionParams]
+Note: duplicate definition of library class [org.apache.http.params.HttpParams]
+Note: duplicate definition of library class [org.apache.http.params.CoreConnectionPNames]
+Note: duplicate definition of library class [org.apache.http.conn.ConnectTimeoutException]
+Note: duplicate definition of library class [org.apache.http.conn.scheme.SocketFactory]
+Note: duplicate definition of library class [org.apache.http.conn.scheme.HostNameResolver]
+Note: duplicate definition of library class [org.apache.http.conn.scheme.LayeredSocketFactory]
+Note: duplicate definition of library class [android.net.http.HttpResponseCache]
+Note: duplicate definition of library class [android.net.http.SslCertificate]
+Note: duplicate definition of library class [android.net.http.SslCertificate$DName]
+Note: duplicate definition of library class [android.net.http.SslError]
+Initializing...
+Ignoring unused library classes...
+  Original number of library classes: 7368
+  Final number of library classes:    129
+Printing kept classes, fields, and methods...
+Shrinking...
+Printing usage to [/Users/nromike/Desktop/SandCastleHassle/complexify/build/outputs/mapping/release/usage.txt]...
+Removing unused program classes and class elements...
+  Original number of program classes: 30
+  Final number of program classes:    29
+Obfuscating...
+Printing mapping to [/Users/nromike/Desktop/SandCastleHassle/complexify/build/outputs/mapping/release/mapping.txt]...
+Writing output...
+Preparing output jar [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/transforms/proguard/release/jars/3/3/main.jar]
+  Copying resources from program directory [/Users/nromike/Desktop/SandCastleHassle/complexify/build/intermediates/classes/release] (filtered)
+Printing classes to [/Users/nromike/Desktop/SandCastleHassle/complexify/build/outputs/mapping/release/dump.txt]...
+:complexify:transformClassesAndResourcesWithSyncLibJarsForRelease
+:complexify:mergeReleaseJniLibFolders
+:complexify:transformNative_libsWithMergeJniLibsForRelease
+:complexify:transformNative_libsWithSyncJniLibsForRelease
+:complexify:bundleRelease
+:app:prepareComAndroidSupportAnimatedVectorDrawable2511Library
+:app:prepareComAndroidSupportAppcompatV72511Library
+:app:prepareComAndroidSupportDesign2340Library
+:app:prepareComAndroidSupportRecyclerviewV72340Library
+:app:prepareComAndroidSupportSupportCompat2511Library
+:app:prepareComAndroidSupportSupportCoreUi2511Library
+:app:prepareComAndroidSupportSupportCoreUtils2511Library
+:app:prepareComAndroidSupportSupportFragment2511Library
+:app:prepareComAndroidSupportSupportMediaCompat2511Library
+:app:prepareComAndroidSupportSupportV42511Library
+:app:prepareComAndroidSupportSupportVectorDrawable2511Library
+:app:prepareComAndroidVolleyVolley100Library
+:app:prepareComGoogleAndroidGmsPlayServicesBase900Library
+:app:prepareComGoogleAndroidGmsPlayServicesBasement900Library
+:app:prepareComGoogleAndroidGmsPlayServicesGcm900Library
+:app:prepareComGoogleAndroidGmsPlayServicesIid900Library
+:app:prepareComGoogleAndroidGmsPlayServicesTasks900Library
+:app:prepareComGoogleFirebaseFirebaseAnalytics900Library
+:app:prepareComGoogleFirebaseFirebaseAnalyticsImpl900Library
+:app:prepareComGoogleFirebaseFirebaseCommon900Library
+:app:prepareComGoogleFirebaseFirebaseCore900Library
+:app:prepareComGoogleFirebaseFirebaseIid900Library
+:app:prepareComJakewhartonButterknife840Library
+:app:prepareComJakewhartonProcessPhoenix111Library
+:app:prepareNetHockeyappAndroidHockeySDK412Library
+:app:prepareSandCastleHassleComplexifyUnspecifiedLibrary
+:app:prepareChocolateReleaseDependencies
+:app:compileChocolateReleaseAidl
+:app:compileChocolateReleaseRenderscript
+:app:generateChocolateReleaseBuildConfig
+:app:generateChocolateReleaseResValues
+:app:processChocolateReleaseGoogleServices
+Parsing json file: /Users/nromike/Desktop/SandCastleHassle/app/google-services.json
+:app:generateChocolateReleaseResources
+:app:mergeChocolateReleaseResources
+:app:processChocolateReleaseManifest
+:app:processChocolateReleaseResources
+:app:generateChocolateReleaseSources
+:app:incrementalChocolateReleaseJavaCompilationSafeguard
+:app:compileChocolateReleaseJavaWithJavac
+:app:newRelicInstrumentTaskDexguardChocolateRelease
+:app:newRelicClassRewriterChocolateRelease
+:app:compileChocolateReleaseNdk UP-TO-DATE
+:app:compileChocolateReleaseSources
+:app:mergeChocolateReleaseShaders
+:app:compileChocolateReleaseShaders
+:app:generateChocolateReleaseAssets
+:app:mergeChocolateReleaseAssets
+:app:processChocolateReleaseJavaRes UP-TO-DATE
+:app:transformResourcesWithMergeJavaResForChocolateRelease
+:app:transformClassesAndResourcesWithProguardForChocolateRelease SKIPPED
+:app:newRelicInstrumentTask
+:app:transformClassesWithDexForChocolateRelease SKIPPED
+:app:transformClassesWithShrinkResForChocolateRelease SKIPPED
+:app:mergeChocolateReleaseJniLibFolders
+:app:transformNative_libsWithMergeJniLibsForChocolateRelease
+:app:validateSigningChocolateRelease
+:app:dexguardChocolateRelease
+[Fatal Error] :1:1: Content is not allowed in prolog.
+:app:dexguardChocolateRelease FAILED
+:app:newRelicDeinstrumentTask
+:app:newRelicMapUploadTaskChocolateRelease
+
+BUILD FAILED
+
+Total time: 14.882 secs

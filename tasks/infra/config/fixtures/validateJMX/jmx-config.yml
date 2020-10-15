@@ -1,0 +1,13 @@
+integration_name: com.newrelic.jmx
+
+instances:
+  - name: jmx
+    command: all_data
+    arguments:
+      jmx_host: jmx-host.localnet
+      jmx_port: 9999
+      jmx_user: secret_user
+      jmx_pass: secret_pass
+      collection_files: "/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml"
+    labels:
+      env: staging

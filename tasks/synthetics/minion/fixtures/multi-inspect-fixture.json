@@ -1,0 +1,1009 @@
+[
+    {
+        "Id": "b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74",
+        "Created": "2019-05-20T23:19:58.764242521Z",
+        "Path": "/bin/sh",
+        "Args": [
+            "-c",
+            "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 137,
+            "Error": "",
+            "StartedAt": "2019-05-20T23:19:59.399568785Z",
+            "FinishedAt": "2019-05-20T23:24:39.976981574Z"
+        },
+        "Image": "sha256:a29dac722ce9c7a5b78bec626fe3a9f9afe09fd06acfdaa0e4417353ebda6aeb",
+        "ResolvConfPath": "/var/lib/docker/containers/b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74/hostname",
+        "HostsPath": "/var/lib/docker/containers/b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74/hosts",
+        "LogPath": "/var/lib/docker/containers/b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74/b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74-json.log",
+        "Name": "/nervous_lumiere",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/var/run/docker.sock:/var/run/docker.sock",
+                "/tmp:/tmp:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/45bbf69ac39172cc59a8e6e2d7db0145aa0c61948eb04c7f80b02d6e3e237fd3-init/diff:/var/lib/docker/overlay2/d4d75e1570d76d6111ea0da501b4757f162e928d9233fd85dfc909e258400457/diff:/var/lib/docker/overlay2/3b2d8affd042aed2abb8f5da6708ac62ecf9a00926b834352ef30c10c197ccdf/diff:/var/lib/docker/overlay2/870b37d0d9b27a8a600457ae12fa127dfaf6ad96ff8449862b0903b865c3dba5/diff:/var/lib/docker/overlay2/941f42659fe7db4e9095a4c5da863a977a5b796d97d5468d6f6f2603b54f89da/diff:/var/lib/docker/overlay2/44801dcb46dd999a3e33c35cbf8ae10dcda3eacccb5c4f04d809acb066d6f83e/diff:/var/lib/docker/overlay2/700acdf11032c6de39b48e801ad8715067fbecdea73e65ebe3f40a8e52618695/diff:/var/lib/docker/overlay2/f0a6035469ce2f63a1c8089a1c21a841fef985e72a2255e146e454ed1ff7d573/diff",
+                "MergedDir": "/var/lib/docker/overlay2/45bbf69ac39172cc59a8e6e2d7db0145aa0c61948eb04c7f80b02d6e3e237fd3/merged",
+                "UpperDir": "/var/lib/docker/overlay2/45bbf69ac39172cc59a8e6e2d7db0145aa0c61948eb04c7f80b02d6e3e237fd3/diff",
+                "WorkDir": "/var/lib/docker/overlay2/45bbf69ac39172cc59a8e6e2d7db0145aa0c61948eb04c7f80b02d6e3e237fd3/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/tmp",
+                "Destination": "/tmp",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "b3e2f06abf13",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "8080/tcp": {},
+                "8180/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "MINION_PRIVATE_LOCATION_KEY=1111a111-a111-111a-111aa-1a1aa1a1111a",
+                "MINION_LOG_LEVEL=DEBUG",
+                "MINION_VSE_PASSPHRASE=password",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/jdk/bin:/opt/newrelic/synthetics/bin",
+                "JAVA_VERSION_MAJOR=8",
+                "JAVA_VERSION_MINOR=181",
+                "JAVA_VERSION_BUILD=13",
+                "JAVA_PACKAGE=server-jre",
+                "JAVA_JCE=unlimited",
+                "JAVA_HOME=/opt/jdk",
+                "GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc",
+                "GLIBC_VERSION=2.28-r0",
+                "LANG=C.UTF-8",
+                "WORKDIR=/opt/newrelic/synthetics",
+                "MINION_JAR=synthetics-minion.jar",
+                "DEFAULT_LOCALE_CFG_FILE=/etc/default/locale",
+                "MINION_PROVIDER=NEW_RELIC",
+                "MINION_USER=nobody",
+                "MINION_GROUP=nogroup",
+                "PLEASE_REDACT=secret-value"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+            ],
+            "ArgsEscaped": true,
+            "Image": "quay.io/newrelic/synthetics-minion:latest",
+            "Volumes": null,
+            "WorkingDir": "/opt/newrelic/synthetics",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "company": "New Relic",
+                "description": "Synthetics Minion, Containerized",
+                "email": "***REMOVED***",
+                "name": "synthetics-minion",
+                "team": "Synthetics Minion"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "5d0eb95d52dccd3617390ea3eb61cc128ace2d9420d2c58aecaa4e1abbb5c354",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/5d0eb95d52dc",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "860f34d90fbb7ecb7ac9828915823cf8a7b882a56a2ab55ee6100773c6382600",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "",
+                    "DriverOpts": null
+                }
+            }
+        }
+    },
+    {
+        "Id": "db9438b731b265313bc9a9ddd1f6ef641dad01d2a359cf16c396e908c535c854",
+        "Created": "2019-05-20T18:28:17.9961898Z",
+        "Path": "/bin/sh",
+        "Args": [
+            "-c",
+            "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 255,
+            "Error": "",
+            "StartedAt": "2019-05-20T18:28:18.5324154Z",
+            "FinishedAt": "2019-05-20T19:11:48.004314119Z"
+        },
+        "Image": "sha256:a29dac722ce9c7a5b78bec626fe3a9f9afe09fd06acfdaa0e4417353ebda6aeb",
+        "ResolvConfPath": "/var/lib/docker/containers/db9438b731b265313bc9a9ddd1f6ef641dad01d2a359cf16c396e908c535c854/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/db9438b731b265313bc9a9ddd1f6ef641dad01d2a359cf16c396e908c535c854/hostname",
+        "HostsPath": "/var/lib/docker/containers/db9438b731b265313bc9a9ddd1f6ef641dad01d2a359cf16c396e908c535c854/hosts",
+        "LogPath": "/var/lib/docker/containers/db9438b731b265313bc9a9ddd1f6ef641dad01d2a359cf16c396e908c535c854/db9438b731b265313bc9a9ddd1f6ef641dad01d2a359cf16c396e908c535c854-json.log",
+        "Name": "/determined_ellis",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/tmp:/tmp:rw",
+                "/var/run/docker.sock:/var/run/docker.sock"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {
+                "8080/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "8080"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/1ea343ba9dc2d93527ff37499fa56120c5bc21fceb321e7014b32a43ad4233cc-init/diff:/var/lib/docker/overlay2/d4d75e1570d76d6111ea0da501b4757f162e928d9233fd85dfc909e258400457/diff:/var/lib/docker/overlay2/3b2d8affd042aed2abb8f5da6708ac62ecf9a00926b834352ef30c10c197ccdf/diff:/var/lib/docker/overlay2/870b37d0d9b27a8a600457ae12fa127dfaf6ad96ff8449862b0903b865c3dba5/diff:/var/lib/docker/overlay2/941f42659fe7db4e9095a4c5da863a977a5b796d97d5468d6f6f2603b54f89da/diff:/var/lib/docker/overlay2/44801dcb46dd999a3e33c35cbf8ae10dcda3eacccb5c4f04d809acb066d6f83e/diff:/var/lib/docker/overlay2/700acdf11032c6de39b48e801ad8715067fbecdea73e65ebe3f40a8e52618695/diff:/var/lib/docker/overlay2/f0a6035469ce2f63a1c8089a1c21a841fef985e72a2255e146e454ed1ff7d573/diff",
+                "MergedDir": "/var/lib/docker/overlay2/1ea343ba9dc2d93527ff37499fa56120c5bc21fceb321e7014b32a43ad4233cc/merged",
+                "UpperDir": "/var/lib/docker/overlay2/1ea343ba9dc2d93527ff37499fa56120c5bc21fceb321e7014b32a43ad4233cc/diff",
+                "WorkDir": "/var/lib/docker/overlay2/1ea343ba9dc2d93527ff37499fa56120c5bc21fceb321e7014b32a43ad4233cc/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/tmp",
+                "Destination": "/tmp",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "db9438b731b2",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "8080/tcp": {},
+                "8180/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "MINION_PRIVATE_LOCATION_KEY=1111a111-a111-111a-111aa-1a1aa1a1111a",
+                "MINION_LOG_LEVEL=debug",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/jdk/bin:/opt/newrelic/synthetics/bin",
+                "JAVA_VERSION_MAJOR=8",
+                "JAVA_VERSION_MINOR=181",
+                "JAVA_VERSION_BUILD=13",
+                "JAVA_PACKAGE=server-jre",
+                "JAVA_JCE=unlimited",
+                "JAVA_HOME=/opt/jdk",
+                "GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc",
+                "GLIBC_VERSION=2.28-r0",
+                "LANG=C.UTF-8",
+                "WORKDIR=/opt/newrelic/synthetics",
+                "MINION_JAR=synthetics-minion.jar",
+                "DEFAULT_LOCALE_CFG_FILE=/etc/default/locale",
+                "MINION_PROVIDER=NEW_RELIC",
+                "MINION_USER=nobody",
+                "MINION_GROUP=nogroup",
+                "PLEASE_REDACT=secret-value"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+            ],
+            "ArgsEscaped": true,
+            "Image": "quay.io/newrelic/synthetics-minion:2.1.8",
+            "Volumes": null,
+            "WorkingDir": "/opt/newrelic/synthetics",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "company": "New Relic",
+                "description": "Synthetics Minion, Containerized",
+                "email": "***REMOVED***",
+                "name": "synthetics-minion",
+                "team": "Synthetics Minion"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "302e8de00cd5d40bb0969af4eb039c938eaaa91cbf08c1ae8f33ce53608078e4",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "8080/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "8080"
+                    }
+                ],
+                "8180/tcp": null
+            },
+            "SandboxKey": "/var/run/docker/netns/302e8de00cd5",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "23ba105e9831c776c5b59d8e3a93755e824433cda0460f706d25d57147ee9c56",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "f6f491d085f7e4dc0c9c059c4cd8c3c4ae4edf588a404ce50dabdb2c2fd76dca",
+                    "EndpointID": "23ba105e9831c776c5b59d8e3a93755e824433cda0460f706d25d57147ee9c56",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "",
+                    "DriverOpts": null
+                }
+            }
+        }
+    },
+    {
+        "Id": "c4da144535976bf9b7853f97276c0d36586db1216cef84d705087b5dddfd6e7c",
+        "Created": "2019-05-20T16:29:44.1058413Z",
+        "Path": "/bin/sh",
+        "Args": [
+            "-c",
+            "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 137,
+            "Error": "",
+            "StartedAt": "2019-05-20T16:29:44.7727848Z",
+            "FinishedAt": "2019-05-20T16:32:09.3304858Z"
+        },
+        "Image": "sha256:a29dac722ce9c7a5b78bec626fe3a9f9afe09fd06acfdaa0e4417353ebda6aeb",
+        "ResolvConfPath": "/var/lib/docker/containers/c4da144535976bf9b7853f97276c0d36586db1216cef84d705087b5dddfd6e7c/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/c4da144535976bf9b7853f97276c0d36586db1216cef84d705087b5dddfd6e7c/hostname",
+        "HostsPath": "/var/lib/docker/containers/c4da144535976bf9b7853f97276c0d36586db1216cef84d705087b5dddfd6e7c/hosts",
+        "LogPath": "/var/lib/docker/containers/c4da144535976bf9b7853f97276c0d36586db1216cef84d705087b5dddfd6e7c/c4da144535976bf9b7853f97276c0d36586db1216cef84d705087b5dddfd6e7c-json.log",
+        "Name": "/condescending_taussig",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/tmp:/tmp:rw",
+                "/var/run/docker.sock:/var/run/docker.sock"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {
+                "8080/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "8080"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/a46aadf6d92199f1571d69d9161ff2611dd52a886cfbd20ccee020956ad07c4a-init/diff:/var/lib/docker/overlay2/d4d75e1570d76d6111ea0da501b4757f162e928d9233fd85dfc909e258400457/diff:/var/lib/docker/overlay2/3b2d8affd042aed2abb8f5da6708ac62ecf9a00926b834352ef30c10c197ccdf/diff:/var/lib/docker/overlay2/870b37d0d9b27a8a600457ae12fa127dfaf6ad96ff8449862b0903b865c3dba5/diff:/var/lib/docker/overlay2/941f42659fe7db4e9095a4c5da863a977a5b796d97d5468d6f6f2603b54f89da/diff:/var/lib/docker/overlay2/44801dcb46dd999a3e33c35cbf8ae10dcda3eacccb5c4f04d809acb066d6f83e/diff:/var/lib/docker/overlay2/700acdf11032c6de39b48e801ad8715067fbecdea73e65ebe3f40a8e52618695/diff:/var/lib/docker/overlay2/f0a6035469ce2f63a1c8089a1c21a841fef985e72a2255e146e454ed1ff7d573/diff",
+                "MergedDir": "/var/lib/docker/overlay2/a46aadf6d92199f1571d69d9161ff2611dd52a886cfbd20ccee020956ad07c4a/merged",
+                "UpperDir": "/var/lib/docker/overlay2/a46aadf6d92199f1571d69d9161ff2611dd52a886cfbd20ccee020956ad07c4a/diff",
+                "WorkDir": "/var/lib/docker/overlay2/a46aadf6d92199f1571d69d9161ff2611dd52a886cfbd20ccee020956ad07c4a/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/tmp",
+                "Destination": "/tmp",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "c4da14453597",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "8080/tcp": {},
+                "8180/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "MINION_PRIVATE_LOCATION_KEY=1111a111-a111-111a-111aa-1a1aa1a1111a",
+                "MINION_LOG_LEVEL=debug",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/jdk/bin:/opt/newrelic/synthetics/bin",
+                "JAVA_VERSION_MAJOR=8",
+                "JAVA_VERSION_MINOR=181",
+                "JAVA_VERSION_BUILD=13",
+                "JAVA_PACKAGE=server-jre",
+                "JAVA_JCE=unlimited",
+                "JAVA_HOME=/opt/jdk",
+                "GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc",
+                "GLIBC_VERSION=2.28-r0",
+                "LANG=C.UTF-8",
+                "WORKDIR=/opt/newrelic/synthetics",
+                "MINION_JAR=synthetics-minion.jar",
+                "DEFAULT_LOCALE_CFG_FILE=/etc/default/locale",
+                "MINION_PROVIDER=NEW_RELIC",
+                "MINION_USER=nobody",
+                "MINION_GROUP=nogroup",
+                "please_REDACT=secret-value"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+            ],
+            "ArgsEscaped": true,
+            "Image": "quay.io/newrelic/synthetics-minion:2.1.8",
+            "Volumes": null,
+            "WorkingDir": "/opt/newrelic/synthetics",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "company": "New Relic",
+                "description": "Synthetics Minion, Containerized",
+                "email": "***REMOVED***",
+                "name": "synthetics-minion",
+                "team": "Synthetics Minion"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "1c0888c9ea7ce942f719815c7c65a3aa554844d1acb68ce673740b0b762d6995",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/1c0888c9ea7c",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "f6f491d085f7e4dc0c9c059c4cd8c3c4ae4edf588a404ce50dabdb2c2fd76dca",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "",
+                    "DriverOpts": null
+                }
+            }
+        }
+    },
+    {
+        "Id": "7f19f8818654cb489d17184697b649adc541b477d6020de0221c5be602627a96",
+        "Created": "2019-05-17T18:33:23.169203Z",
+        "Path": "/bin/sh",
+        "Args": [
+            "-c",
+            "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 137,
+            "Error": "",
+            "StartedAt": "2019-05-17T18:33:23.8654114Z",
+            "FinishedAt": "2019-05-20T16:29:28.8582927Z"
+        },
+        "Image": "sha256:a29dac722ce9c7a5b78bec626fe3a9f9afe09fd06acfdaa0e4417353ebda6aeb",
+        "ResolvConfPath": "/var/lib/docker/containers/7f19f8818654cb489d17184697b649adc541b477d6020de0221c5be602627a96/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/7f19f8818654cb489d17184697b649adc541b477d6020de0221c5be602627a96/hostname",
+        "HostsPath": "/var/lib/docker/containers/7f19f8818654cb489d17184697b649adc541b477d6020de0221c5be602627a96/hosts",
+        "LogPath": "/var/lib/docker/containers/7f19f8818654cb489d17184697b649adc541b477d6020de0221c5be602627a96/7f19f8818654cb489d17184697b649adc541b477d6020de0221c5be602627a96-json.log",
+        "Name": "/stupefied_banach",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/tmp:/tmp:rw",
+                "/var/run/docker.sock:/var/run/docker.sock"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "shareable",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/6ed428d835ba6683604809e5f177a210f539f4345d1967bdb16ca253817894d8-init/diff:/var/lib/docker/overlay2/d4d75e1570d76d6111ea0da501b4757f162e928d9233fd85dfc909e258400457/diff:/var/lib/docker/overlay2/3b2d8affd042aed2abb8f5da6708ac62ecf9a00926b834352ef30c10c197ccdf/diff:/var/lib/docker/overlay2/870b37d0d9b27a8a600457ae12fa127dfaf6ad96ff8449862b0903b865c3dba5/diff:/var/lib/docker/overlay2/941f42659fe7db4e9095a4c5da863a977a5b796d97d5468d6f6f2603b54f89da/diff:/var/lib/docker/overlay2/44801dcb46dd999a3e33c35cbf8ae10dcda3eacccb5c4f04d809acb066d6f83e/diff:/var/lib/docker/overlay2/700acdf11032c6de39b48e801ad8715067fbecdea73e65ebe3f40a8e52618695/diff:/var/lib/docker/overlay2/f0a6035469ce2f63a1c8089a1c21a841fef985e72a2255e146e454ed1ff7d573/diff",
+                "MergedDir": "/var/lib/docker/overlay2/6ed428d835ba6683604809e5f177a210f539f4345d1967bdb16ca253817894d8/merged",
+                "UpperDir": "/var/lib/docker/overlay2/6ed428d835ba6683604809e5f177a210f539f4345d1967bdb16ca253817894d8/diff",
+                "WorkDir": "/var/lib/docker/overlay2/6ed428d835ba6683604809e5f177a210f539f4345d1967bdb16ca253817894d8/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/tmp",
+                "Destination": "/tmp",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "7f19f8818654",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "8080/tcp": {},
+                "8180/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "MINION_PRIVATE_LOCATION_KEY=1111a111-a111-111a-111aa-1a1aa1a1111a",
+                "MINION_LOG_LEVEL=debug",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/jdk/bin:/opt/newrelic/synthetics/bin",
+                "JAVA_VERSION_MAJOR=8",
+                "JAVA_VERSION_MINOR=181",
+                "JAVA_VERSION_BUILD=13",
+                "JAVA_PACKAGE=server-jre",
+                "JAVA_JCE=unlimited",
+                "JAVA_HOME=/opt/jdk",
+                "GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc",
+                "GLIBC_VERSION=2.28-r0",
+                "LANG=C.UTF-8",
+                "WORKDIR=/opt/newrelic/synthetics",
+                "MINION_JAR=synthetics-minion.jar",
+                "DEFAULT_LOCALE_CFG_FILE=/etc/default/locale",
+                "MINION_PROVIDER=NEW_RELIC",
+                "MINION_USER=nobody",
+                "MINION_GROUP=nogroup",
+                "PLEASE_REDACT=secret-value"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "MINION_JVM_OPTS=${MINION_JVM_OPTS:-\"-XX:-UsePerfData\"};     MINION_JVM_MB=${MINION_JVM_MB:-2560};     MINION_EXEC_COMMAND=${MINION_EXEC_COMMAND:-\"containerized-private-minion\"};     MINION_LOG_LEVEL=${MINION_LOG_LEVEL:-\"INFO\"};     [[ ${MINION_LOG_LEVEL} == \"DEBUG\" ]] || [[ ${MINION_LOG_LEVEL} == \"TRACE\" ]]       && MINION_LOG_FORMAT=\"%date{ISO8601} [%thread] %logger{32} %-5level %msg %xEx %n\"       || MINION_LOG_FORMAT=\"%d - %msg %xEx %n\";         java       -server       -Ddw.logging.loggers.com.newrelic=${MINION_LOG_LEVEL} -Ddw.logging.loggers.com.nr=${MINION_LOG_LEVEL}       -Ddw.logging.appenders[0].logFormat=\"${MINION_LOG_FORMAT}\"       ${MINION_JVM_OPTS}       -Xms${MINION_JVM_MB}m -Xmx${MINION_JVM_MB}m       -XX:OnOutOfMemoryError=\"echo 'OOM => Shuting down'; kill %p\"     -jar ${MINION_JAR}     ${MINION_EXEC_COMMAND}"
+            ],
+            "ArgsEscaped": true,
+            "Image": "quay.io/newrelic/synthetics-minion:2.1.8",
+            "Volumes": null,
+            "WorkingDir": "/opt/newrelic/synthetics",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "company": "New Relic",
+                "description": "Synthetics Minion, Containerized",
+                "email": "***REMOVED***",
+                "name": "synthetics-minion",
+                "team": "Synthetics Minion"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "4c9c60a8fb827a3d3f920ce8bac734cf35615484851dff612e94e528538eed63",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/4c9c60a8fb82",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "f6f491d085f7e4dc0c9c059c4cd8c3c4ae4edf588a404ce50dabdb2c2fd76dca",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]

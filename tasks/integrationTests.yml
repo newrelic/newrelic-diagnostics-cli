@@ -1,0 +1,21 @@
+
+ -  test_name: FindFilesPermissionsCheck
+    dockerfile_lines: 
+     - RUN touch /app/newrelic_agent.log
+     - RUN mkdir /symlinktarget/
+     - RUN touch /symlinktarget/php_agent.log
+     - RUN ln -s /symlinktarget /var/log/newrelic
+     - RUN mkdir /app/restrictedFolder && touch /app/restrictedFolder/newrelic_agent.log && chmod 0000 /app/restrictedFolder
+     - RUN mkdir /app/zallowedFolder && touch /app/zallowedFolder/newrelic_agent.log
+     - RUN useradd -r -g users regularUser && chown regularUser ./
+     - USER regularUser
+    docker_cmd: ./nrdiag -v 
+    log_entry_expected: 
+     - "Error when walking filesystem: open /app/restrictedFolder: permission denied"
+     - /app/newrelic_agent.log
+     - /symlinktarget/php_agent.log
+     - /app/zallowedFolder/newrelic_agent.log
+     - Success.*Base/Log/Copy
+    log_entry_not_expected:  
+     - Failure.*Base/Log/Copy
+     - /app/restrictedFolder/newrelic_agent.log

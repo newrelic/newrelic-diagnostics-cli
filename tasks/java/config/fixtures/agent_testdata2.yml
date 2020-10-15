@@ -1,0 +1,24 @@
+# This file configures the New Relic Agent.  New Relic monitors
+# Java applications with deep visibility and low overhead.  For more details and additional
+# configuration options visit https://docs.newrelic.com/docs/java/java-agent-configuration.
+#
+# This configuration file is custom generated for Trib Tech
+#
+# This section is for settings common to all environments.
+# Do not add anything above this next line.
+
+  # ============================== LICENSE KEY ===============================
+  # You must specify the license key associated with your New Relic
+  # account. For example, if your license key is 12345 use this:
+  # license_key: '12345'
+  # The key binds your Agent's data to your account in the New Relic service.
+ - license_key: 'license-key-val-java'
+         stuff;:sssssss
+  # Agent Enabled
+  # Use this setting to disable the agent instead of removing it from the startup command.
+  # Default is true.
+agent_enabled: true
+
+enable_auto_app_naming: true
+enable_auto_transaction_naming: true
+max_stack_trace_lines: true

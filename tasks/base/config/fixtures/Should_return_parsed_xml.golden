@@ -1,0 +1,22 @@
+#[{{validate_basexml.config fixtures/} 1 /configuration/-agentEnabled: true
+/configuration/-xmlns: urn:newrelic-config
+/configuration/application/name: My Application
+/configuration/browserMonitoring/-autoInstrument: true
+/configuration/crossApplicationTracer/-enabled: true
+/configuration/errorCollector/-enabled: true
+/configuration/errorCollector/ignoreErrors/exception/0: System.IO.FileNotFoundException
+/configuration/errorCollector/ignoreErrors/exception/1: System.Threading.ThreadAbortException
+/configuration/errorCollector/ignoreStatusCodes/code/0: 401
+/configuration/errorCollector/ignoreStatusCodes/code/1: 404
+/configuration/log/-level: info/
+/configuration/service/-licenseKey: REPLACE_WITH_LICENSE_KEY
+/configuration/service/-ssl: true
+/configuration/threadProfiling/ignoreMethod/0: System.Threading.WaitHandle:InternalWaitOne
+/configuration/threadProfiling/ignoreMethod/1: System.Threading.WaitHandle:WaitAny
+/configuration/transactionTracer/-enabled: true
+/configuration/transactionTracer/-explainEnabled: true
+/configuration/transactionTracer/-explainThreshold: 500
+/configuration/transactionTracer/-recordSql: obfuscated
+/configuration/transactionTracer/-stackTraceThreshold: 500
+/configuration/transactionTracer/-transactionThreshold: apdex_f
+ }]

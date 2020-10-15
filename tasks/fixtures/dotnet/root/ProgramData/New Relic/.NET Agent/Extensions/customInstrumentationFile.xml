@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<extension xmlns="urn:newrelic-extension">
+   <instrumentation>
+      <tracerFactory name="NewRelic.Agent.Core.Tracer.Factories.BackgroundThreadTracerFactory" metricName="Category/Name">
+         <match assemblyName="AssemblyName" className="NameSpace.ClassName">
+            <exactMethodMatcher methodName="MethodName" />
+         </match>
+      </tracerFactory>
+      <!-- Instrument 0 or more methods called by the trigger method. These methods appear in the transaction breakdown table and in transaction traces. -->
+      <tracerFactory metricName="Category/Name">
+         <match assemblyName="AssemblyName" className="NameSpace.ClassName">
+            <exactMethodMatcher methodName="MethodName" />
+         </match>
+      </tracerFactory>
+   </instrumentation>
+</extension>

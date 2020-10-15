@@ -1,0 +1,6 @@
+integration_name: com.newrelic.jmx
+
+instances:
+  - name: jmx
+    command: all_data
+    arguments:

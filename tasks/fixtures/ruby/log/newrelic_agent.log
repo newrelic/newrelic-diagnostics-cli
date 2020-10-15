@@ -1,0 +1,22 @@
+# Logfile created on 2016-03-31 16:13:24 -0700 by logger.rb/47272
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Starting the New Relic agent in "development" environment.
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : To prevent agent startup add a NEWRELIC_AGENT_ENABLED=false environment variable or modify the "development" section of your newrelic.yml.
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Reading configuration from config/newrelic.yml (/Users/btribbia/dev/ruby/newrelic-ruby-kata)
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : New Relic Agent Developer Mode enabled.
+[03/31/16 16:13:24 -0700 btribbia (60191)] ERROR : No application name configured.
+[03/31/16 16:13:24 -0700 btribbia (60191)] ERROR : The Agent cannot start without at least one. Please check your 
+[03/31/16 16:13:24 -0700 btribbia (60191)] ERROR : newrelic.yml and ensure that it is valid and has at least one 
+[03/31/16 16:13:24 -0700 btribbia (60191)] ERROR : value set for app_name in the development 
+[03/31/16 16:13:24 -0700 btribbia (60191)] ERROR : environment.
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing ActiveJob instrumentation
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing ActiveRecord 4 instrumentation
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing Memcache instrumentation for dalli gem
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing Net instrumentation
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing deferred Rack instrumentation
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing Rack::Builder middleware instrumentation
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing Rails 3+ middleware instrumentation
+[03/31/16 16:13:24 -0700 btribbia (60191)] INFO : Installing Rails 4 Controller instrumentation
+[03/31/16 16:13:25 -0700 btribbia (60191)] INFO : Installing Rails 4 view instrumentation
+[03/31/16 16:13:25 -0700 btribbia (60191)] INFO : Installing Rails 4 Error instrumentation
+[03/31/16 16:13:25 -0700 btribbia (60191)] INFO : Finished instrumentation
+[03/31/16 16:13:25 -0700 btribbia (60191)] INFO : Doing deferred dependency-detection before Rack startup

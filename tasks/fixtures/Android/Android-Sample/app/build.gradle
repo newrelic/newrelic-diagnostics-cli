@@ -1,0 +1,117 @@
+repositories {
+    //mavenLocal()
+
+    //mavenCentral()
+    jcenter()
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'newrelic'
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'MyAndroidKey'
+            storeFile file('/Users/pknudsen/AndroidStudioProjects/keystore/myAndroidKey.keystore')
+        }
+    }
+    compileSdkVersion 24
+    buildToolsVersion '25.0.0'
+    defaultConfig {
+        applicationId "pknudsen.example.com.foobar"
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        signingConfig signingConfigs.release
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            //debug.buildConfigField "String", "token", "xxxx"
+            minifyEnabled false
+            applicationIdSuffix ".debug"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    productFlavors {
+        phone { flavor ->
+            applicationId "pknudsen.example.com.foobarPhone"
+            //rootProject.phone_new_relic_token
+            flavor.buildConfigField "String", "NEW_RELIC_TOKEN", '"12345"'
+            flavor.buildConfigField "String", "appVersion", '"foobarPhone"'
+            versionName "1.0-phone"
+            minSdkVersion 21
+        }
+        tablet { flavor ->
+            applicationId "pknudsen.example.com.foobarTablet"
+            //rootProject.tablet_new_relic_token
+            flavor.buildConfigField "String", "NEW_RELIC_TOKEN", '"12345"'
+            flavor.buildConfigField "String", "appVersion", '"foobarTablet"'
+            versionName "1.0-tablet"
+            minSdkVersion 21
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+repositories {
+    //mavenCentral()
+    //maven {
+    //    url "https://oss.sonatype.org/content/repositories/snapshots/"
+    //}
+    //mavenLocal()
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile "com.newrelic.agent.android:android-agent:${project.agentVersion}"
+    //compile 'com.newrelic.agent.android:android-agent:5.9.0'
+    compile 'com.google.guava:guava:19.0'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'io.reactivex:rxjava:1.1.6'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.+'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.+'
+    compile 'com.squareup.okhttp3:okhttp:3.3.1'
+    compile 'com.squareup.okio:okio:1.8.0'
+
+    compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.android.support:support-v13:25.1.1'
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.android.support:multidex:1.0.1'
+
+    //Enable below to increase number of methods for testing multi-dex or 65k method limit fix with proguard
+    //compile 'com.google.android.gms:play-services:6.+'
+}
+
+task disableNR << {
+        logger.info("[newrelic] newRelicInstrumentTask will be disabled")
+    try {
+        newRelicInstrumentTask.enabled = false
+    } catch (Exception e) {
+        logger.log(LogLevel.ERROR, "[newrelic] an error occured attempting to disable New Relic instrumentation." + "\n" + e.printStackTrace())
+    }
+    if (newRelicInstrumentTask.enabled == true) {
+        logger.log(LogLevel.ERROR, "[newrelic] an error occured attempting to disable New Relic instrumentation.")
+    } else {
+        logger.info("[newrelic] newrelicInstrumentTask has been disabled")
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'compileDebugJavaWithJavac' || task.name.startsWith("compileDebug")) {
+        //Uncomment below to disable NR instrumentation at compile time
+        //task.dependsOn disableNR
+    }
+}

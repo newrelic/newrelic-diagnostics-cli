@@ -1,0 +1,63 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+ext {
+    useSnapshot = true
+    agentVersion = '5.14.0'
+    snapshotNumber = '1632'
+}
+
+subprojects {
+    buildscript {
+        repositories {
+            if (project.useSnapshot) {
+                maven {
+                    url "https://oss.sonatype.org/content/repositories/comnewrelic-${project.snapshotNumber}"
+                }
+            }
+        }
+
+        dependencies {
+            classpath "com.newrelic.agent.android:agent-gradle-plugin:${project.agentVersion}"
+        }
+    }
+
+    repositories {
+        if (project.useSnapshot) {
+            maven {
+                url "https://oss.sonatype.org/content/repositories/comnewrelic-${project.snapshotNumber}"
+            }
+        }
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
+    }
+}
+
+buildscript {
+    repositories {
+        //mavenLocal()
+        //mavenCentral()
+        //maven {
+        //    name "jcenter"
+        //    url "http://jcenter.bintray.com/"
+        //}
+        jcenter()
+
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        //classpath 'com.android.tools.build:gradle:2.3.0-rc1'
+        //classpath 'com.newrelic.agent.android:agent-gradle-plugin:5.9.0'
+        //classpath 'com.newrelic.agent.android:agent-gradle-plugin:5.+'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        //mavenCentral()
+    }
+}
+

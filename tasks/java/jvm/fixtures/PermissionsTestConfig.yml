@@ -1,0 +1,5 @@
+common: &default_settings
+  license_key: 'license-key-val-java'
+  app_name: Permissions Test App
+  log_file_name: custom_name.log
+  log_file_path: /app/logs

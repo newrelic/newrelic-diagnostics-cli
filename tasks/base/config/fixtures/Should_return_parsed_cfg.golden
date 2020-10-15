@@ -1,0 +1,5 @@
+#{{newrelic.cfg ../../fixtures/php/root/etc/newrelic/} 1 /auditlog: /var/log/newrelic/audit.log
+/logfile: /var/log/newrelic/newrelic-daemon.log
+/loglevel: info
+/port: /tmp/.newrelic.sock
+ }

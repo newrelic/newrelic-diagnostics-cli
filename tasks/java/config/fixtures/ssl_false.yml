@@ -1,0 +1,10 @@
+ common: &default_settings
+
+  license_key: 'license-key-val-java'
+
+  app_name: My Java App
+
+  # This is so that it gets passed by Java/Config/Agent task as a valid java yml
+  enable_auto_app_naming: true
+  
+  ssl: false

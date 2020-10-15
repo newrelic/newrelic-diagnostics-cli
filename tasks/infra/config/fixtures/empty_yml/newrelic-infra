@@ -1,0 +1,14 @@
+# This file configures the New Relic Agent.  New Relic monitors
+# Java applications with deep visibility and low overhead.  For more details and additional
+# configuration options visit https://docs.newrelic.com/docs/java/java-agent-configuration.
+#
+# This configuration file is custom generated for Trib Tech
+#
+# This section is for settings common to all environments.
+# Do not add anything above this next line.
+ common: &default_settings
+
+  # ============================== LICENSE KEY ===============================
+  # You must specify the license key associated with your New Relic
+  # account. For example, if your license key is 12345 use this:
+

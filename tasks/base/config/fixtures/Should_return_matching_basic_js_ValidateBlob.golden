@@ -1,0 +1,5 @@
+/app_name/0: My Node App
+/license_key: license-key-val-node
+/logging: {
+/logging.filepath: temp.log
+/logging.level: info

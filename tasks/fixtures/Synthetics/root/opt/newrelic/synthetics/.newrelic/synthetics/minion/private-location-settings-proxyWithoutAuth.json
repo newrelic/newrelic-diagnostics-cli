@@ -1,0 +1,5 @@
+{
+    "key" : "76bcacae-a98a-4f4e-a3ed-0a6f43179fa5",
+    "proxy": "my.horde.proxy.url:8000",
+    "proxyAcceptSelfSigned" : true
+}

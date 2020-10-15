@@ -1,0 +1,1 @@
+export CATALINA_OPTS="$CATALINA_OPTS -Dhttpconnector.port=591"

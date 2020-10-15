@@ -1,0 +1,7 @@
+- test_name: JavaAppServerJbossNotInstalledWindows
+  docker_cmd: ./nrdiag_x64.exe -filter none
+  dockerfile_lines:
+   - "COPY fixtures/java/newrelic/newrelic.yml /app"
+  log_entry_expected:  
+   - None.*Java/Appserver/JbossEapCheck
+  log_entry_not_expected:

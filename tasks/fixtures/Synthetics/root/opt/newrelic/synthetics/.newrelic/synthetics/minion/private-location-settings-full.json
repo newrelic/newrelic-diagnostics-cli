@@ -1,0 +1,8 @@
+{
+    "key" : "76bcacae-a98a-4f4e-a3ed-0a6f43179fa5",
+    "hsm" : false,
+    "hsmPwd" : "VSEPA55WORD",
+    "proxy": "my.horde.proxy.url:8000",
+    "proxyAuth" : "proxyUsername:proxyPassword",
+    "proxyAcceptSelfSigned" : true
+}

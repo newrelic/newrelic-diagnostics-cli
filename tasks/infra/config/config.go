@@ -1,0 +1,29 @@
+package config
+
+import (
+	"os"
+	"runtime"
+
+	log "github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/NrDiag/tasks"
+)
+
+// RegisterWith - will register any plugins in this package
+func RegisterWith(registrationFunc func(tasks.Task, bool)) {
+	log.Debug("Registering Infra/Config/*")
+
+	registrationFunc(InfraConfigDataDirectoryCollect{dataDirectoryGetter: getDataDir, dataDirectoryPathGetter: getDataDirPath}, true)
+	registrationFunc(InfraConfigAgent{validationChecker: checkValidation, configChecker: checkConfig, binaryChecker: checkForBinary}, true)
+	registrationFunc(InfraConfigIntegrationsCollect{fileFinder: tasks.FindFiles}, true)
+	registrationFunc(InfraConfigIntegrationsValidate{fileReader: os.Open}, true)
+	registrationFunc(InfraConfigIntegrationsMatch{
+		runtimeOS: runtime.GOOS,
+	}, true)
+	registrationFunc(InfraConfigIntegrationsValidateJson{}, true)
+
+	if runtime.GOOS != "windows" {
+		registrationFunc(InfraConfigValidateJMX{
+			mCmdExecutor: multiCmdExecutor,
+		}, true)
+	}
+}

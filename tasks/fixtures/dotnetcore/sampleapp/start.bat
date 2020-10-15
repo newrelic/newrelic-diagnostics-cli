@@ -1,0 +1,1 @@
+START /B %LOCALAPPDATA%\Microsoft\dotnet\dotnet.exe C:\app\consoleTest.dll

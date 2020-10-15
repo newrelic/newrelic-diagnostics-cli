@@ -1,0 +1,6 @@
+/Object.defineProperty(exports, "__esModule", { value: true });
+/agent_enabled: ServiceConfiguration_1.getConfigStore().monitoring.newrelic && ServiceConfiguration_1.getConfigStore().monitoring.newrelic.enabled
+/app_name/0: ${ServiceConfiguration_1.getConfigStore().service.name}: ${ServiceConfiguration_1.getConfigStore().service.environment}
+/license_key: ServiceConfiguration_1.getConfigStore().monitoring.newrelic.license
+/logging: {
+/logging.level: info

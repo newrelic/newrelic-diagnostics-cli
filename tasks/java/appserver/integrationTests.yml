@@ -1,0 +1,6 @@
+- test_name: JavaAppServerJbossNotInstalled
+  dockerfile_lines: 
+   - "COPY fixtures/java/newrelic/newrelic.yml /app"
+  docker_cmd: ./nrdiag -filter none
+  log_entry_expected:  
+   - None.*Java/Appserver/JbossEapCheck
