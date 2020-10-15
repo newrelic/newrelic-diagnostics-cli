@@ -27,7 +27,7 @@ var secureLogFilenamePatterns = []string{"docker[.]log$",
 
 var logEnvVars = []string{
 	"NRIA_LOG_FILE", // Infra agent
-	"NEW_RELIC_LOG", //Java, Node and python agent paths:https://source.datanerd.us/agents/agent-specs/blob/master/Environment-Variables-PORTED.md
+	"NEW_RELIC_LOG", //Java, Node and python agent paths
 }
 
 var keysInConfigFile = map[string][]string{
