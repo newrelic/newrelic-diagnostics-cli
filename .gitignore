@@ -8,7 +8,6 @@ test_results*
 bfg-1.13.0.jar
 replacement.txt
 .git.bfg-report/
-hog.out
 #to ignore the binary builds
 nr-diagnostics*
 nrdiag*
