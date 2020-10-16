@@ -35,7 +35,11 @@ New Relic hosts and moderates an online forum where customers can interact with 
 >Add the url for the support thread here
 
 ## Contributing
-We encourage your contributions to improve NR Diag! Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
+Have you ever dealt with a New Relic installation and/or configuration issue? Do you have suggestions on how to automate those steps to diagnose and solve the issue? Then you must contribute to NR Diag! 
+NR diag's main goal is to offer customers self-service for technical support so they do not have to go through the trouble of contacting New Relic's support department. If ever wish you did not have to reach out to Support, but still find assistance to troubleshoot by yourself, then we share the same goals. 
+
+All the information on how to build a new health check for NR diag, as well as the requirements to submit a PR, can be found in our docs directory.
+Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.
 If you have any questions, or to execute our corporate CLA, required if your contribution is on behalf of a company, please drop us an email at opensource@newrelic.com.
 
 ## License
