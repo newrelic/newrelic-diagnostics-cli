@@ -7,12 +7,13 @@ Example of a task name: Node/Env/Version
 
 All of our tasks live in the tasks directory. Individual tasks are broken out by Category and Subcategory where the Category is the broad grouping of similar tasks and the Subcategory is the functional area of the category.
 
-Category: Node
-Subcategory: Env
+Example category: Node
+
+Example subcategory: Env
 
 Categories are designed as top level groupings to keep all items related to the New Relic product our tasks are meant to troubleshoot for. You should ensure your task doesn't fit into one of the existing categories before proposing a new one. 
 
-If the Category or subcategory you want to use does not yet exist, it is possible to add it but the reasoning for making a new one should be included in any PRs. A new task should always come with a unit test file. You'll notice that the task `Node/Env/Version` itself is written in the `version.go` file inside the directory `tasks/node/env`, and that it comes with a version_test.go file for its unit tests.
+If the category or subcategory you want to use does not yet exist, it is possible to add it but the reasoning for making a new one should be included in any PRs. A new task should always come with a unit test file. You'll notice that the task `Node/Env/Version` itself is written in the `version.go` file inside the directory `tasks/node/env`, and that it comes with a `version_test.go file` for its unit tests.
 
 After you are done writing the task, you will also need to add it to `registerTasks.go` (or `registerTasks_windows.go`) and add the relevant package registration file (Copy [template.go](../tasks/example/template/template.go) in the example task and rename it to match your category, subcategory, and package name).
 

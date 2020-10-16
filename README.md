@@ -2,7 +2,7 @@
 
 # NR Diag
 
-[NR Diag](https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/troubleshooting/new-relic-diagnostics) is a troubleshooting and data collection tool used to find common issues with NR installations and problems on client systems, and collect relevant files that the Support team will use to figure out the issue.
+[NR Diag](https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/troubleshooting/new-relic-diagnostics) is a troubleshooting tool used to find common issues with New Relic installation and configuration. If you don't see your app reporting to New Relic, then run NR Diag to find out what went wrong in your app's environment configuration. If no issue is found, NR Diag can still collect relevant files and data that the Support team will use to figure out the issue.
 
 ## Installation
 
@@ -20,23 +20,21 @@ You can simply do `./nrdiag` and it will attempt to troubleshoot for all New Rel
 [Here you can find](https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/troubleshooting/new-relic-diagnostics#cli-options) more details and CLI options to run NR Diag
 
 
-## Usage
+## Ticket Usage
 If after running NR Diag, you still have difficulties understading what the issue is, and/or you have an open ticket with the Support department, then you can upload the data gathered by NR Diag to speed up the troubleshooting process.
 
 To upload your results automatically to a New Relic Support ticket all you need to do is run nrdiag using the attachment flag like this: `./nrdiag -a MY-ATTACHMENT-KEY`
 
-You can get your attachment key by viewing the ticket in the [New Relic Support Portal](https://support.newrelic.com).
+You can get your attachment key by viewing the ticket in the [New Relic Support Portal](https://support.newrelic.com). You can also request a support engineer to provide you the attachment key.
 
 
-## Support
+## Support for NR Diag
 
-New Relic hosts and moderates an online forum where customers can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the New Relic Explorers Hub. You can find this project's topic/threads here:
-
->Add the url for the support thread here
+New Relic hosts and moderates an online forum where customers can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the [New Relic Explorers Hub](https://discuss.newrelic.com/). If you have any questions, concerns or issues while running NR Diag, reach out to us through our Explorers Hub. We'll get back to you soon!
 
 ## Contributing
 Have you ever dealt with a New Relic installation and/or configuration issue? Do you have suggestions on how to automate those steps to diagnose and solve the issue? Then you must contribute to NR Diag! 
-NR diag's main goal is to offer customers self-service for technical support so they do not have to go through the trouble of contacting New Relic's support department. If ever wish you did not have to reach out to Support, but still find assistance to troubleshoot by yourself, then we share the same goals. 
+NR diag's main goal is to offer customers self-service for technical support so they do not have to go through the trouble of contacting New Relic's support department. If ever wish you did not have to reach out to Support, but still find assistance to troubleshoot by yourself, then we share the same goals :) 
 
 All the information on how to build a new health check for NR diag, as well as the requirements to submit a PR, can be found in our docs directory.
 Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project.

@@ -44,7 +44,11 @@ If you have an idea for a new health check or any additional steps nrdiag should
 
 All the docs provided in this directory are meant to guide you through how to build an NR Diag task and how to write appropriate tests for it. Those docs are very thorough, and were written considering contributors of all levels of technical knowledge.
 
-Besides the documentation itself, you can take a look at the files within the task directory, and soon you'll notice that each NR Diag task has a very clear pattern and structure that you can use as reference to build your task. 
+Besides the documentation itself, you can take a look at the files within the task directory, and soon you'll notice that each NR Diag task has a very clear pattern and structure that you can use as reference to build your own task. 
+
+One important thing to keep in mind is that we have already written a lot of good, basic health checks. Please make sure that your idea for a health check has not yet been implemented in one way or another in our tasks directory. If you do not find it and you are ready to start building your task, then take advantage of the helper functions provided in our taskHelpers files inside the tasks directory. This is boiler plate logic that we found is applicable and useful to most New Relic health checks.
+
+Additionally, take advantage of other NR diag tasks to build your own task on top of them. Imagine you want to build a task to validate that a customer is using only Node.js supported versions for the Node Agent, then you could use another nrdiag task that already gathers the Node version from customer's environment. To get more details on how take advantage of `upstream` tasks, take a look at the [code snippets in our Coding Guidelines.](https://github.com/newrelic/NrDiag/blob/main/docs/Coding-Guidelines.md)  
 
 
 ### Testing your task
