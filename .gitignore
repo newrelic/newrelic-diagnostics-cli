@@ -4,6 +4,10 @@ core
 integrationDockerfile
 integration/temp/*
 test_results*
+#BFG repo cleaner
+bfg-1.13.0.jar
+replacement.txt
+.git.bfg-report/
 #to ignore the binary builds
 nr-diagnostics*
 nrdiag*

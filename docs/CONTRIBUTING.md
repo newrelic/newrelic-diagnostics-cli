@@ -36,6 +36,7 @@ We host a public Slack with a dedicated channel for contributors and maintainers
 * Go 1.13.0+
 * GNU Make
 * git
+* Docker
 
 
 ### Guidance

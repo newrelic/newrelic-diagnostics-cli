@@ -2,7 +2,7 @@
 
 We require that contributors provide test coverage for any new code added to the project. 
 
-We strongly recommend [unit tests](./Unit-Testing.md) over integration tests in most instances.
+We strongly recommend [unit tests](./Unit-Testing.md) over integration tests.
 
 That said, a small number of test cases are best suited for broader end-to-end integration tests.
 If you believe you've encountered a case in which integration tests are necessary, please include your reasoning either in a comment in the test or as part of your PR.
@@ -10,30 +10,26 @@ If you believe you've encountered a case in which integration tests are necessar
 -------------------------------------------
 
 NR Diag has an integration test structure that allows us to programatically: 
+
 1. Build Dockerfiles from code 
 2. Build a docker image
-3. Run that docker image and extract the log output, both from your dev environment OR from within a docker image.  
-When you run your own integration test, the test Dockerfile structure is built from Alpine and includes a freshly built nrdiag binary in /app.
-The Windows integration tests are based on Microsoft/nanoserver
+3. Run that docker image and extract the log output, both from your dev environment OR from within a docker image.
 
+When you run your own integration test, the test Dockerfile structure is built from a public image and includes a freshly built nrdiag binary in /app.
 
-That said, the majority of your task's test coverage should come from [unit tests](unit-testing.md)
+Your task's test coverage should come from [unit tests](unit-testing.md). But if you decide to write an integration test, we'll provide detailed instructions.
 
 ### Running integration tests
-You can run the integration test locally by running 
 
-`./integrationTest.sh`  (On windows `powershell .\integrationTest_windows.ps1`)
+You can run our current integrations test locally by going into our scripts directory and running 
 
-This finds all the `integrationTests.yml` files (on windows `integrationTests_windows.yml`) and runs the `integration_test.go` test file, running each test in a docker container running on your local machine.
+`./integrationTest.sh` for Linux and Darwin, or `powershell .\integrationTest_windows.ps1` for Windows. Those scripts will invoke our `integration_test.go` test file, which will do the job of finding all  
+the `integrationTests.yml` or `integrationTests_windows.yml` files, depending of your operating system.
 
-We run the unit tests before running the integration test so a failure in unit tests will cause a faster failure.
-
-### Creating your integration test
-The integration tests are controlled in `integrationTests.yml` in each folder(`integrationTests_windows.yml` for tests to run on windows) . 
-To create an additional integration test simply create an element in the yml array
+Each `integrationTests.yml` or `integrationTests_windows.yml` can contain multiple tests. A single test looks like this:
 
 ```yml
- -  test_name: InvalidXML
+-  test_name: InvalidXML
     dockerfile_lines: 
      - COPY tasks/base/config/fixtures/validate_testdata2 /app/newrelic.config
     log_entry_expected:  
@@ -41,23 +37,29 @@ To create an additional integration test simply create an element in the yml arr
      - Failure.*Base/Config/Validate
     log_entry_not_expected:
      - Success.*Dotnet/Config/Agent
- -  test_name: SuccessfulCollector
-    dockerfile_lines: 
-    log_entry_expected:  
-     - Success.*Base/Collector/Connect
-    log_entry_not_expected:
- -  test_name: FailingCollector
-    docker_cmd: ./nrdiag -p http://127.0.0.1:8888
-    log_entry_expected:  
-     - Failure.*Base/Collector/Connect
-    log_entry_not_expected:
-    
 ```
 
+Our `integration_test.go` test file will parse this syntax and write a dockerfile with the appropriate commands.
+
+Running all these tests in a docker container can take a while. That is why we always suggest to run the unit tests before running the integration test, so a failure in unit tests will cause a faster failure.
+
+### Creating your integration test
+Go into the `tasks` directory and find your appropriate category and subcategory. If you do not find there already a `integrationTests.yml` or`integrationTests_windows.yml` file, you can create one. 
+
+To add a new integration test simply create an element in the yml file with the following format:
+
+```yml
+- test_name: JavaAppServerJbossNotInstalled
+  dockerfile_lines: 
+   - "COPY ./fixtures/java/newrelic/newrelic.yml /app"
+  docker_cmd: ./nrdiag -filter none
+  log_entry_expected:  
+   - None.*Java/Appserver/JbossEapCheck
+```
 
 - test_name - Name of the test. **THIS MUST HAVE NO SPACES IN IT!!!** This will get translated to ci_<testname> (downcased) in the docker image created. Preferably name your tests in a self-documenting style; meaning, a user should be able to predict what your test will do after solely reading the `test_name`. 
 
-**Recommended:** If you are creating multiple tests for a single task, name them with the same prefix. Tests can be run by specifying a partial regex match, and using the same prefix makes this easier to do. For example, the tests `JavaPermissionsLogFileSetFromYAML` and `JavaPermissionsWithSysPropSettings` can be run by entering into your command line: `./scripts/integrationTest.sh JavaPermissions`. A `.*` will be appended to the regex match string, so that line would run any tests with a `test_name` that matches the expression `JavaPermissions.*`
+**Recommended:** If you are creating multiple tests for a single task, name them with the same prefix. Tests can be run by specifying a partial regex match, and using the same prefix makes this easier to do. For example, the tests named `JavaPermissionsLogFileSetFromYAML` and `JavaPermissionsWithSysPropSettings` can be run by entering into your command line: `./scripts/integrationTest.sh JavaPermissions` and it will exclude any other test. A `.*` will be appended to the regex match string, so that line would run any tests with a `test_name` that matches the expression `JavaPermissions.*`
 - dockerfileLines - strings that will be added to the Dockerfile for this test. This MUST follow the standard [Dockerfile syntax](https://docs.docker.com/engine/reference/builder/), primarily should just be files to copy from elsewhere in the project structure. 
 All file references should be relative to the root of the project. 
 
@@ -168,8 +170,3 @@ These can be combined into a single command for convenience with
 #### Running NR Diag with options
 It's worth noting that while the default integration dockerfile does add `CMD ["./nrdiag"]` to run nrdiag without verbose mode, you can run verbose mode by just adding a `CMD ["./nrdiag", "-v"]` to run nrdiag with verbose or some other series of options and it will be executed instead of the default nrdiag execution because it will appear after the first entry of CMD.
 
-#### Setup of Docker for windows
-
-For an in-depth guide on setting up a Windows testing environment, see our [relevant doc](./windows-test-environment-setup.md).
-
-Some contributors followed the setup in this guide https://github.com/docker/labs/blob/master/windows/windows-containers/Setup-Server2016.md, following the instructions in the `PowerShell Package Provider` section and then also following the instructions at the bottom of the guide to register the docker daemon to listen on the network interface as well to allow us to control docker from within docker (Dockerrception!)  
