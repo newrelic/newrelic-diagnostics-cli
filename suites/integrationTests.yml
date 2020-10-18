@@ -1,7 +1,7 @@
 
  -  test_name: SuitesRunExpectedTasks
     dockerfile_lines:
-      - "COPY fixtures/java/newrelic/newrelic.yml /app/newrelic.yml"
+      - "COPY tasks/fixtures/java/newrelic/newrelic.yml /app/newrelic.yml"
     docker_cmd: ./nrdiag -s java -y
     log_entry_expected:  
      - Failure.*Java/Env/Process
@@ -9,7 +9,7 @@
      - Failure.*Infra/Agent/Version
  -  test_name: BadSuiteArgsWarnsWithExit
     dockerfile_lines:
-      - "COPY fixtures/java/newrelic/newrelic.yml /app/newrelic.yml"
+      - "COPY tasks/fixtures/java/newrelic/newrelic.yml /app/newrelic.yml"
     docker_cmd: ./nrdiag -s java,foo -y || true
     log_entry_expected:  
       - Could not find the following task suites

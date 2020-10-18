@@ -1,7 +1,7 @@
 // Class defines structs and methods for timing the run of NR Diag integration tests, and sending test result/timing data to Insights.
 // This expects INSIGHTS_API_KEY and INSIGHTS_ACCOUNT_ID environment variables to be set, otherwise it skips
 // uploading to Insights.
-package integration
+package main
 
 import (
 	"encoding/json"

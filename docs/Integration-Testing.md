@@ -130,10 +130,10 @@ All file references should be relative to the root of the project.
     docker_from: ubuntu:14.04
     dockerfile_lines:
      - RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install lighttpd openssl ca-certificates
-     - COPY fixtures/integration/mockWebServer/lighttpd.conf /etc/lighttpd/lighttpd.conf
+     - COPY tasks/fixtures/integration/mockWebServer/lighttpd.conf /etc/lighttpd/lighttpd.conf
      - RUN mkdir /etc/lighttpd/certs && openssl req -nodes -new -x509  -keyout /etc/lighttpd/certs/lighttpd.pem -out /etc/lighttpd/certs/lighttpd.crt -subj "/C=US/ST=California/L=San Francisco/O=New Relic, Inc./CN=*.newrelic.com"
      - RUN cat /etc/lighttpd/certs/lighttpd.crt >> /etc/lighttpd/certs/lighttpd.pem && cp /etc/lighttpd/certs/lighttpd.crt /usr/local/share/ca-certificates/ && update-ca-certificates --fresh
-     - COPY fixtures/ruby/config/newrelic.yml /app/newrelic.yml
+     - COPY tasks/fixtures/ruby/config/newrelic.yml /app/newrelic.yml
      - 'RUN echo "" >> /var/www/pretends3upload'
      - 'RUN mkdir -p /var/www/api/v1/attachments/ && echo "{\"success\":true}" >> /var/www/api/v1/attachments/upload'
      - 'RUN echo "{\"url\" : \"https://nr-supportlanding.s3.amazonaws.com/pretends3upload\"}" >> /var/www/api/v1/attachments/get_download_url'

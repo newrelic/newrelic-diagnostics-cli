@@ -1,4 +1,4 @@
-package integration
+package main
 
 import (
 	"io/ioutil"

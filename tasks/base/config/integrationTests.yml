@@ -1,6 +1,6 @@
  -  test_name: InvalidYml
     dockerfile_lines: 
-     - COPY fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
+     - COPY tasks/fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
     log_entry_expected: 
      - "yaml: line 15: did not find expected key"
      - Failure.*Base/Config/Validate
@@ -16,7 +16,7 @@
      - Success.*Dotnet/Config/Agent
  -  test_name: ProxyDetectYMLMultipleConfigs
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -26,7 +26,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectYMLSingleConfig
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicSingleConfigyml /app/newrelic.yml
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicSingleConfigyml /app/newrelic.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -36,7 +36,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectYMLInfra
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
+     - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -46,7 +46,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectDotnet
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicdotnet /app/newrelic.config
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicdotnet /app/newrelic.config
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -56,7 +56,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectPHP
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicphp /app/newrelic.ini
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicphp /app/newrelic.ini
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -66,7 +66,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectPHPDaemon
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicphpDaemon /app/newrelic.cfg
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicphpDaemon /app/newrelic.cfg
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -76,7 +76,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectPython
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicpython /app/newrelic.ini
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicpython /app/newrelic.ini
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -86,7 +86,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectNode
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicnode /app/newrelic.js
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicnode /app/newrelic.js
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -96,7 +96,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectCLIOverride
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelic-infra /app/newrelic.yml
+     - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic.yml
     log_entry_expected:
      - Failure.*Base/Collector/Connect
      - tcp 127.0.0.1:8888
@@ -107,7 +107,7 @@
     docker_cmd: ./nrdiag -p http://127.0.0.1:8888 && cat nrdiag-output.json
  -  test_name: ProxyDetectEnvironmentOverride
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
+     - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
     log_entry_expected:
      - Failure.*Base/Collector/Connect
      - tcp 127.0.0.1:8888
@@ -118,7 +118,7 @@
     docker_cmd: HTTP_PROXY=http://127.0.0.1:8888 ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectCLIEnvironmentOverride
     dockerfile_lines:
-     - COPY fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
@@ -129,7 +129,7 @@
     docker_cmd: ./nrdiag -o Base/Config/ProxyDetect.environment=test && cat nrdiag-output.json
  -  test_name: ProxyDetect_MinionWithAuth
     dockerfile_lines:
-     - COPY fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings-proxyWithAuth.json /opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings.json
+     - COPY tasks/fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings-proxyWithAuth.json /opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings.json
      - COPY ./bin/linux/nrdiag /opt/newrelic/synthetics/nrdiag
      - WORKDIR /opt/newrelic/synthetics
     docker_cmd: ./nrdiag -v
@@ -140,7 +140,7 @@
      - Failures.*Base/Config/ProxyDetect
  -  test_name: ProxyDetect_MinionWithoutAuth
     dockerfile_lines:
-     - COPY fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings-proxyWithoutAuth.json /opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings.json
+     - COPY tasks/fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings-proxyWithoutAuth.json /opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings.json
      - COPY ./bin/linux/nrdiag /opt/newrelic/synthetics/nrdiag
      - WORKDIR /opt/newrelic/synthetics
     docker_cmd: ./nrdiag -v
@@ -151,7 +151,7 @@
      - Failures.*Base/Config/ProxyDetect     
  -  test_name: CollectPromptSecureConfig
     dockerfile_lines: 
-     - "COPY fixtures/dotnet/root/ProgramData/New*Relic/.NET*Agent/newrelic.config /app/myawesome.exe.config"
+     - "COPY tasks/fixtures/dotnet/root/ProgramData/New*Relic/.NET*Agent/newrelic.config /app/myawesome.exe.config"
     log_entry_expected:  
      - Success.*Base/Config/Collect
     log_entry_not_expected:
@@ -159,7 +159,7 @@
     docker_cmd: yes | ./nrdiag
  -  test_name: CollectPromptSecureConfigiOS
     dockerfile_lines: 
-     - "COPY fixtures/iOS/Swift_Example_Project/Source/AppDelegate_file.swift /app/iOS/Swift_Example_Project/Source/AppDelegate.swift"
+     - "COPY tasks/fixtures/iOS/Swift_Example_Project/Source/AppDelegate_file.swift /app/iOS/Swift_Example_Project/Source/AppDelegate.swift"
     log_entry_expected:  
      - Success.*Base/Config/Collect
     log_entry_not_expected:

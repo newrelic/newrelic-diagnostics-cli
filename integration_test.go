@@ -1,6 +1,6 @@
 // +build integration
 
-package integration
+package main
 
 import (
 	"archive/zip"
@@ -152,7 +152,8 @@ func parseTestsFromYML() []integrationTest {
 		patterns = []string{"integrationTests.yml"}
 	}
 
-	paths := []string{"./.."} //starting search of files from root dir
+	//starting search of files from root dir
+	paths := []string{"./"}
 
 	integrationFiles := tasks.FindFiles(patterns, paths)
 
