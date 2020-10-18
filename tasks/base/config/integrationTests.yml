@@ -1,0 +1,167 @@
+ -  test_name: InvalidYml
+    dockerfile_lines: 
+     - COPY fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
+    log_entry_expected: 
+     - "yaml: line 15: did not find expected key"
+     - Failure.*Base/Config/Validate
+    log_entry_not_expected: 
+     - Success.*Ruby/Config/Agent
+ -  test_name: InvalidXML
+    dockerfile_lines: 
+     - COPY tasks/base/config/fixtures/validate_badxml.config /app/newrelic.config
+    log_entry_expected:  
+     - "XML syntax error on line 32: element <log> closed by </configuration>"
+     - Failure.*Base/Config/Validate
+    log_entry_not_expected:
+     - Success.*Dotnet/Config/Agent
+ -  test_name: ProxyDetectYMLMultipleConfigs
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - http://username:password@hostname:8080 
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectYMLSingleConfig
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicSingleConfigyml /app/newrelic.yml
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - http://username:password@hostname:8080
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectYMLInfra
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - http://user:password@hostname:port
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectDotnet
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicdotnet /app/newrelic.config
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - http://PROXY_USERNAME:PROXY_PASSWORD@hostname:8888
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectPHP
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicphp /app/newrelic.ini
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - user2:passwd@hostname:port
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectPHPDaemon
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicphpDaemon /app/newrelic.cfg
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - myusername:secretpass@127.0.0.1:12345
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectPython
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicpython /app/newrelic.ini
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - user3:pass4@hostname:8080
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectNode
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicnode /app/newrelic.js
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - http://user:pass@10.0.0.1:8000
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+    docker_cmd: ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectCLIOverride
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelic-infra /app/newrelic.yml
+    log_entry_expected:
+     - Failure.*Base/Collector/Connect
+     - tcp 127.0.0.1:8888
+    log_entry_not_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Success.*Base/Collector/Connect
+     - http://user:password@hostname:port
+    docker_cmd: ./nrdiag -p http://127.0.0.1:8888 && cat nrdiag-output.json
+ -  test_name: ProxyDetectEnvironmentOverride
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
+    log_entry_expected:
+     - Failure.*Base/Collector/Connect
+     - tcp 127.0.0.1:8888
+    log_entry_not_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Success.*Base/Collector/Connect
+     - http://user:password@hostname:port
+    docker_cmd: HTTP_PROXY=http://127.0.0.1:8888 ./nrdiag && cat nrdiag-output.json
+ -  test_name: ProxyDetectCLIEnvironmentOverride
+    dockerfile_lines:
+     - COPY fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
+    log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
+     - Failure.*Base/Collector/Connect
+     - http://username:password@testhostname:8080
+    log_entry_not_expected:
+     - Success.*Base/Collector/Connect
+     - http://user:password@hostname:port
+    docker_cmd: ./nrdiag -o Base/Config/ProxyDetect.environment=test && cat nrdiag-output.json
+ -  test_name: ProxyDetect_MinionWithAuth
+    dockerfile_lines:
+     - COPY fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings-proxyWithAuth.json /opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings.json
+     - COPY ./bin/linux/nrdiag /opt/newrelic/synthetics/nrdiag
+     - WORKDIR /opt/newrelic/synthetics
+    docker_cmd: ./nrdiag -v
+    log_entry_expected:
+     - "Setting proxy via detected config to http://proxyUsername:proxyPassword@my.horde.proxy.url:8000"
+     - Success.*Base/Config/ProxyDetect
+    log_entry_not_expected:
+     - Failures.*Base/Config/ProxyDetect
+ -  test_name: ProxyDetect_MinionWithoutAuth
+    dockerfile_lines:
+     - COPY fixtures/Synthetics/root/opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings-proxyWithoutAuth.json /opt/newrelic/synthetics/.newrelic/synthetics/minion/private-location-settings.json
+     - COPY ./bin/linux/nrdiag /opt/newrelic/synthetics/nrdiag
+     - WORKDIR /opt/newrelic/synthetics
+    docker_cmd: ./nrdiag -v
+    log_entry_expected:
+     - Setting proxy via detected config to http://my.horde.proxy.url:8000
+     - Success.*Base/Config/ProxyDetect
+    log_entry_not_expected:
+     - Failures.*Base/Config/ProxyDetect     
+ -  test_name: CollectPromptSecureConfig
+    dockerfile_lines: 
+     - "COPY fixtures/dotnet/root/ProgramData/New*Relic/.NET*Agent/newrelic.config /app/myawesome.exe.config"
+    log_entry_expected:  
+     - Success.*Base/Config/Collect
+    log_entry_not_expected:
+     - We've found a file that may contain secure information.*Include it in the zip file? 
+    docker_cmd: yes | ./nrdiag
+ -  test_name: CollectPromptSecureConfigiOS
+    dockerfile_lines: 
+     - "COPY fixtures/iOS/Swift_Example_Project/Source/AppDelegate_file.swift /app/iOS/Swift_Example_Project/Source/AppDelegate.swift"
+    log_entry_expected:  
+     - Success.*Base/Config/Collect
+    log_entry_not_expected:
+     - We've found a file that may contain secure information.*Include it in the zip file? 
+    docker_cmd: yes | ./nrdiag
