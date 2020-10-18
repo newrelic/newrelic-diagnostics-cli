@@ -1,0 +1,17 @@
+ server {
+        listen 443;
+        server_name staginghaberdasherurl.com;
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        ssl on;
+        ssl_certificate /etc/nginx/ssl/staginghaberdasherurl.com/diagnostics.crt;
+        ssl_certificate_key /etc/nginx/ssl/staginghaberdasherurl.com/diagnostics.pem;
+        location /attachments/upload {
+            client_max_body_size    10000m;
+            dav_methods             PUT;
+            client_body_temp_path   upload/client_tmp;
+            create_full_put_path    on;
+            dav_access              group:rw  all:r;
+            return                  200 "{\"url\": \"https://s3uploadurl.com/staging/tickets/372279/attachments/cc7cce89-ca79-466d-9459-4a4e8c6d5a56/nrdiag-output-2019-11-15T19%3A02%3A34Z.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=mycredentialid%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20191115T194415Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=93a7414fd48eec201c9fe530b8242c8607a7cd6a413950f53c67800ca81b3731\",\"key\": \"372279/cc7cce89-ca79-466d-9459-4a4e8c6d5a56/nrdiag-output-2019-11-15T19:02:34Z.zip\"}";
+        }
+}

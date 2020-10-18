@@ -1,0 +1,56 @@
+#
+# New Relic Infrastructure configuration file
+#
+# Lines that begin with # are comment lines and are ignored by the 
+# Infrastructure agent. If options have command line equivalents, New Relic 
+# will use the command line option to override any value set in this file.
+#
+
+#
+# Option : license_key
+# Value  : 40-character hexadecimal string provided by New Relic. This is
+#          the only required value in your config file.
+# Default: none
+#
+license_key: your_license_key
+
+#
+# Option : display_name
+# Value  : Hostname to replace the automatically generated hostname for 
+#          reporting.
+# Default: Automatically generated hostname
+#
+display_name: new_name
+
+#
+# Option : proxy
+# Value  : Useful if your firewall rules require the agent to use a 
+#          proxy URL (HTTP or HTTPS) to communicate with New Relic.
+# Default: none
+#
+proxy: http://user:password@hostname:port
+
+#
+# Option : verbose
+# Value  : Enable (1) only if needed for troubleshooting.
+# Default: 0
+#
+verbose: 0
+
+#
+# Option : log_file
+# Value  : Full path and file name when you want to log to a location 
+#          different than the default (for example, with troubleshooting).
+# Default: Typical default location for standard log files
+#
+#log_file: /temp/debug_log
+
+#
+# Option : Optional custom attributes
+# Use optional key-value pairs to build filter sets, group your results, 
+# annotate your Insights data, etc.
+#
+custom_attributes:
+  environment: production
+  service: login service
+  team: alpha-team

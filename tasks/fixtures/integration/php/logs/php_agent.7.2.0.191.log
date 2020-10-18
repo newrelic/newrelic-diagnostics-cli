@@ -1,0 +1,362 @@
+2018-01-31 06:25:02.004 +0000 (5248 5248) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='apache2handler' apache='2.4.18' mpm=prefork pid=5248 ppid=1 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 06:39:01.666 +0000 (12132 12132) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=12132 ppid=12131 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 06:39:01.742 +0000 (12145 12145) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=12145 ppid=12131 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 07:09:01.278 +0000 (15725 15725) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=15725 ppid=15724 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 07:09:01.304 +0000 (15738 15738) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=15738 ppid=15724 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 07:39:02.025 +0000 (19304 19304) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=19304 ppid=19303 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 07:39:02.056 +0000 (19317 19317) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=19317 ppid=19303 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 08:09:01.639 +0000 (22925 22925) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=22925 ppid=22924 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 08:09:01.670 +0000 (22938 22938) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=22938 ppid=22924 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 08:39:01.779 +0000 (26500 26500) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=26500 ppid=26499 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 08:39:01.820 +0000 (26513 26513) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=26513 ppid=26499 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 09:09:01.441 +0000 (30137 30137) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=30137 ppid=30136 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 09:09:01.468 +0000 (30150 30150) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=30150 ppid=30136 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 09:39:01.037 +0000 (1323 1323) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=1323 ppid=1322 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 09:39:01.065 +0000 (1336 1336) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=1336 ppid=1322 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 10:09:01.585 +0000 (4947 4947) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=4947 ppid=4946 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 10:09:01.616 +0000 (4960 4960) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=4960 ppid=4946 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 10:39:01.302 +0000 (8536 8536) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=8536 ppid=8535 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 10:39:01.357 +0000 (8549 8549) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=8549 ppid=8535 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 11:09:01.329 +0000 (12144 12144) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=12144 ppid=12143 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 11:09:01.356 +0000 (12157 12157) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=12157 ppid=12143 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 11:39:01.888 +0000 (15723 15723) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=15723 ppid=15722 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 11:39:01.945 +0000 (15736 15736) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=15736 ppid=15722 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 12:09:01.714 +0000 (19322 19322) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=19322 ppid=19321 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 12:09:01.744 +0000 (19335 19335) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=19335 ppid=19321 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 12:39:01.626 +0000 (22933 22933) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=22933 ppid=22932 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 12:39:01.681 +0000 (22946 22946) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=22946 ppid=22932 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 13:09:01.470 +0000 (26515 26515) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=26515 ppid=26514 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 13:09:01.498 +0000 (26528 26528) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=26528 ppid=26514 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 13:39:01.078 +0000 (30165 30165) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=30165 ppid=30164 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 13:39:01.134 +0000 (30178 30178) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=30178 ppid=30164 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 14:09:01.771 +0000 (1403 1403) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=1403 ppid=1402 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 14:09:01.801 +0000 (1417 1417) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=1417 ppid=1402 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 14:39:01.366 +0000 (5054 5054) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=5054 ppid=5053 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 14:39:01.420 +0000 (5067 5067) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=5067 ppid=5053 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 15:09:01.929 +0000 (8722 8722) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=8722 ppid=8721 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 15:09:01.960 +0000 (8735 8735) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=8735 ppid=8721 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 15:39:01.502 +0000 (12370 12370) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=12370 ppid=12369 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 15:39:01.576 +0000 (12383 12383) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=12383 ppid=12369 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 16:09:01.210 +0000 (16014 16014) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=16014 ppid=16013 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 16:09:01.238 +0000 (16027 16027) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=16027 ppid=16013 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 16:39:01.757 +0000 (19665 19665) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=19665 ppid=19664 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 16:39:01.799 +0000 (19678 19678) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=19678 ppid=19664 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 17:09:01.465 +0000 (23375 23375) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=23375 ppid=23374 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 17:09:01.495 +0000 (23388 23388) info: New Relic 7.2.0.191 ("senechal" - "e178aa4867fa") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=23388 ppid=23374 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 17:32:24.275 +0000 (10400 10400) error: APPINFO failure: len=5648 errno=EPIPE
+2018-01-31 17:32:27.120 +0000 (30034 30034) error: APPINFO failure: len=5648 errno=EPIPE
+2018-01-31 17:32:29.083 +0000 (30296 30296) error: APPINFO failure: len=5648 errno=EPIPE
+2018-01-31 17:32:38.935 +0000 (10993 10993) error: APPINFO failure: len=5648 errno=EPIPE
+2018-01-31 17:32:45.369 +0000 (20492 20492) error: APPINFO failure: len=5648 errno=EPIPE
+2018-01-31 17:34:02.029 +0000 (10403 10403) error: APPINFO failure: len=5648 errno=EPIPE
+2018-01-31 17:35:23.333 +0000 (3818 3818) info: New Relic 7.7.0.203 ("yershova" - "5fedc700f64a") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='apache2handler' apache='2.4.18' mpm=prefork pid=3818 ppid=1 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 17:35:23.333 +0000 (3818 3818) info: spawned daemon child pid=3821
+2018-01-31 17:39:01.455 +0000 (7718 7718) info: New Relic 7.7.0.203 ("yershova" - "5fedc700f64a") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=7718 ppid=7717 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 17:39:01.517 +0000 (7731 7731) info: New Relic 7.7.0.203 ("yershova" - "5fedc700f64a") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=7731 ppid=7717 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 18:09:01.102 +0000 (7222 7222) info: New Relic 7.7.0.203 ("yershova" - "5fedc700f64a") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=7222 ppid=7221 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 18:09:01.149 +0000 (7247 7247) info: New Relic 7.7.0.203 ("yershova" - "5fedc700f64a") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=7247 ppid=7221 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 18:11:20.499 +0000 (3829 3829) error: APPINFO failure: len=5844 errno=EPIPE
+2018-01-31 18:11:43.031 +0000 (4799 4799) error: APPINFO failure: len=5844 errno=EPIPE
+2018-01-31 18:12:58.299 +0000 (11443 11443) info: New Relic 7.7.0.203 ("yershova" - "5fedc700f64a") [daemon='/tmp/.newrelic.sock'  php='7.0.22-0ubuntu0.16.04.1' zts=no sapi='apache2handler' apache='2.4.18' mpm=prefork pid=11443 ppid=1 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-1035-aws' mach='x86_64' ver='#44-Ubuntu SMP Tue Sep 12 17' node='ip-172-31-14-34']
+2018-01-31 18:12:58.299 +0000 (11443 11443) verbosedebug: daemon connect(fd=21 uds=/tmp/.newrelic.sock) returned -1 errno=ECONNREFUSED
+2018-01-31 18:12:58.300 +0000 (11443 11443) info: spawned daemon child pid=11446
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[0]='/usr/bin/newrelic-daemon'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[1]='--agent'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[2]='--pidfile'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[3]='/var/run/newrelic-daemon.pid'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[4]='--logfile'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[5]='/var/log/newrelic/newrelic-daemon.log'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[6]='--loglevel'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[7]='debug'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[8]='--port'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[9]='/tmp/.newrelic.sock'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[10]='--tls'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[11]='--define'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[12]='utilization.detect_aws=true'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[13]='--define'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[14]='utilization.detect_azure=true'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[15]='--define'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[16]='utilization.detect_gcp=true'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[17]='--define'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[18]='utilization.detect_pcf=true'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[19]='--define'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[20]='utilization.detect_docker=true'
+2018-01-31 18:12:58.300 +0000 (11446 11446) verbosedebug: exec[21]='<NULL>'
+2018-01-31 18:12:58.308 +0000 (11443 11443) debug: MINIT processing done
+2018-01-31 18:13:01.440 +0000 (11452 11452) debug: late_init called from pid=11452
+2018-01-31 18:13:01.441 +0000 (11452 11452) verbosedebug: RINIT processing started
+2018-01-31 18:13:01.441 +0000 (11452 11452) verbosedebug: daemon connect(fd=25 uds=/tmp/.newrelic.sock) succeeded
+2018-01-31 18:13:01.441 +0000 (11452 11452) debug: added app='test.givetrack.org' license='26...eb'
+2018-01-31 18:13:01.441 +0000 (11452 11452) verbosedebug: querying app='test.givetrack.org' from parent=25
+2018-01-31 18:13:01.441 +0000 (11452 11452) verbosedebug: sending appinfo message, len=5692
+2018-01-31 18:13:01.442 +0000 (11452 11452) debug: APPINFO reply unknown app='test.givetrack.org'
+2018-01-31 18:13:01.442 +0000 (11452 11452) debug: unable to begin transaction: app 'test.givetrack.org' is unknown
+2018-01-31 18:13:01.563 +0000 (11452 11452) verbosedebug: post-deactivate processing started
+2018-01-31 18:13:01.563 +0000 (11452 11452) verbosedebug: post-deactivate processing done
+2018-01-31 18:14:01.616 +0000 (11453 11453) debug: late_init called from pid=11453
+2018-01-31 18:14:01.617 +0000 (11453 11453) verbosedebug: RINIT processing started
+2018-01-31 18:14:01.617 +0000 (11453 11453) verbosedebug: daemon connect(fd=25 uds=/tmp/.newrelic.sock) succeeded
+2018-01-31 18:14:01.617 +0000 (11453 11453) debug: added app='staging.givetrack.org' license='26...eb'
+2018-01-31 18:14:01.617 +0000 (11453 11453) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:14:01.617 +0000 (11453 11453) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:14:01.618 +0000 (11453 11453) debug: APPINFO reply unknown app='staging.givetrack.org'
+2018-01-31 18:14:01.618 +0000 (11453 11453) debug: unable to begin transaction: app 'staging.givetrack.org' is unknown
+2018-01-31 18:14:01.745 +0000 (11453 11453) verbosedebug: post-deactivate processing started
+2018-01-31 18:14:01.746 +0000 (11453 11453) verbosedebug: post-deactivate processing done
+2018-01-31 18:15:43.806 +0000 (11454 11454) debug: late_init called from pid=11454
+2018-01-31 18:15:43.807 +0000 (11454 11454) verbosedebug: RINIT processing started
+2018-01-31 18:15:43.807 +0000 (11454 11454) verbosedebug: daemon connect(fd=25 uds=/tmp/.newrelic.sock) succeeded
+2018-01-31 18:15:43.807 +0000 (11454 11454) debug: added app='staging.givetrack.org' license='26...eb'
+2018-01-31 18:15:43.807 +0000 (11454 11454) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:15:43.807 +0000 (11454 11454) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:15:43.810 +0000 (11454 11454) debug: APPINFO reply connected
+2018-01-31 18:15:43.810 +0000 (11454 11454) debug: APPINFO reply full app='staging.givetrack.org' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0
+2018-01-31 18:15:43.810 +0000 (11454 11454) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.error.php'
+2018-01-31 18:15:43.811 +0000 (11454 11454) verbosedebug: RINIT processing done
+2018-01-31 18:15:43.811 +0000 (11454 11454) verbosedebug: recording error priority=50 msg='Test Error!' cls='NoticedError'
+2018-01-31 18:15:43.811 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:15:43.811 +0000 (11454 11454) verbosedebug: request_uri='/index.error.php'
+2018-01-31 18:15:43.811 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:15:43.811 +0000 (11454 11454) verbosedebug: post-deactivate processing started
+2018-01-31 18:15:43.812 +0000 (11454 11454) verbosedebug: /proc/self read: 4815 of 4096-byte pages
+2018-01-31 18:15:43.812 +0000 (11454 11454) debug: txn naming freeze
+2018-01-31 18:15:43.812 +0000 (11454 11454) verbosedebug: url rules: ignore=0 before='/index.error.php' after='/index.error.php'
+2018-01-31 18:15:43.812 +0000 (11454 11454) verbosedebug: sending txnname='WebTransaction/Uri/index.error.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=0 duration=1775 threshold=2000000
+2018-01-31 18:15:43.812 +0000 (11454 11454) verbosedebug: sending transaction message, len=3872
+2018-01-31 18:15:43.813 +0000 (11454 11454) verbosedebug: post-deactivate processing done
+2018-01-31 18:16:01.798 +0000 (11455 11455) debug: late_init called from pid=11455
+2018-01-31 18:16:01.798 +0000 (11455 11455) verbosedebug: RINIT processing started
+2018-01-31 18:16:01.799 +0000 (11455 11455) verbosedebug: daemon connect(fd=25 uds=/tmp/.newrelic.sock) succeeded
+2018-01-31 18:16:01.799 +0000 (11455 11455) debug: added app='staging.givetrack.org' license='26...eb'
+2018-01-31 18:16:01.799 +0000 (11455 11455) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:16:01.799 +0000 (11455 11455) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:16:01.799 +0000 (11455 11455) debug: APPINFO reply connected
+2018-01-31 18:16:01.799 +0000 (11455 11455) debug: APPINFO reply full app='staging.givetrack.org' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0
+2018-01-31 18:16:01.800 +0000 (11455 11455) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:16:01.800 +0000 (11455 11455) verbosedebug: RINIT processing done
+2018-01-31 18:16:01.801 +0000 (11455 11455) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:16:01.841 +0000 (11455 11455) debug: txn naming freeze
+2018-01-31 18:16:01.841 +0000 (11455 11455) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:16:01.841 +0000 (11455 11455) verbosedebug: autorum: resizing buffer to 14068 bytes
+2018-01-31 18:16:01.841 +0000 (11455 11455) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:16:01.841 +0000 (11455 11455) verbosedebug: request_uri='/admincp/cron/s/a8fcc6a4490f0670612def56f66e5010'
+2018-01-31 18:16:01.841 +0000 (11455 11455) verbosedebug: attribute 'request.parameters.s' disabled by configuration
+2018-01-31 18:16:01.841 +0000 (11455 11455) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:16:01.842 +0000 (11455 11455) verbosedebug: post-deactivate processing started
+2018-01-31 18:16:01.842 +0000 (11455 11455) verbosedebug: /proc/self read: 6729 of 4096-byte pages
+2018-01-31 18:16:01.842 +0000 (11455 11455) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=112 duration=42613 threshold=2000000
+2018-01-31 18:16:01.842 +0000 (11455 11455) verbosedebug: sending transaction message, len=4716
+2018-01-31 18:16:01.843 +0000 (11455 11455) verbosedebug: post-deactivate processing done
+2018-01-31 18:18:01.898 +0000 (11456 11456) debug: late_init called from pid=11456
+2018-01-31 18:18:01.899 +0000 (11456 11456) verbosedebug: RINIT processing started
+2018-01-31 18:18:01.899 +0000 (11456 11456) verbosedebug: daemon connect(fd=25 uds=/tmp/.newrelic.sock) succeeded
+2018-01-31 18:18:01.899 +0000 (11456 11456) debug: added app='staging.givetrack.org' license='26...eb'
+2018-01-31 18:18:01.899 +0000 (11456 11456) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:18:01.899 +0000 (11456 11456) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:18:01.899 +0000 (11456 11456) debug: APPINFO reply connected
+2018-01-31 18:18:01.899 +0000 (11456 11456) debug: APPINFO reply full app='staging.givetrack.org' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0
+2018-01-31 18:18:01.900 +0000 (11456 11456) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:18:01.900 +0000 (11456 11456) verbosedebug: RINIT processing done
+2018-01-31 18:18:01.901 +0000 (11456 11456) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:18:01.961 +0000 (11456 11456) debug: txn naming freeze
+2018-01-31 18:18:01.962 +0000 (11456 11456) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:18:01.962 +0000 (11456 11456) verbosedebug: autorum: resizing buffer to 14068 bytes
+2018-01-31 18:18:01.962 +0000 (11456 11456) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:18:01.962 +0000 (11456 11456) verbosedebug: request_uri='/admincp/cron/s/a8fcc6a4490f0670612def56f66e5010'
+2018-01-31 18:18:01.962 +0000 (11456 11456) verbosedebug: attribute 'request.parameters.s' disabled by configuration
+2018-01-31 18:18:01.962 +0000 (11456 11456) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:18:01.965 +0000 (11456 11456) verbosedebug: post-deactivate processing started
+2018-01-31 18:18:01.965 +0000 (11456 11456) verbosedebug: /proc/self read: 6729 of 4096-byte pages
+2018-01-31 18:18:01.965 +0000 (11456 11456) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=164 duration=65501 threshold=2000000
+2018-01-31 18:18:01.965 +0000 (11456 11456) verbosedebug: sending transaction message, len=4716
+2018-01-31 18:18:01.966 +0000 (11456 11456) verbosedebug: post-deactivate processing done
+2018-01-31 18:18:13.270 +0000 (11452 11452) verbosedebug: RINIT processing started
+2018-01-31 18:18:13.270 +0000 (11452 11452) debug: added app='staging.givetrack.org' license='26...eb'
+2018-01-31 18:18:13.270 +0000 (11452 11452) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:18:13.270 +0000 (11452 11452) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:18:13.270 +0000 (11452 11452) debug: APPINFO reply connected
+2018-01-31 18:18:13.270 +0000 (11452 11452) debug: APPINFO reply full app='staging.givetrack.org' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0
+2018-01-31 18:18:13.270 +0000 (11452 11452) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:18:13.271 +0000 (11452 11452) verbosedebug: RINIT processing done
+2018-01-31 18:18:13.271 +0000 (11452 11452) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:18:13.331 +0000 (11452 11452) debug: txn naming freeze
+2018-01-31 18:18:13.331 +0000 (11452 11452) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:18:13.331 +0000 (11452 11452) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:18:13.332 +0000 (11452 11452) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:18:13.332 +0000 (11452 11452) verbosedebug: request_uri='/'
+2018-01-31 18:18:13.332 +0000 (11452 11452) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:18:13.333 +0000 (11452 11452) verbosedebug: post-deactivate processing started
+2018-01-31 18:18:13.333 +0000 (11452 11452) verbosedebug: /proc/self read: 8303 of 4096-byte pages
+2018-01-31 18:18:13.333 +0000 (11452 11452) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=157 duration=62440 threshold=2000000
+2018-01-31 18:18:13.333 +0000 (11452 11452) verbosedebug: sending transaction message, len=32960
+2018-01-31 18:18:13.334 +0000 (11452 11452) verbosedebug: post-deactivate processing done
+2018-01-31 18:18:15.165 +0000 (11453 11453) verbosedebug: RINIT processing started
+2018-01-31 18:18:15.165 +0000 (11453 11453) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:18:15.165 +0000 (11453 11453) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:18:15.165 +0000 (11453 11453) debug: APPINFO reply connected
+2018-01-31 18:18:15.166 +0000 (11453 11453) debug: APPINFO reply full app='staging.givetrack.org' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0
+2018-01-31 18:18:15.166 +0000 (11453 11453) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:18:15.166 +0000 (11453 11453) verbosedebug: RINIT processing done
+2018-01-31 18:18:15.167 +0000 (11453 11453) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:18:15.215 +0000 (11453 11453) debug: txn naming freeze
+2018-01-31 18:18:15.215 +0000 (11453 11453) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:18:15.215 +0000 (11453 11453) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:18:15.215 +0000 (11453 11453) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:18:15.215 +0000 (11453 11453) verbosedebug: request_uri='/'
+2018-01-31 18:18:15.215 +0000 (11453 11453) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:18:15.216 +0000 (11453 11453) verbosedebug: post-deactivate processing started
+2018-01-31 18:18:15.216 +0000 (11453 11453) verbosedebug: /proc/self read: 7247 of 4096-byte pages
+2018-01-31 18:18:15.216 +0000 (11453 11453) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=154 duration=50123 threshold=2000000
+2018-01-31 18:18:15.216 +0000 (11453 11453) verbosedebug: sending transaction message, len=32784
+2018-01-31 18:18:15.217 +0000 (11453 11453) verbosedebug: post-deactivate processing done
+2018-01-31 18:18:19.986 +0000 (14390 14390) debug: late_init called from pid=14390
+2018-01-31 18:18:19.987 +0000 (14390 14390) verbosedebug: RINIT processing started
+2018-01-31 18:18:19.987 +0000 (14390 14390) verbosedebug: daemon connect(fd=25 uds=/tmp/.newrelic.sock) succeeded
+2018-01-31 18:18:19.987 +0000 (14390 14390) debug: added app='staging.givetrack.org' license='26...eb'
+2018-01-31 18:18:19.987 +0000 (14390 14390) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:18:19.987 +0000 (14390 14390) verbosedebug: sending appinfo message, len=5700
+2018-01-31 18:18:19.988 +0000 (14390 14390) debug: APPINFO reply connected
+2018-01-31 18:18:19.988 +0000 (14390 14390) debug: APPINFO reply full app='staging.givetrack.org' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0
+2018-01-31 18:18:19.988 +0000 (14390 14390) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:18:19.988 +0000 (14390 14390) verbosedebug: RINIT processing done
+2018-01-31 18:18:19.989 +0000 (14390 14390) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:18:20.044 +0000 (14390 14390) debug: txn naming freeze
+2018-01-31 18:18:20.044 +0000 (14390 14390) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:18:20.044 +0000 (14390 14390) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:18:20.045 +0000 (14390 14390) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:18:20.045 +0000 (14390 14390) verbosedebug: request_uri='/'
+2018-01-31 18:18:20.045 +0000 (14390 14390) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:18:20.046 +0000 (14390 14390) verbosedebug: post-deactivate processing started
+2018-01-31 18:18:20.046 +0000 (14390 14390) verbosedebug: /proc/self read: 6947 of 4096-byte pages
+2018-01-31 18:18:20.046 +0000 (14390 14390) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=162 duration=57745 threshold=2000000
+2018-01-31 18:18:20.046 +0000 (14390 14390) verbosedebug: sending transaction message, len=33192
+2018-01-31 18:18:20.047 +0000 (14390 14390) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:10.720 +0000 (11454 11454) verbosedebug: RINIT processing started
+2018-01-31 18:19:10.720 +0000 (11454 11454) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:19:10.720 +0000 (11454 11454) verbosedebug: sending appinfo message, len=5888
+2018-01-31 18:19:10.720 +0000 (11454 11454) debug: APPINFO reply agent run id still valid app='staging.givetrack.org'
+2018-01-31 18:19:10.721 +0000 (11454 11454) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.error.php'
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: RINIT processing done
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: recording error priority=50 msg='Test Error!' cls='NoticedError'
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: request_uri='/index.error.php'
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: /proc/self read: 4878 of 4096-byte pages
+2018-01-31 18:19:10.721 +0000 (11454 11454) debug: txn naming freeze
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: url rules: ignore=0 before='/index.error.php' after='/index.error.php'
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: sending txnname='WebTransaction/Uri/index.error.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=0 duration=312 threshold=2000000
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: sending transaction message, len=3872
+2018-01-31 18:19:10.721 +0000 (11454 11454) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:12.287 +0000 (11455 11455) verbosedebug: RINIT processing started
+2018-01-31 18:19:12.287 +0000 (11455 11455) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:19:12.287 +0000 (11455 11455) verbosedebug: sending appinfo message, len=5888
+2018-01-31 18:19:12.287 +0000 (11455 11455) debug: APPINFO reply agent run id still valid app='staging.givetrack.org'
+2018-01-31 18:19:12.288 +0000 (11455 11455) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:19:12.288 +0000 (11455 11455) verbosedebug: RINIT processing done
+2018-01-31 18:19:12.288 +0000 (11455 11455) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:19:12.338 +0000 (11455 11455) debug: txn naming freeze
+2018-01-31 18:19:12.338 +0000 (11455 11455) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:19:12.339 +0000 (11455 11455) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:19:12.339 +0000 (11455 11455) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:12.339 +0000 (11455 11455) verbosedebug: request_uri='/'
+2018-01-31 18:19:12.339 +0000 (11455 11455) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:12.340 +0000 (11455 11455) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:12.340 +0000 (11455 11455) verbosedebug: /proc/self read: 7111 of 4096-byte pages
+2018-01-31 18:19:12.340 +0000 (11455 11455) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=154 duration=52382 threshold=2000000
+2018-01-31 18:19:12.340 +0000 (11455 11455) verbosedebug: sending transaction message, len=32792
+2018-01-31 18:19:12.341 +0000 (11455 11455) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:12.762 +0000 (11454 11454) verbosedebug: RINIT processing started
+2018-01-31 18:19:12.762 +0000 (11454 11454) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:19:12.762 +0000 (11454 11454) verbosedebug: RINIT processing done
+2018-01-31 18:19:12.763 +0000 (11454 11454) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:19:12.816 +0000 (11454 11454) debug: txn naming freeze
+2018-01-31 18:19:12.816 +0000 (11454 11454) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:19:12.816 +0000 (11454 11454) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:19:12.816 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:12.816 +0000 (11454 11454) verbosedebug: request_uri='/'
+2018-01-31 18:19:12.816 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:12.817 +0000 (11454 11454) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:12.817 +0000 (11454 11454) verbosedebug: /proc/self read: 7197 of 4096-byte pages
+2018-01-31 18:19:12.817 +0000 (11454 11454) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=160 duration=54702 threshold=2000000
+2018-01-31 18:19:12.817 +0000 (11454 11454) verbosedebug: sending transaction message, len=5252
+2018-01-31 18:19:12.818 +0000 (11454 11454) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:13.755 +0000 (11454 11454) verbosedebug: RINIT processing started
+2018-01-31 18:19:13.755 +0000 (11454 11454) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:19:13.755 +0000 (11454 11454) verbosedebug: RINIT processing done
+2018-01-31 18:19:13.756 +0000 (11454 11454) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:19:13.804 +0000 (11454 11454) debug: txn naming freeze
+2018-01-31 18:19:13.804 +0000 (11454 11454) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:19:13.804 +0000 (11454 11454) verbosedebug: autorum: resizing buffer to 22496 bytes
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: request_uri='/assets/468d2ab1/linkedin.png'
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: /proc/self read: 7266 of 4096-byte pages
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=154 duration=50303 threshold=2000000
+2018-01-31 18:19:13.805 +0000 (11454 11454) verbosedebug: sending transaction message, len=5232
+2018-01-31 18:19:13.806 +0000 (11454 11454) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:15.006 +0000 (11454 11454) verbosedebug: RINIT processing started
+2018-01-31 18:19:15.006 +0000 (11454 11454) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.error.php'
+2018-01-31 18:19:15.006 +0000 (11454 11454) verbosedebug: RINIT processing done
+2018-01-31 18:19:15.006 +0000 (11454 11454) verbosedebug: recording error priority=50 msg='Test Error!' cls='NoticedError'
+2018-01-31 18:19:15.006 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: request_uri='/index.error.php'
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: /proc/self read: 7019 of 4096-byte pages
+2018-01-31 18:19:15.007 +0000 (11454 11454) debug: txn naming freeze
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: url rules: ignore=0 before='/index.error.php' after='/index.error.php'
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: sending txnname='WebTransaction/Uri/index.error.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=0 duration=290 threshold=2000000
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: sending transaction message, len=3872
+2018-01-31 18:19:15.007 +0000 (11454 11454) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: RINIT processing started
+2018-01-31 18:19:15.754 +0000 (11454 11454) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.error.php'
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: RINIT processing done
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: recording error priority=50 msg='Test Error!' cls='NoticedError'
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: request_uri='/index.error.php'
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:15.754 +0000 (11454 11454) verbosedebug: /proc/self read: 7019 of 4096-byte pages
+2018-01-31 18:19:15.754 +0000 (11454 11454) debug: txn naming freeze
+2018-01-31 18:19:15.755 +0000 (11454 11454) verbosedebug: url rules: ignore=0 before='/index.error.php' after='/index.error.php'
+2018-01-31 18:19:15.755 +0000 (11454 11454) verbosedebug: sending txnname='WebTransaction/Uri/index.error.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=0 duration=298 threshold=2000000
+2018-01-31 18:19:15.755 +0000 (11454 11454) verbosedebug: sending transaction message, len=3872
+2018-01-31 18:19:15.755 +0000 (11454 11454) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:19.267 +0000 (11452 11452) verbosedebug: RINIT processing started
+2018-01-31 18:19:19.268 +0000 (11452 11452) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:19:19.268 +0000 (11452 11452) verbosedebug: sending appinfo message, len=5888
+2018-01-31 18:19:19.268 +0000 (11452 11452) debug: APPINFO reply agent run id still valid app='staging.givetrack.org'
+2018-01-31 18:19:19.268 +0000 (11452 11452) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:19:19.268 +0000 (11452 11452) verbosedebug: RINIT processing done
+2018-01-31 18:19:19.269 +0000 (11452 11452) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:19:19.318 +0000 (11452 11452) debug: txn naming freeze
+2018-01-31 18:19:19.318 +0000 (11452 11452) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:19:19.318 +0000 (11452 11452) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:19:19.319 +0000 (11452 11452) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:19.319 +0000 (11452 11452) verbosedebug: request_uri='/'
+2018-01-31 18:19:19.319 +0000 (11452 11452) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:19.319 +0000 (11452 11452) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:19.319 +0000 (11452 11452) verbosedebug: /proc/self read: 8354 of 4096-byte pages
+2018-01-31 18:19:19.319 +0000 (11452 11452) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=154 duration=51500 threshold=2000000
+2018-01-31 18:19:19.320 +0000 (11452 11452) verbosedebug: sending transaction message, len=32784
+2018-01-31 18:19:19.320 +0000 (11452 11452) verbosedebug: post-deactivate processing done
+2018-01-31 18:19:31.480 +0000 (14390 14390) verbosedebug: RINIT processing started
+2018-01-31 18:19:31.480 +0000 (14390 14390) verbosedebug: querying app='staging.givetrack.org' from parent=25
+2018-01-31 18:19:31.480 +0000 (14390 14390) verbosedebug: sending appinfo message, len=5888
+2018-01-31 18:19:31.480 +0000 (14390 14390) debug: APPINFO reply agent run id still valid app='staging.givetrack.org'
+2018-01-31 18:19:31.480 +0000 (14390 14390) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2018-01-31 18:19:31.480 +0000 (14390 14390) verbosedebug: RINIT processing done
+2018-01-31 18:19:31.481 +0000 (14390 14390) verbosedebug: adding custom for callable 'CApplication::handleException'
+2018-01-31 18:19:31.531 +0000 (14390 14390) debug: txn naming freeze
+2018-01-31 18:19:31.531 +0000 (14390 14390) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2018-01-31 18:19:31.531 +0000 (14390 14390) verbosedebug: autorum: resizing buffer to 22468 bytes
+2018-01-31 18:19:31.531 +0000 (14390 14390) verbosedebug: RSHUTDOWN processing started
+2018-01-31 18:19:31.531 +0000 (14390 14390) verbosedebug: request_uri='/'
+2018-01-31 18:19:31.531 +0000 (14390 14390) verbosedebug: RSHUTDOWN processing done
+2018-01-31 18:19:31.532 +0000 (14390 14390) verbosedebug: post-deactivate processing started
+2018-01-31 18:19:31.532 +0000 (14390 14390) verbosedebug: /proc/self read: 7117 of 4096-byte pages
+2018-01-31 18:19:31.532 +0000 (14390 14390) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=WzIse2E6ODk0MTA4MDgyLGI6ODE0MzU0NjYsYzoxNjcwNDE2LGQ6IjcuNy4wLjIwMyIsZToicGhwIixmOiJpcC0xNzItMzEtMTQtMzQiLGc6W3thOjgxNDM1NDY1LGI6InN0YWdpbmcuZ2l2ZXRyYWNrLm9yZyJ9XX0sMjU0OTI1NTA0MF0 nodes_used=154 duration=51882 threshold=2000000
+2018-01-31 18:19:31.533 +0000 (14390 14390) verbosedebug: sending transaction message, len=32784
+2018-01-31 18:19:31.533 +0000 (14390 14390) verbosedebug: post-deactivate processing done

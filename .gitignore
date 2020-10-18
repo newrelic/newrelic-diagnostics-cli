@@ -4,8 +4,11 @@ core
 #integration tests
 bin
 integrationDockerfile
-temp/*
 test_results*
+# ignore files in folder temp
+temp/*
+# but keep the folder temp
+!temp/.keep
 #to ignore the binary builds
 nr-diagnostics*
 nrdiag*

@@ -1,0 +1,3 @@
+2017-07-20 04:21:17.207 -0400 (774 774) info: New Relic 5.2.0.141 ("billey" - "f75e305385c76c24450e7e512d7e83fe418d7d01") [daemon='/tmp/.newrelic.sock'  php='5.5.21' zts=no sapi='fpm-fcgi'  pid=774 ppid=1 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='3.10.0-327.el7.x86_64' mach='x86_64' ver='#1 SMP Thu Oct 29 17' node='ip-192-168-129-76']
+2017-07-20 04:21:17.208 -0400 (774 774) info: spawned daemon child pid=928
+2017-07-20 04:21:17.208 -0400 (774 774) debug: MINIT processing done

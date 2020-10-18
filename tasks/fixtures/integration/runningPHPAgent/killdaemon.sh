@@ -1,0 +1,1 @@
+sudo ps aux | grep -m 1 newrelic | grep -v grep | awk '{print "kill -9 " $2}'| sh

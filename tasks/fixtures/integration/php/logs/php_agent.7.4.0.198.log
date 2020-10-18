@@ -1,0 +1,339 @@
+2017-07-28 17:41:43.555 +0000 (57913 57913) debug: late_init called from pid=57913
+2017-07-28 17:41:43.555 +0000 (57913 57913) verbosedebug: RINIT processing started
+2017-07-28 17:41:43.556 +0000 (57913 57913) verbosedebug: daemon connect(fd=28 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:41:43.556 +0000 (57913 57913) debug: added app='gate' license='19...fe'
+2017-07-28 17:41:43.556 +0000 (57913 57913) verbosedebug: querying app='gate' from parent=28
+2017-07-28 17:41:43.556 +0000 (57913 57913) verbosedebug: sending appinfo message, len=5536
+2017-07-28 17:41:43.556 +0000 (57913 57913) debug: APPINFO reply connected
+2017-07-28 17:41:43.556 +0000 (57913 57913) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:41:43.556 +0000 (57913 57913) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2017-07-28 17:41:43.556 +0000 (57913 57913) verbosedebug: RINIT processing done
+2017-07-28 17:41:43.557 +0000 (57913 57913) debug: detected framework = 'Laravel'
+2017-07-28 17:41:43.557 +0000 (57913 57913) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:41:43.557 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:41:43.557 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:41:43.557 +0000 (57913 57913) debug: Laravel version is '5.4.30'
+2017-07-28 17:41:43.557 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:41:43.557 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:41:43.562 +0000 (57913 57913) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:41:43.565 +0000 (57913 57913) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:41:43.565 +0000 (57913 57913) debug: 'Laravel' naming is 'Illuminate\Foundation\Http\Middleware\CheckForMa'
+2017-07-28 17:41:43.565 +0000 (57913 57913) debug: 'Laravel' naming is 'Illuminate\Foundation\Http\Middleware\ValidatePo'
+2017-07-28 17:41:43.565 +0000 (57913 57913) debug: 'Laravel' naming is 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:41:43.566 +0000 (57913 57913) debug: 'Laravel' naming is 'Illuminate\Foundation\Http\Middleware\ConvertEmp'
+2017-07-28 17:41:43.568 +0000 (57913 57913) verbosedebug: nr_laravel_name_transaction_from_route_action: no controller element in the action array
+2017-07-28 17:41:43.568 +0000 (57913 57913) debug: nr_laravel_name_transaction: using Request::getMethod() fallback for transaction naming due to invalid Route object
+2017-07-28 17:41:43.568 +0000 (57913 57913) debug: 'Laravel' naming is 'GET/index.php'
+2017-07-28 17:41:43.569 +0000 (57913 57913) verbosedebug: nr_laravel_name_transaction_from_route_action: no controller element in the action array
+2017-07-28 17:41:43.569 +0000 (57913 57913) debug: nr_laravel_name_transaction: using Request::getMethod() fallback for transaction naming due to invalid Route object
+2017-07-28 17:41:43.569 +0000 (57913 57913) debug: 'Laravel' naming is 'GET/index.php'
+2017-07-28 17:41:43.569 +0000 (57913 57913) debug: autorum: header empty due to missing js loader
+2017-07-28 17:41:43.569 +0000 (57913 57913) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:41:43.569 +0000 (57913 57913) verbosedebug: request_uri='/'
+2017-07-28 17:41:43.570 +0000 (57913 57913) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:41:43.570 +0000 (57913 57913) verbosedebug: post-deactivate processing started
+2017-07-28 17:41:43.570 +0000 (57913 57913) verbosedebug: /proc/self read: 6281 of 4096-byte pages
+2017-07-28 17:41:43.570 +0000 (57913 57913) debug: txn naming freeze
+2017-07-28 17:41:43.570 +0000 (57913 57913) verbosedebug: sending txnname='WebTransaction/Action/GET/index.php' agent_run_id=239378440449214594 nodes_used=27 duration=13706 threshold=2000000
+2017-07-28 17:41:43.570 +0000 (57913 57913) verbosedebug: sending transaction message, len=3260
+2017-07-28 17:41:43.570 +0000 (57913 57913) verbosedebug: post-deactivate processing done
+2017-07-28 17:42:01.467 +0000 (60365 60365) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=60365 ppid=60364 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:42:01.467 +0000 (60365 60365) verbosedebug: daemon connect(fd=5 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:42:01.467 +0000 (60365 60365) debug: MINIT processing done
+2017-07-28 17:42:01.468 +0000 (60365 60365) debug: late_init called from pid=60365
+2017-07-28 17:42:01.468 +0000 (60365 60365) verbosedebug: RINIT processing started
+2017-07-28 17:42:01.468 +0000 (60365 60365) debug: added app='gate' license='19...fe'
+2017-07-28 17:42:01.468 +0000 (60365 60365) verbosedebug: querying app='gate' from parent=5
+2017-07-28 17:42:01.468 +0000 (60365 60365) verbosedebug: sending appinfo message, len=5516
+2017-07-28 17:42:01.468 +0000 (60365 60365) debug: APPINFO reply connected
+2017-07-28 17:42:01.468 +0000 (60365 60365) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:42:01.469 +0000 (60365 60365) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/www/prod.intranet.sim.fi/artisan'
+2017-07-28 17:42:01.469 +0000 (60365 60365) debug: CLI SAPI: marking txn as background job
+2017-07-28 17:42:01.469 +0000 (60365 60365) verbosedebug: RINIT processing done
+2017-07-28 17:42:01.482 +0000 (60365 60365) debug: detected framework = 'Laravel'
+2017-07-28 17:42:01.492 +0000 (60365 60365) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:42:01.492 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:42:01.492 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:42:01.493 +0000 (60365 60365) debug: Laravel version is '5.4.13'
+2017-07-28 17:42:01.493 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:42:01.493 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:42:01.506 +0000 (60365 60365) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:42:01.532 +0000 (60365 60365) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:42:01.532 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:42:01.532 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:42:01.532 +0000 (60365 60365) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:42:01.532 +0000 (60365 60365) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:42:01.532 +0000 (60365 60365) verbosedebug: adding custom for 'App\Http\Middleware\ProtectDev::handle'
+2017-07-28 17:42:01.533 +0000 (60365 60365) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:42:01.533 +0000 (60365 60365) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:42:01.567 +0000 (60365 60365) debug: 'Laravel' naming is 'Artisan/schedule:run'
+2017-07-28 17:42:01.570 +0000 (60365 60365) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:42:01.570 +0000 (60365 60365) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:42:01.572 +0000 (60365 60365) verbosedebug: post-deactivate processing started
+2017-07-28 17:42:01.572 +0000 (60365 60365) verbosedebug: /proc/self read: 9727 of 4096-byte pages
+2017-07-28 17:42:01.572 +0000 (60365 60365) debug: txn naming freeze
+2017-07-28 17:42:01.572 +0000 (60365 60365) verbosedebug: sending txnname='OtherTransaction/Action/Artisan/schedule:run' agent_run_id=239378440449214594 nodes_used=112 duration=103744 threshold=2000000
+2017-07-28 17:42:01.572 +0000 (60365 60365) verbosedebug: sending transaction message, len=1928
+2017-07-28 17:42:01.572 +0000 (60365 60365) verbosedebug: post-deactivate processing done
+2017-07-28 17:42:01.574 +0000 (60365 60365) debug: MSHUTDOWN processing started
+2017-07-28 17:42:01.574 +0000 (60365 60365) debug: closed daemon connection fd=5
+2017-07-28 17:42:31.864 +0000 (57906 57906) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.868 +0000 (57910 57910) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.869 +0000 (58666 58666) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.872 +0000 (58667 58667) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.878 +0000 (57911 57911) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.891 +0000 (57909 57909) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.891 +0000 (57909 57909) debug: closed daemon connection fd=28
+2017-07-28 17:42:31.895 +0000 (57912 57912) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.900 +0000 (58668 58668) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.900 +0000 (58668 58668) debug: closed daemon connection fd=28
+2017-07-28 17:42:31.905 +0000 (57913 57913) debug: MSHUTDOWN processing started
+2017-07-28 17:42:31.905 +0000 (57913 57913) debug: closed daemon connection fd=28
+2017-07-28 17:42:31.910 +0000 (57906 57906) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='apache2handler' apache='2.4.18' mpm=prefork pid=57906 ppid=1 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:42:31.910 +0000 (57906 57906) verbosedebug: daemon connect(fd=24 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:42:31.910 +0000 (57906 57906) debug: closed daemon connection fd=24
+2017-07-28 17:42:31.910 +0000 (57906 57906) debug: MINIT processing done
+2017-07-28 17:42:43.816 +0000 (60568 60568) debug: late_init called from pid=60568
+2017-07-28 17:42:43.816 +0000 (60568 60568) verbosedebug: RINIT processing started
+2017-07-28 17:42:43.816 +0000 (60568 60568) verbosedebug: daemon connect(fd=28 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:42:43.816 +0000 (60568 60568) debug: added app='gate' license='19...fe'
+2017-07-28 17:42:43.817 +0000 (60568 60568) verbosedebug: querying app='gate' from parent=28
+2017-07-28 17:42:43.817 +0000 (60568 60568) verbosedebug: sending appinfo message, len=5536
+2017-07-28 17:42:43.817 +0000 (60568 60568) debug: APPINFO reply connected
+2017-07-28 17:42:43.817 +0000 (60568 60568) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:42:43.817 +0000 (60568 60568) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2017-07-28 17:42:43.817 +0000 (60568 60568) verbosedebug: RINIT processing done
+2017-07-28 17:43:01.589 +0000 (60700 60700) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=60700 ppid=60698 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:43:01.589 +0000 (60700 60700) verbosedebug: daemon connect(fd=5 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:43:01.589 +0000 (60700 60700) debug: MINIT processing done
+2017-07-28 17:43:01.590 +0000 (60700 60700) debug: late_init called from pid=60700
+2017-07-28 17:43:01.590 +0000 (60700 60700) verbosedebug: RINIT processing started
+2017-07-28 17:43:01.592 +0000 (60700 60700) debug: added app='gate' license='19...fe'
+2017-07-28 17:43:01.592 +0000 (60700 60700) verbosedebug: querying app='gate' from parent=5
+2017-07-28 17:43:01.592 +0000 (60700 60700) verbosedebug: sending appinfo message, len=5516
+2017-07-28 17:43:01.592 +0000 (60700 60700) debug: APPINFO reply connected
+2017-07-28 17:43:01.593 +0000 (60700 60700) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:43:01.593 +0000 (60700 60700) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/www/prod.intranet.sim.fi/artisan'
+2017-07-28 17:43:01.593 +0000 (60700 60700) debug: CLI SAPI: marking txn as background job
+2017-07-28 17:43:01.593 +0000 (60700 60700) verbosedebug: RINIT processing done
+2017-07-28 17:43:01.614 +0000 (60700 60700) debug: detected framework = 'Laravel'
+2017-07-28 17:43:01.614 +0000 (60700 60700) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:43:01.614 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:43:01.614 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:43:01.615 +0000 (60700 60700) debug: Laravel version is '5.4.13'
+2017-07-28 17:43:01.615 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:43:01.615 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:43:01.633 +0000 (60700 60700) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:43:01.659 +0000 (60700 60700) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'App\Http\Middleware\ProtectDev::handle'
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:43:01.660 +0000 (60700 60700) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:43:01.702 +0000 (60700 60700) debug: 'Laravel' naming is 'Artisan/schedule:run'
+2017-07-28 17:43:01.706 +0000 (60700 60700) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:43:01.706 +0000 (60700 60700) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:43:01.708 +0000 (60700 60700) verbosedebug: post-deactivate processing started
+2017-07-28 17:43:01.717 +0000 (60700 60700) verbosedebug: /proc/self read: 9722 of 4096-byte pages
+2017-07-28 17:43:01.717 +0000 (60700 60700) debug: txn naming freeze
+2017-07-28 17:43:01.717 +0000 (60700 60700) verbosedebug: sending txnname='OtherTransaction/Action/Artisan/schedule:run' agent_run_id=239378440449214594 nodes_used=130 duration=123852 threshold=2000000
+2017-07-28 17:43:01.717 +0000 (60700 60700) verbosedebug: sending transaction message, len=1928
+2017-07-28 17:43:01.717 +0000 (60700 60700) verbosedebug: post-deactivate processing done
+2017-07-28 17:43:01.718 +0000 (60700 60700) debug: MSHUTDOWN processing started
+2017-07-28 17:43:01.718 +0000 (60700 60700) debug: closed daemon connection fd=5
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: recording error priority=50 msg='Maximum execution time of 0x1ed seconds exceeded' cls='E_ERROR'
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: request_uri='/'
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: post-deactivate processing started
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: /proc/self read: 5127 of 4096-byte pages
+2017-07-28 17:43:13.841 +0000 (60568 60568) debug: txn naming freeze
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: url rules: ignore=0 before='/index.php' after='/index.php'
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: sending txnname='WebTransaction/Uri/index.php' agent_run_id=239378440449214594 nodes_used=0 duration=30023874 threshold=2000000
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: sending transaction message, len=3152
+2017-07-28 17:43:13.841 +0000 (60568 60568) verbosedebug: post-deactivate processing done
+2017-07-28 17:43:54.845 +0000 (60571 60571) debug: MSHUTDOWN processing started
+2017-07-28 17:43:54.847 +0000 (60570 60570) debug: MSHUTDOWN processing started
+2017-07-28 17:43:54.853 +0000 (60569 60569) debug: MSHUTDOWN processing started
+2017-07-28 17:43:54.853 +0000 (60572 60572) debug: MSHUTDOWN processing started
+2017-07-28 17:43:54.861 +0000 (60634 60634) debug: MSHUTDOWN processing started
+2017-07-28 17:43:54.866 +0000 (60568 60568) debug: MSHUTDOWN processing started
+2017-07-28 17:43:54.866 +0000 (60568 60568) debug: closed daemon connection fd=28
+2017-07-28 17:43:54.936 +0000 (57906 57906) debug: MSHUTDOWN processing started
+2017-07-28 17:43:56.010 +0000 (61019 61019) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='apache2handler' apache='2.4.18' mpm=prefork pid=61019 ppid=1 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:43:56.010 +0000 (61019 61019) verbosedebug: daemon connect(fd=24 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:43:56.010 +0000 (61019 61019) debug: closed daemon connection fd=24
+2017-07-28 17:43:56.010 +0000 (61019 61019) debug: MINIT processing done
+2017-07-28 17:44:01.699 +0000 (61064 61064) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=61064 ppid=61063 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:44:01.699 +0000 (61064 61064) verbosedebug: daemon connect(fd=5 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:44:01.699 +0000 (61064 61064) debug: MINIT processing done
+2017-07-28 17:44:01.699 +0000 (61064 61064) debug: late_init called from pid=61064
+2017-07-28 17:44:01.700 +0000 (61064 61064) verbosedebug: RINIT processing started
+2017-07-28 17:44:01.700 +0000 (61064 61064) debug: added app='gate' license='19...fe'
+2017-07-28 17:44:01.700 +0000 (61064 61064) verbosedebug: querying app='gate' from parent=5
+2017-07-28 17:44:01.700 +0000 (61064 61064) verbosedebug: sending appinfo message, len=5516
+2017-07-28 17:44:01.700 +0000 (61064 61064) debug: APPINFO reply connected
+2017-07-28 17:44:01.700 +0000 (61064 61064) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:44:01.700 +0000 (61064 61064) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/www/prod.intranet.sim.fi/artisan'
+2017-07-28 17:44:01.700 +0000 (61064 61064) debug: CLI SAPI: marking txn as background job
+2017-07-28 17:44:01.700 +0000 (61064 61064) verbosedebug: RINIT processing done
+2017-07-28 17:44:01.716 +0000 (61064 61064) debug: detected framework = 'Laravel'
+2017-07-28 17:44:01.719 +0000 (61064 61064) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:44:01.719 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:44:01.719 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:44:01.720 +0000 (61064 61064) debug: Laravel version is '5.4.13'
+2017-07-28 17:44:01.720 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:44:01.720 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:44:01.734 +0000 (61064 61064) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:44:01.760 +0000 (61064 61064) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:44:01.760 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:44:01.761 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:44:01.761 +0000 (61064 61064) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:44:01.761 +0000 (61064 61064) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:44:01.761 +0000 (61064 61064) verbosedebug: adding custom for 'App\Http\Middleware\ProtectDev::handle'
+2017-07-28 17:44:01.761 +0000 (61064 61064) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:44:01.771 +0000 (61064 61064) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:44:01.805 +0000 (61064 61064) debug: 'Laravel' naming is 'Artisan/schedule:run'
+2017-07-28 17:44:01.809 +0000 (61064 61064) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:44:01.809 +0000 (61064 61064) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:44:01.810 +0000 (61064 61064) verbosedebug: post-deactivate processing started
+2017-07-28 17:44:01.811 +0000 (61064 61064) verbosedebug: /proc/self read: 9738 of 4096-byte pages
+2017-07-28 17:44:01.811 +0000 (61064 61064) debug: txn naming freeze
+2017-07-28 17:44:01.811 +0000 (61064 61064) verbosedebug: sending txnname='OtherTransaction/Action/Artisan/schedule:run' agent_run_id=239378440449214594 nodes_used=108 duration=110187 threshold=2000000
+2017-07-28 17:44:01.811 +0000 (61064 61064) verbosedebug: sending transaction message, len=1928
+2017-07-28 17:44:01.811 +0000 (61064 61064) verbosedebug: post-deactivate processing done
+2017-07-28 17:44:01.812 +0000 (61064 61064) debug: MSHUTDOWN processing started
+2017-07-28 17:44:01.812 +0000 (61064 61064) debug: closed daemon connection fd=5
+2017-07-28 17:44:16.887 +0000 (61022 61022) debug: late_init called from pid=61022
+2017-07-28 17:44:16.888 +0000 (61022 61022) verbosedebug: RINIT processing started
+2017-07-28 17:44:16.888 +0000 (61022 61022) verbosedebug: daemon connect(fd=28 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:44:16.888 +0000 (61022 61022) debug: added app='gate' license='19...fe'
+2017-07-28 17:44:16.888 +0000 (61022 61022) verbosedebug: querying app='gate' from parent=28
+2017-07-28 17:44:16.888 +0000 (61022 61022) verbosedebug: sending appinfo message, len=5536
+2017-07-28 17:44:16.888 +0000 (61022 61022) debug: APPINFO reply connected
+2017-07-28 17:44:16.889 +0000 (61022 61022) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:44:16.889 +0000 (61022 61022) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/index.php'
+2017-07-28 17:44:16.889 +0000 (61022 61022) verbosedebug: RINIT processing done
+2017-07-28 17:44:16.906 +0000 (61022 61022) debug: detected framework = 'Laravel'
+2017-07-28 17:44:16.906 +0000 (61022 61022) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:44:16.906 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:44:16.906 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:44:16.908 +0000 (61022 61022) debug: Laravel version is '5.4.30'
+2017-07-28 17:44:16.908 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:44:16.908 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:44:16.932 +0000 (61022 61022) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:44:16.955 +0000 (61022 61022) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:44:16.955 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:44:16.955 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:44:16.955 +0000 (61022 61022) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:44:16.955 +0000 (61022 61022) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:44:16.956 +0000 (61022 61022) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:44:16.956 +0000 (61022 61022) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:44:16.956 +0000 (61022 61022) debug: 'Laravel' naming is 'Illuminate\Foundation\Http\Middleware\CheckForMa'
+2017-07-28 17:44:16.957 +0000 (61022 61022) debug: 'Laravel' naming is 'Illuminate\Foundation\Http\Middleware\ValidatePo'
+2017-07-28 17:44:16.957 +0000 (61022 61022) debug: 'Laravel' naming is 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:44:16.960 +0000 (61022 61022) debug: 'Laravel' naming is 'Illuminate\Foundation\Http\Middleware\ConvertEmp'
+2017-07-28 17:44:16.976 +0000 (61022 61022) verbosedebug: nr_laravel_name_transaction_from_route_action: no controller element in the action array
+2017-07-28 17:44:16.976 +0000 (61022 61022) debug: nr_laravel_name_transaction: using Request::getMethod() fallback for transaction naming due to invalid Route object
+2017-07-28 17:44:16.977 +0000 (61022 61022) debug: 'Laravel' naming is 'GET/index.php'
+2017-07-28 17:44:16.982 +0000 (61022 61022) verbosedebug: nr_laravel_name_transaction_from_route_action: no controller element in the action array
+2017-07-28 17:44:16.982 +0000 (61022 61022) debug: nr_laravel_name_transaction: using Request::getMethod() fallback for transaction naming due to invalid Route object
+2017-07-28 17:44:16.982 +0000 (61022 61022) debug: 'Laravel' naming is 'GET/index.php'
+2017-07-28 17:44:16.982 +0000 (61022 61022) debug: autorum: header empty due to missing js loader
+2017-07-28 17:44:16.989 +0000 (61022 61022) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:44:16.989 +0000 (61022 61022) verbosedebug: request_uri='/'
+2017-07-28 17:44:16.989 +0000 (61022 61022) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:44:16.990 +0000 (61022 61022) verbosedebug: post-deactivate processing started
+2017-07-28 17:44:16.990 +0000 (61022 61022) verbosedebug: /proc/self read: 7328 of 4096-byte pages
+2017-07-28 17:44:16.990 +0000 (61022 61022) debug: txn naming freeze
+2017-07-28 17:44:16.990 +0000 (61022 61022) verbosedebug: sending txnname='WebTransaction/Action/GET/index.php' agent_run_id=239378440449214594 nodes_used=149 duration=101139 threshold=2000000
+2017-07-28 17:44:16.990 +0000 (61022 61022) verbosedebug: sending transaction message, len=3260
+2017-07-28 17:44:16.990 +0000 (61022 61022) verbosedebug: post-deactivate processing done
+2017-07-28 17:45:01.801 +0000 (61364 61364) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=61364 ppid=61363 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:45:01.801 +0000 (61364 61364) verbosedebug: daemon connect(fd=5 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:45:01.801 +0000 (61364 61364) debug: MINIT processing done
+2017-07-28 17:45:01.802 +0000 (61364 61364) debug: late_init called from pid=61364
+2017-07-28 17:45:01.802 +0000 (61364 61364) verbosedebug: RINIT processing started
+2017-07-28 17:45:01.802 +0000 (61364 61364) debug: added app='gate' license='19...fe'
+2017-07-28 17:45:01.802 +0000 (61364 61364) verbosedebug: querying app='gate' from parent=5
+2017-07-28 17:45:01.803 +0000 (61364 61364) verbosedebug: sending appinfo message, len=5516
+2017-07-28 17:45:01.803 +0000 (61364 61364) debug: APPINFO reply connected
+2017-07-28 17:45:01.803 +0000 (61364 61364) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:45:01.803 +0000 (61364 61364) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/www/prod.intranet.sim.fi/artisan'
+2017-07-28 17:45:01.803 +0000 (61364 61364) debug: CLI SAPI: marking txn as background job
+2017-07-28 17:45:01.803 +0000 (61364 61364) verbosedebug: RINIT processing done
+2017-07-28 17:45:01.815 +0000 (61364 61364) debug: detected framework = 'Laravel'
+2017-07-28 17:45:01.815 +0000 (61364 61364) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:45:01.815 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:45:01.815 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:45:01.816 +0000 (61364 61364) debug: Laravel version is '5.4.13'
+2017-07-28 17:45:01.827 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:45:01.827 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:45:01.840 +0000 (61364 61364) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:45:01.867 +0000 (61364 61364) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'App\Http\Middleware\ProtectDev::handle'
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:45:01.877 +0000 (61364 61364) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:45:02.133 +0000 (61364 61364) debug: 'Laravel' naming is 'Artisan/schedule:run'
+2017-07-28 17:45:02.137 +0000 (61364 61364) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:45:02.137 +0000 (61364 61364) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:45:02.139 +0000 (61364 61364) verbosedebug: post-deactivate processing started
+2017-07-28 17:45:02.139 +0000 (61364 61364) verbosedebug: /proc/self read: 9792 of 4096-byte pages
+2017-07-28 17:45:02.139 +0000 (61364 61364) debug: txn naming freeze
+2017-07-28 17:45:02.139 +0000 (61364 61364) verbosedebug: sending txnname='OtherTransaction/Action/Artisan/schedule:run' agent_run_id=239378440449214594 nodes_used=144 duration=336454 threshold=2000000
+2017-07-28 17:45:02.140 +0000 (61364 61364) verbosedebug: sending transaction message, len=3308
+2017-07-28 17:45:02.140 +0000 (61364 61364) verbosedebug: post-deactivate processing done
+2017-07-28 17:45:02.141 +0000 (61364 61364) debug: MSHUTDOWN processing started
+2017-07-28 17:45:02.141 +0000 (61364 61364) debug: closed daemon connection fd=5
+2017-07-28 17:46:01.937 +0000 (61724 61724) info: New Relic 7.4.0.198 ("uhlenbeck" - "e87df60f8af0") [daemon='/tmp/.newrelic.sock'  php='7.0.18-0ubuntu0.16.04.1' zts=no sapi='cli'  pid=61724 ppid=61723 uid=0 euid=0 gid=0 egid=0 backtrace=yes startup=agent os='Linux' rel='4.4.0-83-generic' mach='x86_64' ver='#106-Ubuntu SMP Mon Jun 26 17' node='gate']
+2017-07-28 17:46:01.937 +0000 (61724 61724) verbosedebug: daemon connect(fd=5 uds=/tmp/.newrelic.sock) succeeded
+2017-07-28 17:46:01.937 +0000 (61724 61724) debug: MINIT processing done
+2017-07-28 17:46:01.941 +0000 (61724 61724) debug: late_init called from pid=61724
+2017-07-28 17:46:01.951 +0000 (61724 61724) verbosedebug: RINIT processing started
+2017-07-28 17:46:01.951 +0000 (61724 61724) debug: added app='gate' license='19...fe'
+2017-07-28 17:46:01.951 +0000 (61724 61724) verbosedebug: querying app='gate' from parent=5
+2017-07-28 17:46:01.951 +0000 (61724 61724) verbosedebug: sending appinfo message, len=5516
+2017-07-28 17:46:01.952 +0000 (61724 61724) debug: APPINFO reply connected
+2017-07-28 17:46:01.952 +0000 (61724 61724) debug: APPINFO reply full app='gate' agent_run_id=239378440449214594
+2017-07-28 17:46:01.952 +0000 (61724 61724) debug: 'WT_IS_FILENAME & SCRIPT_FILENAME' naming is '/www/prod.intranet.sim.fi/artisan'
+2017-07-28 17:46:01.952 +0000 (61724 61724) debug: CLI SAPI: marking txn as background job
+2017-07-28 17:46:01.952 +0000 (61724 61724) verbosedebug: RINIT processing done
+2017-07-28 17:46:01.964 +0000 (61724 61724) debug: detected framework = 'Laravel'
+2017-07-28 17:46:01.965 +0000 (61724 61724) debug: 'Laravel' naming is 'unknown'
+2017-07-28 17:46:01.965 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Foundation\Application::__construct'
+2017-07-28 17:46:01.965 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Console\Application::doRun'
+2017-07-28 17:46:01.966 +0000 (61724 61724) debug: Laravel version is '5.4.13'
+2017-07-28 17:46:01.966 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Foundation\Application::boot'
+2017-07-28 17:46:01.966 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Routing\Router::prepareResponse'
+2017-07-28 17:46:01.979 +0000 (61724 61724) verbosedebug: adding custom for callable 'Illuminate\Foundation\Bootstrap\HandleExceptions::handleException'
+2017-07-28 17:46:02.005 +0000 (61724 61724) verbosedebug: nr_laravel_register_after_filter: Router does not support filters, transaction naming may be degraded
+2017-07-28 17:46:02.005 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::handle'
+2017-07-28 17:46:02.005 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ValidatePostSize::handle'
+2017-07-28 17:46:02.005 +0000 (61724 61724) verbosedebug: adding custom for 'App\Http\Middleware\TrimStrings::handle'
+2017-07-28 17:46:02.005 +0000 (61724 61724) verbosedebug: adding custom for 'Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::handle'
+2017-07-28 17:46:02.005 +0000 (61724 61724) verbosedebug: adding custom for 'App\Http\Middleware\ProtectDev::handle'
+2017-07-28 17:46:02.006 +0000 (61724 61724) verbosedebug: adding custom for 'App\Exceptions\Handler::render'
+2017-07-28 17:46:02.006 +0000 (61724 61724) verbosedebug: adding custom for 'App\Exceptions\Handler::report'
+2017-07-28 17:46:02.060 +0000 (61724 61724) debug: 'Laravel' naming is 'Artisan/schedule:run'
+2017-07-28 17:46:02.064 +0000 (61724 61724) verbosedebug: RSHUTDOWN processing started
+2017-07-28 17:46:02.064 +0000 (61724 61724) verbosedebug: RSHUTDOWN processing done
+2017-07-28 17:46:02.066 +0000 (61724 61724) verbosedebug: post-deactivate processing started
+2017-07-28 17:46:02.066 +0000 (61724 61724) verbosedebug: /proc/self read: 10537 of 4096-byte pages
+2017-07-28 17:46:02.066 +0000 (61724 61724) debug: txn naming freeze
+2017-07-28 17:46:02.066 +0000 (61724 61724) verbosedebug: sending txnname='OtherTransaction/Action/Artisan/schedule:run' agent_run_id=239378440449214594 nodes_used=131 duration=114035 threshold=2000000
+2017-07-28 17:46:02.066 +0000 (61724 61724) verbosedebug: sending transaction message, len=2828
+2017-07-28 17:46:02.066 +0000 (61724 61724) verbosedebug: post-deactivate processing done
+2017-07-28 17:46:02.067 +0000 (61724 61724) debug: MSHUTDOWN processing started
+2017-07-28 17:46:02.067 +0000 (61724 61724) debug: closed daemon connection fd=5
