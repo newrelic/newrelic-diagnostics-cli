@@ -15,7 +15,7 @@ CONFIG_PATH="github.com/newrelic/NrDiag/config"
 
 echo "Building linux x86"
 GOOS=linux GOARCH=386 go build -o "$EXENAME" -ldflags "-X ${CONFIG_PATH}.Version=INTEGRATION -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.UsageEndpoint=${USAGE_ENDPOINT} -X ${CONFIG_PATH}.AttachmentEndpoint=${ATTACHMENT_ENDPOINT}"
-mkdir -p integration/bin/linux
-$(mv "$EXENAME" "integration/bin/linux/$EXENAME")
+mkdir -p bin/linux
+$(mv "$EXENAME" "bin/linux/$EXENAME")
 echo "Running integration tests"
-go test integration/integration_test.go integration/integration_test_timer.go integration/dockerHelper_test.go -timeout 2h -v --tags=integration -testNames=$1
+go test integration_test.go integration_test_timer.go dockerHelper_test.go -timeout 2h -v --tags=integration -testNames=$1
