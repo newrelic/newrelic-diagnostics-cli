@@ -51,7 +51,7 @@ Note: if your task is not one that should be run by default, change the `true` t
 
 From the main directory of the project, type:
 
-`go build && ./nrdiag -t Java/JVM/Taste`
+`go build && ./NrDiag -t Java/JVM/Taste`
 
 You should see a result that looks something like:
 
@@ -89,7 +89,7 @@ This probably means that either:
 
 You might get a hint of what went wrong by looking at the help screen that lists all registered tasks.
 
-`./nrdiag -h tasks`
+`./NrDiag -h tasks`
 
 Along with all the other output, you should see:
 
