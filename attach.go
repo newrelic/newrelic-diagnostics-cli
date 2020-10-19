@@ -136,7 +136,7 @@ func uploadCustomerFile() {
 	stat, err := os.Stat(config.Flags.FileUpload)
 
 	if err != nil {
-		log.Info("Error getting filesize, check permissions on the file to upload")
+		log.Info("Error getting information for the file provided: ", err)
 		os.Exit(1)
 	}
 	file.filesize = stat.Size()
