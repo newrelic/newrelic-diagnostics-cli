@@ -38,7 +38,7 @@ We've got a file, but it still has all the original example names
 
 ### Register the new task
 
-Now we have a task that doesn't do much, but we should at least be able to compile and run it. However, nr-diagnostics doesn't know that it's *supposed* to run this task yet. So, we have to "register" the new task (note: this registration step is unique to this project; it's not a normal `go` thing).
+Now we have a task that doesn't do much, but we should at least be able to compile and run it. However, NR Diag doesn't know that it's *supposed* to run this task yet. So, we have to "register" the new task (note: this registration step is unique to this project; it's not a normal `go` thing).
 
 Find the "main" package file for the package/folder your task is in. In our case, this is going to be the file `./tasks/java/jvm/jvm.go`
 
@@ -51,7 +51,7 @@ Note: if your task is not one that should be run by default, change the `true` t
 
 From the main directory of the project, type:
 
-`go build && ./nr-diagnostics -t Java/JVM/Taste`
+`go build && ./nrdiag -t Java/JVM/Taste`
 
 You should see a result that looks something like:
 
@@ -89,7 +89,7 @@ This probably means that either:
 
 You might get a hint of what went wrong by looking at the help screen that lists all registered tasks.
 
-`./nr-diagnostics -h tasks`
+`./nrdiag -h tasks`
 
 Along with all the other output, you should see:
 

@@ -98,6 +98,7 @@ func Upload(attachmentKey string) (err error) {
 	jsonResponse, err := getUploadURL(zipfile.newFilename, attachmentKey, zipfile.filesize)
 	if err != nil {
 		log.Infof("Unable to retrieve upload URL: %s\n", err.Error())
+		log.Infof("If you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n")
 		return
 	}
 	zipfile.URL = jsonResponse.URL
@@ -133,6 +134,7 @@ func uploadCustomerFile() {
 	file := uploadFiles{}
 
 	stat, err := os.Stat(config.Flags.FileUpload)
+
 	if err != nil {
 		log.Info("Error getting filesize, check permissions on the file to upload")
 		os.Exit(1)
@@ -145,6 +147,7 @@ func uploadCustomerFile() {
 	jsonResponse, err := getUploadURL(stat.Name(), attachmentKey, stat.Size())
 	if err != nil {
 		log.Infof("Unable to retrieve upload URL: %s\n", err.Error())
+		log.Infof("If you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n")
 		return
 	}
 	file.URL = jsonResponse.URL
@@ -353,6 +356,10 @@ func getUploadURL(filename, attachmentKey string, filesize int64) (jsonResponse,
 	res, err := httpHelper.MakeHTTPRequest(wrapper)
 	if err != nil {
 		return jsonResponse{}, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return jsonResponse{}, fmt.Errorf("Got %v status code when making a GET request to the following url %s", res.StatusCode, requestURL)
 	}
 
 	bodyBytes, readErr := ioutil.ReadAll(res.Body)
