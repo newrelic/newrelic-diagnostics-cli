@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/newrelic/NrDiag/config"
@@ -46,6 +47,17 @@ func (l packageMethods) Info(s ...interface{}) {
 //Infof is wrapper for Printf. No verbosity check -- it always logs.
 func Infof(format string, s ...interface{}) {
 	fmt.Printf(format, s...)
+}
+
+//Fatal is wrapper for log.Fatal(). Prints message followed by a call to os.Exit(1).
+func Fatal(s ...interface{}) {
+	// log.Fatal("Exception occured!") or log.Fatal(err)
+	log.Fatal(s...)
+}
+
+//Fatalf is wrapper for log.Fatalf. No verbosity check --it always logs followed by a call to os.Exit(1).
+func Fatalf(format string, s ...interface{}) {
+	log.Fatalf(format, s...)
 }
 
 // Infof - alias via an empty struct to the original implementation
