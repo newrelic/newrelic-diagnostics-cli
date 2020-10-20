@@ -16,8 +16,8 @@ const versionURL = `http://download.newrelic.com/nrdiag/version.txt`
 const downloadURL = `http://download.newrelic.com/nrdiag/nrdiag_latest.zip`
 
 // ProcessAutoVersionCheck - looks at the program version and warnds the user if it is out of date, takes no actions
-func ProcessAutoVersionCheck() {
-	processAutoVersionCheck(logger.Log, getOnlineVersion)
+func ProcessAutoVersionCheck() bool {
+	return processAutoVersionCheck(logger.Log, getOnlineVersion)
 }
 
 // ProcessVersion - looks at the program version and warnds the user if it is out of date, prompts user and is able to download
@@ -91,7 +91,7 @@ func logVersionString(log logger.API) {
 	}
 }
 
-func processAutoVersionCheck(log logger.API, getOnlineVersion func(logger.API) string) {
+func processAutoVersionCheck(log logger.API, getOnlineVersion func(logger.API) string) bool {
 	onlineVersion := getOnlineVersion(log)
 	if onlineVersion != "" && onlineVersion != config.Version {
 		if !config.Flags.VeryQuiet {
@@ -99,7 +99,9 @@ func processAutoVersionCheck(log logger.API, getOnlineVersion func(logger.API) s
 			log.Infof(color.ColorString(color.Yellow, "Version %s has been released and is newer than your version.\n"), onlineVersion)
 			log.Info("Please run with the -version flag to download the new release.")
 		}
+		return false
 	}
+	return true
 }
 
 func processVersion(log logger.API, promptUser func(input string) bool, getOnlineVersion func(logger.API) string, getLatestVersion func(logger.API) error) {

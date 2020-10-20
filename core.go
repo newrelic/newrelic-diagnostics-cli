@@ -41,6 +41,16 @@ func main() {
 		haberdasher.DefaultClient.SetBaseURL(config.HaberdasherURL)
 	}
 
+	if config.Flags.Version && config.Flags.Quiet {
+		// Support for automated version check by newrelic-cli
+		current := version.ProcessAutoVersionCheck()
+		if !current {
+			os.Exit(1)
+		} else {
+			os.Exit(0)
+		}
+	}
+
 	go processTasksToRun()
 
 	// if statments for doing stuff with args
