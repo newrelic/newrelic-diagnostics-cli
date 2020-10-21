@@ -37,7 +37,7 @@ To upload your results automatically to a New Relic Support ticket all you need 
 
 ## Support for NR Diag
 
-New Relic hosts and moderates an online forum where customers can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the New Relic Explorers Hub. If you have any questions, concerns or issues while running NR Diag, reach out to us through our [Explorers Hub](https://discuss.newrelic.com/). Or if the issue has been confirmed as a bug or is a Feature request, please file a Github issue. Either way we'll get back to you soon!
+New Relic hosts and moderates an online forum where customers can interact with New Relic employees as well as other customers to get help and share best practices. Like all official New Relic open source projects, there's a related Community topic in the New Relic Explorers Hub. If you have any questions, concerns or issues while running NR Diag, reach out to us through our [Explorers Hub](https://discuss.newrelic.com/t/new-relic-diagnostic-aka-nr-diag/118819). Or if the issue has been confirmed as a bug or is a Feature request, please file a Github issue. Either way we'll get back to you soon!
 
 ## Contributing
 Have you ever dealt with a New Relic installation and/or configuration issue? Do you have suggestions on how to automate those steps to diagnose and solve the issue? Then we would love for you to contribute to NR Diag (or at least file a very detailed feature request)! NR Diag's main goal is to speed up and simplify the resolution of issues, no matter if you are working on your own or with our Support teams.
