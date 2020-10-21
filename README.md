@@ -42,7 +42,16 @@ New Relic hosts and moderates an online forum where customers can interact with 
 ## Contributing
 Have you ever dealt with a New Relic installation and/or configuration issue? Do you have suggestions on how to automate those steps to diagnose and solve the issue? Then we would love for you to contribute to NR Diag (or at least file a very detailed feature request)! NR Diag's main goal is to speed up and simplify the resolution of issues, no matter if you are working on your own or with our Support teams.
 All the information on how to build a new health check using NR Diag, as well as the requirements to submit a PR, can be found in our docs directory. Keep in mind when you submit your pull request, you'll need to sign the CLA via the click-through using CLA-Assistant. You only have to sign the CLA one time per project. If you have any questions, or to execute our corporate CLA, required if your contribution is on behalf of a company, please drop us an email at opensource@newrelic.com.
+
 ### Recommended Doc reading order
+1. [Contributing overview](./docs/Contributing.md)
+2. [Coding Guidelines](./docs/Coding-Guidelines.md)
+3. [Anatomy of a Task](./docs/Anatomy-of-a-Task.md)
+4. [How To Build A Task](./docs/How-To-Build-A-Task.md)
+5. [Testing Overview](./docs/Testing-Overview.md)
+6. [Unit Testing](./docs/Unit-Testing.md)
+7. [Dependency Injection](./docs/Dependency-Injection.md)
+8. [Integration Testing](./docs/Integration-Testing.md)
 
 
 ## License
