@@ -72,7 +72,7 @@ func addFileToForm(originalFilename string, newFilename string, i int, w *multip
 }
 
 // Upload - takes the attachment key from a ticket and uploads the output to that ticket
-func Upload(attachmentKey string) (err error) {
+func Upload(attachmentKey string) {
 	log.Info("Uploading files to support ticket...")
 	log.Debugf("Attempting to attach file with key: %s\n", attachmentKey)
 
@@ -89,7 +89,7 @@ func Upload(attachmentKey string) (err error) {
 	zipfile.filename = "nrdiag-output.zip"
 	stat, err := os.Stat(zipfile.path + "/" + zipfile.filename)
 	if err != nil {
-		log.Info("Error getting filesize")
+		log.Fatalf("Error getting filesize: %s", err.Error())
 	}
 	zipfile.filesize = stat.Size()
 	zipfile.newFilename = datestampFile("nrdiag-output.zip", timestamp)
@@ -97,8 +97,7 @@ func Upload(attachmentKey string) (err error) {
 
 	jsonResponse, err := getUploadURL(zipfile.newFilename, attachmentKey, zipfile.filesize)
 	if err != nil {
-		log.Infof("Unable to retrieve upload URL: %s\n", err.Error())
-		return
+		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n", err.Error())
 	}
 	zipfile.URL = jsonResponse.URL
 	if jsonResponse.Key != "" {
@@ -116,27 +115,22 @@ func Upload(attachmentKey string) (err error) {
 	filesToUpload = append(filesToUpload, zipfile)
 	filesToUpload = append(filesToUpload, jsonfile)
 
-	fileErr := uploadFilelist(attachmentKey, filesToUpload)
-	if fileErr != nil {
-		log.Info("Error uploading file")
-		return fileErr
-	}
-	return nil
+	uploadFilelist(attachmentKey, filesToUpload)
 }
 
 func uploadCustomerFile() {
 	attachmentKey := config.Flags.AttachmentKey
 	if attachmentKey == "" {
-		log.Info("No AttachmentKey supplied, you must run '-file-upload' with '-a' option to upload a file")
-		os.Exit(1)
+		log.Fatal("No AttachmentKey supplied, you must run '-file-upload' with '-a' option to upload a file")
 	}
 	file := uploadFiles{}
 
 	stat, err := os.Stat(config.Flags.FileUpload)
+
 	if err != nil {
-		log.Info("Error getting filesize, check permissions on the file to upload")
-		os.Exit(1)
+		log.Fatalf("Error getting information for the file provided: %s", err.Error())
 	}
+
 	file.filesize = stat.Size()
 	file.filename = stat.Name()
 	file.path = filepath.Dir(config.Flags.FileUpload)
@@ -144,23 +138,17 @@ func uploadCustomerFile() {
 	file.newFilename = datestampFile(file.filename, time.Now().UTC().Format(time.RFC3339))
 	jsonResponse, err := getUploadURL(stat.Name(), attachmentKey, stat.Size())
 	if err != nil {
-		log.Infof("Unable to retrieve upload URL: %s\n", err.Error())
-		return
+		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n", err.Error())
 	}
 	file.URL = jsonResponse.URL
 	file.key = jsonResponse.Key
 
 	log.Debug("Uploading file", file)
 	files := []uploadFiles{file}
-	fileErr := uploadFilelist(attachmentKey, files)
-	if fileErr != nil {
-		log.Info("Error uploading file", fileErr)
-		os.Exit(1)
-	}
-
+	uploadFilelist(attachmentKey, files)
 }
 
-func uploadFilelist(attachmentKey string, filelist []uploadFiles) (err error) {
+func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 	var filesForTicketAttachment, filesForAWS []uploadFiles
 
 	for _, upload := range filelist {
@@ -178,8 +166,7 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) (err error) {
 		log.Debug("Uploading to AWS")
 		AWSErr := uploadAWS(filesForAWS, attachmentKey)
 		if AWSErr != nil {
-			log.Info("Error uploading large file:", AWSErr)
-			os.Exit(1)
+			log.Fatalf("Error uploading large file: %s", AWSErr.Error())
 		}
 		log.Debug("Successfully uploaded to AWS, adding completed files for ticket attachment upload")
 		filesForTicketAttachment = append(filesForTicketAttachment, filesForAWS...)
@@ -189,12 +176,11 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) (err error) {
 		log.Debug("Uploading to Haberdasher for ticket attachment")
 		attachErr := uploadTicketAttachments(filesForTicketAttachment, attachmentKey)
 		if attachErr != nil {
-			log.Info("Error uploading file to New Relic Support:", attachErr)
+			log.Fatalf("Error uploading file to New Relic Support: %s", attachErr.Error())
 		}
-
 	}
-	return nil
 }
+
 func uploadTicketAttachments(filesToUpload []uploadFiles, attachmentKey string) error {
 
 	// Prepare a form that you will submit to that URL.
@@ -353,6 +339,10 @@ func getUploadURL(filename, attachmentKey string, filesize int64) (jsonResponse,
 	res, err := httpHelper.MakeHTTPRequest(wrapper)
 	if err != nil {
 		return jsonResponse{}, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return jsonResponse{}, fmt.Errorf("Got %v status code from %s", res.StatusCode, requestURL)
 	}
 
 	bodyBytes, readErr := ioutil.ReadAll(res.Body)
