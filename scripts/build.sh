@@ -10,8 +10,8 @@ mkdir -p bin/linux
 VERSION_NUMBER=$BUILD_NUMBER
 CONFIG_PATH="github.com/newrelic/NrDiag/config"
 
-if [ -z "$BUILD_NUMBER" ]; then
-  echo "No arguments supplied"
+if [[ -z "${VERSION_NUMBER}" ]]; then
+  echo "No arguments supplied for BUILD_NUMBER"
   VERSION_NUMBER="DEVELOP"
   # Development mode, send usage data to staging endpoint
   USAGE_ENDPOINT="${STAGING_USAGE_ENDPOINT}"

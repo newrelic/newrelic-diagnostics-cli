@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if  [[ $(basename `pwd`) != "nr-diagnostics" ]]
+if  [[ $(basename `pwd`) != "NrDiag" ]]
   then
-    echo "Won't run outside a 'nr-diagnostics' directory'"
+    echo "Won't run outside a 'NrDiag' directory'"
     exit
 fi
 
@@ -24,8 +24,8 @@ if rm -r ./nrdiag-output/ 2> /dev/null
 fi
 
 echo "Looking for binaries"
-if rm ./nr-diagnostics 2> /dev/null
-  then echo "...removed nr-diagnostics binary"
+if rm ./NrDiag 2> /dev/null
+  then echo "...removed NrDiag binary"
 fi
 
 if rm -r ./bin/ 2> /dev/null

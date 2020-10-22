@@ -170,7 +170,8 @@ func ParseFlags() {
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
-	if strings.Contains(os.Args[0], "nr-diagnostics") {
+	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
+	if strings.Contains(os.Args[0], "NrDiag") {
 		flag.StringVar(&Flags.AttachmentEndpoint, "attachment-endpoint", defaultString, "The endpoint to send attachments to. (NR ONLY)")
 	}
 

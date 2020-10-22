@@ -121,8 +121,8 @@ func init() {
 	nodeRequirements.RegisterWith(Register)
 	rubyRequirements.RegisterWith(Register)
 
-	//example stuff, doesn't need to "ship"
-	if strings.Contains(os.Args[0], "nr-diagnostics") {
+	//example stuff, doesn't need to "ship" because binary gets name after directory with `go build` cmd
+	if strings.Contains(os.Args[0], "NrDiag") {
 		template.RegisterWith(Register)
 	}
 

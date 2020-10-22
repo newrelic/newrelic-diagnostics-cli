@@ -1,4 +1,4 @@
-$EXENAME="nr-diagnostics"
+$EXENAME="NrDiag"
 echo "Running go get -t ./..."
 go get -t ./...
 go get github.com/onsi/ginkgo/ginkgo # needed to pull down the ginkgo binary
