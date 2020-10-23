@@ -49,7 +49,8 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	}
 
 	baseWindowsDockerFrom := []string{
-		"FROM nrdiagregistry.azurecr.io/base-win-nano",
+		"FROM microsoft/nanoserver",
+		`SHELL ["powershell"]`,
 	}
 
 	baseDockerApp := []string{
