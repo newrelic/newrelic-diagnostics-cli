@@ -110,7 +110,15 @@ func main() {
 		}
 
 		if config.Flags.Suites == "" && config.Flags.Tasks == "" {
-			log.Infof("\n\nTo diagnose a specific product or issue, see task suites options: '%s -h suites'\n\n", os.Args[0])
+			var command, option string
+			if config.Flags.InNewRelicCLI {
+				command = "newrelic diagnose run"
+				option = "--list-suites"
+			} else {
+				command = os.Args[0]
+				option = "-h suites"
+			}
+			log.Infof("\n\nTo diagnose a specific product or issue, see task suites options: '%s %s'\n\n", command, option)
 		}
 	}
 }
