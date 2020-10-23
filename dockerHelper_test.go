@@ -52,7 +52,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	}
 
 	baseWindowsDockerFrom := []string{
-		"FROM mcr.microsoft.com/windows/nanoserver:1903",
+		"FROM mcr.microsoft.com/windows/nanoserver:1803-amd64",
 		`SHELL ["powershell"]`,
 	}
 
