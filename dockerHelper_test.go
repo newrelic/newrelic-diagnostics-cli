@@ -12,10 +12,10 @@ import (
 func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, dockerLines []string) error {
 
 	//Create the Dockerfile
-	dockerfile, err := CreateDockerfile(imageName, dockerFROM, docker_cmd, dockerLines)
+	dockerfile, dockerfilecontent, err := CreateDockerfile(imageName, dockerFROM, docker_cmd, dockerLines)
 	defer os.Remove(dockerfile) // clean up
 	if err != nil {
-		log.Info("Error creating integrationDockerfile", err)
+		log.Fatal("Error creating integrationDockerfile: ", err)
 	}
 
 	log.Debug("Running docker build -f integrationDockerfile -t ", imageName, " .")
@@ -25,22 +25,25 @@ func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, d
 	output, cmdBuildErr := cmdBuild.CombinedOutput()
 
 	if cmdBuildErr != nil {
-		log.Info("Error running docker build -", cmdBuildErr)
-		log.Info("Error was ", string(output))
+		log.Infof("Error running cmd: docker build -f %s -t %s .", dockerfile, imageName)
+		log.Info("Error was: ", string(output))
+		log.Info("Content in dockerfile is: ", dockerfilecontent)
 		return cmdBuildErr
 	}
 	return nil
 }
 
 //CreateDockerfile - This builds the raw Dockerfile from the slice of tests
-func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, dockerfileLines []string) (string, error) {
+func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, dockerfileLines []string) (string, []string, error) {
 
 	f, err := ioutil.TempFile("temp", imageName)
 	//Build base Dockerfile
 
+	var dockerfile []string
+
 	if _, err = f.WriteString("\r\n"); err != nil {
 		log.Info("Error writing output file", err)
-		return "", err
+		return "", dockerfile, err
 	}
 
 	baseDockerFrom := []string{
@@ -62,7 +65,6 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 		"WORKDIR /app",
 	}
 
-	var dockerfile []string
 	if runtime.GOOS == "windows" && dockerFROM == "" {
 		dockerfile = append(baseWindowsDockerFrom, baseWindowsDockerApp...)
 		dockerfile = append(dockerfile, dockerfileLines...)
@@ -102,10 +104,10 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 		log.Debug(line)
 		if _, err = f.WriteString(line + "\r\n"); err != nil {
 			log.Info("Error writing output file", err)
-			return "", err
+			return "", dockerfile, err
 		}
 	}
-	return f.Name(), nil
+	return f.Name(), dockerfile, nil
 }
 
 //RunDockerContainer - This runs the docker container from the image previously built
