@@ -1,5 +1,5 @@
 
--  test_name: InvalidYml
+ -  test_name: InvalidYml
 dockerfile_lines: 
  - COPY fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
 log_entry_expected:  
