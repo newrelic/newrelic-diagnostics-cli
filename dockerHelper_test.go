@@ -25,7 +25,7 @@ func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, d
 	output, cmdBuildErr := cmdBuild.CombinedOutput()
 
 	if cmdBuildErr != nil {
-		log.Infof("Error running cmd: docker build -f %s -t %s .", dockerfile, imageName)
+		log.Infof("Error running cmd: docker build -f %s -t %s .\n", dockerfile, imageName)
 		log.Info("Error was: ", string(output))
 		log.Info("Content in dockerfile is: ", dockerfilecontent)
 		return cmdBuildErr
@@ -52,7 +52,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	}
 
 	baseWindowsDockerFrom := []string{
-		"docker run mcr.microsoft.com/windows/nanoserver:1903",
+		"FROM mcr.microsoft.com/windows/nanoserver:1903",
 		`SHELL ["powershell"]`,
 	}
 
