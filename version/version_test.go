@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/newrelic/NrDiag/config"
-	"github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 var promptUserAllow = func(string) bool { return true }

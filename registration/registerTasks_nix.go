@@ -3,7 +3,7 @@
 package registration
 
 import (
-	"github.com/newrelic/NrDiag/tasks/java/jvm"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/jvm"
 )
 
 func init() {

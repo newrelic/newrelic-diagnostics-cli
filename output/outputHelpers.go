@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/newrelic/NrDiag/config"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/registration"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 const permissionsError = "\n------Error creating output files.------\n Please check to ensure you have rights to creating files in the local directory or specify a different output directory with -output-path\n"

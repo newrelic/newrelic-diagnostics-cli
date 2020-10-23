@@ -8,8 +8,8 @@ import (
 
 	"os/user"
 
-	"github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // types used for dependency injection

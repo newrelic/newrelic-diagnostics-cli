@@ -20,8 +20,8 @@ import (
 	"sync"
 
 	"github.com/shirou/gopsutil/process"
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	log "github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 // OsFunc - for dependency injecting osGetwd

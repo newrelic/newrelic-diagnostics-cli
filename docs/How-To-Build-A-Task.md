@@ -5,7 +5,7 @@
 For this document it is assumed that:
  * You have a working `go` environment
  * You can compile and run the `nrdiag` project
- * You are working off a fork of NrDiag
+ * You are working off a fork of newrelic-diagnostics-cli
  
 
 **This** doc only goes over the minimal mechanics to get a task up and running.
@@ -51,7 +51,7 @@ Note: if your task is not one that should be run by default, change the `true` t
 
 From the main directory of the project, type:
 
-`go build && ./NrDiag -t Java/JVM/Taste`
+`go build && ./newrelic-diagnostics-cli -t Java/JVM/Taste`
 
 You should see a result that looks something like:
 
@@ -89,7 +89,7 @@ This probably means that either:
 
 You might get a hint of what went wrong by looking at the help screen that lists all registered tasks.
 
-`./NrDiag -h tasks`
+`./newrelic-diagnostics-cli -h tasks`
 
 Along with all the other output, you should see:
 

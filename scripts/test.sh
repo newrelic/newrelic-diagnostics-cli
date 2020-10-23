@@ -2,7 +2,7 @@
 
 set -e
 
-EXENAME=NrDiag
+EXENAME=newrelic-diagnostics-cli
 
 # This looks for an import of "path" vs "path/filepath", see overview at top of https://golang.org/pkg/path/
 if grep -R --include="*.go" -n "\"path\"" ./ *.go; then

@@ -7,8 +7,8 @@ import (
 	"time"
 	"net"
 
-	"github.com/newrelic/NrDiag/config"
-	log "github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 

@@ -8,11 +8,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/newrelic/NrDiag/config"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/registration"
-	"github.com/newrelic/NrDiag/suites"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/suites"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // validateHTTPProxy - basic input validation for the -proxy <proxy> flag argument

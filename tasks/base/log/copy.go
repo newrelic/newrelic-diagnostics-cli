@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/newrelic/NrDiag/config"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	baseConfig "github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	baseConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 // BaseLogCopy - Primary task to search for and find config file. Will optionally take command line input as source

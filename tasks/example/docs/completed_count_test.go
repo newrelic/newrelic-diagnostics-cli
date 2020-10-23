@@ -7,8 +7,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/log"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 func TestBaseLogCount(t *testing.T) {

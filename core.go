@@ -4,12 +4,12 @@ import (
 	"os"
 	"sync"
 
-	"github.com/newrelic/NrDiag/config"
-	"github.com/newrelic/NrDiag/internal/haberdasher"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/output"
-	"github.com/newrelic/NrDiag/usage"
-	"github.com/newrelic/NrDiag/version"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output"
+	"github.com/newrelic/newrelic-diagnostics-cli/usage"
+	"github.com/newrelic/newrelic-diagnostics-cli/version"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package agent
 import (
 	"runtime"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var (

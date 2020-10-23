@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if  [[ $(basename `pwd`) != "NrDiag" ]]
+if  [[ $(basename `pwd`) != "newrelic-diagnostics-cli" ]]
   then
-    echo "Won't run outside a 'NrDiag' directory'"
+    echo "Won't run outside a 'newrelic-diagnostics-cli' directory'"
     exit
 fi
 
@@ -24,8 +24,8 @@ if rm -r ./nrdiag-output/ 2> /dev/null
 fi
 
 echo "Looking for binaries"
-if rm ./NrDiag 2> /dev/null
-  then echo "...removed NrDiag binary"
+if rm ./newrelic-diagnostics-cli 2> /dev/null
+  then echo "...removed newrelic-diagnostics-cli binary"
 fi
 
 if rm -r ./bin/ 2> /dev/null

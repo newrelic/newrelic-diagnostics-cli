@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/newrelic/NrDiag/config"
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	"github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/output/color"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 )
 
 const versionURL = `http://download.newrelic.com/nrdiag/version.txt`

@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"strings"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	baseConfig "github.com/newrelic/NrDiag/tasks/base/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	baseConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 var logFilenamePatterns = []string{"newrelic_agent.*[.]log$",

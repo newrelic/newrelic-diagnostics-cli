@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/newrelic/NrDiag/tasks"
-	dependencies "github.com/newrelic/NrDiag/tasks/node/env"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	dependencies "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

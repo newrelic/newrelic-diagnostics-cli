@@ -11,8 +11,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/shirou/gopsutil/process"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 func TestJavaEnvProcess(t *testing.T) {
@@ -112,15 +112,15 @@ var _ = Describe("JavaEnvProcess", func() {
 				p.findProcByName = func(string) ([]process.Process, error) {
 					return javaProcesses, nil
 				}
-				cmdLineArgs := "-javaagent:/root/go/src/github.com/newrelic/NrDiag/newrelic.jar"
+				cmdLineArgs := "-javaagent:/root/go/src/github.com/newrelic/newrelic-diagnostics-cli/newrelic.jar"
 				p.getCmdLineArgs = func(process.Process) (string, error) {
 					return cmdLineArgs, nil
 				}
 				cmdLineArgsList := strings.Split(cmdLineArgs, " ")
 				p.getCurrentDir = func(process.Process, string) string {
-					return "/root/go/src/github.com/newrelic/NrDiag"
+					return "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli"
 				}
-				expectedPayload = append(expectedPayload, ProcIdAndArgs{Proc: javaProcesses[0], CmdLineArgs: cmdLineArgsList, Cwd: "/root/go/src/github.com/newrelic/NrDiag", EnvVars: envVarsPayload})
+				expectedPayload = append(expectedPayload, ProcIdAndArgs{Proc: javaProcesses[0], CmdLineArgs: cmdLineArgsList, Cwd: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", EnvVars: envVarsPayload})
 			})
 
 			It("should return a tasks.Result with a success status, a summary and a payload", func() {

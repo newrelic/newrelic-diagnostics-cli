@@ -1,6 +1,6 @@
 package fixtures
 
-import "github.com/newrelic/NrDiag/tasks"
+import "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 
 type GoodTaskFileTwoDependencies struct {
 }

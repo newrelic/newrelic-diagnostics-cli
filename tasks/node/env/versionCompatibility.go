@@ -3,7 +3,7 @@ package env
 import (
 	"fmt"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // To update compatibility requirements, modify what's the contents of supportedNodeVersions

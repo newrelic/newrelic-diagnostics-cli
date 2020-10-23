@@ -14,9 +14,9 @@ import (
 
 	"github.com/shirou/gopsutil/process"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/java/env"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
 )
 
 /* PermissionsPayload - struct used to construct the eventual result payload */

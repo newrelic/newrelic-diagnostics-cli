@@ -5,8 +5,8 @@ package docs
 import (
 	"strconv"
 
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/log"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 // BaseLogCount - This struct defined the sample plugin which can be used as a starting point

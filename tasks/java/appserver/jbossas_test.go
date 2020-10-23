@@ -9,8 +9,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/shirou/gopsutil/process"
 
-	baseConfig "github.com/newrelic/NrDiag/config"
-	tasks "github.com/newrelic/NrDiag/tasks"
+	baseConfig "github.com/newrelic/newrelic-diagnostics-cli/config"
+	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestMain(m *testing.M) {

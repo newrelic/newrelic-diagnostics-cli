@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/newrelic/NrDiag/config"
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/registration"
-	"github.com/newrelic/NrDiag/tasks"
-	l "github.com/newrelic/NrDiag/tasks/base/log"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	l "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 const defaultProtocolVersion = "1.0"

@@ -5,8 +5,8 @@ package requirements
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	tasks "github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/env"
+	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 )
 
 var _ = Describe("Dotnet/Requirements/ProcessorType", func() {

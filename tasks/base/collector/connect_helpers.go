@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 )
 
 type requestFunc func(wrapper httpHelper.RequestWrapper) (*http.Response, error)

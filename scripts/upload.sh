@@ -42,4 +42,4 @@ aws s3 cp bin/version.txt s3://${S3_BUCKET}/nrdiag/
 fi
 
 # This script should be run from jenkins with the following environment values passed in
-# docker run --rm -e S3_BUCKET  -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e BUILD_NUMBER -v $PWD/production:/root/go/src/github.com/newrelic/NrDiag/sharedfolder madhatter-build ./scripts/upload.sh
+# docker run --rm -e S3_BUCKET  -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e BUILD_NUMBER -v $PWD/production:/root/go/src/github.com/newrelic/newrelic-diagnostics-cli/sharedfolder madhatter-build ./scripts/upload.sh

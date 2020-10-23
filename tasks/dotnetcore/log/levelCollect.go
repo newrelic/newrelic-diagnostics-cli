@@ -3,9 +3,9 @@ package log
 import (
 	"strings"
 
-	"github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 // DotNetCoreLogLevelCollect - This struct defines this plugin

@@ -1,4 +1,4 @@
-$EXENAME="NrDiag"
+$EXENAME="newrelic-diagnostics-cli"
 echo "Running go get -t ./..."
 go get -t ./...
 go get github.com/onsi/ginkgo/ginkgo # needed to pull down the ginkgo binary

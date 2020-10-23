@@ -42,7 +42,7 @@
 						"Streamed": false
 					}
 				],
-				"Payload": "[{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/NrDiag/fixtures/java/newrelic/\"},{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/NrDiag/fixtures/ruby/config/\"}]"
+				"Payload": "[{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/newrelic-diagnostics-cli/fixtures/java/newrelic/\"},{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/newrelic-diagnostics-cli/fixtures/ruby/config/\"}]"
 			}
 		},
 		{

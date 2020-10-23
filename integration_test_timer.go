@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	log "github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 const insightsEventName = "NRDiagIntegrationTestRun"
