@@ -1,0 +1,45 @@
+# Sample Test format
+# To add your test simply copy a test_name section and replace with details of your test
+ -  test_name: "NormalOutput"
+    dockerfile_lines: 
+     - CMD ["/bin/sh", "-c", "./nrdiag"]
+    log_entry_expected:
+     - Check Results
+     - Failure.*Base/Config/Collect
+     - results not shown
+     - Issues Found
+     - New Relic configuration files not found
+    log_entry_not_expected: 
+ -  test_name: "QuietOutput"
+    docker_cmd: ./nrdiag -q
+    log_entry_expected:
+     - Check Results
+     - Failure.*Base/Config/Collect
+     - results not shown
+    log_entry_not_expected: 
+     - Issues Found
+     - New Relic configuration files not found
+ -  test_name: "VeryQuietOutput"
+    docker_cmd: ./nrdiag -qq
+    log_entry_expected:
+     - "results:"
+    log_entry_not_expected: 
+     - Base/Config/Collect
+     - results not shown
+     - Check Results
+     - Issues Found
+     - New Relic configuration files not found
+ -  test_name: overrideOutputDirectory
+    docker_cmd: ./nrdiag -output-path test-folder && ls test-folder
+    dockerfile_lines: 
+     - COPY fixtures/ruby/config/newrelic.yml app/newrelic.yml
+    log_entry_expected:
+     - nrdiag-output.zip
+     - nrdiag-output.json
+ -  test_name: FilelistInZipfile
+    dockerfile_lines:
+     - COPY fixtures/ruby/config/newrelic.yml app/newrelic.yml
+    docker_cmd: ./nrdiag && zipdetails nrdiag-output.zip
+    log_entry_expected:
+     - nrdiag-output/nrdiag-filelist.txt
+     - nrdiag-output/Base/Config/newrelic.yml

@@ -1,14 +1,14 @@
-- test_name: InfrastructureVersionPresentWindows
-  docker_from: microsoft/windowsservercore:latest
-  dockerfile_lines:
-    - RUN NET USER nradmin /add
-    - RUN NET LOCALGROUP Administrators /add nradmin
-    - USER nradmin
-    - RUN @powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin" -Y
-    - SHELL ["powershell"]
-    - ADD https://download.newrelic.com/infrastructure_agent/windows/newrelic-infra.msi newrelic-infra.msi
-    - RUN ["msiexec.exe", "/qn", "/i", "newrelic-infra.msi"]
-  log_entry_expected:  
-    - Info.*Infra/Agent/Version.*
-    - Success.*Infra/Agent/Connect
-  log_entry_not_expected:
+# - test_name: InfrastructureVersionPresentWindows
+#   docker_from: microsoft/windowsservercore:latest
+#   dockerfile_lines:
+#     - RUN NET USER nradmin /add
+#     - RUN NET LOCALGROUP Administrators /add nradmin
+#     - USER nradmin
+#     - RUN @powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin" -Y
+#     - SHELL ["powershell"]
+#     - ADD https://download.newrelic.com/infrastructure_agent/windows/newrelic-infra.msi newrelic-infra.msi
+#     - RUN ["msiexec.exe", "/qn", "/i", "newrelic-infra.msi"]
+#   log_entry_expected:  
+#     - Info.*Infra/Agent/Version.*
+#     - Success.*Infra/Agent/Connect
+#   log_entry_not_expected:
