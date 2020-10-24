@@ -17,7 +17,7 @@ $env:GOARCH='amd64'
 go build -o $EXENAME -ldflags "-X github.com/newrelic/NrDiag/config.Version=INTEGRATION -X github.com/newrelic/NrDiag/config.BuildTimestamp=$BUILD_TIMESTAMP"
 move-item -Force -Path .\nrdiag -Destination .\bin\win\"$EXENAME"_x64.exe
 
-go test integration_test.go integration_test_timer.go dockerHelper_test.go -v -timeout 3h --tags=integration -testNames="$tests"
+go test integration_test.go integration_test_timer.go dockerHelper_test.go -v -timeout 3h --tags=integration -testNames="InvalidYml"
 
 if ($LASTEXITCODE -eq 1) {
     exit $LASTEXITCODE
