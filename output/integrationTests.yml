@@ -32,14 +32,14 @@
  -  test_name: overrideOutputDirectory
     docker_cmd: ./nrdiag -output-path test-folder && ls test-folder
     dockerfile_lines: 
-     - COPY fixtures/ruby/config/newrelic.yml app/newrelic.yml
+     - COPY tasks/fixtures/ruby/config/newrelic.yml app/newrelic.yml
     log_entry_expected:
      - nrdiag-output.zip
      - nrdiag-output.json
  -  test_name: FilelistInZipfile
     dockerfile_lines:
-     - COPY fixtures/ruby/config/newrelic.yml app/newrelic.yml
-    docker_cmd: ./nrdiag && zipdetails nrdiag-output.zip
+     - COPY tasks/fixtures/ruby/config/newrelic.yml app/newrelic.yml
+    docker_cmd: ./nrdiag && zipinfo nrdiag-output.zip
     log_entry_expected:
      - nrdiag-output/nrdiag-filelist.txt
      - nrdiag-output/Base/Config/newrelic.yml

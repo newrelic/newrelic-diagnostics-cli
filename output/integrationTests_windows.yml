@@ -1,7 +1,7 @@
 - test_name: FilelistInZipfile
   dockerfile_lines:
-   - COPY ["fixtures/ruby/config/newrelic.yml" , "/app/newrelic.yml"]
-   - COPY ["fixtures/integration/filelistInZipfile.ps1" , "/app/filelistInZipfile.ps1"]
+   - COPY ["tasks/fixtures/ruby/config/newrelic.yml" , "/app/newrelic.yml"]
+   - COPY ["tasks/fixtures/integration/filelistInZipfile.ps1" , "/app/filelistInZipfile.ps1"]
   docker_cmd: "/app/filelistInZipfile.ps1"
   log_entry_expected:
    - nrdiag-output/nrdiag-filelist.txt

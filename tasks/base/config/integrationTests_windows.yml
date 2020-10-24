@@ -1,6 +1,6 @@
 - test_name: InvalidYml
   dockerfile_lines: 
-   - COPY fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
+   - COPY tasks/fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
   log_entry_expected:  
    - "yaml: line 15: did not find expected key"
    - Failure.*Base/Config/Validate
