@@ -50,10 +50,13 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 		"FROM ubuntu:16.04",
 		"RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qqy unzip apt-transport-https ca-certificates",
 	}
-
+	//		"FROM mcr.microsoft.com/windows/nanoserver:1803-amd64",
 	baseWindowsDockerFrom := []string{
-		"FROM mcr.microsoft.com/windows/nanoserver:1803-amd64",
+		"FROM mcr.microsoft.com/windows/servercore:ltsc2019",
 		`SHELL ["powershell"]`,
+		"RUN NET USER nradmin /add",
+		"RUN NET LOCALGROUP administrators /add nradmin",
+		"USER nradmin",
 	}
 
 	baseDockerApp := []string{

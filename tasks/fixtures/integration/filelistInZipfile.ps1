@@ -1,1 +1,1 @@
-.\nrdiag_x64.exe;[IO.Compression.ZipFile]::OpenRead('nrdiag-output.zip').Entries.FullName
+.\nrdiag_x64.exe;Add-Type -AssemblyName System.IO.Compression.FileSystem;[System.IO.Compression.ZipFile]::OpenRead('nrdiag-output.zip').Entries.FullName
