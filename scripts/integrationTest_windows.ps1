@@ -1,9 +1,6 @@
 ﻿param([string]$tests)
 # We can run a test by name by running powershell .\integrationTest_windows.ps1 'FailingCollector,SuccessfullCollector'
 
-echo "Loging into Container reg"
-C:\dockerCreds\winDockerCreds.ps1
-
 echo "Running go get -t"
 go get -t
 
