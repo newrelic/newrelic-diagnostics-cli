@@ -50,7 +50,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 
 	baseWindowsDockerFrom := []string{
 		// "FROM mcr.microsoft.com/windows/servercore:ltsc2019",
-		"FROM mcr.microsoft.com/windows/nanoserver:1803-amd64",
+		"FROM mcr.microsoft.com/windows/nanoserver:1809",
 		`SHELL ["powershell"]`,
 		"RUN NET USER nradmin /add",
 		"RUN NET LOCALGROUP administrators /add nradmin",
