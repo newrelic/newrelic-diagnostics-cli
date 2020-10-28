@@ -18,25 +18,22 @@ jobs:
         with:
           fetch-depth: 0
       #extract tag value from GITHUB_REF/refs/tags/build/32 or /refs/heads/main
-      - name: set build version env var
-        run: |
-          echo "Build number:"
-          echo ${GITHUB_REF#refs/tags/build/}
-          echo "BUILD_NUMBER=${GITHUB_REF#refs/tags/build/}" >> $GITHUB_ENV
-          echo "my build number:"
-          echo ${{ env.BUILD_NUMBER }}
-          echo $BUILD_NUMBER
-      # - name: build and publish to download.newrelic.com/nrdiag/
-      #   shell: bash
-      #   env:
-      #     S3_BUCKET: ${{ secrets.S3_BUCKET }}
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     BUILD_NUMBER:
+      # - name: set build version env var
       #   run: |
-      #       echo $BUILD_NUMBER
-      #       echo ${{ env.BUILD_NUMBER }}
-      #       ./scripts/upload.sh
+      #     echo "Build number:"
+      #     echo ${GITHUB_REF#refs/tags/build/}
+      #     echo "BUILD_NUMBER=${GITHUB_REF#refs/tags/build/}" >> $GITHUB_ENV
+      #     echo "my build number:"
+      #     echo ${{ env.BUILD_NUMBER }}
+      #     echo $BUILD_NUMBER
+      - name: build and publish to download.newrelic.com/nrdiag/
+        shell: bash
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+            BUILD_NUMBER=${GITHUB_REF#refs/tags/build/} ./scripts/upload.sh
 
 
 

@@ -39,9 +39,9 @@ if [ "$VERSION_NUMBER" == "$BUILD_NUMBER" ]
 echo "Uploading to Download.Newrelic.com"
 ln -s $ZIPFILENAME nrdiag_latest.zip
 
-aws s3 cp ${ZIPFILENAME} s3://${S3_BUCKET}/nrdiag/
-aws s3 cp nrdiag_latest.zip s3://${S3_BUCKET}/nrdiag/
-aws s3 cp bin/version.txt s3://${S3_BUCKET}/nrdiag/
+aws s3 cp ${ZIPFILENAME} s3://${S3_BUCKET}/nrdiag/test/
+aws s3 cp nrdiag_latest.zip s3://${S3_BUCKET}/nrdiag/test/
+aws s3 cp bin/version.txt s3://${S3_BUCKET}/nrdiag/test/
 
 fi
 

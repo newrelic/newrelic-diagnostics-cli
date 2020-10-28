@@ -20,6 +20,7 @@ if [ -z "$BUILD_NUMBER" ]; then
   HABERDASHER_URL="${STAGING_HABERDASHER_URL}"
 else
   # Build number is present, send usage data to production endpoint
+  echo "send usage data to Haberdasher production"
   USAGE_ENDPOINT="${PROD_USAGE_ENDPOINT}"
   ATTACHMENT_ENDPOINT="${PROD_ATTACHMENT_ENDPOINT}"
   HABERDASHER_URL="${PROD_HABERDASHER_URL}"
