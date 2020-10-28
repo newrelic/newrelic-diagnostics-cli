@@ -12,8 +12,6 @@ VERSION_NUMBER=$BUILD_NUMBER
 
 if [ -z "$BUILD_NUMBER" ]
   then
-    echo ${S3_BUCKET}
-    echo $S3_BUCKET
     echo "No arguments supplied for BUILD_NUMBER"
     VERSION_NUMBER="DEVELOP"
 fi
