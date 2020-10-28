@@ -112,7 +112,14 @@ func processHelp() {
 //infra			Infrastructure Agent
 func printSuites() {
 	log.Info("\nSuites are a targeted collection of diagnostic tasks.\n")
-	log.Infof("Usage: \n\t%s --suites [suite arguments] \nExample:\n\t%[1]s --suites \"java,infra\"\n", os.Args[0])
+	var command string
+	// Match help strings to context
+	if config.Flags.InNewRelicCLI {
+		command = "newrelic diagnose run"
+	} else {
+		command = os.Args[0]
+	}
+	log.Infof("Usage: \n\t%s --suites [suite arguments] \nExamples:\n\t%[1]s --suites java,infra\n\t%[1]s --suites python\n", command)
 	log.Info("\nUse the following arguments to select task suite(s) to run:\n")
 	log.Infof("%-18s%s\n\n", "Arguments:", "Diagnostics for:")
 
@@ -147,7 +154,7 @@ func printTasks() {
 
 	sort.Sort(tasks.ByIdentifier(allTasks))
 
-	log.Infof("There are %d tasks\n", len(allTasks))
+	log.Infof("There are %d tasks:\n", len(allTasks))
 
 	var lastTask tasks.Task
 	for index, task := range allTasks {

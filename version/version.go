@@ -1,6 +1,7 @@
 package version
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -97,7 +98,13 @@ func processAutoVersionCheck(log logger.API, getOnlineVersion func(logger.API) s
 		if !config.Flags.VeryQuiet {
 			logVersionString(log)
 			log.Infof(color.ColorString(color.Yellow, "Version %s has been released and is newer than your version.\n"), onlineVersion)
-			log.Info("Please run with the -version flag to download the new release.")
+			var command string
+			if config.Flags.InNewRelicCLI {
+				command = "newrelic diagnose update"
+			} else {
+				command = fmt.Sprintf("%s -version", os.Args[0])
+			}
+			log.Infof("Please run '%s' to download the new release.", command)
 		}
 		return false
 	}

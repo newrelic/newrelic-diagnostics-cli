@@ -44,6 +44,7 @@ type userFlags struct {
 	BrowserURL         string
 	AttachmentEndpoint string
 	Suites             string
+	InNewRelicCLI	   bool
 }
 
 type ConfigFlag struct {
@@ -202,6 +203,8 @@ func ParseFlags() {
 		Flags.Override = "Browser/Agent/GetSource.url=" + Flags.BrowserURL + "," + Flags.Override
 		Flags.Tasks = "Browser/Agent/Detect," + Flags.Tasks
 	}
+
+	Flags.InNewRelicCLI = (os.Getenv("NEWRELIC_CLI_SUBPROCESS") != "")
 }
 
 // UsagePayload gathers and sanitizes user command line input
