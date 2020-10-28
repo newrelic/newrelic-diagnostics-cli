@@ -25,7 +25,7 @@ mkdir ../nrdiag/
 cp -r ./* ../nrdiag/
 cd ../
 zip -r $ZIPFILENAME nrdiag/
-
+#upload to artifactory:
 if [ "$VERSION_NUMBER" == "$BUILD_NUMBER" ]
   then 
  
