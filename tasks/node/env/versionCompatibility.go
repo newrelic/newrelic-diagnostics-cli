@@ -55,7 +55,7 @@ func (p NodeEnvVersionCompatibility) Execute(options tasks.Options, upstream map
 		}
 	}
 
-	if isItCompatible == false {
+	if !isItCompatible {
 		return tasks.Result{
 			Summary: fmt.Sprintf("Your current Node.js version, %v, is not compatible with New Relic's Node.js agent", nodeVersion),
 			Status:  tasks.Failure,

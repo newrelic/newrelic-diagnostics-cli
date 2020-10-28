@@ -8,13 +8,6 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-func mockCmdExecSuccess(name string, arg ...string) ([]byte, error) {
-	return []byte("v10.7.0"), nil
-}
-func mockCmdExecFailure(name string, arg ...string) ([]byte, error) {
-	return []byte{}, errors.New("execution error")
-}
-
 var _ = Describe("Node/Env/Version", func() {
 	var p NodeEnvVersion //instance of our task struct that tests will be using
 

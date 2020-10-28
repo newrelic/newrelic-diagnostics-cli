@@ -1,9 +1,6 @@
 package registration
 
 import (
-	"fmt"
-	"io/ioutil"
-	"regexp"
 	"testing"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -86,29 +83,29 @@ func TestTasksHaveValidExplain(t *testing.T) {
 	}
 }
 
-func countPatternInFile(pattern string, filename string) int {
-	lines, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	r, _ := regexp.Compile(pattern)
-	matches := r.FindAllStringSubmatch(string(lines), -1)
+// func countPatternInFile(pattern string, filename string) int {
+// 	lines, err := ioutil.ReadFile(filename)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	r, _ := regexp.Compile(pattern)
+// 	matches := r.FindAllStringSubmatch(string(lines), -1)
 
-	return len(matches)
-}
+// 	return len(matches)
+// }
 
-func dumpTasks(ts map[string]registeredTask) {
-	fmt.Println("### map has ", len(ts), " items")
-	for _, t := range ts {
-		if t.runByDefault {
-			fmt.Println("dumping: ", t.Task.Identifier())
-		}
-	}
-}
+// func dumpTasks(ts map[string]registeredTask) {
+// 	fmt.Println("### map has ", len(ts), " items")
+// 	for _, t := range ts {
+// 		if t.runByDefault {
+// 			fmt.Println("dumping: ", t.Task.Identifier())
+// 		}
+// 	}
+// }
 
-func dumpQueue(q chan tasks.Task) {
-	fmt.Println("### queue has ", len(q), " items")
-	for t := range q {
-		fmt.Println("from queue: ", t.Identifier())
-	}
-}
+// func dumpQueue(q chan tasks.Task) {
+// 	fmt.Println("### queue has ", len(q), " items")
+// 	for t := range q {
+// 		fmt.Println("from queue: ", t.Identifier())
+// 	}
+// }
