@@ -9,30 +9,29 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version:
-          - 1.13.x
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    #extract tag value from GITHUB_REF/refs/tags/build/32 or /refs/heads/main
-    - name: set build version env var
-      run: echo "BUILD_NUMBER=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-    - name: build and publish to download.newrelic.com/nrdiag/
-      shell: bash
-      env:
-        S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        BUILD_NUMBER:
-      run: |
-          echo $S3_BUCKET
-          echo $BUILD_NUMBER
-          echo ${{ env.BUILD_NUMBER }}
-          ./scripts/upload.sh
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.13.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      #extract tag value from GITHUB_REF/refs/tags/build/32 or /refs/heads/main
+      - name: set build version env var
+        run: echo "BUILD_NUMBER=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: build and publish to download.newrelic.com/nrdiag/
+        shell: bash
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          BUILD_NUMBER:
+        run: |
+            echo $S3_BUCKET
+            echo $BUILD_NUMBER
+            echo ${{ env.BUILD_NUMBER }}
+            ./scripts/upload.sh
 
 
 
