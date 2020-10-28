@@ -20,13 +20,12 @@ jobs:
       #extract tag value from GITHUB_REF/refs/tags/build/32 or /refs/heads/main
       - name: set build version env var
         run: |
-          echo "my build:"
+          echo "Build number:"
           echo ${GITHUB_REF#refs/tags/build/}
-          echo "my tags: "
-          echo ${GITHUB_REF#refs/tags/}
           echo "BUILD_NUMBER=${GITHUB_REF#refs/tags/build/}" >> $GITHUB_ENV
           echo "my build number:"
           echo ${{ env.BUILD_NUMBER }}
+          echo $BUILD_NUMBER
       # - name: build and publish to download.newrelic.com/nrdiag/
       #   shell: bash
       #   env:
