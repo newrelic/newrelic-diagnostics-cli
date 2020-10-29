@@ -10,7 +10,7 @@ mkdir -p bin/linux
 VERSION_NUMBER=$BUILD_NUMBER
 CONFIG_PATH="github.com/newrelic/newrelic-diagnostics-cli/config"
 
-if [[ -z "${VERSION_NUMBER}" ]]; then
+if [ -z "$BUILD_NUMBER" ]; then
   echo "No arguments supplied for BUILD_NUMBER"
   VERSION_NUMBER="DEVELOP"
   # Development mode, send usage data to staging endpoint
@@ -20,6 +20,7 @@ if [[ -z "${VERSION_NUMBER}" ]]; then
   HABERDASHER_URL="${STAGING_HABERDASHER_URL}"
 else
   # Build number is present, send usage data to production endpoint
+  echo "send usage data to Haberdasher production"
   USAGE_ENDPOINT="${PROD_USAGE_ENDPOINT}"
   ATTACHMENT_ENDPOINT="${PROD_ATTACHMENT_ENDPOINT}"
   HABERDASHER_URL="${PROD_HABERDASHER_URL}"

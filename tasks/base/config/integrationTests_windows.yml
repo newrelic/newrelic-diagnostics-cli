@@ -1,0 +1,26 @@
+
+ -  test_name: InvalidYml
+    dockerfile_lines: 
+     - COPY tasks/fixtures/integration/invalidYml/newrelic.yml /app/newrelic.yml
+    log_entry_expected:  
+     - "yaml: line 15: did not find expected key"
+     - Failure.*Base/Config/Validate
+    log_entry_not_expected:
+     - Success.*Ruby/Config/Agent
+#  -  test_name: InvalidXML
+#     dockerfile_lines: 
+#      - COPY tasks/base/config/fixtures/validate_badxml.config /app/newrelic.config
+#     log_entry_expected:  
+#      - "XML syntax error on line 32: element <log> closed by </configuration>"
+#      - Failure.*Base/Config/Validate
+#     log_entry_not_expected:
+#      - Success.*Dotnet/Config/Agent
+#      - Success.*Dotnet/Config/Agent
+#  -  test_name: CollectAndSkipPromptWSMStatusMonitor
+#     dockerfile_lines: 
+#      - COPY ["fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/newrelic.config", "/app/NewRelic.ServerMonitor.Config.exe.config"]
+#      - COPY ["fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/newrelic.config", "/app/NewRelicStatusMonitor.exe.config"]
+#     log_entry_expected:  
+#      - Success.*Base/Config/Collect
+#     log_entry_not_expected:
+#      - We've found a file that may contain secure information.*Include it in the zip file?
