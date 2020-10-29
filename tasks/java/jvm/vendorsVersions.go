@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/shirou/gopsutil/process"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/shirou/gopsutil/process"
 )
 
 /*
@@ -66,7 +66,6 @@ type PIDInfo struct {
 type JavaJVMVendorsVersions struct {
 	findProcessByName func(string) ([]process.Process, error)
 	cmdExec           func(name string, arg ...string) ([]byte, error)
-	name              string
 	runtimeGOOS       string
 	getCmdLineArgs    func(process.Process) (string, error)
 }
@@ -446,7 +445,7 @@ func extractVersionFromArgs(cmdLineArgs string) (version string) {
 			return
 		/* e.g. -Djava.vm.version=Oracle JRockit(R) (R28.0.0-617-125986-1.6.0_17-20091215-2120-windows-x86_64, compiled mode) */
 		case strings.Contains(cmdLineArg, "java.vm.version"):
-			matchVendorString := regexp.MustCompile(".*([0-9]{1}\\.[0-9]{1}\\.[0-9]{1}[_0-9]{0,3}).*")
+			matchVendorString := regexp.MustCompile(".*([0-9]{1}\\.[0-9]{1}\\.[0-9]{1}[_0-9]{0,3}).*") //nolint
 			version = matchVendorString.FindStringSubmatch(cmdLineArg)[1]
 			return
 		}
@@ -458,50 +457,48 @@ func extractVersionFromArgs(cmdLineArgs string) (version string) {
 func extractVendorFromArgs(cmdLineArgs string) (vendor string) {
 
 	//splitting on just space here would break when: Djava.vm.name=Java HotSpot(TM)
+
 	sliceCmdLineArgs := strings.Split(cmdLineArgs, " -")
 	for _, cmdLineArg := range sliceCmdLineArgs {
 		if strings.Contains(cmdLineArg, "java.vm.name") {
 			/* IBM J9 */
-			match, _ := regexp.MatchString(".*IBM.*", cmdLineArg)
-			if match {
+			if strings.Contains(cmdLineArg, "IBM") {
 				log.Debug("Detected IBM JVM")
 				vendor = "IBM"
 				return
 			}
 			/* IBM Classic VM */
-			match, _ = regexp.MatchString(".*Classic.*", cmdLineArg)
-			if match {
+			if strings.Contains(cmdLineArg, "Classic") {
 				log.Debug("Detected IBM Classic JVM")
 				vendor = "IBM"
 				return
 			}
-			match, _ = regexp.MatchString(".*HotSpot.*", cmdLineArg)
-			if match {
+
+			if strings.Contains(cmdLineArg, "HotSpot") {
 				log.Debug("Detected Hotspot JVM")
 				vendor = "HotSpot"
 				return
 			}
-			match, _ = regexp.MatchString(".*JRockit.*", cmdLineArg)
-			if match {
+
+			if strings.Contains(cmdLineArg, "JRockit") {
 				log.Debug("Detected JRockit JVM")
 				vendor = "JRockit"
 				return
 			}
 		}
 		if strings.Contains(cmdLineArg, "java.vm.vendor") {
-			match, _ := regexp.MatchString("Apple.*", cmdLineArg)
-			if match {
+			//cmlineArg would look something like this: -Djava.vm.vendor=Oracle Corporation
+
+			if strings.Contains(cmdLineArg, "Apple") {
 				log.Debug("Detected Apple JVM")
 				vendor = "Apple"
 				return
 			}
-			match, _ = regexp.MatchString(".*IBM.*", cmdLineArg)
-			if match {
+			if strings.Contains(cmdLineArg, "IBM") {
 				log.Debug("Detected IBM JVM")
 				vendor = "IBM"
 			}
-			match, _ = regexp.MatchString("Oracle.*", cmdLineArg)
-			if match == true && vendor != "HotSpot" {
+			if (strings.Contains(cmdLineArg, "Oracle")) && vendor != "HotSpot" {
 				log.Debug("Detected Oracle JVM")
 				vendor = "Oracle"
 			}

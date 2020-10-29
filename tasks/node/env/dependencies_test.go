@@ -9,13 +9,6 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-func mockFailure(string, ...string) ([]byte, error) {
-	return []byte{}, errors.New("an error message")
-}
-func mockSuccess(string, ...string) ([]byte, error) {
-	return []byte("a long list of Node.js modules"), nil
-}
-
 var _ = Describe("Node/Env/Dependencies", func() {
 
 	var p NodeEnvDependencies

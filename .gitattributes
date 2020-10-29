@@ -1,0 +1,4 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+#to ensure that line endings for windows builds are properly formatted:
+*.go text eol=lf
