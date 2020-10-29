@@ -141,7 +141,7 @@ func checkLinux(osPlatform string, osVersion string) (result tasks.Result) {
 		return
 	}
 
-	if checkPassed == true {
+	if checkPassed {
 		result.Status = tasks.Success
 		result.Summary = "OS detected as meeting requirements. See HostInfo task Payload for more info on OS."
 		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"

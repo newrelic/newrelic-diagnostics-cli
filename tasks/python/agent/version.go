@@ -52,7 +52,7 @@ func (t PythonAgentVersion) Execute(options tasks.Options, upstream map[string]t
 	agentVersion := getPythonVersionFromLog(logs)
 	log.Debug("Agent version", agentVersion)
 	for _, pythonLog := range agentVersion {
-		if pythonLog.MatchFound == true {
+		if pythonLog.MatchFound {
 			result.Status = tasks.Info
 			result.Summary = pythonLog.AgentVersion
 			result.Payload = pythonLog.AgentVersion
