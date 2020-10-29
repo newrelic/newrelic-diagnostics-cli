@@ -61,7 +61,6 @@ var (
 )
 
 type JavaJVMPermissions struct {
-	name string
 }
 
 // Identifier - returns the Category (Agent), Subcategory (Java) and Name (Permissions)
@@ -374,7 +373,7 @@ func checkForYAMLValues(values agentValues) (newYAMLFile, newLogFileName, newLog
 		if strings.Contains(fmt.Sprint(err), ("string not found in file")) {
 			/* we aren't concerned if the customer does not set this variable in the newrelic.yml; it will later be set to the default value if so */
 			newLogFileName = valueSource{"", ""}
-			err = nil
+			err = nil //nolint
 		} else {
 			newLogFileName.Source = yamlSource
 			log.Debug(taskName + "Setting log file name to " + newLogFileName.Value + " from " + newLogFileName.Source)
@@ -390,7 +389,7 @@ func checkForYAMLValues(values agentValues) (newYAMLFile, newLogFileName, newLog
 		if strings.Contains(fmt.Sprint(err), ("string not found in file")) {
 			/* we aren't concerned if the customer does not set this variable in the newrelic.yml; it will later be set to the default value if so */
 			newLogPath = valueSource{"", ""}
-			err = nil
+			err = nil //nolint
 		} else {
 			newLogPath.Source = yamlSource
 			log.Debug(taskName + "Setting log path to " + newLogPath.Value + " from " + newLogPath.Source)
