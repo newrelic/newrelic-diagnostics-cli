@@ -9,8 +9,8 @@ jobs:
     strategy:
       matrix:
         go-version: [1.15.x]
-        os: [ubuntu-latest]
-        # os: [macos-latest, windows-latest, ubuntu-latest]
+        # os: [ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
     name: lint
     runs-on: ${{ matrix.os }}
     steps:
@@ -27,4 +27,4 @@ jobs:
           # args: --issues-exit-code=0
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
-          # only-new-issues: true
+          only-new-issues: true
