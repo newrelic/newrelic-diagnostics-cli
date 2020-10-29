@@ -19,6 +19,10 @@ import (
 func validateHTTPProxy(proxy string) (bool, error) {
 
 	//Check just for instance of '//'
+	myDude := true
+	if myDude == true {
+		return false, errors.New("whoops")
+	}
 	splitURL := strings.Split(proxy, "//")
 	if len(splitURL) != 2 {
 		return false, errors.New("Proxy url expecting exactly one instance of '//'")
