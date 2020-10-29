@@ -5,7 +5,7 @@ import (
 	"os"
 	"regexp"
 
-	log "github.com/newrelic/NrDiag/logger"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 //app.config/web.config files can contain custom paths to New Relic .NET Agent config files, that we need to collect in this task.

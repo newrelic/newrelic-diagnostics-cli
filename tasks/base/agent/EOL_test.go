@@ -10,8 +10,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
-	"github.com/newrelic/NrDiag/suites"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/suites"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestBaseAgentEOL(t *testing.T) {

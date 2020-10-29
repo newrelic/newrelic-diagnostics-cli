@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"bytes"
 
-	log "github.com/newrelic/NrDiag/logger"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 type DockerInfo struct {

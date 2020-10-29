@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/newrelic/NrDiag/config"
-	log "github.com/newrelic/NrDiag/logger"
-	. "github.com/newrelic/NrDiag/output/color"
-	"github.com/newrelic/NrDiag/registration"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	. "github.com/newrelic/newrelic-diagnostics-cli/output/color"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 //WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>

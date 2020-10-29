@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var (

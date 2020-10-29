@@ -10,7 +10,7 @@ import (
 
 	"github.com/StackExchange/wmi"
 
-	log "github.com/newrelic/NrDiag/logger"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"golang.org/x/sys/windows/registry"
 )
 

@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/newrelic/NrDiag/config"
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // BaseCollectorConnectUS - This task connects to collector.newrelic.com and reports the status

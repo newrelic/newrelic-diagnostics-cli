@@ -3,9 +3,9 @@ package agent
 import (
 	"runtime"
 
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // RegisterWith - will register any plugins in this package

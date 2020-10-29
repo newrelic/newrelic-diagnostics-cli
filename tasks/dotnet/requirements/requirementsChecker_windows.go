@@ -1,7 +1,7 @@
 package requirements
 
 import (
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // DotnetRequirementsChecker - This struct defines this plugin

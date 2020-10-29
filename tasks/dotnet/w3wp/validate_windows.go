@@ -8,8 +8,8 @@ import (
 
 	"github.com/shirou/gopsutil/process"
 	"github.com/shirou/w32"
-	"github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 type inspectResults struct {

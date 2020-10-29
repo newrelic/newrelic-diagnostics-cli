@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"errors"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // InfraAgentVersion - This struct defines the Infrastructure agent version task

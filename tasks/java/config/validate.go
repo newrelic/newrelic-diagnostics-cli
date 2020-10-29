@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/shirou/gopsutil/process"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/config"
-	"github.com/newrelic/NrDiag/tasks/java/env"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
 )
 
 // JavaConfigValidate - This struct defined the sample plugin which can be used as a starting point

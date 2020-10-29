@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/env"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 )
 
 // ExampleTemplateMinimalTask - This task checks the OS version against the .Net Agent requirements

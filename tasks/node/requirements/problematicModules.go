@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	dependencies "github.com/newrelic/NrDiag/tasks/node/env"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	dependencies "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
 )
 
 var modules = map[string][]string{

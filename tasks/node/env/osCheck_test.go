@@ -3,8 +3,8 @@ package env
 import (
 	"testing"
 
-	"github.com/newrelic/NrDiag/tasks"
-	baseEnv "github.com/newrelic/NrDiag/tasks/base/env"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	baseEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

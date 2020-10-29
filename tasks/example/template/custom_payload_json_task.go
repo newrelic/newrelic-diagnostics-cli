@@ -3,7 +3,7 @@ package template
 import (
 	"encoding/json"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // ExampleTemplateCustomPayloadJSONTask - This struct defined the sample plugin which can be used as a starting point

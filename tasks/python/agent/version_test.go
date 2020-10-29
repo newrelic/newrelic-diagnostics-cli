@@ -5,7 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	logtask "github.com/newrelic/NrDiag/tasks/base/log"
+	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 func TestPythonAgentVersion(t *testing.T) {

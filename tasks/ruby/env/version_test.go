@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func mockRubyVExecuteSuccess(name string, arg ...string) ([]byte, error) {

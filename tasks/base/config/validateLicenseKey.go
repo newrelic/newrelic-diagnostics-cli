@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/newrelic/NrDiag/internal/haberdasher"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var (

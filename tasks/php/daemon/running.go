@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/shirou/gopsutil/process"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // PHPDaemonRunning - Retrieve status of newrelic-daemon processes for PHP Agent

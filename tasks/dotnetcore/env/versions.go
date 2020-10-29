@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // DotNetCoreEnvVersions - This struct defined the sample plugin which can be used as a starting point

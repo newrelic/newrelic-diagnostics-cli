@@ -1,4 +1,4 @@
-module github.com/newrelic/NrDiag
+module github.com/newrelic/newrelic-diagnostics-cli
 
 go 1.14
 

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	log "github.com/newrelic/NrDiag/logger"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 // FileCopyEnvelope - stores information about a file we want to copy

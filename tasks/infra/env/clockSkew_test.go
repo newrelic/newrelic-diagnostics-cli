@@ -11,8 +11,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func mockValidDateHeader(wrapper httpHelper.RequestWrapper) (*http.Response, error) {

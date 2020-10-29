@@ -3,8 +3,8 @@ package requirements
 import (
 	"testing"
 
-	tasks "github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/env"
+	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 )
 
 func TestCheckOs(t *testing.T) {

@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	tasks "github.com/newrelic/NrDiag/tasks"
+	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func Test_parseOverrides(t *testing.T) {

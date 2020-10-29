@@ -3,7 +3,7 @@ package config
 import (
 	"strings"
 
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 func LoadSpec() map[string]interface{} {

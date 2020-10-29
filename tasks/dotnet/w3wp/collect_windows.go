@@ -1,8 +1,8 @@
 package w3wp
 
 import (
-	"github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 type DotNetW3wpCollect struct {

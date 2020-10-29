@@ -4,7 +4,7 @@ core
 nr-diagnostics*
 debug*
 nrdiag
-NrDiag
+newrelic-diagnostics-cli
 Dockerfile
 .dockerignore
 integrationDockerfile

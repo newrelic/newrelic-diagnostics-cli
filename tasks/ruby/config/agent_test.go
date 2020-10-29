@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 func Test_checkValidation(t *testing.T) {

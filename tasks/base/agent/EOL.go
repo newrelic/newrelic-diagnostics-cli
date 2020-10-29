@@ -5,10 +5,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/newrelic/NrDiag/suites"
+	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // EOLVersions prior to: Node 1.14.1, Java 3.6.0 (except 2.21.7), .NET 5.1, PHP 5.0.0.115, Python 2.42.0, Ruby 3.9.6

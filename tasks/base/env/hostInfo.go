@@ -4,7 +4,7 @@ package env
 
 import (
 	"fmt"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 

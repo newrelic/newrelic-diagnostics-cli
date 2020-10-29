@@ -3,11 +3,11 @@ package config
 import (
 	"fmt"
 	"errors"
-	"github.com/newrelic/NrDiag/tasks"
-	log "github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"strings"
 	"strconv"
-	"github.com/newrelic/NrDiag/internal/haberdasher"
+	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 )
 
 var HSM_CONFIG_NAMES = []string{

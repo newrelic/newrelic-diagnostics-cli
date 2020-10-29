@@ -3,7 +3,7 @@ package requirements
 import (
 	"strings"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // DotnetRequirementsNetTargetAgentVerValidate - This struct defines the task

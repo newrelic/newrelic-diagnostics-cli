@@ -3,8 +3,8 @@ package profiler
 import (
 	"strings"
 	"fmt"
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"golang.org/x/sys/windows/registry"
 )
 

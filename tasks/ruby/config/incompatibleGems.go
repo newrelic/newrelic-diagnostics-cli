@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // List of incompatible gems: keys are displayed to customer in task Result

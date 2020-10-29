@@ -1,9 +1,9 @@
 package agent
 
 import (
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
-	logtask "github.com/newrelic/NrDiag/tasks/base/log"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 // NodeAgentVersion - This struct defines the function to collect the current running Node agent version from its logfile.

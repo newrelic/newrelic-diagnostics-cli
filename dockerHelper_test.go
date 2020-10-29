@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	log "github.com/newrelic/NrDiag/logger"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, dockerLines []string) error {
