@@ -458,57 +458,48 @@ func extractVersionFromArgs(cmdLineArgs string) (version string) {
 func extractVendorFromArgs(cmdLineArgs string) (vendor string) {
 
 	//splitting on just space here would break when: Djava.vm.name=Java HotSpot(TM)
-	regIbm := regexp.MustCompile(".*IBM.*")
-	regClassic := regexp.MustCompile(".*Classic.*")
-	regHotspot := regexp.MustCompile(".*HotSpot.*")
-	regJrockit := regexp.MustCompile(".*JRockit.*")
-	regApple := regexp.MustCompile("Apple.*")
-	regOracle := regexp.MustCompile("Oracle.*")
 
 	sliceCmdLineArgs := strings.Split(cmdLineArgs, " -")
 	for _, cmdLineArg := range sliceCmdLineArgs {
 		if strings.Contains(cmdLineArg, "java.vm.name") {
 			/* IBM J9 */
-			match := regIbm.MatchString(cmdLineArg)
-			if match {
+			if strings.Contains(cmdLineArg, "IBM") {
 				log.Debug("Detected IBM JVM")
 				vendor = "IBM"
 				return
 			}
 			/* IBM Classic VM */
-			match = regClassic.MatchString(cmdLineArg)
-			if match {
+			if strings.Contains(cmdLineArg, "Classic") {
 				log.Debug("Detected IBM Classic JVM")
 				vendor = "IBM"
 				return
 			}
-			match = regHotspot.MatchString(cmdLineArg)
-			if match {
+
+			if strings.Contains(cmdLineArg, "HotSpot") {
 				log.Debug("Detected Hotspot JVM")
 				vendor = "HotSpot"
 				return
 			}
-			match = regJrockit.MatchString(cmdLineArg)
-			if match {
+
+			if strings.Contains(cmdLineArg, "JRockit") {
 				log.Debug("Detected JRockit JVM")
 				vendor = "JRockit"
 				return
 			}
 		}
 		if strings.Contains(cmdLineArg, "java.vm.vendor") {
-			match := regApple.MatchString(cmdLineArg)
-			if match {
+			//cmlineArg would look something like this: -Djava.vm.vendor=Oracle Corporation
+
+			if strings.Contains(cmdLineArg, "Apple") {
 				log.Debug("Detected Apple JVM")
 				vendor = "Apple"
 				return
 			}
-			match = regIbm.MatchString(cmdLineArg)
-			if match {
+			if strings.Contains(cmdLineArg, "IBM") {
 				log.Debug("Detected IBM JVM")
 				vendor = "IBM"
 			}
-			match = regOracle.MatchString(cmdLineArg)
-			if match && vendor != "HotSpot" {
+			if (strings.Contains(cmdLineArg, "Oracle")) && vendor != "HotSpot" {
 				log.Debug("Detected Oracle JVM")
 				vendor = "Oracle"
 			}
