@@ -1,0 +1,65 @@
+# Sample Test format
+# To add your test simply copy a test_name section and replace with details of your test
+#  -  test_name: ValidPython
+#     dockerfile_lines: 
+#      - COPY fixtures/php/root/etc/php5/conf.d/newrelic.ini /app/newrelic.ini
+#     log_entry_expected: 
+#      - Success.*Python/Config/Agent
+#     log_entry_not_expected: 
+#      - Success.*(Ruby|Java|PHP|Node|Infra)/Config/Agent
+#  -  test_name: InvalidXML
+#     dockerfile_lines: 
+#      - COPY tasks/base/config/fixtures/validate_testdata2 /app/newrelic.config
+#     log_entry_expected:  
+#      - "XML syntax error on line 32: element <log> closed by </configuration>"
+#      - Failure.*Base/Config/Validate
+#     log_entry_not_expected:
+#      - Success.*Dotnet/Config/Agent
+-  test_name: DotNet_W3WP_AgentNotInstalled
+   docker_from: luces/base-win
+   dockerfile_lines:
+    - COPY ["/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/newrelic.config", "/app/newrelic.config"]
+   log_entry_expected:  
+    - Failure.*DotNet/Agent/Installed
+   log_entry_not_expected:
+    - Success.*DotNet/W3wp/Collect
+    - Success.*DotNet/W3wp/Validate
+
+-  test_name: DotNet_W3WP_AgentInstalledNoW3wp_NoAdmin
+   docker_from: luces/base-win-no-admin-net-framework
+   dockerfile_lines:
+   log_entry_expected:  
+    - Error.*DotNet/W3wp/Collect 
+   log_entry_not_expected:
+    - Success.*DotNet/W3wp/Collect
+    - Success.*DotNet/W3wp/Validate    
+
+-  test_name: DotNet_W3WP_AgentInstalledNoW3wp_Admin
+   docker_from: luces/base-dotnet-framework
+   dockerfile_lines:
+   log_entry_expected:  
+    - Warning.*DotNet/W3wp/Collect
+   log_entry_not_expected:
+    - Success.*DotNet/W3wp/Collect
+    - Success.*DotNet/W3wp/Validate 
+
+
+#- test_name: DotNet_W3WP_AgentInstalledW3wpRunning
+#  docker_from: microsoft/windowsservercore
+#  dockerfile_lines:
+#  - SHELL ["powershell"]
+#  - RUN powershell -Command Add-WindowsFeature Web-Server -includeallsubfeature
+#  - COPY /fixtures/integration/DotNetSampleApp/App App
+#  #- RUN Remove-WebSite -Name 'Default Web Site'
+#  #- RUN New-Website -Name 'BasicWebDockerPOCApp' -Port 8000 -PhysicalPath 'c:\BasicWebDockerPOCApp' -ApplicationPool '.NET v4.5'
+#  - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+#  - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=50"]
+#  #- EXPOSE 80
+#  - COPY /fixtures/integration/PowerShellScripts/iisMagic.ps1 iisMagic.ps1
+#  #- RUN iisreset
+#  log_entry_expected:  
+#  - Success.*DotNet/W3wp/Collect
+#  - Success.*DotNet/W3wp/Validate
+#  log_entry_not_expected:
+#   - Warning.*DotNet/W3wp/Collect
+#   - Warning.*DotNet/W3wp/Validate

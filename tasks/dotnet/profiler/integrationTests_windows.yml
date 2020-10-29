@@ -1,0 +1,71 @@
+
+- test_name: DotNetProfilerOnlyIISKeysSet
+  docker_from: luces/base-dotnet-framework
+  dockerfile_lines: 
+  log_entry_expected:  
+   - Success.*DotNet/Profiler/W3svcRegKey
+   - Success.*DotNet/Profiler/WasRegKey
+   - Success.*DotNet/Profiler/InstrumentationPossible
+   - Warning.*DotNet/Profiler/EnvVarKey
+  log_entry_not_expected:
+   - Failure.*DotNet/Profiler/W3svcRegKey
+   - Failure.*DotNet/Profiler/WasRegKey
+   - Failure.*DotNet/Profiler/InstrumentationPossible
+
+
+- test_name: DotNet_Profiler_All_KeysSet
+  docker_from: luces/base-dotnet-framework-all-install
+  dockerfile_lines: 
+  log_entry_expected:  
+    - Success.*DotNet/Profiler/W3svcRegKey
+    - Success.*DotNet/Profiler/WasRegKey
+    - Success.*DotNet/Profiler/InstrumentationPossible
+    - Success.*DotNet/Profiler/EnvVarKey
+  log_entry_not_expected:
+    - Failure.*DotNet/Profiler/InstrumentationPossible
+
+- test_name: DotNet_Profiler_OnlyEnv_KeysSet
+  docker_from: luces/base-dotnet-framework-all-install
+  dockerfile_lines: 
+    - COPY /fixtures/integration/PowerShellScripts/RemoveIisRegKeysScript.ps1 RemoveIisRegKeysScript.ps1
+  docker_cmd: ./RemoveIisRegKeysScript.ps1 
+  log_entry_expected:  
+    - Warning.*DotNet/Profiler/W3svcRegKey
+    - Warning.*DotNet/Profiler/WasRegKey
+    - Success.*DotNet/Profiler/InstrumentationPossible
+    - Success.*DotNet/Profiler/EnvVarKey
+  log_entry_not_expected:
+    - Failure.*DotNet/Profiler/InstrumentationPossible    
+
+- test_name: DotNet_Profiler_No_KeysSet
+  docker_from: luces/base-dotnet-framework
+  dockerfile_lines: 
+   - COPY /fixtures/integration/PowerShellScripts/RemoveIisRegKeysScript.ps1 RemoveIisRegKeysScript.ps1
+  docker_cmd: ./RemoveIisRegKeysScript.ps1 
+  log_entry_expected:  
+   - Warning.*DotNet/Profiler/W3svcRegKey
+   - Warning.*DotNet/Profiler/WasRegKey
+   - Failure.*DotNet/Profiler/InstrumentationPossible
+   - Warning.*DotNet/Profiler/EnvVarKey
+  log_entry_not_expected:
+   - Success.*DotNet/Profiler/W3svcRegKey
+   - Success.*DotNet/Profiler/WasRegKey
+   - Success.*DotNet/Profiler/InstrumentationPossible
+   - Success.*DotNet/Profiler/EnvVarKey
+
+- test_name: DotNet_Profiler_PartReg_KeysSet
+  docker_from: luces/base-dotnet-framework
+  dockerfile_lines: 
+   - COPY /fixtures/integration/PowerShellScripts/ChangeIisRegKeysScript.ps1 ChangeIisRegKeysScript.ps1
+  docker_cmd: ./ChangeIisRegKeysScript.ps1
+  log_entry_expected:  
+   - Warning.*DotNet/Profiler/W3svcRegKey
+   - Warning.*DotNet/Profiler/WasRegKey
+   - Failure.*DotNet/Profiler/InstrumentationPossible
+   - Warning.*DotNet/Profiler/EnvVarKey
+  log_entry_not_expected:
+   - Success.*DotNet/Profiler/W3svcRegKey
+   - Success.*DotNet/Profiler/WasRegKey
+   - Success.*DotNet/Profiler/InstrumentationPossible
+   - Success.*DotNet/Profiler/EnvVarKey
+

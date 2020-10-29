@@ -1,0 +1,9 @@
+ -  test_name: InfrastructureVersionPresentWindows
+    dockerfile_lines: 
+      - ADD https://download.newrelic.com/infrastructure_agent/windows/newrelic-infra.msi newrelic-infra.msi
+      - RUN ["msiexec.exe", "/qn", "/i", "newrelic-infra.msi"]
+    log_entry_expected:  
+     - Info.*Infra/Agent/Version.*
+     - Success.*Infra/Agent/Connect
+    log_entry_not_expected:
+     
