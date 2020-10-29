@@ -3,7 +3,7 @@ package requirements
 import (
 	"errors"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

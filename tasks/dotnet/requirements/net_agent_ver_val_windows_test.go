@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	tasks "github.com/newrelic/NrDiag/tasks"
+	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {

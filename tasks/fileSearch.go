@@ -5,7 +5,7 @@ import (
 	"os"
 	"regexp"
 
-	log "github.com/newrelic/NrDiag/logger"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 //global var for mocking to ensure test coverage

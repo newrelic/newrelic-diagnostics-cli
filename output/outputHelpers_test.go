@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func Test_copyFilesToZip(t *testing.T) {

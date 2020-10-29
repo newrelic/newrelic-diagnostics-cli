@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/newrelic/NrDiag/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
 )
 
 //API - an empty struct to hang the logger methods off of

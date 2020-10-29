@@ -9,11 +9,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/newrelic/NrDiag/config"
-	"github.com/newrelic/NrDiag/registration"
-	"github.com/newrelic/NrDiag/tasks"
-	l "github.com/newrelic/NrDiag/tasks/base/log"
-	"github.com/newrelic/NrDiag/tasks/example/template"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	l "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/example/template"
 )
 
 var sampleFileCopyEnvelope = []tasks.FileCopyEnvelope{}

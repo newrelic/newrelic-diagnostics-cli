@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	tasks "github.com/newrelic/NrDiag/tasks"
+	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 //this mock is used for testing the listDir function to create a mock os.FileInfo object

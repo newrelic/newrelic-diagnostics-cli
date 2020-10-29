@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 //https://github.com/edmorley/newrelic-python-agent/blame/master/newrelic/setup.py#L100

@@ -1,7 +1,7 @@
 package template
 
 import (
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // ExampleTemplateDependentTask - This struct defined the sample plugin which can be used as a starting point

@@ -8,7 +8,7 @@ mkdir -p bin/win
 mkdir -p bin/linux
 
 VERSION_NUMBER=$BUILD_NUMBER
-CONFIG_PATH="github.com/newrelic/NrDiag/config"
+CONFIG_PATH="github.com/newrelic/newrelic-diagnostics-cli/config"
 
 if [[ -z "${VERSION_NUMBER}" ]]; then
   echo "No arguments supplied for BUILD_NUMBER"

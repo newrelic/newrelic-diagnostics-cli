@@ -3,8 +3,8 @@ package agent
 import (
 	"fmt"
 
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 // PHPAgentVersion - Check the version of the PHP Agent according to the logs

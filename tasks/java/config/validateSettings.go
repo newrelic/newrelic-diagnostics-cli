@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/newrelic/NrDiag/output/color"
-	"github.com/newrelic/NrDiag/tasks"
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 // JavaConfigValidateSettings - This struct defined the sample plugin which can be used as a starting point

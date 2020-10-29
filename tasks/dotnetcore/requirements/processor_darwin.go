@@ -1,7 +1,7 @@
 package requirements
 
 import (
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // DotNetCoreRequirementsProcessorType - This task checks the kernel/processor architecture against the .NET Core Agent requirements

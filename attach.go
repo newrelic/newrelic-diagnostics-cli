@@ -16,10 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 
-	"github.com/newrelic/NrDiag/config"
-	log "github.com/newrelic/NrDiag/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 type uploadFiles struct {

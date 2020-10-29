@@ -3,8 +3,8 @@ package requirements
 import (
 	"strings"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // DotnetRequirementsMessagingServicesCheck - This struct defines the .Net Messaging Services check

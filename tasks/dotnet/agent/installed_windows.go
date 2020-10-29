@@ -1,9 +1,9 @@
 package agent
 
 import (
-	"github.com/newrelic/NrDiag/tasks/base/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // Paths to check for agent DLLs. Order of this slice indicates priority of returned install when multiple 

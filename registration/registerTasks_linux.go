@@ -3,7 +3,7 @@
 package registration
 
 import (
-	"github.com/newrelic/NrDiag/tasks/base/env"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 )
 
 func init() {

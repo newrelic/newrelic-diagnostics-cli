@@ -12,7 +12,7 @@ temp/*
 #to ignore the binary builds
 nr-diagnostics*
 nrdiag*
-NrDiag*
+newrelic-diagnostics-cli*
 #BFG repo cleaner
 bfg-1.13.0.jar
 replacement.txt

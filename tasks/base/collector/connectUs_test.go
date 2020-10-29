@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestBaseCollectorConnectUS_prepareEarlyResult(t *testing.T) {

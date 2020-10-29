@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/newrelic/NrDiag/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func Test_GetResultsJSON(t *testing.T) {
@@ -114,7 +114,7 @@ func generateResultArray() []registration.TaskResult {
 				tasks.FileCopyEnvelope{Path: "./fixtures/java/newrelic/newrelic.yml", Identifier: "Base/Config/Collect"},
 				tasks.FileCopyEnvelope{Path: "./fixtures/ruby/config/newrelic.yml", Identifier: "Base/Config/Collect"},
 			},
-			Payload: "[{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/NrDiag/fixtures/java/newrelic/\"},{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/NrDiag/fixtures/ruby/config/\"}]",
+			Payload: "[{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/newrelic-diagnostics-cli/fixtures/java/newrelic/\"},{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/newrelic-diagnostics-cli/fixtures/ruby/config/\"}]",
 		},
 	}
 

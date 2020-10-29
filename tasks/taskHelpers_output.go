@@ -1,6 +1,6 @@
 package tasks
 
-import "github.com/newrelic/NrDiag/output/color"
+import "github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
 func (s Status) GetColor() color.Color {
 	switch s {

@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/NrDiag/suites"
+	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 )
 
 func TestProcessTasks(t *testing.T) {

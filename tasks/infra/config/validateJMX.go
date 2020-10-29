@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os/exec"
 
-	log "github.com/newrelic/NrDiag/logger"
-	"github.com/newrelic/NrDiag/tasks"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // Values used when no host or port are found in the jmx-config.yml

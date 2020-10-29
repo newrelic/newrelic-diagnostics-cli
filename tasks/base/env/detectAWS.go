@@ -1,8 +1,8 @@
 package env
 
 import (
-	"github.com/newrelic/NrDiag/helpers/httpHelper"
-	"github.com/newrelic/NrDiag/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // BaseEnvDetectAWS - This struct defined the sample plugin which can be used as a starting point
