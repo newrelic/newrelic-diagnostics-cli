@@ -65,7 +65,7 @@ func Register(t tasks.Task, runByDefault bool) {
 func TasksForIdentifierString(ident string) []tasks.Task {
 	var tasks []tasks.Task
 
-	if strings.Index(ident, "*") >= 0 {//nolint
+	if strings.Contains(ident, "*") {
 		converter, _ := regexp.Compile("\\*")
 		matchString := converter.ReplaceAllString(strings.ToLower(ident), ".*")
 		matcher, err := regexp.Compile(matchString)

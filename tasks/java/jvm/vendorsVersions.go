@@ -66,9 +66,8 @@ type PIDInfo struct {
 type JavaJVMVendorsVersions struct {
 	findProcessByName func(string) ([]process.Process, error)
 	cmdExec           func(name string, arg ...string) ([]byte, error)
-	// name              string
-	runtimeGOOS    string
-	getCmdLineArgs func(process.Process) (string, error)
+	runtimeGOOS       string
+	getCmdLineArgs    func(process.Process) (string, error)
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task

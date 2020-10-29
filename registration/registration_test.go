@@ -39,9 +39,6 @@ func TestRegisterDependentTasks(t *testing.T) {
 	AddIdentifierToQueue(tasks.IdentifierFromString("Base/Config/Validate"))
 	CompleteTaskRegistration()
 
-	// dumpTasks(Work.Tasks)
-	// dumpQueue(Work.WorkQueue)
-
 	if len(Work.WorkQueue) != 3 {
 		t.Error("WorkQueue expected to have 3 items after adding Base/Config/Validate; has:", len(Work.WorkQueue))
 	}
@@ -59,9 +56,6 @@ func TestRegisterAllTasks(t *testing.T) {
 
 	AddAllToQueue()
 	CompleteTaskRegistration()
-
-	// dumpTasks(Work.Tasks)
-	// dumpQueue(Work.WorkQueue)
 
 	runnableTasks := 0
 	for _, regTask := range registeredTasks {
@@ -83,29 +77,3 @@ func TestTasksHaveValidExplain(t *testing.T) {
 	}
 }
 
-// func countPatternInFile(pattern string, filename string) int {
-// 	lines, err := ioutil.ReadFile(filename)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	r, _ := regexp.Compile(pattern)
-// 	matches := r.FindAllStringSubmatch(string(lines), -1)
-
-// 	return len(matches)
-// }
-
-// func dumpTasks(ts map[string]registeredTask) {
-// 	fmt.Println("### map has ", len(ts), " items")
-// 	for _, t := range ts {
-// 		if t.runByDefault {
-// 			fmt.Println("dumping: ", t.Task.Identifier())
-// 		}
-// 	}
-// }
-
-// func dumpQueue(q chan tasks.Task) {
-// 	fmt.Println("### queue has ", len(q), " items")
-// 	for t := range q {
-// 		fmt.Println("from queue: ", t.Identifier())
-// 	}
-// }

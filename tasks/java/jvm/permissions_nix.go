@@ -275,7 +275,6 @@ func checkEnvValues(envVars map[string]string) (LogFile, LogPath, LogFileName va
 	return
 }
 
-
 func checkForSystemProps(args []string, values agentValues) (newValues agentValues) {
 	newValues = values
 	/* System property checks: range through each JVM option */
@@ -373,7 +372,6 @@ func checkForYAMLValues(values agentValues) (newYAMLFile, newLogFileName, newLog
 		if strings.Contains(fmt.Sprint(err), ("string not found in file")) {
 			/* we aren't concerned if the customer does not set this variable in the newrelic.yml; it will later be set to the default value if so */
 			newLogFileName = valueSource{"", ""}
-			err = nil //nolint
 		} else {
 			newLogFileName.Source = yamlSource
 			log.Debug(taskName + "Setting log file name to " + newLogFileName.Value + " from " + newLogFileName.Source)
@@ -389,7 +387,6 @@ func checkForYAMLValues(values agentValues) (newYAMLFile, newLogFileName, newLog
 		if strings.Contains(fmt.Sprint(err), ("string not found in file")) {
 			/* we aren't concerned if the customer does not set this variable in the newrelic.yml; it will later be set to the default value if so */
 			newLogPath = valueSource{"", ""}
-			err = nil //nolint
 		} else {
 			newLogPath.Source = yamlSource
 			log.Debug(taskName + "Setting log path to " + newLogPath.Value + " from " + newLogPath.Source)
@@ -409,7 +406,7 @@ func setDefaultValues(values agentValues) (newValues agentValues) {
 		newValues.LogFileName = valueSource{"newrelic_agent.log", defaultSource}
 		log.Debug(taskName + "Setting log file name to " + newValues.LogFileName.Value + " from " + newValues.LogFileName.Source)
 	}
-	
+
 	if values.LogFile.Value == "" {
 		newValues.LogFile = valueSource{(newValues.LogPath.Value + "/" + newValues.LogFileName.Value), defaultSource}
 		log.Debug(taskName + "Setting log file to " + newValues.LogFile.Value + " using " + newValues.LogFile.Source)
