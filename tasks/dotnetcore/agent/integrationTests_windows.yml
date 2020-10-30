@@ -1,5 +1,5 @@
 -  test_name: DotNetCore_Agent_Installed_Windows
-   docker_from: base-dotnet-core
+   # docker_from: base-dotnet-core
    dockerfile_lines: 
    log_entry_expected:  
     - Success.*DotNetCore/Agent/Installed

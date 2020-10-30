@@ -1,8 +1,8 @@
- -  test_name: "DotNet_Config_Validate"
-    docker_from: luces/base-dotnet-framework
-    dockerfile_lines: 
-    log_entry_expected: 
-     - Success.*DotNet/Config/Agent
-    log_entry_not_expected: 
-     - Success.*(Ruby|Java|Node|Python|Infra)/Config/Agent
-     - Failure.*DotNet/Config/Agent
+#  -  test_name: "DotNet_Config_Validate"
+#     docker_from: luces/base-dotnet-framework
+#     dockerfile_lines: 
+#     log_entry_expected: 
+#      - Success.*DotNet/Config/Agent
+#     log_entry_not_expected: 
+#      - Success.*(Ruby|Java|Node|Python|Infra)/Config/Agent
+#      - Failure.*DotNet/Config/Agent
