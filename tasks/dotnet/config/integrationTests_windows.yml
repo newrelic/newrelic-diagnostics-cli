@@ -1,5 +1,4 @@
  -  test_name: "DotNet_Config_Validate"
-    # docker_from: luces/base-dotnet-framework
     dockerfile_lines: 
       - ADD https://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
       - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"]
