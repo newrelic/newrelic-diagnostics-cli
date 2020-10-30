@@ -2,7 +2,7 @@
 -  test_name: DotNet_W3WP_AgentNotInstalled
 #    docker_from: luces/base-win
    dockerfile_lines:
-    - COPY ["/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/newrelic.config", "/app/newrelic.config"]
+    - COPY ["tasks/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/newrelic.config", "/app/newrelic.config"]
    log_entry_expected:  
     - Failure.*DotNet/Agent/Installed
    log_entry_not_expected:
@@ -33,13 +33,13 @@
 #  dockerfile_lines:
 #  - SHELL ["powershell"]
 #  - RUN powershell -Command Add-WindowsFeature Web-Server -includeallsubfeature
-#  - COPY /fixtures/integration/DotNetSampleApp/App App
+#  - COPY tasks/fixtures/integration/DotNetSampleApp/App App
 #  #- RUN Remove-WebSite -Name 'Default Web Site'
 #  #- RUN New-Website -Name 'BasicWebDockerPOCApp' -Port 8000 -PhysicalPath 'c:\BasicWebDockerPOCApp' -ApplicationPool '.NET v4.5'
 #  - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
 #  - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=50"]
 #  #- EXPOSE 80
-#  - COPY /fixtures/integration/PowerShellScripts/iisMagic.ps1 iisMagic.ps1
+#  - COPY tasks/fixtures/integration/PowerShellScripts/iisMagic.ps1 iisMagic.ps1
 #  #- RUN iisreset
 #  log_entry_expected:  
 #  - Success.*DotNet/W3wp/Collect
