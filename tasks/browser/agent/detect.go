@@ -32,7 +32,7 @@ func (t BrowserAgentDetect) Explain() string {
 	// gorun -t browser/agent/detect -v -o Browser/Agent/Detect.url=http://localhost:3000
 }
 
-// Dependencies - Returns the dependencies for ech task.
+// Dependencies - Returns the dependencies for each task.
 func (t BrowserAgentDetect) Dependencies() []string {
 	return []string{
 		"Browser/Agent/GetSource",
@@ -52,10 +52,11 @@ func (t BrowserAgentDetect) Execute(options tasks.Options, upstream map[string]t
 	log.Debug("source of loaders", len(source.Loader))
 	if len(source.Loader) == 0 {
 		log.Debug("No loaders detected, setting to failed")
-		result.Status = tasks.Failure
-		result.Summary = "Failed to detect browser agent"
-		result.URL = "https://docs.newrelic.com/docs/browser/new-relic-browser/installation/install-new-relic-browser-agent"
-		return result
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: "Failed to detect browser agent",
+			URL:     "https://docs.newrelic.com/docs/browser/new-relic-browser/installation/install-new-relic-browser-agent",
+		}
 	} else if len(source.Loader) > 2 {
 		log.Debug("More than 1 browser agent detected")
 		result.Status = tasks.Warning
