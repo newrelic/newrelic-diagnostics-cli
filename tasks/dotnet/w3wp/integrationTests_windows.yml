@@ -28,21 +28,3 @@
      - Success.*DotNet/W3wp/Validate 
 
 
- -  test_name: DotNet_W3WP_AgentInstalledW3wpRunning
-    dockerfile_lines:
-     - SHELL ["powershell"]
-     - RUN powershell -Command Add-WindowsFeature Web-Server -includeallsubfeature
-     - COPY tasks/fixtures/integration/DotNetSampleApp/App App
-    #- RUN Remove-WebSite -Name 'Default Web Site'
-    #- RUN New-Website -Name 'BasicWebDockerPOCApp' -Port 8000 -PhysicalPath 'c:\BasicWebDockerPOCApp' -ApplicationPool '.NET v4.5'
-     - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
-     - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=50"]
-    #- EXPOSE 80
-     - COPY tasks/fixtures/integration/PowerShellScripts/iisMagic.ps1 iisMagic.ps1
-    #- RUN iisreset
-    log_entry_expected:  
-     - Success.*DotNet/W3wp/Collect
-     - Success.*DotNet/W3wp/Validate
-    log_entry_not_expected:
-     - Warning.*DotNet/W3wp/Collect
-     - Warning.*DotNet/W3wp/Validate
