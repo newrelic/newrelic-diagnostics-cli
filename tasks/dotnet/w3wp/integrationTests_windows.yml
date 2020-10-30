@@ -29,7 +29,6 @@
 
 
  -  test_name: DotNet_W3WP_AgentInstalledW3wpRunning
-    docker_from: microsoft/windowsservercore
     dockerfile_lines:
      - SHELL ["powershell"]
      - RUN powershell -Command Add-WindowsFeature Web-Server -includeallsubfeature
