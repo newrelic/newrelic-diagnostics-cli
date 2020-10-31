@@ -1,0 +1,8 @@
+-  test_name: DotNetCore_Agent_Not_Installed_And_Env_Vars_Not_Set_Windows
+   dockerfile_lines: 
+   docker_cmd: ./nrdiag_x64 -filter all
+   log_entry_expected:  
+    - None.*DotNetCore/Agent/Installed
+   log_entry_not_expected:
+    - Failure.*DotNetCore/Agent/Installed
+    - Success.*DotNetCore/Agent/Installed

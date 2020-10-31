@@ -1,0 +1,39 @@
+- test_name: DotNetRequirementsRequirementCheckFail
+  dockerfile_lines: 
+   - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+   - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"]
+  log_entry_expected:  
+   - "Failure.*DotNet/Requirements/RequirementCheck.*"
+  log_entry_not_expected:
+
+- test_name: DotNetRequirementsRequirementCheckBasicPass
+  docker_cmd: ./nrdiag_x64.exe -y -o Base/Env/HostInfo.timeout=30
+  dockerfile_lines: 
+   - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+   - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"]
+   - COPY ["tasks/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/Web.config", "/app/Web.config"]
+  log_entry_expected:  
+   - "Success.*DotNet/Requirements/RequirementCheck.*"
+  log_entry_not_expected:
+
+# - test_name: DotNetRequirementsRequirementCheckPassWithDatastore
+#   docker_cmd: ./nrdiag_x64.exe -y -o Base/Env/HostInfo.timeout=30
+#   dockerfile_lines: 
+#    - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+#    - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"]
+#    - COPY ["tasks/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/Web.config", "/app/Web.config"]
+#    - ADD ["https://pdx-artifacts.pdx.vm.datanerd.us/support-tools-test/test-artifacts/DotNetFramework/dlls/Oracle.ManagedDataAccess.dll", "/app/Oracle.ManagedDataAccess.dll"]
+#   log_entry_expected:  
+#    - "Success.*DotNet/Requirements/RequirementCheck.*"
+#   log_entry_not_expected:
+
+# - test_name: DotNetRequirementsRequirementCheckPassWithDatastoreMsg
+#   docker_from: luces/base-dotnet-framework
+#   docker_cmd: ./nrdiag_x64.exe -y -o Base/Env/HostInfo.timeout=30
+#   dockerfile_lines: 
+#    - COPY ["/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/Web.config", "/app/Web.config"]
+#    - ADD ["https://pdx-artifacts.pdx.vm.datanerd.us/support-tools-test/test-artifacts/DotNetFramework/dlls/Oracle.ManagedDataAccess.dll", "/app/Oracle.ManagedDataAccess.dll"]
+#    - ADD ["https://pdx-artifacts.pdx.vm.datanerd.us/support-tools-test/test-artifacts/DotNetFramework/dlls/RabbitMQ.Client.dll", "/app/RabbitMQ.Client.dll"] 
+#   log_entry_expected:  
+#    - "Success.*DotNet/Requirements/RequirementCheck.*"
+#   log_entry_not_expected:

@@ -13,7 +13,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  unit-tests:
+  linux:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -36,3 +36,16 @@ jobs:
             ${{ runner.os }}-go-
       - name: Test
         run: ./scripts/test.sh
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.13.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Test
+        run: ./scripts/test_windows.ps1

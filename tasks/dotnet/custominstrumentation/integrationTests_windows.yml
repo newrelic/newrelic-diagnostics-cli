@@ -1,0 +1,20 @@
+ -  test_name: DotNet_CustomInstrumentation_Collect
+    dockerfile_lines:
+      - ADD https://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+      - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"] 
+      - COPY ["tasks/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/Extensions/customInstrumentationFile.xml", "c:/ProgramData/New Relic/.NET Agent/Extensions/customInstrumentationFile.xml"]
+    log_entry_expected: 
+     - Success.*DotNet/CustomInstrumentation/Collect
+    log_entry_not_expected: 
+     - Failure.*DotNet/CustomInstrumentation/Collect
+
+ -  test_name: DotNet_CustomInstrumentation_Collect_No_Files
+    dockerfile_lines: 
+      - ADD https://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+      - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"]
+    docker_cmd: ./nrdiag_x64 -filter all
+    log_entry_expected:  
+      - None.*DotNet/CustomInstrumentation/Collect
+    log_entry_not_expected:
+      - Failure.*DotNet/CustomInstrumentation/Collect
+      - Success.*DotNet/CustomInstrumentation/Collect

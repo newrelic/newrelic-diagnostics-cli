@@ -1,0 +1,30 @@
+
+ -  test_name: DotNet_W3WP_AgentNotInstalled
+    dockerfile_lines:
+     - COPY ["tasks/fixtures/dotnet/root/ProgramData/New Relic/.NET Agent/newrelic.config", "/app/newrelic.config"]
+    log_entry_expected:  
+     - Failure.*DotNet/Agent/Installed
+    log_entry_not_expected:
+     - Success.*DotNet/W3wp/Collect
+     - Success.*DotNet/W3wp/Validate
+
+# -  test_name: DotNet_W3WP_AgentInstalledNoW3wp_NoAdmin
+#    docker_from: luces/base-win-no-admin-net-framework
+#    dockerfile_lines:
+#    log_entry_expected:  
+#     - Error.*DotNet/W3wp/Collect 
+#    log_entry_not_expected:
+#     - Success.*DotNet/W3wp/Collect
+#     - Success.*DotNet/W3wp/Validate    
+
+ -  test_name: DotNet_W3WP_AgentInstalledNoW3wp_Admin
+    dockerfile_lines:
+     - ADD http://download.newrelic.com/dot_net_agent/latest_release/NewRelicDotNetAgent_x64.msi NewRelicDotNetAgent_x64.msi
+     - RUN ["msiexec.exe", "/i", "NewRelicDotNetAgent_x64.msi" ,"/qb", "NR_LICENSE_KEY=LICENSE-KEY-HERE", "INSTALLLEVEL=1"]
+    log_entry_expected:  
+     - Warning.*DotNet/W3wp/Collect
+    log_entry_not_expected:
+     - Success.*DotNet/W3wp/Collect
+     - Success.*DotNet/W3wp/Validate 
+
+
