@@ -8,6 +8,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Show GitHub ref
+        run: echo "$GITHUB_REF"
       - name: debug github event
         run: |
           echo "tags:"
