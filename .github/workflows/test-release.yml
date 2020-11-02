@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: debug github event
         run: |
+          echo ${GITHUB_REF#refs/tags/} 
+          echo ${GITHUB_REF#refs/tags/build/} 
           echo "${{ toJson(github.event.pull_request.labels.*.names) }}"
           echo "${{ toJson(github.event.pull_request.labels.*.name) }}"
           echo "${{ toJson(github.event.pull_request) }}"
