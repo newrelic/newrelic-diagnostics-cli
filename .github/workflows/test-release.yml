@@ -3,13 +3,6 @@ name: Release
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    # Push events on main branch and push event to build tag  
-    # branches:
-      # patterns matched against refs/heads/main
-      # - main
-    # tags:
-      # patterns matched against refs/tags/build
-      # - 'build/*'
 
 jobs:
   release:
