@@ -17,10 +17,13 @@ jobs:
     steps:
       - name: debug github event
         run: |
-          echo ${GITHUB_REF#refs/tags/} 
-          echo ${GITHUB_REF#refs/tags/build/} 
-          echo "${{ toJson(github.event.pull_request.labels.*.names) }}"
+          echo "tags:"
+          echo ${GITHUB_REF#refs/tags/}
+          echo "build:" 
+          echo ${GITHUB_REF#refs/tags/build/}
+          echo "labels:" 
           echo "${{ toJson(github.event.pull_request.labels.*.name) }}"
+          echo "event PR:"
           echo "${{ toJson(github.event.pull_request) }}"
 
 
