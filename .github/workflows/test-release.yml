@@ -2,7 +2,7 @@ name: Release
 
 on:
   pull_request:
-    types: [open]
+    types: [opened]
     # Push events on main branch and push event to build tag  
     # branches:
       # patterns matched against refs/heads/main
