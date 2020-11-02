@@ -1,17 +1,19 @@
 name: Release
 
 on:
-  push:
-    # Sequence of patterns matched against refs/heads
-    branches:
-      # Push events on main branch
-      - main
-    tags:
-      # patterns matched against refs/tags
-      - 'build/*' # Push events to build/a-name-or-number tag
+  pull_request:
+    types: [closed]
+    # Push events on main branch and push event to build tag  
+    # branches:
+      # patterns matched against refs/heads/main
+      # - main
+    # tags:
+      # patterns matched against refs/tags/build
+      # - 'build/*'
 
 jobs:
   release:
+    if: contains(github.event.pull_request.labels.*.name, 'build')
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
