@@ -1,19 +1,12 @@
 name: Release
 
 on:
-  pull_request:
-    types: [closed]
-    # Push events on main branch and push event to build tag  
-    # branches:
-      # patterns matched against refs/heads/main
-      # - main
-    # tags:
-      # patterns matched against refs/tags/build
-      # - 'build/*'
+  release:
+    types: [published]
 
 jobs:
   release:
-    if: contains(github.event.pull_request.labels.*.name, 'build')
+    # if: contains(github.event.pull_request.labels.*.name, 'build')
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
@@ -32,6 +25,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
             BUILD_NUMBER=${GITHUB_REF#refs/tags/build/} ./scripts/upload.sh
+            echo "${{ toJson(github.ref) }}"
+            echo "${{ toJson(github.event) }}"
 
 
 
