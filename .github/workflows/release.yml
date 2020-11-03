@@ -24,9 +24,13 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-            BUILD_NUMBER=${GITHUB_REF#refs/tags/build/} ./scripts/upload.sh
-            echo "${{ toJson(github.ref) }}"
-            echo "${{ toJson(github.event) }}"
+            echo "release with following build version:"
+            echo ${{ github.event.release.name }}
+            BUILD_NUMBER=${{ github.event.release.name }} ./scripts/upload.sh
+      - name: Debug GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
 
 
