@@ -18,7 +18,7 @@ Focus on the new tasks that are included in this release. Run the binary on a re
 
 4. After the PR gets merged, publish a new release(https://github.com/newrelic/newrelic-diagnostics-cli/releases/new) with this tag version format: v.major.minor_buildnumber. The "Release title" MUST only include the build number.
 
-![release image](https://github.com/newrelic/newrelic-diagnostics-cli/docs/images/release.png)
+![release image](https://github.com/newrelic/newrelic-diagnostics-cli/tree/main/docs/images/release.png)
 
 The published release will trigger a release process to deploy a new version of nrdiag in https://dowload.newrelic.com/nrdiag
 
