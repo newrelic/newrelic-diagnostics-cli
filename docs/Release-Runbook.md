@@ -14,12 +14,10 @@ Focus on the new tasks that are included in this release. Run the binary on a re
 
 2. Draft the release notes for discuss.newrelic.com and for docs.newrelic.com
 
-3. Create a branch to bump version in majorMinorVersion.txt and open a PR. Right after and prior to requesting a PR review, push a tag that features the new build. Example:
+3. Create a branch to bump version in majorMinorVersion.txt and open a PR.
 
-Create the tag `$git tag build/32`
-Push the tag `git push origin build/32`
+4. After the PR gets merged, publish a new release with this tag version format: build/{a-build-number}: https://github.com/newrelic/newrelic-diagnostics-cli/releases/new
 
-Once this tag gets merged into the main branch, it will trigger our release process implemented on .github/workflows/release.yml.
+The published release will trigger a release process to deploy a new version of nrdiag in https://dowload.newrelic.com/nrdiag
 
-4. Publish the drafted release notes.
-
+5. Publish the drafted release notes.
