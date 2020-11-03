@@ -21,4 +21,3 @@ Focus on the new tasks that are included in this release. Run the binary on a re
 The published release will trigger a release process to deploy a new version of nrdiag in https://dowload.newrelic.com/nrdiag
 
 5. Publish the drafted release notes.
-
