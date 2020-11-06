@@ -1,4 +1,4 @@
-module github.com/zlesnr/newrelic-diagnostics-cli
+module github.com/newrelic/newrelic-diagnostics-cli
 
 go 1.14
 
