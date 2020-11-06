@@ -14,9 +14,21 @@ var appNameConfigKeys = []string{
 	"app_name",         // Java, Node, Python, Ruby
 	"newrelic.appname", // PHP
 	"AppName",          // GoLang
-	"NewRelic.AppName", // .Net
-	"name",             // .Net
+	"NewRelic.AppName", // .Net for app.config and web.config
+	"name",             // .Net for newrelic.config
 }
+
+/* Sample for newrelic.config
+	<appSettings>
+    <add key="NewRelic.AppName" value="App Name" />
+	</appSettings>
+*/
+
+/* Sample for app.config and web.config
+	<application>
+    <name> App Name </name>
+	</application>
+*/
 
 var defaultAppNames = []string{
 	"PHP Application",                  // PHP
@@ -90,8 +102,8 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 
 	if len(appNameInfosFromConfig) == 0 {
 		return tasks.Result{
-			Status:  tasks.Failure,
-			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable.",
+			Status:  tasks.Warning,
+			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME). Note: This health check does not account for Java System properties.",
 			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 		}
 	}
@@ -147,12 +159,12 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 		configFilePath := configFile.Config.FilePath
 		configFileName := configFile.Config.FileName
 		/*
-		Only grab the first appname key found as this is the main required for an app to start reporting. The other appname keys are optional. Example:
-			/common/app_name: Luces-sqs-java
-			/development/app_name: My Application (Development)
-			/production/app_name: My Application (Production)
-			/staging/app_name: My Application (Staging)
-			/test/app_name: My Application (Test)
+			Only grab the first appname key found as this is the main required for an app to start reporting. The other appname keys are optional. Example:
+				/common/app_name: Luces-sqs-java
+				/development/app_name: My Application (Development)
+				/production/app_name: My Application (Production)
+				/staging/app_name: My Application (Staging)
+				/test/app_name: My Application (Test)
 		*/
 		if len(foundKeys) > 0 {
 			key := foundKeys[0]

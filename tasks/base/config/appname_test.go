@@ -209,8 +209,8 @@ var _ = Describe("Base/Config/AppName", func() {
 				}
 
 				expectedResult := tasks.Result{
-					Status:  tasks.Failure,
-					Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable.",
+					Status:  tasks.Warning,
+					Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME). Note: This health check does not account for Java System properties.",
 					URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 				}
 
