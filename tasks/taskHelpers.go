@@ -734,6 +734,67 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 	return
 }
 
+// GetCmdLineArgs is a wrapper for Process.Cmdline
+func GetCmdLineArgs(proc process.Process) (string, error) {
+	return proc.Cmdline()
+}
+// JavaProcArgs has a Java process id with its associated cmdline arguments
+type JavaProcArgs struct{
+	ProcID int32
+	Args []string
+}
+// GetJavaProcArgs return a slice of JavaProcArgs
+func GetJavaProcArgs() ([]JavaProcArgs){
+	javaProcs, err := FindProcessByName("java")
+	if err != nil {
+		log.Debug("We encountered an error while detecting all running Java processes: " + err.Error())
+	}
+	if javaProcs == nil {
+		return []JavaProcArgs{}
+	}
+	javaProcArgs := []JavaProcArgs{}
+	for _, proc := range javaProcs {
+		cmdLineArgsStr, err := GetCmdLineArgs(proc)
+		if err != nil {
+			log.Debug("Error getting command line options")
+		}
+		cmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
+		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsList})
+	}
+	return javaProcArgs
+}
+// ProcIDSysProps has a running java process id and its associated system properties organized as map of key system property and the value of the system property
+type ProcIDSysProps struct {
+	ProcID   int32
+	SysPropsKeyToVal map[string]string
+}
+// GetNewRelicSystemProps - gathers a given process's System Properties that are New Relic related
+func GetNewRelicSystemProps() ([]ProcIDSysProps) {
+	
+	javaProcessesArgs := GetJavaProcArgs()
+
+	if len(javaProcessesArgs) > 0 {
+		procIDSysProps := []ProcIDSysProps{}
+		
+		for _, proc := range javaProcessesArgs {
+
+			sysPropsKeyToVal := make(map[string]string)
+			for _, arg := range proc.Args {
+				if strings.Contains(arg, "-Dnewrelic") {
+					//ex: -Dnewrelic.config.app_name=myappname
+					keyVal := strings.Split(arg, "=")
+					sysPropsKeyToVal[keyVal[0]] = keyVal[1]
+					procIDSysProps = append(procIDSysProps, ProcIDSysProps{ProcID: proc.ProcID, SysPropsKeyToVal: sysPropsKeyToVal})
+				}	
+			}
+		}
+
+		return procIDSysProps
+	}
+	// no java processes running :(
+	return []ProcIDSysProps{}
+}
+
 // TrimQuotes helper func for cleaning up single and double quoted yml values
 // from ValidateBlobs when it's time to use them (filepaths for example)
 func TrimQuotes(s string) string {
