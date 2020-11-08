@@ -9,7 +9,7 @@ import (
 )
 
 var appNameEnvVarKey = "NEW_RELIC_APP_NAME" //PHP does not use env vars
-
+var appNameSysProp = "-Dnewrelic.config.app_name"
 var appNameConfigKeys = []string{
 	"app_name",         // Java, Node, Python, Ruby
 	"newrelic.appname", // PHP
@@ -66,6 +66,7 @@ func (t BaseConfigAppName) Dependencies() []string {
 	return []string{
 		"Base/Config/Validate",
 		"Base/Env/collectEnvVars",
+		"Base/Env/collectSysProps",
 	}
 }
 
@@ -82,7 +83,18 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
-	// check if upstream for collecting config files was successful
+	//check system properties which takes precedence over config files for Java agent
+
+	appname := getAppNameFromSysProps(upstream)
+	if appname != "" {
+		return tasks.Result{
+			Status:  tasks.Success,
+			Summary: fmt.Sprintf("A unique application name was found through the a New Relic system property: %s", appname),
+			Payload: []AppNameInfo{AppNameInfo{Name: appname, FilePath: appNameSysProp}},
+		}
+	}
+
+	// No system props then let's check for config files
 	if upstream["Base/Config/Validate"].Status != tasks.Success && (upstream["Base/Config/Validate"].Status != tasks.Warning) {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -135,6 +147,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 }
 
 func getAppNameFromEnvVar(upstream map[string]tasks.Result) AppNameInfo {
+
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 
 	if !ok {
@@ -200,4 +213,26 @@ func findNameKeyInConfigFile(configFile ValidateElement) []tasks.ValidateBlob {
 		}
 	}
 	return []tasks.ValidateBlob{}
+}
+
+func getAppNameFromSysProps(upstream map[string]tasks.Result) string {
+	if upstream["Base/Env/CollectSysProps"].Status != tasks.Info {
+		return ""
+	}
+
+	sysProps, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+
+	if !ok {
+		logger.Debug("Task did not meet requirements necessary to run: type assertion failure")
+		return ""
+	}
+
+	for i := 0; i < len(sysProps); i++ {
+		sysPropMap := sysProps[i].SysPropsKeyToVal
+		appName, isPresent := sysPropMap[appNameSysProp]
+		if isPresent {
+			return appName
+		}
+	}
+	return ""
 }

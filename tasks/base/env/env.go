@@ -17,6 +17,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		HostInfoProviderWithContext: NewHostInfoWithContext,
 	}, true)
 	registrationFunc(BaseEnvCollectEnvVars{}, true)
+	registrationFunc(BaseEnvCollectSysProps{}, true)
 	registrationFunc(BaseEnvDetectAWS{
 		httpGetter: tasks.HTTPRequester,
 	}, true)
