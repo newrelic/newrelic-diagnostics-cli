@@ -1,8 +1,6 @@
 package env
 
 import (
-	"fmt"
-
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -28,12 +26,12 @@ func (t BaseEnvCollectSysProps) Dependencies() []string {
 // Execute - The core work within each task
 func (t BaseEnvCollectSysProps) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	systemProps := tasks.GetNewRelicSystemProps()
-	fmt.Println("luces slice of structs: ", systemProps)
+
 	if len(systemProps) > 0 {
 		return tasks.Result{
 			Status:  tasks.Info,
 			Summary: "Succesfully collected some new relic system properties",
-			Payload: systemProps,//[]ProcIDSysProps
+			Payload: systemProps, //[]ProcIDSysProps
 		}
 	}
 	return tasks.Result{

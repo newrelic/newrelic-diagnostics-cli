@@ -65,8 +65,8 @@ func (t BaseConfigAppName) Explain() string {
 func (t BaseConfigAppName) Dependencies() []string {
 	return []string{
 		"Base/Config/Validate",
-		"Base/Env/collectEnvVars",
-		"Base/Env/collectSysProps",
+		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 	}
 }
 
@@ -78,7 +78,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if len(appNameInfoFromEnvVar.Name) > 0 {
 		return tasks.Result{
 			Status:  tasks.Success,
-			Summary: fmt.Sprintf("A unique application name was found through the New Relic' App name environment variable: %s", appNameInfoFromEnvVar.Name),
+			Summary: fmt.Sprintf("An application name was found through the New Relic' App name environment variable: %s", appNameInfoFromEnvVar.Name),
 			Payload: []AppNameInfo{appNameInfoFromEnvVar}, //though is a single item, we still add them to a slice of AppNameInfo to stay consistant with a future upstream payload type assertion
 		}
 	}
@@ -89,7 +89,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if appname != "" {
 		return tasks.Result{
 			Status:  tasks.Success,
-			Summary: fmt.Sprintf("A unique application name was found through the a New Relic system property: %s", appname),
+			Summary: fmt.Sprintf("An application name was found through the a New Relic system property: %s", appname),
 			Payload: []AppNameInfo{AppNameInfo{Name: appname, FilePath: appNameSysProp}},
 		}
 	}
@@ -115,7 +115,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if len(appNameInfosFromConfig) == 0 {
 		return tasks.Result{
 			Status:  tasks.Warning,
-			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME). Note: This health check does not account for Java System properties.",
+			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME).",
 			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 		}
 	}
