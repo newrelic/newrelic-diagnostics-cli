@@ -1,11 +1,12 @@
 package env
 
 import (
-	"testing"
 	"errors"
+	"testing"
+
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Base/Env/InitSystem", func() {
@@ -93,7 +94,6 @@ var _ = Describe("Base/Env/InitSystem", func() {
 			})
 		})
 
-
 		Context("when /sbin/init symlink points to unrecognized init system path", func() {
 
 			BeforeEach(func() {
@@ -107,7 +107,7 @@ var _ = Describe("Base/Env/InitSystem", func() {
 			})
 
 			It("should return an expected error result status", func() {
-				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Status).To(Equal(tasks.None))
 			})
 
 			It("should return an expected error result summary", func() {
@@ -129,9 +129,31 @@ var _ = Describe("Base/Env/InitSystem", func() {
 
 			It("should return an expected info result ", func() {
 				expectedResult := tasks.Result{
-					Status: tasks.Info,
+					Status:  tasks.Info,
 					Summary: "Systemd detected",
 					Payload: "Systemd",
+				}
+				Expect(result).To(Equal(expectedResult))
+			})
+		})
+
+		Context("when /sbin/init symlink points to a compatible init system such as openrc-init", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{}
+
+				p.runtimeOs = "linux"
+				p.evalSymlink = func(string) (string, error) {
+					return "/bin/busybox", nil
+				}
+			})
+
+			It("should return an expected info result ", func() {
+				expectedResult := tasks.Result{
+					Status:  tasks.Info,
+					Summary: "OpenRC Busybox integration detected",
+					Payload: "OpenRC Busybox integration",
 				}
 				Expect(result).To(Equal(expectedResult))
 			})
@@ -144,7 +166,7 @@ func Test_parseInitSystem(t *testing.T) {
 
 	tests := []struct {
 		initPath string
-		want string
+		want     string
 	}{
 		{initPath: "/sbin/init", want: "SysV"},
 		{initPath: "/lib/systemd/systemd", want: "Systemd"},
@@ -156,7 +178,7 @@ func Test_parseInitSystem(t *testing.T) {
 		{initPath: "", want: ""},
 		{initPath: "/lib/systemd/", want: ""},
 		{initPath: "/usr/lib/systemd/fgdfg", want: ""},
-		{initPath: "/test/location/systemd/", want: ""},		
+		{initPath: "/test/location/systemd/", want: ""},
 	}
 	for _, tt := range tests {
 		t.Run("parseInitSystem() unit test", func(t *testing.T) {

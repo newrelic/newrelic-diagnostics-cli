@@ -3,6 +3,7 @@ package env
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
@@ -54,7 +55,7 @@ func (p BaseEnvInitSystem) Execute(options tasks.Options, upstream map[string]ta
 	initSystem := parseInitSystem(initPath)
 	if initSystem == "" {
 		return tasks.Result{
-			Status:  tasks.Error,
+			Status:  tasks.None, //tasks.None because tasks.Error, for this specific task, has historically caused concerns among customers as they think is a blocking/relevant issue
 			Summary: fmt.Sprintf("Unable to parse init system from: %s", initPath),
 		}
 	}
@@ -68,6 +69,8 @@ func (p BaseEnvInitSystem) Execute(options tasks.Options, upstream map[string]ta
 
 func parseInitSystem(initPath string) string {
 	//https://linuxconfig.org/detecting-which-system-manager-is-running-on-linux-system
+
+	//the most common system managers are SysV (init), Systemd and Upstart
 	regexSysD := regexp.MustCompile(`.*(\/systemd$)`)
 	regexUpstart := regexp.MustCompile(`.*(upstart$)`)
 
@@ -81,6 +84,12 @@ func parseInitSystem(initPath string) string {
 
 	if regexUpstart.Match([]byte(initPath)) {
 		return "Upstart"
+	}
+
+	//For OpenRC, fully compatible with the init system, the executable /sbin/init will be pointing to /bin/busybox. Busybox as shell for OpenRC is the most popular option
+
+	if strings.Contains(initPath, "busybox") {
+		return "OpenRC Busybox integration"
 	}
 
 	return ""
