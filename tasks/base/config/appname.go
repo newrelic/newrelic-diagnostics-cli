@@ -78,7 +78,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if len(appNameInfoFromEnvVar.Name) > 0 {
 		return tasks.Result{
 			Status:  tasks.Success,
-			Summary: fmt.Sprintf("A unique application name was found through the New Relic' App name environment variable: %s", appNameInfoFromEnvVar.Name),
+			Summary: fmt.Sprintf("A unique application name was found through the New Relic App name environment variable: %s", appNameInfoFromEnvVar.Name),
 			Payload: []AppNameInfo{appNameInfoFromEnvVar}, //though is a single item, we still add them to a slice of AppNameInfo to stay consistant with a future upstream payload type assertion
 		}
 	}
@@ -173,7 +173,7 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 				for _, child := range primaryNameKey.Children {
 					appName := child.Value()
 					result = append(result, AppNameInfo{
-						Name:     appName, // should we sanitize this?
+						Name:     appName,
 						FilePath: fmt.Sprintf("%s%s", configFilePath, configFileName),
 					})
 				}
@@ -182,7 +182,7 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 
 				if len(appName) > 0 {
 					result = append(result, AppNameInfo{
-						Name:     appName, // should we sanitize this?
+						Name:     appName,
 						FilePath: fmt.Sprintf("%s%s", configFilePath, configFileName),
 					})
 				}
