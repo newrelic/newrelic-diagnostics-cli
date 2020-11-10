@@ -161,6 +161,59 @@ var _ = Describe("Base/Config/AppName", func() {
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
 			})
 		})
+		Context("If upstream returns a config file containing multiple appnames", func() {
+			It("Should return a payload with a formatted message and success status", func() {
+				executeOptions := tasks.Options{}
+				executeUpstream := map[string]tasks.Result{
+					"Base/Config/Validate": tasks.Result{
+						Payload: []ValidateElement{
+							{
+								Config: ConfigElement{
+									FileName: "newrelic.yml",
+									FilePath: "/nrdiag/fixtures/java/newrelic/",
+								},
+								ParsedResult: tasks.ValidateBlob{
+									Key:      "",
+									Path:     "",
+									RawValue: "",
+									Children: []tasks.ValidateBlob{
+										{
+											Key:      "app_name",
+											Path:     "common",
+											RawValue: "Custom AppName",
+										},
+										{
+											Key:      "app_name",
+											Path:     "development",
+											RawValue: "My Application (Development)",
+										},
+										{
+											Key:      "app_name",
+											Path:     "production",
+											RawValue: "My Application (Production)",
+										},
+									},
+								},
+							},
+						},
+						Status: tasks.Success,
+					},
+				}
+
+				expectedResult := tasks.Result{
+					Status: tasks.Success,
+					Payload: []AppNameInfo{
+						{
+							Name:     "Custom AppName",
+							FilePath: "/nrdiag/fixtures/java/newrelic/newrelic.yml",
+						},
+					},
+					Summary: "1 unique application name(s) found.",
+				}
+
+				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
+			})
+		})
 		Context("If upstream finds the new relic env var app name", func() {
 			It("Should return a payload with the env var value and ignore values found in config files", func() {
 				executeOptions := tasks.Options{}
