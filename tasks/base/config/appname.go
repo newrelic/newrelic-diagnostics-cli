@@ -89,7 +89,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if appname != "" {
 		return tasks.Result{
 			Status:  tasks.Success,
-			Summary: fmt.Sprintf("An application name was found through the a New Relic system property: %s", appname),
+			Summary: fmt.Sprintf("An application name was found through a New Relic system property: %s", appname),
 			Payload: []AppNameInfo{AppNameInfo{Name: appname, FilePath: appNameSysProp}},
 		}
 	}
@@ -141,7 +141,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: fmt.Sprintf("%s unique application name(s) found.", strconv.Itoa(len(appNameInfosFromConfig))),
+		Summary: fmt.Sprintf("%s unique application name(s) found: %s", strconv.Itoa(len(appNameInfosFromConfig)), appNameInfosFromConfig[0].Name),
 		Payload: appNameInfosFromConfig,
 	}
 }

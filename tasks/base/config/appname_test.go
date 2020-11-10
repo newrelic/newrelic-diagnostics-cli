@@ -155,7 +155,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							FilePath: "/nrdiag/fixtures/java/newrelic/newrelic.yml",
 						},
 					},
-					Summary: "1 unique application name(s) found.",
+					Summary: "1 unique application name(s) found: Custom AppName",
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
