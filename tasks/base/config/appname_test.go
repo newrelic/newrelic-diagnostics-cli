@@ -208,7 +208,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							FilePath: "/nrdiag/fixtures/java/newrelic/newrelic.yml",
 						},
 					},
-					Summary: "1 unique application name(s) found.",
+					Summary: "1 unique application name(s) found: Custom AppName",
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
@@ -251,7 +251,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							FilePath: "NEW_RELIC_APP_NAME",
 						},
 					},
-					Summary: "An application name was found through the New Relic' App name environment variable: mysolid-appname",
+					Summary: "A unique application name was found through the New Relic App name environment variable: mysolid-appname",
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
@@ -305,7 +305,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							FilePath: "-Dnewrelic.config.app_name",
 						},
 					},
-					Summary: "An application name was found through the a New Relic system property: my-appname",
+					Summary: "An application name was found through a New Relic system property: my-appname",
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
