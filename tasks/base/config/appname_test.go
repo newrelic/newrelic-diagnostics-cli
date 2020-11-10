@@ -1,9 +1,9 @@
 package config
 
 import (
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Base/Config/AppName", func() {
@@ -31,6 +31,7 @@ var _ = Describe("Base/Config/AppName", func() {
 		It("Should return a slice with dependencies", func() {
 			expectedDependencies := []string{
 				"Base/Config/Validate",
+				"Base/Env/collectEnvVars",
 			}
 			Expect(p.Dependencies()).To(Equal(expectedDependencies))
 		})
@@ -89,7 +90,7 @@ var _ = Describe("Base/Config/AppName", func() {
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "newrelic.appname",
 									Path:     "",
-									RawValue: "My Application (Staging)",
+									RawValue: "My Application",
 								},
 							},
 						},
@@ -98,21 +99,16 @@ var _ = Describe("Base/Config/AppName", func() {
 				}
 
 				expectedResult := tasks.Result{
-					Status: tasks.Warning,
-					Summary: "One or more of your applications is using a default appname: " +
-						"\n\t\"My Application (Staging)\" as specified in /nrdiag/fixtures/java/newrelic/newrelic.yml " +
-						"\nMultiple applications with the same default appname will all report to the same source. " +
-						"You may want to consider changing to a unique appname. Note that this will cause the application to report to " +
-						"a new heading in the New Relic user interface, with a total discontinuity of data. If you are overriding the " +
-						"default appname with environment variables, you can ignore this warning.\n--",
-					URL: "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
+					Status:  tasks.Warning,
+					Summary: "One or more of your applications is using a default appname: \n\t\"My Application\" as specified in /nrdiag/fixtures/java/newrelic/newrelic.yml \nMultiple applications with the same default appname will all report to the same source. Consider changing to a unique appname and review the recommended documentation",
+					URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
 			})
 		})
 		Context("If upstream returns a config file containing a customized appname", func() {
-			It("Should return a payload with a formatted message and Warning status", func() {
+			It("Should return a payload with a formatted message and success status", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
@@ -147,6 +143,102 @@ var _ = Describe("Base/Config/AppName", func() {
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
 			})
 		})
+		Context("If upstream returns a config file containing multiple appnames", func() {
+			It("Should return a payload with a formatted message and success status", func() {
+				executeOptions := tasks.Options{}
+				executeUpstream := map[string]tasks.Result{
+					"Base/Config/Validate": tasks.Result{
+						Payload: []ValidateElement{
+							{
+								Config: ConfigElement{
+									FileName: "newrelic.yml",
+									FilePath: "/nrdiag/fixtures/java/newrelic/",
+								},
+								ParsedResult: tasks.ValidateBlob{
+									Key:      "",
+									Path:     "",
+									RawValue: "",
+									Children: []tasks.ValidateBlob{
+										{
+											Key:      "app_name",
+											Path:     "common",
+											RawValue: "Custom AppName",
+										},
+										{
+											Key:      "app_name",
+											Path:     "development",
+											RawValue: "My Application (Development)",
+										},
+										{
+											Key:      "app_name",
+											Path:     "production",
+											RawValue: "My Application (Production)",
+										},
+									},
+								},
+							},
+						},
+						Status: tasks.Success,
+					},
+				}
+
+				expectedResult := tasks.Result{
+					Status: tasks.Success,
+					Payload: []AppNameInfo{
+						{
+							Name:     "Custom AppName",
+							FilePath: "/nrdiag/fixtures/java/newrelic/newrelic.yml",
+						},
+					},
+					Summary: "1 unique application name(s) found.",
+				}
+
+				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
+			})
+		})
+		Context("If upstream finds the new relic env var app name", func() {
+			It("Should return a payload with the env var value and ignore values found in config files", func() {
+				executeOptions := tasks.Options{}
+				executeUpstream := map[string]tasks.Result{
+
+					"Base/Env/CollectEnvVars": tasks.Result{
+						Status: tasks.Success,
+						Payload: map[string]string{
+							"NEW_RELIC_APP_NAME": "mysolid-appname",
+						},
+					},
+					"Base/Config/Validate": tasks.Result{
+						Payload: []ValidateElement{
+							{
+								Config: ConfigElement{
+									FileName: "newrelic.yml",
+									FilePath: "/nrdiag/fixtures/java/newrelic/",
+								},
+								ParsedResult: tasks.ValidateBlob{
+									Key:      "newrelic.appname",
+									Path:     "",
+									RawValue: "Custom AppName",
+								},
+							},
+						},
+						Status: tasks.Success,
+					},
+				}
+
+				expectedResult := tasks.Result{
+					Status: tasks.Success,
+					Payload: []AppNameInfo{
+						{
+							Name:     "mysolid-appname",
+							FilePath: "NEW_RELIC_APP_NAME",
+						},
+					},
+					Summary: "A unique application name was found through the New Relic App name environment variable: mysolid-appname",
+				}
+
+				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
+			})
+		})
 		Context("", func() {
 			It("Should return a payload with a formatted message and Warning status", func() {
 				executeOptions := tasks.Options{}
@@ -171,7 +263,7 @@ var _ = Describe("Base/Config/AppName", func() {
 
 				expectedResult := tasks.Result{
 					Status:  tasks.Warning,
-					Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration.",
+					Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME). Note: This health check does not account for Java System properties.",
 					URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 				}
 
