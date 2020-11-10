@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -91,6 +92,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	}
 
 	configElements, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement)
+
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
@@ -155,7 +157,7 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 	result := []AppNameInfo{}
 
 	for _, configFile := range configElements {
-		foundKeys := findNameKeyInConfigFile(configFile)
+		primaryNameKey := findPrimaryNameKeyInConfigFile(configFile)
 		configFilePath := configFile.Config.FilePath
 		configFileName := configFile.Config.FileName
 		/*
@@ -166,10 +168,9 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 				/staging/app_name: My Application (Staging)
 				/test/app_name: My Application (Test)
 		*/
-		if len(foundKeys) > 0 {
-			key := foundKeys[0]
-			if !key.IsLeaf() {
-				for _, child := range key.Children {
+		if len(primaryNameKey.Key) > 0 {
+			if !primaryNameKey.IsLeaf() {
+				for _, child := range primaryNameKey.Children {
 					appName := child.Value()
 					result = append(result, AppNameInfo{
 						Name:     appName, // should we sanitize this?
@@ -177,7 +178,7 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 					})
 				}
 			} else {
-				appName := key.Value()
+				appName := primaryNameKey.Value()
 
 				if len(appName) > 0 {
 					result = append(result, AppNameInfo{
@@ -191,13 +192,21 @@ func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {
 	return result
 }
 
-func findNameKeyInConfigFile(configFile ValidateElement) []tasks.ValidateBlob {
+func findPrimaryNameKeyInConfigFile(configFile ValidateElement) tasks.ValidateBlob {
 
 	for i := 0; i < len(appNameConfigKeys); i++ {
 		foundKeys := configFile.ParsedResult.FindKey(appNameConfigKeys[i])
-		if len(foundKeys) > 0 {
-			return foundKeys
+		if len(foundKeys) == 1 {
+			return foundKeys[0]
+		} else if len(foundKeys) > 1 {
+			for _, validateBlob := range foundKeys {
+				if strings.Contains(validateBlob.Path, "common") {
+					return validateBlob
+				}
+			}
+			return foundKeys[0] //backup plan because it seems predetermined that the primary name shows up first
 		}
+
 	}
-	return []tasks.ValidateBlob{}
+	return tasks.ValidateBlob{}
 }
