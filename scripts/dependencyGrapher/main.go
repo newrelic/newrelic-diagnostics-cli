@@ -41,7 +41,7 @@ func main() {
 
 }
 
-//parseTasks takes in slice of filepaths for nr diag tasks. It reads each file and parses out task identifier and dependencies
+//parseTasks takes in slice of filepaths for the Diagnostics CLI tasks. It reads each file and parses out task identifier and dependencies
 func parseTasks(goFiles []string) (map[string]map[string]bool, error) {
 	foundTasks := map[string]map[string]bool{}
 	for _, file := range goFiles {

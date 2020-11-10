@@ -90,7 +90,7 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a failure result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal("The package.json and package-lock.json files were not found where NR Diagnostics was executed. Please ensure the NR Diagnostics executable is within your application's directory alongside your package.json file"))
+				Expect(result.Summary).To(Equal("The package.json and package-lock.json files were not found where the " + ThisProgramFullName + " was executed. Please ensure the " + ThisProgramFullName + " executable is within your application's directory alongside your package.json file"))
 			})
 		})
 

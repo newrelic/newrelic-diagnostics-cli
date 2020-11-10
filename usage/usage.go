@@ -158,7 +158,7 @@ func SendUsageData(results []registration.TaskResult, runID string) {
 
 	prompt := response.Survey.Prompt
 	if prompt == "" {
-		prompt = "We'd love to know more about your experience using NR Diagnostics! Please visit:"
+		prompt = "We'd love to know more about your experience using the " + ThisProgramFullName + "! Please visit:"
 	}
 
 	log.Info(prompt)

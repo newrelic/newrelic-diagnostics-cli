@@ -9,7 +9,7 @@ If you believe you've encountered a case in which integration tests are necessar
 
 -------------------------------------------
 
-NR Diag has an integration test structure that allows us to programatically: 
+The Diagnostics CLI has an integration test structure that allows us to programmatically: 
 
 1. Build Dockerfiles from code 
 2. Build a docker image
@@ -79,7 +79,7 @@ All file references should be relative to the root of the project.
 
 - docker_cmd - adds a custom docker CMD command, wrapped in a shell command to execute the desired actions
 
-**Example:** runs NR Diag with a proxy
+**Example:** runs the Diagnostics CLI with a proxy
 
 ```yml
  -  test_name: ProxyConnect
@@ -95,7 +95,7 @@ All file references should be relative to the root of the project.
 
 - docker_from - Adds a custom docker FROM command to change the source image the docker container is built from. The integration test suite will automatically add the nrdiag binary and set the work directory to /app when using a custom image source.
 
-**Example:** run NR Diag from an ubuntu image
+**Example:** run the Diagnostics CLI from an ubuntu image
 
 ```yml
  -  test_name: ProxyConnect
@@ -167,6 +167,6 @@ These can be combined into a single command for convenience with
 
 `docker build --rm -t myTest -f integrationDockerfile && docker run --rm myTest`. 
 
-#### Running NR Diag with options
+#### Running the Diagnostics CLI with options
 It's worth noting that while the default integration dockerfile does add `CMD ["./nrdiag"]` to run nrdiag without verbose mode, you can run verbose mode by just adding a `CMD ["./nrdiag", "-v"]` to run nrdiag with verbose or some other series of options and it will be executed instead of the default nrdiag execution because it will appear after the first entry of CMD.
 

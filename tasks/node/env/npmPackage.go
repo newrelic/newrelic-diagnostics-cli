@@ -66,7 +66,7 @@ func (p NodeEnvNpmPackage) Execute(options tasks.Options, upstream map[string]ta
 	if len(foundFiles) == 0 {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "The package.json and package-lock.json files were not found where NR Diagnostics was executed. Please ensure the NR Diagnostics executable is within your application's directory alongside your package.json file",
+			Summary: "The package.json and package-lock.json files were not found where the " + ThisProgramFullName + " was executed. Please ensure the " + ThisProgramFullName + " executable is within your application's directory alongside your package.json file",
 		}
 	}
 

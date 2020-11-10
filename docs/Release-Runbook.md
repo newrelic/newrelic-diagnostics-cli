@@ -1,4 +1,4 @@
-# NR Diag release runbook - Internal usage only
+# Diagnostics CLIrelease runbook - Internal usage only
 
 This assumes the main branch is in a state ready for release. 
 

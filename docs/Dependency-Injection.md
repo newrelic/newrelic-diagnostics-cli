@@ -59,7 +59,7 @@ Let's refactor `makeCollectorRequest()`. To do so, we need to:
 
 1. Add a field to the task struct for each of our external depencies. 
 2. Attach our `makeCollectorRequest()` function to the task struct as a struct method (so it can reference its dependencies defined as struct fields)
-3. Define our "in-production" dependency when registering our task with the NR Diag task runner, i.e. creating the task struct instance.
+3. Define our "in-production" dependency when registering our task with the Diagnostics CLI task runner, i.e. creating the task struct instance.
 
 ### (1) allow dependencies to be attached to the task struct as struct fields
 

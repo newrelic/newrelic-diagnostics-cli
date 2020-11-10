@@ -98,7 +98,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Unable to find app config file. Are you running NR Diag from your application's parent directory?"))
+				Expect(result.Summary).To(Equal("Unable to find app config file. Are you running the " + ThisProgramFullName + " from your application's parent directory?"))
 			})
 		})
 		Context("when unable to find .NET version", func() {
