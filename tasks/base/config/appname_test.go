@@ -233,7 +233,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							FilePath: "NEW_RELIC_APP_NAME",
 						},
 					},
-					Summary: "A unique application name was found through the New Relic' App name environment variable: mysolid-appname",
+					Summary: "A unique application name was found through the New Relic App name environment variable: mysolid-appname",
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
