@@ -14,6 +14,8 @@ import (
 
 var pathsToIgnore = []string{"node_modules"}
 
+var configSysProp = "-Dnewrelic.config.file"
+
 var configEnvVarKeys = []string{
 	"NEW_RELIC_HOME",        // Node, Java
 	"NEW_RELIC_CONFIG_FILE", // Python
@@ -84,6 +86,7 @@ func (p BaseConfigCollect) Dependencies() []string {
 	// no dependencies!
 	return []string{
 		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 	}
 }
 
@@ -186,6 +189,20 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 			}
 		} else {
 			foundConfigs = append(foundConfigs, secureConfig)
+		}
+	}
+
+	//search for config file in New Relic System Property
+	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
+		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		if ok {
+			for _, process := range proccesses {
+				configPath, isPresent := process.SysPropsKeyToVal[configSysProp]
+				if isPresent {
+					//-Dnewrelic.config.file=/usr/local/newrelic/newrelic.yml
+
+				}
+			}
 		}
 	}
 
