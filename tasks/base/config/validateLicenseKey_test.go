@@ -3,9 +3,9 @@ package config
 import (
 	"errors"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("BaseConfigValidateLicenseKey", func() {
@@ -59,7 +59,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in` + "\n" + ` /usr/local/etc/php/conf.d/newrelic.ini ` + "\n" + `does not have a valid format: REPLACE_WITH_REAL_KEY. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in /usr/local/etc/php/conf.d/newrelic.ini does not have a valid format: REPLACE_WITH_REAL_KEY. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
 
 			})
 		})
@@ -80,7 +80,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 				}
 				p.validateAgainstAccount = func(map[string][]string) (map[string][]string, map[string][]string, error) {
 					validLKToSources := make(map[string][]string)
-          validLKToSources["08a2ad66c637a29c3982469a3fe8d1982d00NRAL"] = []string{"/data/www/myappname-production/releases/20191009171653/config/newrelic.yml"}
+					validLKToSources["08a2ad66c637a29c3982469a3fe8d1982d00NRAL"] = []string{"/data/www/myappname-production/releases/20191009171653/config/newrelic.yml"}
 
 					return validLKToSources, map[string][]string{}, nil
 				}
@@ -88,8 +88,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-        Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in /data/www/myappname-production/releases/20191009171653/config/newrelic.yml passed our validation check when verifying against your account:` + "\n" + ` 08a2ad66c637a29c3982469a3fe8d1982d00NRAL` + "\nNote: If your agent is reporting an 'Invalid license key' log entry for this valid License key, reach out to New Relic support to verify any issues in our end.\n\n"))
-
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in /data/www/myappname-production/releases/20191009171653/config/newrelic.yml passed our validation check when verifying against your account:` + "\n" + ` 08a2ad66c637a29c3982469a3fe8d1982d00NRAL` + "\nNote: If your agent is reporting an 'Invalid license key' log entry for this valid License key, reach out to New Relic support to verify any issues in our end.\n\n"))
 
 			})
 		})
@@ -102,7 +101,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
 							LicenseKey{
-                Value:  `"08a2ad66c637a29c3982469a3fe8d1982d00NRAL"`,
+								Value:  `"08a2ad66c637a29c3982469a3fe8d1982d00NRAL"`,
 								Source: "/app/myappname/newrelic.ini",
 							},
 						},
@@ -116,8 +115,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
-        Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in /app/myappname/newrelic.ini has a valid New Relic format: "08a2ad66c637a29c3982469a3fe8d1982d00NRAL". ` + "\n" + `Though we ran into an error (Expected StatusCode < 300 got 500: {"success":false,"error":"Could not resolve license keys") while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.` + "\n\n"))
-
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in /app/myappname/newrelic.ini has a valid New Relic format: "08a2ad66c637a29c3982469a3fe8d1982d00NRAL". ` + "\n" + `Though we ran into an error (Expected StatusCode < 300 got 500: {"success":false,"error":"Could not resolve license keys") while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.` + "\n\n"))
 
 			})
 		})
@@ -130,7 +128,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
 							LicenseKey{
-                Value:  `"eu01xx66c637a29c3982469a3fe8d1982d00NRAL"`,
+								Value:  `"eu01xx66c637a29c3982469a3fe8d1982d00NRAL"`,
 								Source: `C:\ProgramData\New Relic\.NET Agent\newrelic.config`,
 							},
 							LicenseKey{
@@ -142,15 +140,14 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 				}
 				p.validateAgainstAccount = func(map[string][]string) (map[string][]string, map[string][]string, error) {
 					invalidLKToSources := make(map[string][]string)
-          invalidLKToSources["eu01xx66c637a29c3982469a3fe8d1982d00NRAL"] = []string{`C:\ProgramData\New Relic\.NET Agent\newrelic.config`, `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml`}
+					invalidLKToSources["eu01xx66c637a29c3982469a3fe8d1982d00NRAL"] = []string{`C:\ProgramData\New Relic\.NET Agent\newrelic.config`, `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml`}
 					return map[string][]string{}, invalidLKToSources, nil
 				}
 			})
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-        Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in C:\ProgramData\New Relic\.NET Agent\newrelic.config,` + "\n " + `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml` + " did not pass our validation check when verifying against your account:\neu01xx66c637a29c3982469a3fe8d1982d00NRAL\nIf your agent is reporting an 'Invalid license key' log entry, please reach out to New Relic Support.\n\n"))
-
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in C:\ProgramData\New Relic\.NET Agent\newrelic.config,` + "\n " + `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml` + " did not pass our validation check when verifying against your account:\neu01xx66c637a29c3982469a3fe8d1982d00NRAL\nIf your agent is reporting an 'Invalid license key' log entry, please reach out to New Relic Support.\n\n"))
 
 			})
 		})
@@ -182,7 +179,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal("We validated 2 license key(s):\n" + `The license key found in /newrelic/newrelic.yml passed our validation check when verifying against your account:` + "\n" + ` 08a2ad66c637a29c3982469a3fe8d1982d002c4a` + "\n" + "Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, reach out to New Relic support to verify any issues in our end.\n" + "\n" + `The license key found in` + "\n" + ` C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml ` + "\n" + `does not have a valid format: 08a2ad66c637a29c3982469a3fe8d1982d002c4. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
+				Expect(result.Summary).To(Equal("We validated 2 license key(s):\n" + `The license key found in /newrelic/newrelic.yml passed our validation check when verifying against your account:` + "\n" + ` 08a2ad66c637a29c3982469a3fe8d1982d002c4a` + "\n" + "Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, reach out to New Relic support to verify any issues in our end.\n" + "\n" + `The license key found in C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml does not have a valid format: 08a2ad66c637a29c3982469a3fe8d1982d002c4. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
 			})
 		})
 
@@ -261,7 +258,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
 							LicenseKey{
-                Value:  `"aaaaaa1a1a11a111111aa1111a11aa1a11aa111aaaa1a11"`,
+								Value:  `"aaaaaa1a1a11a111111aa1111a11aa1a11aa111aaaa1a11"`,
 								Source: "mynodeapp/newrelic.js",
 							},
 						},
@@ -271,8 +268,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-        Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in` + "\n" + ` mynodeapp/newrelic.js ` + "\n" + `does not have a valid format: aaaaaa1a1a11a111111aa1111a11aa1a11aa111aaaa1a11. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
-
+				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in mynodeapp/newrelic.js does not have a valid format: aaaaaa1a1a11a111111aa1111a11aa1a11aa111aaaa1a11. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
 
 			})
 		})
@@ -295,7 +291,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in` + "\n" + ` newrelic/newrelic.yml ` + "\n" + `does not have a valid format: <%!=(MISSING)c8f8ff84ed677d5791eeefb672a69447fb788486%!>(MISSING). ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
+				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in newrelic/newrelic.yml does not have a valid format: <%!=(MISSING)c8f8ff84ed677d5791eeefb672a69447fb788486%!>(MISSING). ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
 
 			})
 		})
@@ -319,7 +315,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in` + "\n" + ` C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml ` + "\n" + `does not have a valid format: 5306276ad40fb0c3caccba85f869dcadc018e54. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
+				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml does not have a valid format: 5306276ad40fb0c3caccba85f869dcadc018e54. ` + "\n" + `The NR license key is 40 alphanumeric characters. ` + "\n" + `Review this documentation to make sure that you have the proper format of a New Relic Personal API key: ` + "\n" + `https://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys` + "\n\n"))
 
 			})
 		})
@@ -338,7 +334,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 								Source: "newrelic/newrelic.yml",
 							},
 							LicenseKey{
-                Value:  `eu01xx66c637a29c3982469a3fe8d1982d00NRAL`,
+								Value:  `eu01xx66c637a29c3982469a3fe8d1982d00NRAL`,
 								Source: "NEW_RELIC_LICENSE_KEY",
 							},
 						},
@@ -346,14 +342,13 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 				}
 				p.validateAgainstAccount = func(map[string][]string) (map[string][]string, map[string][]string, error) {
 					validLKToSources := make(map[string][]string)
-          validLKToSources["eu01xx66c637a29c3982469a3fe8d1982d00NRAL"] = []string{"NEW_RELIC_LICENSE_KEY"}
+					validLKToSources["eu01xx66c637a29c3982469a3fe8d1982d00NRAL"] = []string{"NEW_RELIC_LICENSE_KEY"}
 					return validLKToSources, map[string][]string{}, nil
 				}
 			})
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-        Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in NEW_RELIC_LICENSE_KEY passed our validation check when verifying against your account:` + "\n" + ` eu01xx66c637a29c3982469a3fe8d1982d00NRAL` + "\n" + `Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, please verify that your agent version is compatible with New Relic license keys that are 'region aware': https://docs.newrelic.com/docs/using-new-relic/welcome-new-relic/get-started/our-eu-us-region-data-centers. Reach out to Support if this is not the issue.` + "\n"))
-
+				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in NEW_RELIC_LICENSE_KEY passed our validation check when verifying against your account:` + "\n" + ` eu01xx66c637a29c3982469a3fe8d1982d00NRAL` + "\n" + `Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, please verify that your agent version is compatible with New Relic license keys that are 'region aware': https://docs.newrelic.com/docs/using-new-relic/welcome-new-relic/get-started/our-eu-us-region-data-centers. Reach out to Support if this is not the issue.` + "\n"))
 
 			})
 
@@ -366,7 +361,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
 							LicenseKey{
-                Value:  `eu01xx66c637a29c3982469a3fe8d1982d00NRAL`,
+								Value:  `eu01xx66c637a29c3982469a3fe8d1982d00NRAL`,
 								Source: "NRIA_LICENSE_KEY",
 							},
 							LicenseKey{
@@ -378,15 +373,14 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 				}
 				p.validateAgainstAccount = func(map[string][]string) (map[string][]string, map[string][]string, error) {
 					validLKToSources := make(map[string][]string)
-          validLKToSources["eu01xx66c637a29c3982469a3fe8d1982d00NRAL"] = []string{"NRIA_LICENSE_KEY"}
+					validLKToSources["eu01xx66c637a29c3982469a3fe8d1982d00NRAL"] = []string{"NRIA_LICENSE_KEY"}
 					return validLKToSources, map[string][]string{}, nil
 				}
 			})
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-        Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in NRIA_LICENSE_KEY passed our validation check when verifying against your account:` + "\n" + ` eu01xx66c637a29c3982469a3fe8d1982d00NRAL` + "\n" + `Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, please verify that your agent version is compatible with New Relic license keys that are 'region aware': https://docs.newrelic.com/docs/using-new-relic/welcome-new-relic/get-started/our-eu-us-region-data-centers. Reach out to Support if this is not the issue.` + "\n"))
-
+				Expect(result.Summary).To(Equal("We validated 1 license key(s):\n" + `The license key found in NRIA_LICENSE_KEY passed our validation check when verifying against your account:` + "\n" + ` eu01xx66c637a29c3982469a3fe8d1982d00NRAL` + "\n" + `Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, please verify that your agent version is compatible with New Relic license keys that are 'region aware': https://docs.newrelic.com/docs/using-new-relic/welcome-new-relic/get-started/our-eu-us-region-data-centers. Reach out to Support if this is not the issue.` + "\n"))
 
 			})
 		})

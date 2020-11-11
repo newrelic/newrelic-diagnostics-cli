@@ -200,7 +200,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 				configPath, isPresent := process.SysPropsKeyToVal[configSysProp]
 				if isPresent {
 					//Example path: -Dnewrelic.config.file=/usr/local/newrelic/newrelic.yml
-					invalidConfigFiles, foundConfigs = appendToInvalidOrFoundConfigs(configPath, &warningSummaryOnInvalidFiles, invalidConfigFiles, foundConfigs) //add to list of foundConfigs or to list of invalidConfigFiles depending if the file can be collected //Also not passing a pointer to slices since slice it self is a pointer to bootstrap array
+					invalidConfigFiles, foundConfigs = appendToInvalidOrFoundConfigs(configPath, &warningSummaryOnInvalidFiles, invalidConfigFiles, foundConfigs) //add to list of foundConfigs or to list of invalidConfigFiles depending if the file can be collected
 				}
 			}
 		}
