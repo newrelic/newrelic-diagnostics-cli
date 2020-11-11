@@ -8,7 +8,7 @@
 * Code readability and maintainability is top priority. 
   * Don’t be clever.
   * Don’t sacrifice readability to DRY up code.
-  * Consistent naming is important, if you want to include the name of this tool in a tasks output use const `ThisProgramFullName`   
+  * Consistent naming is important, if you want to include the name of this tool in a tasks output use const `tasks.ThisProgramFullName`   
 * Your code will be running on the customer’s machine.
   * Be sensitive to your code’s memory footprint (e.g. don’t load large files into memory).
   * Don’t perform blocking operations for long periods of time.

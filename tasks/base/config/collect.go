@@ -57,7 +57,7 @@ var secureFilePatterns = []string{
 	"(?i)appSettings[.]json$",
 }
 
-var warningSummaryFmt = "The " + ThisProgramFullName + " cannot collect New Relic config files from the provided path (%s):\n%s\nIf you are working with a support ticket, manually provide your New Relic config file for further troubleshooting\n"
+var warningSummaryFmt = "The " + tasks.ThisProgramFullName + " cannot collect New Relic config files from the provided path (%s):\n%s\nIf you are working with a support ticket, manually provide your New Relic config file for further troubleshooting\n"
 
 // BaseConfigCollect - Primary task to search for and find config file. Will optionally take command line input as source
 type BaseConfigCollect struct {
@@ -235,7 +235,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 	if len(foundConfigs) == 0 && len(invalidConfigFiles) == 0 {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "New Relic configuration files not found where the " + ThisProgramFullName + " was executed. Please ensure the " + ThisProgramFullName + " executable is within your application's directory alongside your New Relic agent configuration file(s). If you cannot set New Relic configuration files in your application's directory, move the " + ThisProgramFullName + " to that directory or use the -c <file_path> to specify the New Relic configuration file location.",
+			Summary: "New Relic configuration files not found where the " + tasks.ThisProgramFullName + " was executed. Please ensure the " + tasks.ThisProgramFullName + " executable is within your application's directory alongside your New Relic agent configuration file(s). If you cannot set New Relic configuration files in your application's directory, move the " + tasks.ThisProgramFullName + " to that directory or use the -c <file_path> to specify the New Relic configuration file location.",
 		}
 	}
 

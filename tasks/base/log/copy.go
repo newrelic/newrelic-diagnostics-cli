@@ -51,7 +51,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 	if len(logFilesPaths) < 1 {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "New Relic log file(s) not found where the " + ThisProgramFullName + " was executed, or in default agent log file paths. If you can see New Relic logs being generated, you will need to manually provide these logs if you are working with New Relic Support. Review the following document to send the proper level of logging for Support troubleshooting.",
+			Summary: "New Relic log file(s) not found where the " + tasks.ThisProgramFullName + " was executed, or in default agent log file paths. If you can see New Relic logs being generated, you will need to manually provide these logs if you are working with New Relic Support. Review the following document to send the proper level of logging for Support troubleshooting.",
 			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 		}
 	}
@@ -64,7 +64,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 	for _, file := range logFilesStatuses {
 		if !file.IsValid {
 			invalidLogFiles = append(invalidLogFiles, file.Path)
-			resultSummary += fmt.Sprintf("Warning! the " + ThisProgramFullName + " cannot collect New Relic log files from the provided path(%s):%s.If you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", file.Path, (file.ErrorMsg).Error())
+			resultSummary += fmt.Sprintf("Warning! the " + tasks.ThisProgramFullName + " cannot collect New Relic log files from the provided path(%s):%s.If you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", file.Path, (file.ErrorMsg).Error())
 		} else {
 			validLogFiles = append(validLogFiles, file.Path)
 		}

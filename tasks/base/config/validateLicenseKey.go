@@ -139,7 +139,7 @@ func findLKFromEnvVarSources(licenseKeys []LicenseKey) []LicenseKey {
 
 func checkEnvVarFormat(licenseKey LicenseKey) (bool, string) {
 	if licenseKeyUsingQuotes(licenseKey.Value) {
-		errMsg := fmt.Sprintf(`Using quotes around %s may cause inconsistent behavior. We highly recommend removing those quotes, and running the ` + ThisProgramFullName + ` again.`+"\n\n", licenseKey.Source)
+		errMsg := fmt.Sprintf(`Using quotes around %s may cause inconsistent behavior. We highly recommend removing those quotes, and running the ` + tasks.ThisProgramFullName + ` again.`+"\n\n", licenseKey.Source)
 		return false, errMsg
 	}
 	if isFormatValid(strings.TrimSpace(licenseKey.Value)) {
