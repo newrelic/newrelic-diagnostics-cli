@@ -34,7 +34,7 @@ type Client struct {
 	// User Agent used when communication with Haberdasher API
 	UserAgent string
 
-	// RunID is unique to each run of NR Diag and is required as a header for many haberdasher endpoints
+	// RunID is unique to each run of the Diagnostics CLI and is required as a header for many haberdasher endpoints
 	RunID string
 
 	// InsertKey is a value seeded by the RunID, and is required as a header for many haberdasher endpoints
@@ -171,7 +171,7 @@ func newResponse(r *http.Response) *Response {
 	return response
 }
 
-// SetRunID sets the NR Diag run ID for a client
+// SetRunID sets the Diagnostics CLI run ID for a client
 func (c *Client) SetRunID(runID string) {
 	c.RunID = runID
 	c.InsertKey = generateInsertKey(runID)

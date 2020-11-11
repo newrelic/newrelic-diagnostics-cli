@@ -4,7 +4,7 @@ _This image will make sense in about 5 minutes._
 
 # Unit Tests
 
-We require contributors to provide unit test coverage for submitted NR Diag tasks. Test-driven Development (TDD) is one of the best ways introduce test coverage while writing readable, maintainable, and high quality code.
+We require contributors to provide unit test coverage for submitted Diagnostics CLI tasks. Test-driven Development (TDD) is one of the best ways introduce test coverage while writing readable, maintainable, and high quality code.
 
 It is recommended you plan out your task to use separate methods that are then invoked in your task's `Execute()` method. 
 You can then write unit tests for each of those individual methods. 
@@ -32,7 +32,7 @@ You should read the following article before moving forward with this readme:
 
 # Getting setup with Ginkgo
 
-[Ginkgo](http://onsi.github.io/ginkgo/) is the Go testing framework we use for unit testing in NR Diag. We'll be using it to write unit tests in this tutorial.
+[Ginkgo](http://onsi.github.io/ginkgo/) is the Go testing framework we use for unit testing in the Diagnostics CLI. We'll be using it to write unit tests in this tutorial.
 
 You can install Ginkgo by running the following commands in your terminal:
 
@@ -378,7 +378,7 @@ If you would like to check your work and see the finished task and task_test fil
 * [Completed `count.go`](../tasks/example/docs/completed_count.go)
 * [Completed `count_test.go`](../tasks/example/docs/completed_count_test.go)
 
-> **NOTE:** You may notice `[]LogElement{}` is changed to `[]log.LogElement{}` in the above two files. In order to avoid this example task being a part of NR Diag itself,  the two example files live in the `tasks/example/docs/` folder and are thus part of the `docs` package, instead of the `log` package.
+> **NOTE:** You may notice `[]LogElement{}` is changed to `[]log.LogElement{}` in the above two files. In order to avoid this example task being a part of the Diagnostics CLI itself,  the two example files live in the `tasks/example/docs/` folder and are thus part of the `docs` package, instead of the `log` package.
 
 # Dependency injection
 
@@ -386,4 +386,4 @@ Dependency injection helps us write more testable code by passing in external de
 
 Using dependency injection is especially useful when writing unit tests for your task's `Execute()` function.
 
-For an example of how you can use this in NR Diag, see the [Dependency Injection readme](Dependency-Injection.md)
+For an example of how you can use this in the Diagnostics CLI, see the [Dependency Injection readme](Dependency-Injection.md)

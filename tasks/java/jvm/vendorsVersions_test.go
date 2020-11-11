@@ -322,7 +322,7 @@ func TestCheckLegacySupported(t *testing.T) {
 		{os: "darwin", vendor: "HotSpot", version: "6", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
 
-		// No "os: solaris" tests because we don't compile NR Diag for Solaris
+		// No "os: solaris" tests because we don't compile the Diagnostics CLI for Solaris
 
 		// IBM JVM version 6 for Linux
 		{os: "linux", vendor: "IBM", version: "6", result: true},

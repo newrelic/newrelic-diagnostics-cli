@@ -38,7 +38,7 @@ We've got a file, but it still has all the original example names
 
 ### Register the new task
 
-Now we have a task that doesn't do much, but we should at least be able to compile and run it. However, NR Diag doesn't know that it's *supposed* to run this task yet. So, we have to "register" the new task (note: this registration step is unique to this project; it's not a normal `go` thing).
+Now we have a task that doesn't do much, but we should at least be able to compile and run it. However, the Diagnostics CLI doesn't know that it's *supposed* to run this task yet. So, we have to "register" the new task (note: this registration step is unique to this project; it's not a normal `go` thing).
 
 Find the "main" package file for the package/folder your task is in. In our case, this is going to be the file `./tasks/java/jvm/jvm.go`
 

@@ -49,7 +49,7 @@ func (p BaseEnvCheckWindowsAdmin) Execute(options tasks.Options, upstream map[st
 	// 1- check FS - this will fail in docker (this is tested with a unit test)
 	isAdminFromFS, fsErr := p.adminFSCheck()
 	if isAdminFromFS {
-		result.Summary = "NR Diag detected having Elevated permissions"
+		result.Summary = tasks.ThisProgramFullName + " detected having Elevated permissions"
 		result.Status = tasks.Success
 		return result
 	} else if fsErr != nil {
@@ -59,7 +59,7 @@ func (p BaseEnvCheckWindowsAdmin) Execute(options tasks.Options, upstream map[st
 	// 2- check USERNAME env variable - will be Administrator if elevated (this is tested with a unit test)
 	isAdminFromUsernameEnvVar, usernameEnvVarErr := p.adminUsernameEnvVarCheck()
 	if isAdminFromUsernameEnvVar {
-		result.Summary = "NR Diag detected having Elevated permissions"
+		result.Summary = tasks.ThisProgramFullName + " detected having Elevated permissions"
 		result.Status = tasks.Success
 		return result
 	} else if usernameEnvVarErr != nil {
@@ -69,7 +69,7 @@ func (p BaseEnvCheckWindowsAdmin) Execute(options tasks.Options, upstream map[st
 	// 3- check logged in user (this is tested with an integration test)
 	isAdminFromLoggedInUser, loggedInUserErr := p.adminLoggedInUserCheck()
 	if isAdminFromLoggedInUser {
-		result.Summary = "NR Diag detected having Elevated permissions"
+		result.Summary = tasks.ThisProgramFullName + " detected having Elevated permissions"
 		result.Status = tasks.Success
 		return result
 	} else if loggedInUserErr != nil {
@@ -78,7 +78,7 @@ func (p BaseEnvCheckWindowsAdmin) Execute(options tasks.Options, upstream map[st
 
 	// not admin
 	result.Status = tasks.Warning
-	result.Summary = "NR Diag did not detect having Elevated permissions. Some Tasks may fail. If possible re-run from an Admin cmd prompt or PowerShell."
+	result.Summary = tasks.ThisProgramFullName + " did not detect having Elevated permissions. Some Tasks may fail. If possible re-run from an Admin cmd prompt or PowerShell."
 	if len(errorsSlice) > 0 {
 		result.Summary += "\n" + strconv.Itoa(len(errorsSlice)) + " errors encountered: "
 		for _, e := range errorsSlice {

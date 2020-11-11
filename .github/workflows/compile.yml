@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  # NR Diag binaries must compile on all of our supported OSes
+  # nrdiag binaries must compile on all of our supported OSes
   compile:
     strategy:
       matrix:

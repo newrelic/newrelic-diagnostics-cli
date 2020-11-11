@@ -71,7 +71,7 @@ func (p DotnetRequirementsMessagingServicesCheck) Execute(options tasks.Options,
 	if len(localDirs) < 1 {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Unable to determine NR Diag working and executable directory paths.",
+			Summary: "Unable to determine the " + tasks.ThisProgramFullName + " working and executable directory paths.",
 		}
 	}
 

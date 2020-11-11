@@ -208,7 +208,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\nUsing quotes around NEW_RELIC_LICENSE_KEY may cause inconsistent behavior. We highly recommend removing those quotes, and running NR Diagnostics again.\n\n"))
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\nUsing quotes around NEW_RELIC_LICENSE_KEY may cause inconsistent behavior. We highly recommend removing those quotes, and running the " + tasks.ThisProgramFullName + " again.\n\n"))
 
 			})
 		})

@@ -1,6 +1,6 @@
 # Testing
 
-NR Diag utilizes two types of testing: [Unit testing](Unit-Testing.md) and [Integration testing](Integration-Testing.md).
+The Diagnostics CLI utilizes two types of testing: [Unit testing](Unit-Testing.md) and [Integration testing](Integration-Testing.md).
 
 We recommend **unit testing** to make up a majority of your code's test coverage because unit tests:
  * Are quicker to run than integration tests
@@ -10,7 +10,7 @@ We recommend **unit testing** to make up a majority of your code's test coverage
 
  If you believe you are unable to use unit tests to adequately test your code, please add your reasoning for not using unit tests.
  
-Here is our documentation on both unit and integration testing your NR Diag contributions:
+Here is our documentation on both unit and integration testing your Diagnostics CLI contributions:
 
 * [**Unit testing**](Unit-Testing.md)
 * [**Integration testing**](Integration-Testing.md)

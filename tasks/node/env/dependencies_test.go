@@ -104,7 +104,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return a Failure result summary", func() {
-				Expect(result.Summary).To(Equal("an error message: npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that NR Diagnostics is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors"))
+				Expect(result.Summary).To(Equal("an error message: npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors"))
 			})
 		})
 		Context("When NodeModulesVersions length is zero", func() {

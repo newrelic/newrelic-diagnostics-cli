@@ -181,7 +181,7 @@ func ParseFlags() {
 	// Bail early if bad length attachment key provided.
 	if Flags.AttachmentKey != "" && len(Flags.AttachmentKey) < 32 {
 		fmt.Printf("Invalid attachment key '%s' length: %d\n", Flags.AttachmentKey, len(Flags.AttachmentKey))
-		fmt.Println("The 32 character NR Diagnostics Attachment Key can be found upper-right of your ticket on support.newrelic.com")
+		fmt.Println("The 32 character Diagnostics CLI Attachment Key can be found upper-right of your ticket on support.newrelic.com")
 		os.Exit(1)
 	}
 

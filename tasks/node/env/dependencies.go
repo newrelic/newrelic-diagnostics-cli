@@ -60,7 +60,7 @@ func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]t
 	if npmErr != nil && (npmErr.Error() != "exit status 1") {
 		return tasks.Result{
 			Status:      tasks.Error,
-			Summary:     npmErr.Error() + ": npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that NR Diagnostics is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors",
+			Summary:     npmErr.Error() + ": npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors",
 			FilesToCopy: filesToCopy,
 		}
 	}
