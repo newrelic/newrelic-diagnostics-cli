@@ -72,7 +72,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run NR Diag after setting the NRIA_LOG_FILE environment variable."))
+				Expect(result.Summary).To(Equal("No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run the " + tasks.ThisProgramFullName + " after setting the NRIA_LOG_FILE environment variable."))
 			})
 		})
 

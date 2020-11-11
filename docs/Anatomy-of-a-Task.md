@@ -60,7 +60,7 @@ The registration file to add your task to this package would be:
 tasks/morty/agent/agent.go
 ```
 
-This is where you register the task(s) for the Morty agent, so that they can be used and run by NR Diag core. Just add a...
+This is where you register the task(s) for the Morty agent, so that they can be used and run by the Diagnostics CLI core. Just add a...
 
 ```
 registrationFunc(MortyAgentTaskname{}, true)

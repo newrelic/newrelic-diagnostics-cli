@@ -29,7 +29,7 @@ For more information about CLAs, please check out Alex Russell’s excellent pos
 
 We host a public Slack with a dedicated channel for contributors and maintainers of open source projects hosted by New Relic.  If you are contributing to this project, you're welcome to request access to the #oss-contributors channel in the newrelicusers.slack.com workspace.  To request access, see https://newrelicusers-signup.herokuapp.com/.
 
-## Developing for NR diag
+## Developing for the Diagnostics CLI
 
 ### Requirements
 
@@ -41,15 +41,15 @@ We host a public Slack with a dedicated channel for contributors and maintainers
 
 ### Guidance
 
-If you have an idea for a new health check or any additional steps nrdiag should take to validate that a New Relic product has been configured correctly, then you should build an NR Diag task, it's easy!
+If you have an idea for a new health check or any additional steps the Diagnostics CLI should take to validate that a New Relic product has been configured correctly, then you should build a task for the Diagnostics CLI, it's easy!
 
-All the docs provided in this directory are meant to guide you through how to build an NR Diag task and how to write appropriate tests for it. Those docs are very thorough, and were written considering contributors of all levels of technical knowledge.
+All the docs provided in this directory are meant to guide you through how to build a task for the Diagnostics CLI and how to write appropriate tests for the task. Those docs are very thorough, and were written considering contributors of all levels of technical knowledge.
 
-Besides the documentation itself, you can take a look at the files within the task directory, and soon you'll notice that each NR Diag task has a very clear pattern and structure that you can use as reference to build your own task.
+Besides the documentation itself, you can take a look at the files within the task directory, and soon you'll notice that each task in the Diagnostics CLI has a very clear pattern and structure that you can use as reference to build your own task.
 
 One important thing to keep in mind is that we have already written a lot of good, basic health checks. Please make sure that your idea for a health check has not yet been implemented in one way or another in our tasks directory. If you do not find it and you are ready to start building your task, then take advantage of the helper functions provided in our taskHelpers files inside the tasks directory. This is boiler plate logic that we found is applicable and useful to most New Relic health checks.
 
-Additionally, take advantage of other NR diag tasks to build your own task on top of them. Imagine you want to build a task to validate that a customer is using only Node.js supported versions for the Node Agent, then you could use another nrdiag task that already gathers the Node version from customer's environment. To get more details on how take advantage of `upstream` tasks, take a look at the [code snippets in our Coding Guidelines.](https://github.com/newrelic/newrelic-diagnostics-cli/blob/main/docs/Coding-Guidelines.md)
+Additionally, take advantage of other Diagnostics CLI tasks to build your own task on top of them. Imagine you want to build a task to validate that a customer is using only Node.js supported versions for the Node Agent, then you could use another Diagnostics CLI task that already gathers the Node version from customer's environment. To get more details on how take advantage of `upstream` tasks, take a look at the [code snippets in our Coding Guidelines.](https://github.com/newrelic/newrelic-diagnostics-cli/blob/main/docs/Coding-Guidelines.md)
 
 
 ### Testing your task

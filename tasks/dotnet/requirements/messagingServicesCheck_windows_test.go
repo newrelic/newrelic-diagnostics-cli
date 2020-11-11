@@ -62,7 +62,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Unable to determine NR Diag working and executable directory paths."))
+				Expect(result.Summary).To(Equal("Unable to determine the " + tasks.ThisProgramFullName + " working and executable directory paths."))
 			})
 		})
 		Context("when no Dlls found", func() {

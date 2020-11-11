@@ -1,5 +1,5 @@
 """
-This script takes csv formatted task dependency output from NR Diag
+This script takes csv formatted task dependency output from the Diagnostics CLI
 and creates a dependency graph using the graphviz library. 
 It expects a csv list from STDIN in the form: dependency, parent_task.
 This script is meant to be fed the output of `newrelic-diagnostics  --print-dependencies`

@@ -63,7 +63,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 	if upstream["Base/Log/Copy"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run NR Diag after setting the NRIA_LOG_FILE environment variable.",
+			Summary: "No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run the " + tasks.ThisProgramFullName + " after setting the NRIA_LOG_FILE environment variable.",
 			URL:     "https://docs.newrelic.com/docs/infrastructure/install-configure-manage-infrastructure/configuration/infrastructure-configuration-settings#log-file",
 		}
 	}

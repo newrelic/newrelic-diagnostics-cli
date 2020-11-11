@@ -13,7 +13,6 @@ type DotNetEnvTargetVersion struct {
 	returnStringInFile tasks.ReturnStringInFileFunc
 }
 
-
 // Identifier - This returns the Category, Subcategory and Name of each task
 func (p DotNetEnvTargetVersion) Identifier() tasks.Identifier {
 	return tasks.IdentifierFromString("DotNet/Env/TargetVersion")
@@ -50,7 +49,7 @@ func (p DotNetEnvTargetVersion) Execute(options tasks.Options, upstream map[stri
 	configFiles := p.getNetConfigFiles(workingDir)
 	if len(configFiles) < 1 {
 		result.Status = tasks.Warning
-		result.Summary = "Unable to find app config file. Are you running NR Diag from your application's parent directory?"
+		result.Summary = "Unable to find app config file. Are you running the " + tasks.ThisProgramFullName + " from your application's parent directory?"
 		result.URL = "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/new-relic-diagnostics"
 		return result
 	}
