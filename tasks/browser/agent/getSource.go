@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"regexp"
 
@@ -79,10 +80,23 @@ func (t BrowserAgentGetSource) Execute(options tasks.Options, upstream map[strin
 		Identifier: t.Identifier().String(),
 	}}
 
+	scripts, loaderError := getLoader(string(responseBody))
+	if loaderError != nil {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: loaderError.Error(),
+			Payload: BrowserAgentSourcePayload{
+				URL:    url,
+				Source: string(responseBody),
+				Loader: scripts,
+			},
+		}
+	}
+
 	result.Payload = BrowserAgentSourcePayload{
 		URL:    url,
 		Source: string(responseBody),
-		Loader: getLoader(string(responseBody)),
+		Loader: scripts,
 	}
 	result.Status = tasks.Success
 	result.Summary = "Successfully downloaded source from " + url
@@ -102,24 +116,40 @@ func streamSource(responseBody []byte, ch chan string) {
 
 }
 
-func getLoader(data string) []string {
+func getLoader(data string) ([]string, error) {
 	var scripts []string
+	// check for Browser agent in head tag
+	headTagRegex := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>[\s\S]*<\/head>)`)
+	headMatches := headTagRegex.FindAllString(data, -1)
+	//Now loop through matches
+	headNREUM := regexp.MustCompile("window.NREUM")
+	for _, script := range headMatches {
+		if headNREUM.MatchString(script) {
+			log.Debug("Browser Loader found in head ")
+			scripts = append(scripts, script)
+			return scripts, nil
+		}
+	}
+
 	// First we grab the script tags
 	regex := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>)`)
 
 	matches := regex.FindAllString(data, -1)
 	// Now loop through matches to find the browser agent loader
 	nreum := regexp.MustCompile("window.NREUM")
+	var loaderError error
 	for _, script := range matches {
 		if nreum.MatchString(script) {
-			log.Debug("Browser Loader found")
+			loaderError = errors.New("Browser Loader found but not in the head")
 			scripts = append(scripts, script)
 		}
 	}
 
 	if len(scripts) == 0 {
-		log.Debug("No loader found")
+		loaderError = errors.New("No loader found")
+		return scripts, loaderError
+	} else {
+		return scripts, loaderError
 	}
 
-	return scripts
 }
