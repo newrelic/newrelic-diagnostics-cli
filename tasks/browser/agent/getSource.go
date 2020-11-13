@@ -132,9 +132,9 @@ func getLoader(data string) ([]string, error) {
 	}
 
 	// First we grab the script tags
-	regex := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>)`)
+	outsideHeadRegex := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>)`)
 
-	matches := regex.FindAllString(data, -1)
+	matches := outsideHeadRegex.FindAllString(data, -1)
 	// Now loop through matches to find the browser agent loader
 	nreum := regexp.MustCompile("window.NREUM")
 	var loaderError error

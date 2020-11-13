@@ -57,7 +57,7 @@ func (t BrowserAgentDetect) Execute(options tasks.Options, upstream map[string]t
 			Summary: "Failed to detect browser agent",
 			URL:     "https://docs.newrelic.com/docs/browser/new-relic-browser/installation/install-new-relic-browser-agent",
 		}
-	} else if len(source.Loader) > 2 {
+	} else if len(source.Loader) > 1 {
 		log.Debug("More than 1 browser agent detected")
 		result.Status = tasks.Warning
 		result.Summary = "More than one browser agent detected, please check to ensure only one browser agent is configured per page"
