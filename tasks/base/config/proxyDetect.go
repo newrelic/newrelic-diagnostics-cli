@@ -11,6 +11,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
+//ProxyConfig represents an specific proxy server settings/configuration. The processID field mostly serves a purpose for agents like the Java Agent
 type ProxyConfig struct {
 	proxyHost     string
 	proxyPort     string
@@ -114,15 +115,12 @@ func (p BaseConfigProxyDetect) Execute(options tasks.Options, upstream map[strin
 		log.Debug("Setting environment override to :", envOverride)
 	}
 
-	validations, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
+	validations, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement)
 	if ok {
 		log.Debug("Base/Config/Validate payload is correct type")
-		//		log.Debug(configs) //This may be useful when debugging to log the entire results to the screen
 	}
-
-	// Loop through validations to see if the proxy is configured anywhere in there or to at least find out which agent are we dealing with
-	for _, validation := range validations {
-
+	// Loop through validations to see if the proxy is configured anywhere in there or to at least find out which agent are we dealing with based on the filename
+	for _, validation := range validations { //We'll exit the iteration as soon as we set a proxy
 		proxyConfigs, err := findProxyValues(validation, envOverride, upstream)
 		if err != nil {
 			log.Debug("Error getting proxy. Error was ", err)
@@ -135,7 +133,7 @@ func (p BaseConfigProxyDetect) Execute(options tasks.Options, upstream map[strin
 		for _, proxyConfig := range proxyConfigs {
 			if proxyConfig.proxyHost != "" {
 				proxyURL := setProxyFromConfig(proxyConfig)
-				proxySuccessSummary = proxySuccessSummary + fmt.Sprintf("Set proxy to: %\n", proxyURL)
+				proxySuccessSummary = proxySuccessSummary + fmt.Sprintf("Set proxy to: %s\n", proxyURL)
 			}
 		}
 		if len(proxySuccessSummary) > 0 {
@@ -145,21 +143,9 @@ func (p BaseConfigProxyDetect) Execute(options tasks.Options, upstream map[strin
 				Payload: proxyConfigs,
 			}
 		}
-		// if proxyValue.proxyHost != "" {
-		// 	proxyURL := setProxyFromConfig(proxyValue)
-		// 	result.Status = tasks.Success
-		// 	result.Summary = "Set proxy to: " + proxyURL + " from file: " + validation.Config.FilePath + validation.Config.FileName
-		// 	result.Payload = []proxyConfig{proxyValue}
-		// 	return result //Exit as soon as we set a proxy
-		// }
 
+		//Check proxy configuration, if set in multiple locations and NOT matching, flag a warning
 	}
-
-	//Check proxy configuration, if set in multiple locations and NOT matching, flag a warning
-
-	//Set proxy if not set via env or command line
-
-	//Report proxy used to payload and summary, regardless if successful or not
 
 	return result
 }
@@ -263,10 +249,10 @@ func findValueFromSysProps(upstream map[string]tasks.Result) []ProxyConfig {
 	return proxyConfigs
 }
 
-func findValueFromYml(input ValidateElement, envOverride string) (ProxyConfig, error) {
+func findValueFromYml(fileElement ValidateElement, envOverride string) (ProxyConfig, error) {
 	var returnProxyValues ProxyConfig
 
-	proxyValues, proxyMap := findValueFromKeys(standardProxyKeys, input)
+	proxyValues, proxyMap := findValueFromKeys(standardProxyKeys, fileElement)
 	if proxyValues.proxyHost != "" {
 		//This indicates only one section found in our yml config file
 		return proxyValues, nil
@@ -301,12 +287,12 @@ func findValueFromYml(input ValidateElement, envOverride string) (ProxyConfig, e
 	return returnProxyValues, nil
 }
 
-func findValueFromKeys(searchKeys ProxyConfig, input ValidateElement) (ProxyConfig, map[string]string) {
+func findValueFromKeys(searchKeys ProxyConfig, fileElement ValidateElement) (ProxyConfig, map[string]string) {
 	var proxyValues ProxyConfig
 	var combinedMap = make(map[string]string)
 
 	//This will return 1 or more found keys that we need to map to the slice
-	hostValues := input.ParsedResult.FindKey(searchKeys.proxyHost)
+	hostValues := fileElement.ParsedResult.FindKey(searchKeys.proxyHost)
 
 	// call out to build the map from the value
 
@@ -318,7 +304,7 @@ func findValueFromKeys(searchKeys ProxyConfig, input ValidateElement) (ProxyConf
 		}
 	}
 	if searchKeys.proxyPort != "" {
-		portValues := input.ParsedResult.FindKey(searchKeys.proxyPort)
+		portValues := fileElement.ParsedResult.FindKey(searchKeys.proxyPort)
 		for _, v := range portValues {
 			if len(portValues) == 1 {
 				proxyValues.proxyPort = v.Value()
@@ -328,7 +314,7 @@ func findValueFromKeys(searchKeys ProxyConfig, input ValidateElement) (ProxyConf
 		}
 	}
 	if searchKeys.proxyUser != "" {
-		userValues := input.ParsedResult.FindKey(searchKeys.proxyUser)
+		userValues := fileElement.ParsedResult.FindKey(searchKeys.proxyUser)
 		for _, v := range userValues {
 			if len(userValues) == 1 {
 				proxyValues.proxyUser = v.Value()
@@ -338,7 +324,7 @@ func findValueFromKeys(searchKeys ProxyConfig, input ValidateElement) (ProxyConf
 		}
 	}
 	if searchKeys.proxyPassword != "" {
-		passValues := input.ParsedResult.FindKey(searchKeys.proxyPassword)
+		passValues := fileElement.ParsedResult.FindKey(searchKeys.proxyPassword)
 		for _, v := range passValues {
 			if len(passValues) == 1 {
 				proxyValues.proxyPassword = v.Value()
@@ -347,7 +333,7 @@ func findValueFromKeys(searchKeys ProxyConfig, input ValidateElement) (ProxyConf
 			}
 		}
 		// Do second search for password because java and ruby are dumb and almost match
-		passwordValues := input.ParsedResult.FindKey(searchKeys.proxyPassword + "word")
+		passwordValues := fileElement.ParsedResult.FindKey(searchKeys.proxyPassword + "word")
 		for _, v := range passwordValues {
 			if len(passwordValues) == 1 {
 				proxyValues.proxyPassword = v.Value()
