@@ -6,8 +6,8 @@ _This image will make sense in about 5 minutes._
 
 We require contributors to provide unit test coverage for submitted Diagnostics CLI tasks. Test-driven Development (TDD) is one of the best ways introduce test coverage while writing readable, maintainable, and high quality code.
 
-It is recommended you plan out your task to use separate methods that are then invoked in your task's `Execute()` method. 
-You can then write unit tests for each of those individual methods. 
+It is recommended you plan out your task to use separate methods that are then invoked in your task's `Execute()` method.
+You can then write unit tests for each of those individual methods.
 
 The `./test.sh` script has already been written to find and execute all unit tests so all you should need to do is create your `*_test.go` file and populate it to ensure your unit tests are run:
 
@@ -171,8 +171,9 @@ Don't get too excited - it's going to **fail**. Remember, the problem we're solv
 Running a test and watching it fail is a key aspect of test driven development. If your test passes on the first run, that means you didn't write the test first!
 
 Before actually running the test, it's helpful to call out:
-1) Whether you think it will fail
-2) Why it will fail
+
+1. Whether you think it will fail
+2. Why it will fail
 
 In our case, the test will fail because, while we have an `Identify` method, it's returning the wrong value. Running our test proves that:
 
@@ -199,7 +200,7 @@ $ go test
 
 ![](./images/ginkgo_pass.png)
 
-Woohoo! Our test passed! We're in the green. 
+Woohoo! Our test passed! We're in the green.
 
 If this were a more complex method, we'd now go back and **REFACTOR**, using this test as a guide to show that we're on the right track.
 
@@ -232,7 +233,6 @@ Alright, let's write our tests! With `Execute()`, it will be a bit more complica
   * upstream dependency returned unexpected payload type (type assertion failure)
   * one or more log files found by upstream dependency
   * no log files found by upstream dependency
-
 
 * The parameter we'll be modifying is called `upstream`. We'll want to create fixtures that correspond to each of the above contexts. This will be done using Ginkgo's `BeforeEach()` method.
 
