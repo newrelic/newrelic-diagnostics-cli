@@ -25,7 +25,7 @@ var secureLogFilenamePatterns = []string{"docker[.]log$",
 	"syslog$",
 }
 
-var logSysProp = "-Dnewrelic.log" //EX: Dnewrelic.logfile=/opt/newrelic/java/logs/newrelic/somenewnameformylogs.log
+var logSysProp = "-Dnewrelic.logfile" //EX: Dnewrelic.logfile=/opt/newrelic/java/logs/newrelic/somenewnameformylogs.log
 
 var logEnvVars = []string{
 	"NRIA_LOG_FILE", // Infra agent
@@ -126,15 +126,17 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		}
 	}
 
-	//this is our fallback because env vars and default paths should take precedence over system properties and config files
-	if len(fileLocations) < 1 && len(secureFileLocations) < 1 {
-		//check for potential system property set
-		if len(foundSysPropPath) > 0 &&
-		!(tasks.PosString(fileLocations, foundSysPropPath) > -1) && //make sure we are not adding a log file we already found
-		!(tasks.PosString(secureFileLocations, foundSysPropPath) > -1) {
+	//check for system properties
+	if len(foundSysPropPath) > 0 {
+		//make sure we are not adding a log file we already found
+		if !(tasks.PosString(fileLocations, foundSysPropPath) > -1) && !(tasks.PosString(secureFileLocations, foundSysPropPath) > -1) {
 			fileLocations = append(fileLocations, foundSysPropPath)
 		}
-		//even if we found a path through system prop, we still want to check config files in case we are looking at an app that has, say, Infra agent besides Java agent
+
+	}
+
+	//this is our fallback because env vars, system props and default paths can take precedence over config files values
+	if len(fileLocations) < 1 && len(secureFileLocations) < 1 {
 		configFilePaths := getLogPathsFromConfigFile(configElements)
 		fileLocations = append(fileLocations, configFilePaths...)
 	}

@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -143,7 +142,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: fmt.Sprintf("%s unique application name(s) found: %s", strconv.Itoa(len(appNameInfosFromConfig)), appNameInfosFromConfig[0].Name),
+		Summary: fmt.Sprintf("%d unique application name(s) found: %s", len(appNameInfosFromConfig), appNameInfosFromConfig[0].Name),
 		Payload: appNameInfosFromConfig,
 	}
 }
