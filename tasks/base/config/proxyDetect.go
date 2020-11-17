@@ -17,10 +17,14 @@ type ProxyConfig struct {
 	proxyPort     string
 	proxyUser     string
 	proxyPassword string
+	proxyURL      string
+	proxyScheme   string
 	processID     int32
+	proxySource   string
 }
 
 var proxyEnvVarsKeys = []string{
+	"NRIA_PROXY",               //Infra: https://proxy_user.access_10@proxy_01:1080
 	"NEW_RELIC_PROXY_HOST",     //Java, Node, Python, Ruby
 	"NEW_RELIC_PROXY_PASS",     //Node, Python, Ruby
 	"NEW_RELIC_PROXY_PORT",     //Java, Node, Python, Ruby
@@ -37,7 +41,7 @@ var proxySysPropsKeys = []string{
 	"-Dnewrelic.config.proxy_password",
 }
 
-var proxyConfigKeys = []ProxyConfig{ //This is a slice with all the possible entries that we will search through
+var nrProxyConfigs = []ProxyConfig{ //This is a slice with all the possible entries that we will search through
 	minionProxyKeys,
 	standardProxyKeys,
 	dotnetProxyKeys,
@@ -50,6 +54,7 @@ var standardProxyKeys = ProxyConfig{ //This is the values used by Java, Ruby, No
 	proxyPort:     "proxy_port",
 	proxyUser:     "proxy_user",
 	proxyPassword: "proxy_pass",
+	proxyScheme:   "proxy_scheme",
 }
 
 var dotnetProxyKeys = ProxyConfig{
@@ -60,7 +65,7 @@ var dotnetProxyKeys = ProxyConfig{
 }
 
 var infraOrNodeProxyKeys = ProxyConfig{
-	proxyHost: "proxy", //Infra agent and Node support the single proxy item names (which take as a value a url: 'http://user:pass@10.0.0.1:8000/') or the standard config keys so we look for both. This setting will override the other standardProxyKeys in the config file
+	proxyURL: "proxy", //Infra agent and Node support the single proxy item names (which take as a value a url: 'http://user:pass@10.0.0.1:8000/') or the standard config keys so we look for both. This setting will override the other standardProxyKeys in the config file
 }
 
 // minion has combined auth key "proxyAuth".
@@ -71,6 +76,11 @@ var minionProxyKeys = ProxyConfig{
 
 var phpProxyKeys = ProxyConfig{
 	proxyHost: "newrelic.daemon.proxy",
+}
+
+var httpsProxyKeys = []string{
+	"HTTP_PROXY",
+	"HTTPS_PROXY",
 }
 
 // BaseConfigProxyDetect - Primary task to search for and find config file. Will optionally take command line input as source
@@ -99,66 +109,111 @@ func (p BaseConfigProxyDetect) Dependencies() []string {
 
 // Execute - This task will search for config files based on the string array defined and walk the directory tree from the working directory searching for additional matches
 func (p BaseConfigProxyDetect) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var result tasks.Result
-	//Check options to see if proxy was configured via command line or env
 
-	if envProxy := os.Getenv("HTTP_PROXY"); envProxy != "" {
-		log.Debug("Proxy set via ENV variable. Task did not run.")
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Proxy set via ENV variable. Task did not run.",
-		}
-	}
-	var envOverride string
-	if options.Options["environment"] != "" {
-		envOverride = (string(options.Options["environment"]))
-		log.Debug("Setting environment override to :", envOverride)
-	}
+	//check if the customer has http_proxy or https_proxy in their environment. If they don't, later we'll set the env var using the proxy values found via newrelic proxy settings; this is env var will allow us to connect nrdiag to newrelic and upload their data into a ticket
+	httpsProxyKey, httpsProxyVal := checkForHttpORHttpsProxies()
 
-	validations, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement)
+	validations, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement) //data coming from config files found
+
 	if ok {
-		log.Debug("Base/Config/Validate payload is correct type")
-	}
-	// Loop through validations to see if the proxy is configured anywhere in there or to at least find out which agent are we dealing with based on the filename
-	for _, validation := range validations { //We'll exit the iteration as soon as we set a proxy
-		proxyConfigs, err := findProxyValues(validation, envOverride, upstream)
-		if err != nil {
-			log.Debug("Error getting proxy. Error was ", err)
-			result.Status = tasks.Warning
-			result.Summary = "Error retrieving proxy from config file" + err.Error()
-		}
-		log.Debug("execute proxyValue is", proxyConfigs)
+		proxyConfig, multipleProxyErr := getProxyConfig(validations, options, upstream)
 
-		proxySuccessSummary := ""
-		for _, proxyConfig := range proxyConfigs {
-			if proxyConfig.proxyHost != "" {
-				proxyURL := setProxyFromConfig(proxyConfig)
-				proxySuccessSummary = proxySuccessSummary + fmt.Sprintf("Set proxy to: %s\n", proxyURL)
+		if multipleProxyErr != nil {
+			return tasks.Result{
+				Status:  tasks.Warning,
+				Summary: "We had difficulties retrieving proxy settings from your New Relic config file: " + multipleProxyErr.Error(),
+				Payload: proxyConfig,
 			}
 		}
-		if len(proxySuccessSummary) > 0 {
+
+		if (proxyConfig != ProxyConfig{}) {
+			proxyURL := ""
+			if (proxyConfig.proxyHost != "") || (proxyConfig.proxyURL != "") {
+				proxyURL = proxyURL + setProxyURL(proxyConfig)
+			}
+			if httpsProxyKey == "" {
+				os.Setenv("HTTP_PROXY", proxyURL) //Set this env var temporarily to be used by: https://github.com/newrelic/newrelic-diagnostics-cli/blob/main/processOptions.go#L39
+			}
+			log.Debug(proxyConfig)
 			return tasks.Result{
 				Status:  tasks.Success,
-				Summary: proxySuccessSummary,
-				Payload: proxyConfigs,
+				Summary: fmt.Sprintf("We have succesfully detected a proxy URL set %s via New Relic proxy settings using %s\n", proxyURL, proxyConfig.proxySource),
+				Payload: proxyConfig,
 			}
 		}
-
-		//Check proxy configuration, if set in multiple locations and NOT matching, flag a warning
 	}
 
-	return result
+	if httpsProxyKey != "" {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: fmt.Sprintf("We have detected a proxy set via %s: %s\nThough this may be a valid configuration for you app and it is supported by New Relic Infinite Tracing, keep in mind that New Relic agents support their own specific proxy settings.", httpsProxyKey, httpsProxyVal),
+			URL:     "https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/install-configure/configure-agent",
+		}
+	}
+
+	return tasks.Result{
+		Status:  tasks.None,
+		Summary: "No proxy server settings found for this app",
+	}
 }
 
-func setProxyFromConfig(proxy ProxyConfig) string {
-	//Build proxy url. Some agents and customers will preprend a protocol to their host configuration. So want to avoid building a url such as this one: http://https://myuser:mypassword@myproxy.mycompany.com:8080
+func checkForHttpORHttpsProxies() (string, string) {
+	for _, httpsProxyKey := range httpsProxyKeys {
+		httpsProxyVal := os.Getenv(httpsProxyKey)
+		if httpsProxyVal != "" {
+			return httpsProxyKey, httpsProxyVal
+		}
+	}
+	return "", ""
+}
+
+func getProxyConfig(validations []ValidateElement, options tasks.Options, upstream map[string]tasks.Result) (ProxyConfig, error) {
+	var proxyConfig ProxyConfig
+
+	proxyConfig = findProxyValuesFromEnvVars(upstream)
+
+	for _, validation := range validations { // Go through each config file validation to see if the proxy is configured anywhere in there or to at least find out which agent are we dealing with based on the file extension
+		if filepath.Ext(validation.Config.FileName) != ".ini" && (proxyConfig != ProxyConfig{}) {
+			return proxyConfig, nil //early exit because env vars take precendence for all agents except python. PHP does not use env vars
+		}
+		if filepath.Ext(validation.Config.FileName) == ".yml" && (validation.Config.FileName != "newrelic-infra.yml") {
+			//applicable only to Java not Ruby:
+			proxyConfig := findProxyValuesFromSysProps(upstream)
+			if (proxyConfig != ProxyConfig{}) {
+				return proxyConfig, nil //early exit because system properties take precendence over config file
+			}
+			//Check for proxy values in yml file, applicable to both Java and Ruby
+			proxyConfig = findProxyValuesFromYmlFile(validation, options)
+
+			if (proxyConfig != ProxyConfig{}) {
+				proxyConfig.proxySource = validation.Config.FilePath + validation.Config.FileName
+			}
+			return proxyConfig, nil
+		}
+		// now let's look into infra, .NET, PHP, minion and other standard settings
+		for _, proxyConfigKeys := range nrProxyConfigs {
+			proxyConfig, multipleProxyConfigs := findProxyValuesFromConfigFile(proxyConfigKeys, validation)
+			log.Debug("Detected multipleProxyConfigs: ", multipleProxyConfigs)
+			if proxyConfig.proxyHost != "" {
+				return proxyConfig, nil //return as soon as we have a match
+			}
+			if len(multipleProxyConfigs) > 1 {
+				return proxyConfig, errors.New("multiple proxy values found within a config File")
+			}
+		}
+	} // end of iterating through config validations
+	return proxyConfig, nil
+}
+
+func setProxyURL(proxy ProxyConfig) string {
+	//this single setting is only available for a couple of agents and they ovewrite other proxy settings
+	if proxy.proxyURL != "" {
+		return proxy.proxyURL
+	}
+	//build the URL by putting together all the proxy setting values they have used
 	var proxyURL string
-	defaultProxyProtocol := "http://"
-	//Proxy user credential found?
 	if proxy.proxyUser != "" {
-
 		proxyURL += proxy.proxyUser
-
 		//No pass found case for combined auth in single key (e.g. private minion's proxyAuth)
 		if proxy.proxyPassword != "" {
 			proxyURL += ":" + proxy.proxyPassword
@@ -171,219 +226,207 @@ func setProxyFromConfig(proxy ProxyConfig) string {
 	if proxy.proxyPort != "" {
 		proxyURL += ":" + proxy.proxyPort
 	}
-
-	if !(strings.Contains(proxyURL, "http")) {
-		proxyURL = defaultProxyProtocol + proxyURL
+	//Some customers will preprend a protocol to their host configuration. So want to avoid building a url such as this one: http://https://myuser:mypassword@myproxy.mycompany.com:8080
+	if strings.Contains(proxyURL, "http") {
+		return proxyURL
 	}
-	//This is how we set the proxy and all default connections will use it
-	log.Debug("Setting proxy via detected config to", proxyURL)
-	os.Setenv("HTTP_PROXY", proxyURL)
+
+	if proxy.proxyScheme != "" { //setting option only for python and java
+		proxyURL = proxy.proxyScheme + "://" + proxyURL
+		return proxyURL
+	}
+	//default to http
+	proxyURL = "http://" + proxyURL
 	return proxyURL
 }
 
-func findProxyValues(fileElement ValidateElement, envOverride string, upstream map[string]tasks.Result) ([]ProxyConfig, error) {
-	//So first we build a map so we can track the results, using the proxy_host as the string of the map itself
-	var defaultProxyConfig ProxyConfig
+func findProxyValuesFromEnvVars(upstream map[string]tasks.Result) ProxyConfig {
+	proxyConfig := ProxyConfig{}
 
-	if filepath.Ext(fileElement.Config.FileName) == ".yml" && fileElement.Config.FileName != "newrelic-infra.yml" {
-		//applicable only to Java
-		proxyConfigs := findValueFromSysProps(upstream) //the only reason I am return an slice of ProxyConfigs is because I am assumming that in some crazy world you can have different JVM processes, each running with its own proxy server settings
-		if len(proxyConfigs) > 0 {
-			return proxyConfigs, nil
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info {
+		envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+		if ok {
+			for _, proxyEnvVarKey := range proxyEnvVarsKeys {
+				proxyEnvVarVal, isPresent := envVars[proxyEnvVarKey]
+				if isPresent {
+					lowerCaseEnvVar := strings.ToLower(proxyEnvVarKey)
+					if strings.Contains(lowerCaseEnvVar, "host") {
+						proxyConfig.proxyHost = proxyEnvVarVal
+					} else if strings.Contains(lowerCaseEnvVar, "port") {
+						proxyConfig.proxyPort = proxyEnvVarVal
+					} else if strings.Contains(lowerCaseEnvVar, "user") {
+						proxyConfig.proxyUser = proxyEnvVarVal
+					} else if strings.Contains(lowerCaseEnvVar, "pass") { //should match pass or password
+						proxyConfig.proxyPassword = proxyEnvVarVal
+					} else if strings.Contains(lowerCaseEnvVar, "scheme") {
+						proxyConfig.proxyScheme = proxyEnvVarVal
+					} else {
+						proxyConfig.proxyURL = proxyEnvVarVal
+					}
+				}
+			}
+			if (proxyConfig != ProxyConfig{}) {
+				proxyConfig.proxySource = "New Relic Environment variables"
+			}
 		}
-		//Check for proxy values in yml file, applicable to Java and Ruby
-		proxyConfig, err := findValueFromYml(fileElement, envOverride)
-		if err != nil {
-			return []ProxyConfig{proxyConfig}, err
-		}
-		return []ProxyConfig{proxyConfig}, nil
 	}
-	// now let's look into infra, .NET, PHP, minion and other standard settings
-	for _, proxyKey := range proxyConfigKeys {
-		proxyConfig, proxyMap := findValueFromKeys(proxyKey, fileElement)
-		log.Debug("Detected proxyConfig", proxyConfig)
-		log.Debug("Detected proxyMap", proxyMap)
-		if len(proxyMap) > 1 {
-			return []ProxyConfig{defaultProxyConfig}, errors.New("multiple proxy values")
-		}
-		if proxyConfig.proxyHost != "" {
-			return []ProxyConfig{proxyConfig}, nil //return as soon as we have a match
-		}
-	}
-
-	log.Debug("returning found proxy values of ", defaultProxyConfig)
-	return []ProxyConfig{defaultProxyConfig}, nil
+	return proxyConfig
 }
 
-func findValueFromSysProps(upstream map[string]tasks.Result) []ProxyConfig {
-	proxyConfigs := []ProxyConfig{}
+func findProxyValuesFromSysProps(upstream map[string]tasks.Result) ProxyConfig {
+	proxyConfig := ProxyConfig{}
 
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
 		processes, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
 			for _, process := range processes {
-				config := ProxyConfig{}
 				for _, proxySysPropKey := range proxySysPropsKeys {
 					proxySysPropVal, isPresent := process.SysPropsKeyToVal[proxySysPropKey]
 					if isPresent {
 						if strings.Contains(proxySysPropKey, "host") {
-							config.proxyHost = proxySysPropVal
+							proxyConfig.proxyHost = proxySysPropVal
 						} else if strings.Contains(proxySysPropKey, "port") {
-							config.proxyPort = proxySysPropVal
+							proxyConfig.proxyPort = proxySysPropVal
 						} else if strings.Contains(proxySysPropKey, "user") {
-							config.proxyUser = proxySysPropVal
+							proxyConfig.proxyUser = proxySysPropVal
 						} else {
-							config.proxyPassword = proxySysPropVal
+							proxyConfig.proxyPassword = proxySysPropVal
 						}
 					}
 				}
-				if (config != ProxyConfig{}) { // we want at least one of the proxyConfig fiels to be populated
-					config.processID = process.ProcID
-					proxyConfigs = append(proxyConfigs, config)
+				if (proxyConfig != ProxyConfig{}) { // we want at least one of the proxyConfig fiels to be populated
+					proxyConfig.processID = process.ProcID
+					proxyConfig.proxySource = "system properties"
+					return proxyConfig //early exit, we got the proxyConfig info that we needed
 				}
-			}
+			} //end of iterating through java processes
 		}
-		return proxyConfigs
 	}
-
-	return proxyConfigs
+	return proxyConfig
 }
 
-func findValueFromYml(fileElement ValidateElement, envOverride string) (ProxyConfig, error) {
-	var returnProxyValues ProxyConfig
-
-	proxyValues, proxyMap := findValueFromKeys(standardProxyKeys, fileElement)
+func findProxyValuesFromYmlFile(fileElement ValidateElement, options tasks.Options) ProxyConfig {
+	proxyValues, proxyMap := findProxyValuesFromConfigFile(standardProxyKeys, fileElement)
 	if proxyValues.proxyHost != "" {
-		//This indicates only one section found in our yml config file
-		return proxyValues, nil
-	} //More than one set of values found so we're going to default to trying to find them based on production
-
-	if envOverride == "" {
+		//This indicates only one environment section found in our yml config file and we did not have to bother creating a proxyMap
+		return proxyValues
+	}
+	//More than one set of values found so we're going to default to trying to find them based on production
+	var envOverride string
+	if options.Options["environment"] != "" { //is an nrdiag cmdline option to set their environment to production, staging, etc.
+		envOverride = (string(options.Options["environment"]))
+	} else {
 		envOverride = "production"
 	}
 
+	var proxyConfig ProxyConfig
 	// Set host
 	path := "/" + envOverride + "/" + standardProxyKeys.proxyHost
-	returnProxyValues.proxyHost = proxyMap[path]
+	proxyConfig.proxyHost = proxyMap[path]
 
 	// Set Port
 	path = "/" + envOverride + "/" + standardProxyKeys.proxyPort
-	returnProxyValues.proxyPort = proxyMap[path]
+	proxyConfig.proxyPort = proxyMap[path]
 
 	// Set User
 	path = "/" + envOverride + "/" + standardProxyKeys.proxyUser
-	returnProxyValues.proxyUser = proxyMap[path]
-	// Set Pass
+	proxyConfig.proxyUser = proxyMap[path]
+
+	// Set Pass or Password
 	path = "/" + envOverride + "/" + standardProxyKeys.proxyPassword
 	if val, ok := proxyMap[path]; ok {
-		returnProxyValues.proxyPassword = val
+		proxyConfig.proxyPassword = val
 	} else {
 		path = "/" + envOverride + "/" + standardProxyKeys.proxyPassword + "word"
-		returnProxyValues.proxyPassword = proxyMap[path]
+		proxyConfig.proxyPassword = proxyMap[path]
 	}
+	proxyConfig.proxyPassword = proxyMap[path]
 
-	returnProxyValues.proxyPassword = proxyMap[path]
-	log.Debug("returning found proxy values of", returnProxyValues)
-	return returnProxyValues, nil
+	// Set Scheme
+	path = "/" + envOverride + "/" + standardProxyKeys.proxyScheme
+	proxyConfig.proxyScheme = proxyMap[path]
+
+	log.Debug("returning found proxy values of", proxyConfig)
+	return proxyConfig
 }
 
-func findValueFromKeys(searchKeys ProxyConfig, fileElement ValidateElement) (ProxyConfig, map[string]string) {
-	var proxyValues ProxyConfig
-	var combinedMap = make(map[string]string)
-
-	//This will return 1 or more found keys that we need to map to the slice
-	hostValues := fileElement.ParsedResult.FindKey(searchKeys.proxyHost)
-
-	// call out to build the map from the value
-
+func findProxyValuesFromConfigFile(proxyConfigKeys ProxyConfig, fileElement ValidateElement) (ProxyConfig, map[string]string) {
+	var proxyConfig ProxyConfig
+	var proxyKeyPathToVal = make(map[string]string)
+	//This will return possibly multiple key instances if the config file has an instance per environment (common, production, staging and development)
+	hostValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyHost) //we make the assumption that proxyConfigKeys will have at least a proxyHost field because that is a field all different agent proxy settings have in common
 	for _, v := range hostValues {
 		if len(hostValues) == 1 {
-			proxyValues.proxyHost = v.Value()
+			proxyConfig.proxyHost = v.Value()
 		} else {
-			combinedMap[v.PathAndKey()] = v.Value()
+			proxyKeyPathToVal[v.PathAndKey()] = v.Value() //Ex: proxyKeyPathToVal["/Common/proxy_host"]
 		}
 	}
-	if searchKeys.proxyPort != "" {
-		portValues := fileElement.ParsedResult.FindKey(searchKeys.proxyPort)
+
+	if proxyConfigKeys.proxyPort != "" {
+		portValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyPort)
 		for _, v := range portValues {
 			if len(portValues) == 1 {
-				proxyValues.proxyPort = v.Value()
+				proxyConfig.proxyPort = v.Value()
 			} else {
-				combinedMap[v.PathAndKey()] = v.Value()
+				proxyKeyPathToVal[v.PathAndKey()] = v.Value()
 			}
 		}
 	}
-	if searchKeys.proxyUser != "" {
-		userValues := fileElement.ParsedResult.FindKey(searchKeys.proxyUser)
+
+	if proxyConfigKeys.proxyUser != "" {
+		userValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyUser)
 		for _, v := range userValues {
 			if len(userValues) == 1 {
-				proxyValues.proxyUser = v.Value()
+				proxyConfig.proxyUser = v.Value()
 			} else {
-				combinedMap[v.PathAndKey()] = v.Value()
+				proxyKeyPathToVal[v.PathAndKey()] = v.Value()
 			}
 		}
 	}
-	if searchKeys.proxyPassword != "" {
-		passValues := fileElement.ParsedResult.FindKey(searchKeys.proxyPassword)
+
+	if proxyConfigKeys.proxyPassword != "" {
+		passValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyPassword)
 		for _, v := range passValues {
 			if len(passValues) == 1 {
-				proxyValues.proxyPassword = v.Value()
+				proxyConfig.proxyPassword = v.Value()
 			} else {
-				combinedMap[v.PathAndKey()] = v.Value()
+				proxyKeyPathToVal[v.PathAndKey()] = v.Value()
 			}
 		}
-		// Do second search for password because java and ruby are dumb and almost match
-		passwordValues := fileElement.ParsedResult.FindKey(searchKeys.proxyPassword + "word")
+		// Do second search for password because java and ruby match in everything except on this proxy key: proxy_pass vs proxy_password
+		passwordValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyPassword + "word")
 		for _, v := range passwordValues {
 			if len(passwordValues) == 1 {
-				proxyValues.proxyPassword = v.Value()
+				proxyConfig.proxyPassword = v.Value()
 			} else {
-				combinedMap[v.PathAndKey()] = v.Value()
+				proxyKeyPathToVal[v.PathAndKey()] = v.Value()
 			}
 		}
-
 	}
 
-	log.Debug("combined proxy map is", combinedMap)
-	log.Debug("proxyValues found are", proxyValues)
-	return proxyValues, combinedMap
-}
-
-func convertToMapStruct(incomingMap map[string]string, proxyKey *ProxyConfig) map[string]ProxyConfig {
-	var returnedConfig = make(map[string]ProxyConfig)
-
-	//We're going to default to assuming environment of prod
-	//support an override to pass in a different environment sectrion to activate but otherwise just use prod
-
-	log.Debug("Proxy key is ", proxyKey.proxyHost)
-
-	for key := range incomingMap {
-		if strings.Contains(key, proxyKey.proxyHost) {
-			split := strings.Split(key, "/")
-			var mapKey string
-			for i := 0; i <= len(split)-2; i++ { //minus two because it starts at 0 and we don't want the last segment
-				mapKey = mapKey + "/" + split[i]
+	if proxyConfigKeys.proxyURL != "" {
+		proxyURLValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyURL)
+		for _, v := range proxyURLValues {
+			if len(proxyURLValues) == 1 {
+				proxyConfig.proxyURL = v.Value()
+			} else {
+				proxyKeyPathToVal[v.PathAndKey()] = v.Value()
 			}
-			log.Debug("total mapKey is ", mapKey)
 		}
 	}
 
-	return returnedConfig
-}
-
-func setProxyMap(hostValue map[string]string, searchKey string, found *map[string]ProxyConfig) {
-	var prefixes []string
-
-	for key := range hostValue {
-		log.Debug("Key found is", key)
-		split := strings.Split(key, "/")
-		//Now we reconstruct the key to match port with the host
-		var mapKey string
-		for i := 0; i <= len(split)-2; i++ { //minute two because it starts at 0 and we don't want the last segment
-			mapKey = mapKey + "/" + split[i]
+	if proxyConfigKeys.proxyScheme != "" {
+		proxySchemeValues := fileElement.ParsedResult.FindKey(proxyConfigKeys.proxyScheme)
+		for _, v := range proxySchemeValues {
+			if len(proxySchemeValues) == 1 {
+				proxyConfig.proxyScheme = v.Value()
+			} else {
+				proxyKeyPathToVal[v.PathAndKey()] = v.Value()
+			}
 		}
-		prefixes = append(prefixes, mapKey)
-
 	}
 
+	log.Debug("combined proxy map is", proxyKeyPathToVal)
+	return proxyConfig, proxyKeyPathToVal
 }
