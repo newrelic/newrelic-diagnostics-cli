@@ -48,6 +48,7 @@ Aditionally, you'll have to fork this repo prior to cloning or you'll get a perm
 If you have any questions, or to execute our corporate CLA, required if your contribution is on behalf of a company, please drop us an email at opensource@newrelic.com.
 
 ### Recommended Doc reading order
+
 1. [Contributing overview](./docs/Contributing.md)
 2. [Coding Guidelines](./docs/Coding-Guidelines.md)
 3. [Anatomy of a Task](./docs/Anatomy-of-a-Task.md)
@@ -57,7 +58,7 @@ If you have any questions, or to execute our corporate CLA, required if your con
 7. [Dependency Injection](./docs/Dependency-Injection.md)
 8. [Integration Testing](./docs/Integration-Testing.md)
 
-
 ## License
+
 The Diagnostics CLI is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
->[The Diagnostics CLI also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.]
+The Diagnostics CLI also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.
