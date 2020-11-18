@@ -135,12 +135,12 @@ func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, error) {
 	Example: -javaagent:/Users/shuayhuaca/Desktop/projects/java/luces/newrelic.jar */
 	isFileNameCorrect := strings.Contains(fileName, "newrelic") && strings.Contains(fileName, ".jar")
 
-	if isFileNameCorrect == false {
+	if !isFileNameCorrect {
 		err = errors.New("Failed to find the java agent. Does the java agent .jar file include 'newrelic' in its filename?")
 	}
 
 	path := cmdLineArgsString[firstIndexOfPath : lastIndexOfPath+1]
-	if strings.Contains(path, "/") == false {
+	if !strings.Contains(path, "/") {
 		path = "./"
 	}
 	return path, err
