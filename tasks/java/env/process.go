@@ -3,13 +3,13 @@
 package env
 
 import (
+	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 
-	"github.com/shirou/gopsutil/process"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/shirou/gopsutil/process"
 )
 
 /* structure to contain a process and its corresponding command line args */
@@ -24,7 +24,7 @@ type JavaEnvProcess struct {
 	name           string
 	findProcByName tasks.FindProcessByNameFunc
 	getCmdLineArgs func(process.Process) (string, error)
-	getCurrentDir  func(process.Process, string) string
+	getCwd         func(process.Process) (string, error)
 }
 
 // Identifier - returns the Category (Agent), Subcategory (Java) and Name (SysPropCollect)
@@ -78,12 +78,23 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 		if err != nil {
 			log.Debug("Error getting command line options")
 		}
-		/* check the command line args contain the new relic Java Agent JAR, called newrelic.jar, though few customer may change the name of the file */
-		if strings.Contains(cmdLineArgsStr, "newrelic.jar") {
-			CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
-			cwd := p.getCurrentDir(proc, cmdLineArgsStr)
-			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, EnvVars: envVars})
+
+		cwdFromCmdLineArgs, err := getCwdFromCmdLineArgs(cmdLineArgsStr)
+		if err != nil {
+			return tasks.Result{
+				Status:  tasks.Failure,
+				Summary: err.Error(),
+			}
 		}
+
+		cwd, cwdErr := p.getCwd(proc)
+		// getCwd() does not work properly on darwin and will return an error. If that's the case, we get the cwd from the command line script.
+		if cwdErr != nil {
+			cwd = cwdFromCmdLineArgs
+		}
+
+		CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
+		javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, EnvVars: envVars})
 	}
 
 	if len(javaAgentProcsIdArgs) > 0 {
@@ -106,21 +117,35 @@ func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }
 
-//getCurrentDir
-func getCurrentDir(process process.Process, cmdLineArgsStr string) string {
+func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, error) {
+	var err error
 
-	cwd, err := process.Cwd()
+	// 11 is the index after '-javaagent:'
+	firstIndexOfPath := 11
+	lastIndexOfPath := strings.LastIndex(cmdLineArgsString, "/")
 
-	// This command does not work properly on darwin and it will return an error. If that's the case, let's get the cwd from this backup:
-	if err != nil {
-		log.Debug("error: ", err)
-		//Example: -javaagent:/Users/shuayhuaca/Desktop/projects/java/luces/newrelic.jar
-		regex := regexp.MustCompile("-javaagent:(.+)newrelic.jar")
-		result := regex.FindStringSubmatch(cmdLineArgsStr)
-		if result != nil {
-			cwd = result[1]
-		}
+	// if there is no path in the cmdLineArgsString
+	if lastIndexOfPath == -1 {
+		lastIndexOfPath = firstIndexOfPath - 1
 	}
 
-	return cwd
+	fileName := cmdLineArgsString[lastIndexOfPath+1:]
+
+	/* check that the command line args contain the new relic Java Agent JAR, called newrelic.jar, though few customer may change the name of the file. The filename must include 'newrelic' in it.
+	Example: -javaagent:/Users/shuayhuaca/Desktop/projects/java/luces/newrelic.jar */
+	isFileNameCorrect := strings.Contains(fileName, "newrelic") && strings.Contains(fileName, ".jar")
+
+	if isFileNameCorrect == false {
+		err = errors.New("Failed to find the java agent. Does the java agent .jar file include 'newrelic' in its filename?")
+	}
+
+	path := cmdLineArgsString[firstIndexOfPath : lastIndexOfPath+1]
+	if strings.Contains(path, "/") == false {
+		path = "./"
+	}
+	return path, err
+}
+
+func getCwd(proc process.Process) (string, error) {
+	return proc.Cwd()
 }
