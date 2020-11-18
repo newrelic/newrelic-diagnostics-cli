@@ -20,7 +20,7 @@ Before submitting an Issue, please search for similar ones in the
 `git branch fMulder/create-BaseEnvFindTruth-task`
 `git branch TheLoneGunmen/issue29-fixfalsepositive` (assuming this contributor is addressing one of our github issues)
 3. Once you open a Pull Request, sign the License Agreement which will show up in the UI as one of our checks. We'll talk in more detail about this in the next section.
-4. After the PR check have ran, if you notice the banner `this branch is out-of-date with the base branch`, get the latest changes from upstream into your origin branch (you can find some recommended steps on how to do this at the bottom of this doc.)
+4. After the PR checks have ran, if you notice the banner `this branch is out-of-date with the base branch`, get the latest changes from upstream into your origin branch (you can find some recommended steps on how to do this at the bottom of this doc.)
 5. You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ## Contributor License Agreement
