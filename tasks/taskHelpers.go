@@ -735,8 +735,8 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 }
 
 // GetCmdLineArgs is a wrapper for Process.Cmdline
-func GetCmdLineArgs(proc process.Process) (string, error) {
-	return proc.Cmdline()
+func GetCmdLineArgs(proc process.Process) ([]string, error) {
+	return proc.CmdlineSlice() //Keep in mind that If an single argument looked like this: -Dnewrelic.config.app_name="my appname", Go for darwin will still separate by spaces and will split it into 2 arguments even if they were enclosed by quotes.
 }
 
 // JavaProcArgs has a Java process id with its associated cmdline arguments
@@ -756,41 +756,13 @@ func GetJavaProcArgs() []JavaProcArgs {
 	}
 	javaProcArgs := []JavaProcArgs{}
 	for _, proc := range javaProcs {
-		cmdLineArgsStr, err := GetCmdLineArgs(proc)
+		cmdLineArgsSlice, err := GetCmdLineArgs(proc)
 		if err != nil {
-			log.Debug("Error getting command line options")
+			log.Debug("Error getting command line options while running GetCmdLineArgs(proc)")
 		}
-		cmdLineArgsList := splitCmdLineByArg(cmdLineArgsStr)
-		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsList})
+		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsSlice})
 	}
 	return javaProcArgs
-}
-
-func splitCmdLineByArg(cmdLineArgsStr string) []string {
-	cmdLineArgsList := []string{}
-	argsBySpace := strings.Split(cmdLineArgsStr, " ")
-	incompleteArg := ""
-	//We'll iterate through our list just to verify we didn't incorrectly split a argument by space that had quotes in between. Example: -Dnewrelic.config.app_name="my app name"
-	for _, arg := range argsBySpace {
-		if strings.Count(arg, `"`) == 1 {
-			fmt.Println("luces has quote: ", arg)
-			if incompleteArg != "" {
-				cmdLineArgsList = append(cmdLineArgsList, (incompleteArg + " " + arg))
-				incompleteArg = ""
-				continue
-			}
-			incompleteArg = arg //first ocurrence of an argument that got chopped off
-			continue
-		}
-		if incompleteArg != "" { //does not include the closing quote but we also know that we have a pending arg with a closing quote coming its way
-			incompleteArg = incompleteArg + " " + arg
-			continue
-		}
-		fmt.Println("luces no quote: ", arg)
-
-		cmdLineArgsList = append(cmdLineArgsList, arg)
-	}
-	return cmdLineArgsList
 }
 
 // ProcIDSysProps has a running java process id and its associated system properties organized as map of key system property and the value of the system property
@@ -812,7 +784,6 @@ func GetNewRelicSystemProps() []ProcIDSysProps {
 			sysPropsKeyToVal := make(map[string]string)
 			for _, arg := range proc.Args {
 				if strings.Contains(arg, "-Dnewrelic") {
-					//ex: -Dnewrelic.config.app_name=myappname
 					keyVal := strings.Split(arg, "=")
 					sysPropsKeyToVal[keyVal[0]] = keyVal[1]
 					procIDSysProps = append(procIDSysProps, ProcIDSysProps{ProcID: proc.ProcID, SysPropsKeyToVal: sysPropsKeyToVal})
