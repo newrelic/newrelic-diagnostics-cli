@@ -168,9 +168,8 @@ func checkForHttpORHttpsProxies() (string, string) {
 }
 
 func getProxyConfig(validations []ValidateElement, options tasks.Options, upstream map[string]tasks.Result) (ProxyConfig, error) {
-	var proxyConfig ProxyConfig
 
-	proxyConfig = findProxyValuesFromEnvVars(upstream)
+	proxyConfig := findProxyValuesFromEnvVars(upstream)
 
 	for _, validation := range validations { // Go through each config file validation to see if the proxy is configured anywhere in there or to at least find out which agent are we dealing with based on the file extension
 		if filepath.Ext(validation.Config.FileName) != ".ini" && (proxyConfig != ProxyConfig{}) {
