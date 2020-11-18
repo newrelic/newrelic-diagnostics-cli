@@ -19,9 +19,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/shirou/gopsutil/process"
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/shirou/gopsutil/process"
 )
 
 // OsFunc - for dependency injecting osGetwd
@@ -738,13 +738,15 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 func GetCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }
+
 // JavaProcArgs has a Java process id with its associated cmdline arguments
-type JavaProcArgs struct{
+type JavaProcArgs struct {
 	ProcID int32
-	Args []string
+	Args   []string
 }
+
 // GetJavaProcArgs return a slice of JavaProcArgs
-func GetJavaProcArgs() ([]JavaProcArgs){
+func GetJavaProcArgs() []JavaProcArgs {
 	javaProcs, err := FindProcessByName("java")
 	if err != nil {
 		log.Debug("We encountered an error while detecting all running Java processes: " + err.Error())
@@ -758,24 +760,53 @@ func GetJavaProcArgs() ([]JavaProcArgs){
 		if err != nil {
 			log.Debug("Error getting command line options")
 		}
-		cmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
+		cmdLineArgsList := splitCmdLineByArg(cmdLineArgsStr)
 		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsList})
 	}
 	return javaProcArgs
 }
+
+func splitCmdLineByArg(cmdLineArgsStr string) []string {
+	cmdLineArgsList := []string{}
+	argsBySpace := strings.Split(cmdLineArgsStr, " ")
+	incompleteArg := ""
+	//We'll iterate through our list just to verify we didn't incorrectly split a argument by space that had quotes in between. Example: -Dnewrelic.config.app_name="my app name"
+	for _, arg := range argsBySpace {
+		if strings.Count(arg, `"`) == 1 {
+			fmt.Println("luces has quote: ", arg)
+			if incompleteArg != "" {
+				cmdLineArgsList = append(cmdLineArgsList, (incompleteArg + " " + arg))
+				incompleteArg = ""
+				continue
+			}
+			incompleteArg = arg //first ocurrence of an argument that got chopped off
+			continue
+		}
+		if incompleteArg != "" { //does not include the closing quote but we also know that we have a pending arg with a closing quote coming its way
+			incompleteArg = incompleteArg + " " + arg
+			continue
+		}
+		fmt.Println("luces no quote: ", arg)
+
+		cmdLineArgsList = append(cmdLineArgsList, arg)
+	}
+	return cmdLineArgsList
+}
+
 // ProcIDSysProps has a running java process id and its associated system properties organized as map of key system property and the value of the system property
 type ProcIDSysProps struct {
-	ProcID   int32
+	ProcID           int32
 	SysPropsKeyToVal map[string]string
 }
+
 // GetNewRelicSystemProps - gathers a given process's System Properties that are New Relic related
-func GetNewRelicSystemProps() ([]ProcIDSysProps) {
-	
+func GetNewRelicSystemProps() []ProcIDSysProps {
+
 	javaProcessesArgs := GetJavaProcArgs()
 
 	if len(javaProcessesArgs) > 0 {
 		procIDSysProps := []ProcIDSysProps{}
-		
+
 		for _, proc := range javaProcessesArgs {
 
 			sysPropsKeyToVal := make(map[string]string)
@@ -785,7 +816,7 @@ func GetNewRelicSystemProps() ([]ProcIDSysProps) {
 					keyVal := strings.Split(arg, "=")
 					sysPropsKeyToVal[keyVal[0]] = keyVal[1]
 					procIDSysProps = append(procIDSysProps, ProcIDSysProps{ProcID: proc.ProcID, SysPropsKeyToVal: sysPropsKeyToVal})
-				}	
+				}
 			}
 		}
 
