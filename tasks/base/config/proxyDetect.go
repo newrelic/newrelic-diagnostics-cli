@@ -192,6 +192,7 @@ func getProxyConfig(validations []ValidateElement, options tasks.Options, upstre
 		// now let's look into infra, .NET, PHP, minion and other standard settings
 		for _, proxyConfigKeys := range nrProxyConfigs {
 			proxyConfig, multipleProxyConfigs := findProxyValuesFromConfigFile(proxyConfigKeys, validation)
+			log.Debug("ProxyConfig found through config file: ", proxyConfig)
 			log.Debug("Detected multipleProxyConfigs: ", multipleProxyConfigs)
 			if proxyConfig.proxyHost != "" {
 				return proxyConfig, nil //return as soon as we have a match
@@ -213,7 +214,7 @@ func setProxyURL(proxy ProxyConfig) string {
 	var proxyURL string
 	if proxy.proxyUser != "" {
 		proxyURL += proxy.proxyUser
-		//No pass found case for combined auth in single key (e.g. private minion's proxyAuth)
+		//No password found case for combined auth in single key (e.g. private minion's proxyAuth)
 		if proxy.proxyPassword != "" {
 			proxyURL += ":" + proxy.proxyPassword
 		}
@@ -236,6 +237,7 @@ func setProxyURL(proxy ProxyConfig) string {
 	}
 	//default to http
 	proxyURL = "http://" + proxyURL
+	log.Debug("Setting proxy via detected config to", proxyURL)
 	return proxyURL
 }
 
