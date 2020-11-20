@@ -19,9 +19,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/shirou/gopsutil/process"
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/shirou/gopsutil/process"
 )
 
 // OsFunc - for dependency injecting osGetwd
@@ -732,6 +732,69 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 	}
 
 	return
+}
+
+// GetCmdLineArgs is a wrapper for Process.Cmdline
+func GetCmdLineArgs(proc process.Process) ([]string, error) {
+	return proc.CmdlineSlice() //Keep in mind that If an single argument looked like this: -Dnewrelic.config.app_name="my appname", Go for darwin will still separate by spaces and will split it into 2 arguments even if they were enclosed by quotes.
+}
+
+// JavaProcArgs has a Java process id with its associated cmdline arguments
+type JavaProcArgs struct {
+	ProcID int32
+	Args   []string
+}
+
+// GetJavaProcArgs return a slice of JavaProcArgs
+func GetJavaProcArgs() []JavaProcArgs {
+	javaProcs, err := FindProcessByName("java")
+	if err != nil {
+		log.Debug("We encountered an error while detecting all running Java processes: " + err.Error())
+	}
+	if javaProcs == nil {
+		return []JavaProcArgs{}
+	}
+	javaProcArgs := []JavaProcArgs{}
+	for _, proc := range javaProcs {
+		cmdLineArgsSlice, err := GetCmdLineArgs(proc)
+		if err != nil {
+			log.Debug("Error getting command line options while running GetCmdLineArgs(proc)")
+		}
+		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsSlice})
+	}
+	return javaProcArgs
+}
+
+// ProcIDSysProps has a running java process id and its associated system properties organized as map of key system property and the value of the system property
+type ProcIDSysProps struct {
+	ProcID           int32
+	SysPropsKeyToVal map[string]string
+}
+
+// GetNewRelicSystemProps - gathers a given process's System Properties that are New Relic related
+func GetNewRelicSystemProps() []ProcIDSysProps {
+
+	javaProcessesArgs := GetJavaProcArgs()
+
+	if len(javaProcessesArgs) > 0 {
+		procIDSysProps := []ProcIDSysProps{}
+
+		for _, proc := range javaProcessesArgs {
+
+			sysPropsKeyToVal := make(map[string]string)
+			for _, arg := range proc.Args {
+				if strings.Contains(arg, "-Dnewrelic") {
+					keyVal := strings.Split(arg, "=")
+					sysPropsKeyToVal[keyVal[0]] = keyVal[1]
+					procIDSysProps = append(procIDSysProps, ProcIDSysProps{ProcID: proc.ProcID, SysPropsKeyToVal: sysPropsKeyToVal})
+				}
+			}
+		}
+
+		return procIDSysProps
+	}
+	// no java processes running :(
+	return []ProcIDSysProps{}
 }
 
 // TrimQuotes helper func for cleaning up single and double quoted yml values
