@@ -47,7 +47,7 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 			Summary: "Infra/Config/ValidateJMX did not pass our validation. That issue will need to be resolved first before this task can be executed.",
 		}
 	}
-
+	//We are able to run our nrjmx integration directly against your JMX server
 	jmxConfig, ok := upstream["Infra/Config/ValidateJMX"].Payload.(config.JmxConfig)
 
 	if !ok {
@@ -57,25 +57,37 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 		}
 	}
 
-	beanQueries := getBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
+	mbeanQueries := getBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
 
-	success, emptyResult, errResult := executeNrjmxCmdToFindBeans(beanQueries, jmxConfig)
+	//if not beanQueries found then tasks.None
 
-	var failureResult string
-	if len(emptyResult) > 0 {
-		failureResult = fmt.Sprintf("We are able to run our nrjmx integration directly against your JMX server. However, the following query/queries found in jvm-metrics.yml may not exist or will need to be redefined in your yml because we are unable to find it among the MBeans listed on your server: %s", strings.Join(emptyResult, ", "))
+	mbeansFound, mbeansNotFound, mbeansWithErr := executeNrjmxCmdToFindBeans(mbeanQueries, jmxConfig)
+
+	summaryIntro := fmt.Sprintf("In order to validate your queries defined in your jvm-metrics.yml against our JMX integration, we parse them from the yml file, ran them with the cmd echo {yourquery} | ./nrjmx -H %s -P %s -v -d -, and found the following: \n", jmxConfig.Host, jmxConfig.Port)
+
+	var summaryFailure string
+	if len(mbeansNotFound) > 0 {
+		summaryFailure = fmt.Sprintf("Unsuccessful queries - %s - They may not exist or they will need to be redefined in the yml file because we are unable to find them among the MBeans listed on your server.", strings.Join(mbeansNotFound, ", "))
+	}
+	var summaryErr string
+	if len(summaryErr) > 0 {
+		summaryErr = "Errors coming from - \n"
+		for query, errMsg := range mbeansWithErr {
+			summaryErr = summaryErr + query + ": " + errMsg + "\n"
+		}
 	}
 
-	// if cmdOutput == {} {
-	// 	return tasks.Result{
-	// 		Status: tasks.Failure,
-	// 		Summary: "We are able to run our nrjmx integration directly against your JMX server. However, the query found in jvm-metrics.yml may not exist or will need to be redefined in your yml because we are unable to find it among the MBeans listed on your server.",
-	// 	}
-	// }
+	if len(summaryErr) > 0 || len(summaryFailure) > 0 {
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: summaryIntro + summaryErr + summaryFailure,
+		}
+	}
 
+	summarySuccess := fmt.Sprintf("All successful queries - %s - They are available and ready to report to New Relic", strings.Join(mbeansFound, ", "))
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: "Successfully connected to configured JMX Integration config",
+		Summary: summaryIntro + summarySuccess,
 	}
 
 }
@@ -86,7 +98,7 @@ func getBeanQueriesFromJMVMetricsYml(pathToJvmMetricsYml string) []string {
 
 func executeNrjmxCmdToFindBeans(beanQueries []string, jmxConfig config.JmxConfig) ([]string, []string, map[string]string) {
 
-	//echo 'Glassbox:type=OfflineHandler,name=Offline_client_clingine' | ./nrjmx -H localhost -P 5002 -v -d
+	//echo 'Glassbox:type=OfflineHandler,name=Offline_client_clingine' | ./nrjmx -H localhost -P 5002 -v -d -
 	//{}
 	successCmdOutputs := []string{}
 	errorCmdOutputs := make(map[string]string)
