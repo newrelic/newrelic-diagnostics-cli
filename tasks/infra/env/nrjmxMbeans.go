@@ -2,12 +2,15 @@ package env
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	baseConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/Base/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
+	infraConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
 )
 
 // InfraEnvnrjmxMbeans - This struct defines the task
@@ -48,7 +51,7 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 		}
 	}
 	//We are able to run our nrjmx integration directly against your JMX server
-	jmxConfig, ok := upstream["Infra/Config/ValidateJMX"].Payload.(config.JmxConfig)
+	jmxConfig, ok := upstream["Infra/Config/ValidateJMX"].Payload.(infraConfig.JmxConfig)
 
 	if !ok {
 		return tasks.Result{
@@ -57,9 +60,18 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 		}
 	}
 
-	mbeanQueries := getBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
+	mbeanQueries, parseYmlErr := getBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
 
-	//if not beanQueries found then tasks.None
+	if parseYmlErr != nil {
+
+	}
+
+	if len(mbeanQueries) < 1 {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "No queries have been defined yet in jvm-metrics.yml. This task did not run.",
+		}
+	}
 
 	mbeansFound, mbeansNotFound, mbeansWithErr := executeNrjmxCmdToFindBeans(mbeanQueries, jmxConfig)
 
@@ -92,8 +104,33 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 
 }
 
-func getBeanQueriesFromJMVMetricsYml(pathToJvmMetricsYml string) []string {
+func getBeanQueriesFromJMVMetricsYml(pathToJvmMetricsYml string) ([]string, error) {
 
+	if pathToJvmMetricsYml == "" {
+		return []string{}, nil
+	}
+	file, err := os.Open(pathToJvmMetricsYml)
+	defer file.Close()
+	if err != nil {
+		log.Debugf("Unable to open '%s': %s\n", pathToJvmMetricsYml, err.Error())
+		return []string{}, err
+	}
+	//Sample file: https://github.com/newrelic/nri-jmx/blob/master/jvm-metrics.yml.sample
+	parsedFile, err := baseConfig.ParseYaml(file)
+	if err != nil {
+		log.Debugf("Unable to parse '%s': %s\n", pathToJvmMetricsYml, err.Error())
+		return []string{}, err
+	}
+	domainKey := parsedFile.FindKey("domain") //we expect only one
+	if len(domainKey) > 1 {
+
+	}
+	formattedQueries := []string{}
+	queryValues := parsedFile.FindKey("query")  //we expect one or more
+	for _,query := range queryValues {
+		formattedQueries = append(formattedQueries, domain + ":" + query.Value())
+	}
+	return formattedQueries
 }
 
 func executeNrjmxCmdToFindBeans(beanQueries []string, jmxConfig config.JmxConfig) ([]string, []string, map[string]string) {
