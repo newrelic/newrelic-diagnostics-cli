@@ -17,5 +17,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		checkForClockSkew: checkForClockSkew,
 		runtimeOS:         runtime.GOOS,
 	}, true)
-
+	registrationFunc(InfraEnvnrjmxMbeans{
+		mCmdExecutor: multiCmdExecutor,
+	}, true)
 }
