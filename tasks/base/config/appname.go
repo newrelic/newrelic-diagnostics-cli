@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -10,7 +9,7 @@ import (
 )
 
 var appNameEnvVarKey = "NEW_RELIC_APP_NAME" //PHP does not use env vars
-
+var appNameSysProp = "-Dnewrelic.config.app_name"
 var appNameConfigKeys = []string{
 	"app_name",         // Java, Node, Python, Ruby
 	"newrelic.appname", // PHP
@@ -66,7 +65,8 @@ func (t BaseConfigAppName) Explain() string {
 func (t BaseConfigAppName) Dependencies() []string {
 	return []string{
 		"Base/Config/Validate",
-		"Base/Env/collectEnvVars",
+		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 	}
 }
 
@@ -83,7 +83,18 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
-	// check if upstream for collecting config files was successful
+	//check system properties which takes precedence over config files for Java agent
+
+	appname := getAppNameFromSysProps(upstream)
+	if appname != "" {
+		return tasks.Result{
+			Status:  tasks.Success,
+			Summary: fmt.Sprintf("An application name was found through a New Relic system property: %s", appname),
+			Payload: []AppNameInfo{AppNameInfo{Name: appname, FilePath: appNameSysProp}},
+		}
+	}
+
+	// No system props then let's check for config files
 	if upstream["Base/Config/Validate"].Status != tasks.Success && (upstream["Base/Config/Validate"].Status != tasks.Warning) {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -105,7 +116,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if len(appNameInfosFromConfig) == 0 {
 		return tasks.Result{
 			Status:  tasks.Warning,
-			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME). Note: This health check does not account for Java System properties.",
+			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME).",
 			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 		}
 	}
@@ -131,12 +142,13 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: fmt.Sprintf("%s unique application name(s) found.", strconv.Itoa(len(appNameInfosFromConfig))),
+		Summary: fmt.Sprintf("%d unique application name(s) found: %s", len(appNameInfosFromConfig), appNameInfosFromConfig[0].Name),
 		Payload: appNameInfosFromConfig,
 	}
 }
 
 func getAppNameFromEnvVar(upstream map[string]tasks.Result) AppNameInfo {
+
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 
 	if !ok {
@@ -209,4 +221,26 @@ func findPrimaryNameKeyInConfigFile(configFile ValidateElement) tasks.ValidateBl
 
 	}
 	return tasks.ValidateBlob{}
+}
+
+func getAppNameFromSysProps(upstream map[string]tasks.Result) string {
+	if upstream["Base/Env/CollectSysProps"].Status != tasks.Info {
+		return ""
+	}
+
+	sysProps, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+
+	if !ok {
+		logger.Debug("Task did not meet requirements necessary to run: type assertion failure")
+		return ""
+	}
+
+	for i := 0; i < len(sysProps); i++ {
+		sysPropMap := sysProps[i].SysPropsKeyToVal
+		appName, isPresent := sysPropMap[appNameSysProp]
+		if isPresent {
+			return appName
+		}
+	}
+	return ""
 }

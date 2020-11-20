@@ -14,6 +14,8 @@ import (
 
 var pathsToIgnore = []string{"node_modules"}
 
+var configSysProp = "-Dnewrelic.config.file"
+
 var configEnvVarKeys = []string{
 	"NEW_RELIC_HOME",        // Node, Java
 	"NEW_RELIC_CONFIG_FILE", // Python
@@ -84,6 +86,7 @@ func (p BaseConfigCollect) Dependencies() []string {
 	// no dependencies!
 	return []string{
 		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 	}
 }
 
@@ -189,40 +192,27 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
+	//search for config file in New Relic System Property
+	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
+		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		if ok {
+			for _, process := range proccesses {
+				configPath, isPresent := process.SysPropsKeyToVal[configSysProp]
+				if isPresent {
+					//Example path: -Dnewrelic.config.file=/usr/local/newrelic/newrelic.yml
+					invalidConfigFiles, foundConfigs = appendToInvalidOrFoundConfigs(configPath, &warningSummaryOnInvalidFiles, invalidConfigFiles, foundConfigs) //add to list of foundConfigs or to list of invalidConfigFiles depending if the file can be collected
+				}
+			}
+		}
+	}
+
 	// Search for config file in New Relic environment variables
 	for _, envVarKey := range configEnvVarKeys {
 		configPath, envVarKeyIsPresent := envVars[envVarKey]
 		if !envVarKeyIsPresent {
 			continue
 		}
-
-		pathInfo, err := os.Stat(configPath)
-		if err != nil {
-			invalidConfigFiles = append(invalidConfigFiles, configPath)
-			warningSummaryOnInvalidFiles += fmt.Sprintf(warningSummaryFmt, configPath, err.Error())
-			continue
-		}
-
-		if pathInfo.IsDir() {
-			foundFiles := tasks.FindFiles(patterns, []string{configPath})
-			for _, file := range foundFiles {
-				//make sure we are not adding a config file we already found by looking at standard places
-				if tasks.PosString(foundConfigs, file) == -1 {
-					foundConfigs = append(foundConfigs, file)
-				}
-			}
-		} else {
-			//make sure we are not adding a config file we already found by looking at standard places
-			if tasks.PosString(foundConfigs, configPath) == -1 {
-				//validate that path provided by env var takes us a valid file that can be collected
-				fileStatus := tasks.ValidatePath(configPath)
-				if !(fileStatus.IsValid) {
-					invalidConfigFiles = append(invalidConfigFiles, fileStatus.Path)
-					warningSummaryOnInvalidFiles += fmt.Sprintf(warningSummaryFmt, fileStatus.Path, fileStatus.ErrorMsg.Error())
-				}
-				foundConfigs = append(foundConfigs, configPath)
-			}
-		}
+		invalidConfigFiles, foundConfigs = appendToInvalidOrFoundConfigs(configPath, &warningSummaryOnInvalidFiles, invalidConfigFiles, foundConfigs)
 	}
 
 	if len(foundConfigs) == 0 && len(invalidConfigFiles) > 0 {
@@ -276,4 +266,37 @@ func isConfigFileinPathToIgnore(dir string) bool {
 		}
 	}
 	return false
+}
+
+func appendToInvalidOrFoundConfigs(configPath string, warningSummaryOnInvalidFiles *string, invalidConfigFiles, foundConfigs []string) ([]string, []string) {
+
+	pathInfo, err := os.Stat(configPath)
+	if err != nil {
+		invalidConfigFiles = append(invalidConfigFiles, configPath)
+		*warningSummaryOnInvalidFiles += fmt.Sprintf(warningSummaryFmt, configPath, err.Error())
+		return invalidConfigFiles, foundConfigs
+	}
+	//this conditional will probably get skipped for a path set by system property as it requires a full path that includes the yml file, so it is not a directory
+	if pathInfo.IsDir() {
+		foundFiles := tasks.FindFiles(patterns, []string{configPath})
+		for _, file := range foundFiles {
+			//make sure we are not adding a config file we already found by looking at standard places
+			if tasks.PosString(foundConfigs, file) == -1 {
+				foundConfigs = append(foundConfigs, file)
+			}
+		}
+		return invalidConfigFiles, foundConfigs
+	}
+	//first make sure we are not adding a config file we already found by looking at standard places
+	if tasks.PosString(foundConfigs, configPath) == -1 {
+		//validate that the path provided takes us to a valid file that can be collected
+		fileStatus := tasks.ValidatePath(configPath)
+		if !(fileStatus.IsValid) {
+			invalidConfigFiles = append(invalidConfigFiles, fileStatus.Path)
+			*warningSummaryOnInvalidFiles += fmt.Sprintf(warningSummaryFmt, fileStatus.Path, fileStatus.ErrorMsg.Error())
+			return invalidConfigFiles, foundConfigs
+		}
+		foundConfigs = append(foundConfigs, configPath)
+	}
+	return invalidConfigFiles, foundConfigs
 }
