@@ -79,22 +79,25 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 			log.Debug("Error getting command line options")
 		}
 
-		cwdFromCmdLineArgs, err := getCwdFromCmdLineArgs(cmdLineArgsStr)
-		if err != nil {
-			return tasks.Result{
-				Status:  tasks.Failure,
-				Summary: err.Error(),
+		if strings.Contains(cmdLineArgsStr, "-javaagent") {
+
+			cwdFromCmdLineArgs, newRelicAgentNotFoundErr := getCwdFromCmdLineArgs(cmdLineArgsStr)
+			if newRelicAgentNotFoundErr != nil {
+				return tasks.Result{
+					Status:  tasks.Failure,
+					Summary: "Failed to find the New Relic Java Agent Jar in the following JVM argument: " + newRelicAgentNotFoundErr.Error() + "\nIf this is another Java Agent, keep in mind that New Relic is not compatible with other additional agents.",
+				}
 			}
-		}
 
-		cwd, cwdErr := p.getCwd(proc)
-		// getCwd() does not work properly on darwin and will return an error. If that's the case, we get the cwd from the command line script.
-		if cwdErr != nil {
-			cwd = cwdFromCmdLineArgs
-		}
+			cwd, cwdErr := p.getCwd(proc)
+			// getCwd() does not work properly on darwin and will return an error. If that's the case, we get the cwd from the command line script.
+			if cwdErr != nil {
+				cwd = cwdFromCmdLineArgs
+			}
 
-		CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
-		javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, EnvVars: envVars})
+			CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
+			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, EnvVars: envVars})
+		}
 	}
 
 	if len(javaAgentProcsIdArgs) > 0 {
@@ -120,26 +123,34 @@ func getCmdLineArgs(proc process.Process) (string, error) {
 func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, error) {
 	var err error
 
-	// 11 is the index after '-javaagent:'
-	firstIndexOfPath := 11
-	lastIndexOfPath := strings.LastIndex(cmdLineArgsString, "/")
+	javaAgentCmd := "javaagent:"
 
-	// if there is no path in the cmdLineArgsString
+	var javaAgentArg string
+	for _, arg := range strings.Split(cmdLineArgsString, " ") {
+		if strings.Contains(arg, javaAgentCmd) {
+			javaAgentArg = arg
+		}
+	}
+
+	firstIndexOfPath := strings.Index(javaAgentArg, javaAgentCmd) + len(javaAgentCmd)
+	lastIndexOfPath := strings.LastIndex(javaAgentArg, "/")
+
+	// if there is no path in the javaAgentArg
 	if lastIndexOfPath == -1 {
 		lastIndexOfPath = firstIndexOfPath - 1
 	}
 
-	fileName := cmdLineArgsString[lastIndexOfPath+1:]
+	fileName := javaAgentArg[lastIndexOfPath+1:]
 
 	/* check that the command line args contain the new relic Java Agent JAR, called newrelic.jar, though few customer may change the name of the file. The filename must include 'newrelic' in it.
 	Example: -javaagent:/Users/shuayhuaca/Desktop/projects/java/luces/newrelic.jar */
 	isFileNameCorrect := strings.Contains(fileName, "newrelic") && strings.Contains(fileName, ".jar")
 
 	if !isFileNameCorrect {
-		err = errors.New("Failed to find the java agent. Does the java agent .jar file include 'newrelic' in its filename?")
+		err = errors.New(javaAgentArg)
 	}
 
-	path := cmdLineArgsString[firstIndexOfPath : lastIndexOfPath+1]
+	path := javaAgentArg[firstIndexOfPath : lastIndexOfPath+1]
 	if !strings.Contains(path, "/") {
 		path = "./"
 	}

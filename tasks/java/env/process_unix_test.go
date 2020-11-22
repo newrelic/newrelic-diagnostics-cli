@@ -227,7 +227,7 @@ var _ = Describe("JavaEnvProcess", func() {
 
 			It("should return a tasks.Result with a failure status and a summary of the failure", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
-				Expect(result.Summary).To(Equal("Failed to find the java agent. Does the java agent .jar file include 'newrelic' in its filename?"))
+				Expect(result.Summary).To(Equal("Failed to find the New Relic Java Agent Jar in the following JVM argument: " + "-javaagent:/root/go/src/github.com/newrelic/newrelic-diagnostics-cli/bluerelic-1.8.0.jar" + "\nIf this is another Java Agent, keep in mind that New Relic is not compatible with other additional agents."))
 			})
 		})
 	})
@@ -259,6 +259,20 @@ var _ = Describe("JavaEnvProcess", func() {
 			})
 		})
 
+		Context("When cmdLineArgsStr content contains things other than the javaagent argument", func() {
+			It("should return the path and no error", func() {
+				otherBefore := "/usr/bin/java -Dnewrelic.logfile=/Users/shuayhuaca/Desktop/newrelic_agent.log -jar "
+				path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
+				javaAgent := "newrelic-1.8.3.jar"
+				otherAfter := " build/libs/lucessqs-1.0-SNAPSHOT.jar"
+				commandLineArgsStr := otherBefore + command + path + javaAgent + otherAfter
+
+				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
+				Expect(result).To(Equal(path))
+				Expect(err).To(BeNil())
+			})
+		})
+
 		Context("When given a cmdLineArgsStr that does not contain a path, but has a valid agent name", func() {
 			It("should return ./ as the path and no error", func() {
 				javaAgent := "newrelic-1.8.3.jar"
@@ -278,7 +292,7 @@ var _ = Describe("JavaEnvProcess", func() {
 
 				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
 				Expect(result).To(Equal(path))
-				Expect(err.Error()).To(Equal("Failed to find the java agent. Does the java agent .jar file include 'newrelic' in its filename?"))
+				Expect(err.Error()).To(Equal(commandLineArgsStr))
 			})
 		})
 	})
