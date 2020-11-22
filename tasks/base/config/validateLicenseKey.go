@@ -154,7 +154,7 @@ func checkConfigFormat(licenseKey string, sources []string) (bool, string) {
 	if isFormatValid(sanitizedLicenseKey) {
 		return true, ""
 	}
-	errMsg := fmt.Sprintf("The license key found in\n %s \ndoes not have a valid format: %s. \nThe NR license key is 40 alphanumeric characters. \nReview this documentation to make sure that you have the proper format of a New Relic Personal API key: \nhttps://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys\n\n", strings.Join(sources, ",\n "), sanitizedLicenseKey)
+	errMsg := fmt.Sprintf("The license key found in %s does not have a valid format: %s. \nThe NR license key is 40 alphanumeric characters. \nReview this documentation to make sure that you have the proper format of a New Relic Personal API key: \nhttps://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys\n\n", strings.Join(sources, ",\n "), sanitizedLicenseKey)
 	return false, errMsg
 }
 

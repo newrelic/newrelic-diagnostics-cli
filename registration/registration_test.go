@@ -39,7 +39,7 @@ func TestRegisterDependentTasks(t *testing.T) {
 	AddIdentifierToQueue(tasks.IdentifierFromString("Base/Config/Validate"))
 	CompleteTaskRegistration()
 
-	if len(Work.WorkQueue) != 3 {
+	if len(Work.WorkQueue) != 4 { //the expected length of the queue may have to continue going up as Base/Config/Validate becomes dependent on new nrdiag tasks that must be run prior to it
 		t.Error("WorkQueue expected to have 3 items after adding Base/Config/Validate; has:", len(Work.WorkQueue))
 	}
 }
@@ -76,4 +76,3 @@ func TestTasksHaveValidExplain(t *testing.T) {
 		}
 	}
 }
-

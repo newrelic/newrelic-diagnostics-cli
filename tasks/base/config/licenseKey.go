@@ -22,6 +22,8 @@ var licenseKeyEnvVars = []string{
 	"NEW_RELIC_LICENSE_KEY", //all other agents
 }
 
+var licenseKeySysProp = "-Dnewrelic.config.license_key"
+
 type LicenseKey struct {
 	Value  string
 	Source string
@@ -46,6 +48,7 @@ func (t BaseConfigLicenseKey) Dependencies() []string {
 	return []string{
 		"Base/Config/Validate",
 		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 	}
 }
 
@@ -55,6 +58,7 @@ func (t BaseConfigLicenseKey) Execute(options tasks.Options, upstream map[string
 	licenseKeys := []LicenseKey{}
 	licenseKeysFromConfig := []LicenseKey{}
 	licenseKeysFromEnv := []LicenseKey{}
+	licenseKeyFromSysProp := LicenseKey{} //there can only be one system property for a license key
 
 	configElements, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement)
 	if ok {
@@ -66,6 +70,16 @@ func (t BaseConfigLicenseKey) Execute(options tasks.Options, upstream map[string
 	if ok {
 		licenseKeysFromEnv = getLicenseKeysFromEnv(envVarValues)
 		licenseKeys = append(licenseKeys, licenseKeysFromEnv...)
+	}
+
+	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
+		procIDSysProps, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		if ok {
+			licenseKeyFromSysProp = getLicenseKeysFromSysProps(procIDSysProps)
+			if licenseKeyFromSysProp.Value != "" {
+				licenseKeys = append(licenseKeys, licenseKeyFromSysProp)
+			}
+		}
 	}
 
 	if len(licenseKeys) == 0 {
@@ -83,7 +97,7 @@ func (t BaseConfigLicenseKey) Execute(options tasks.Options, upstream map[string
 	if len(deDupedLicenseKeys) > 1 {
 		return tasks.Result{
 			Status:  tasks.Warning,
-			Summary: "Multiple license keys detected:\n" + summarizeLicenseKeySources(deDupedLicenseKeys) + envOverrideMessage(licenseKeysFromEnv),
+			Summary: "Multiple license keys detected:\n" + summarizeLicenseKeySources(deDupedLicenseKeys) + envOverrideMessage(deDupedLicenseKeys),
 			URL:     "https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/install-configure/configure-agent",
 			Payload: licenseKeys,
 		}
@@ -91,23 +105,29 @@ func (t BaseConfigLicenseKey) Execute(options tasks.Options, upstream map[string
 
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: strconv.Itoa(len(deDupedLicenseKeys)) + " unique New Relic license key(s) found." + envOverrideMessage(licenseKeysFromEnv),
+		Summary: strconv.Itoa(len(deDupedLicenseKeys)) + " unique New Relic license key(s) found." + envOverrideMessage(licenseKeys),
 		Payload: licenseKeys,
 	}
 }
 
-func envOverrideMessage(envSourcedLicenseKeys []LicenseKey) string {
-	message := ""
+func envOverrideMessage(licenseKeys []LicenseKey) string {
+	envMessage := ""
+	sysPropMessage := ""
 
-	for _, licenseKey := range envSourcedLicenseKeys {
+	for _, licenseKey := range licenseKeys {
 		if licenseKey.Source == "NRIA_LICENSE_KEY" {
-			message = message + fmt.Sprintf("\n     '%s' will be used by New Relic Infrastructure Agent", licenseKey.Value)
+			envMessage = envMessage + fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic Infrastructure Agent", licenseKey.Value, licenseKey.Source)
 		} else if licenseKey.Source == "NEW_RELIC_LICENSE_KEY" {
-			message = message + fmt.Sprintf("\n     '%s' will be used by New Relic APM Agents", licenseKey.Value)
+			envMessage = envMessage + fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic APM Agents", licenseKey.Value, licenseKey.Source)
+		} else if licenseKey.Source == "-Dnewrelic.config.license_key" {
+			sysPropMessage = fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic APM Agents", licenseKey.Value, licenseKey.Source)
 		}
 	}
 
-	return message
+	if len(envMessage) > 0 {
+		return envMessage
+	}
+	return sysPropMessage
 }
 
 func getLicenseKeysFromEnv(envVariables map[string]string) []LicenseKey {
@@ -125,6 +145,21 @@ func getLicenseKeysFromEnv(envVariables map[string]string) []LicenseKey {
 		}
 	}
 	return results
+}
+
+func getLicenseKeysFromSysProps(sysProps []tasks.ProcIDSysProps) LicenseKey {
+
+	for i := 0; i < len(sysProps); i++ {
+		sysPropMap := sysProps[i].SysPropsKeyToVal
+		lk, isPresent := sysPropMap[licenseKeySysProp]
+		if isPresent {
+			return LicenseKey{
+				Value:  lk,
+				Source: licenseKeySysProp,
+			}
+		}
+	}
+	return LicenseKey{}
 }
 
 func getLicenseKeysFromConfig(configElements []ValidateElement, configKeys []string) []LicenseKey {
@@ -217,9 +252,14 @@ func dedupeLicenseKeySlice(licenseKeys []LicenseKey) []LicenseKey {
 	for _, licenseKey := range licenseKeys {
 
 		//If key already exists in dedupe map skip if its not an env variable
-		//We want to give precedence to env variable as the source
-		if _, ok := uniques[licenseKey.Value]; ok && (tasks.PosString(licenseKeyEnvVars, licenseKey.Source) == -1) {
-			continue
+		//We want to give precedence to env variable and system property over config file
+		if lk, present := uniques[licenseKey.Value]; present {
+			if (tasks.PosString(licenseKeyEnvVars, licenseKey.Source) == -1) && licenseKeySysProp != licenseKey.Source {
+				continue //skip value of config files
+			}
+			if licenseKey.Source == licenseKeySysProp && lk.Source == "NEW_RELIC_LICENSE_KEY" {
+				continue //skip value of system property if the already present lk.Source was from an env var
+			}
 		}
 		uniques[licenseKey.Value] = licenseKey
 	}

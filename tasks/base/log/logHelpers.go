@@ -25,6 +25,8 @@ var secureLogFilenamePatterns = []string{"docker[.]log$",
 	"syslog$",
 }
 
+var logSysProp = "-Dnewrelic.logfile" //EX: Dnewrelic.logfile=/opt/newrelic/java/logs/newrelic/somenewnameformylogs.log
+
 var logEnvVars = []string{
 	"NRIA_LOG_FILE", // Infra agent
 	"NEW_RELIC_LOG", //Java, Node and python agent paths
@@ -58,7 +60,7 @@ type LogElement struct {
 	FilePath string
 }
 
-func collectFilePaths(envVars map[string]string, configElements []baseConfig.ValidateElement) ([]string, []string) {
+func collectFilePaths(envVars map[string]string, configElements []baseConfig.ValidateElement, foundSysPropPath string) ([]string, []string) {
 	var paths []string
 	localPath, err := os.Getwd()
 	if err != nil {
@@ -123,7 +125,17 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 			fileLocations = append(fileLocations, logPath)
 		}
 	}
-	//this is our fallback because env vars and default paths should take precedence over config file
+
+	//check for system properties
+	if len(foundSysPropPath) > 0 {
+		//make sure we are not adding a log file we already found
+		if !(tasks.PosString(fileLocations, foundSysPropPath) > -1) && !(tasks.PosString(secureFileLocations, foundSysPropPath) > -1) {
+			fileLocations = append(fileLocations, foundSysPropPath)
+		}
+
+	}
+
+	//this is our fallback because env vars, system props and default paths can take precedence over config files values
 	if len(fileLocations) < 1 && len(secureFileLocations) < 1 {
 		configFilePaths := getLogPathsFromConfigFile(configElements)
 		fileLocations = append(fileLocations, configFilePaths...)

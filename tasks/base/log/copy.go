@@ -37,6 +37,7 @@ func (p BaseLogCopy) Explain() string {
 func (p BaseLogCopy) Dependencies() []string {
 	return []string{
 		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 		"Base/Config/Validate",
 	}
 }
@@ -44,9 +45,7 @@ func (p BaseLogCopy) Dependencies() []string {
 // Execute - This task will search for config files based on the string array defined and walk the directory tree from the working directory searching for additional matches
 func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	envVars, configElements := initializeDependencies(upstream)
-
-	logFilesPaths := searchForLogPaths(options, envVars, configElements)
+	logFilesPaths := searchForLogPaths(options, upstream)
 
 	if len(logFilesPaths) < 1 {
 		return tasks.Result{
@@ -128,14 +127,39 @@ func initializeDependencies(upstream map[string]tasks.Result) (map[string]string
 	return envVars, configElements
 }
 
-func searchForLogPaths(options tasks.Options, envVars map[string]string, configElements []baseConfig.ValidateElement) []string {
+func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) []string {
+
+	//get payload from env vars
+	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+	if !ok {
+		log.Debug("Could not get envVars from upstream")
+	}
+	//get payload from config files
+	configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
+	if !ok {
+		log.Debug("type assertion failure")
+	}
+	//attempt to find payload in system properties
+	var foundSysPropPath string
+	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
+		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		if ok {
+			for _, process := range proccesses {
+				sysPropVal, isPresent := process.SysPropsKeyToVal[logSysProp]
+				if isPresent {
+					foundSysPropPath = sysPropVal
+				}
+			}
+		}
+	}
+
 	var logFilesPaths []string
 	var secureLogFilesPaths []string
 
 	if options.Options["logpath"] != "" {
 		logFilesPaths = []string{options.Options["logpath"]}
 	} else {
-		logFilesPaths, secureLogFilesPaths = collectFilePaths(envVars, configElements)
+		logFilesPaths, secureLogFilesPaths = collectFilePaths(envVars, configElements, foundSysPropPath) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
 		if secureLogFilesPaths != nil {
 			for _, secureLog := range secureLogFilesPaths {
 				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", secureLog) +
