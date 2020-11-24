@@ -10,12 +10,12 @@ import (
 	"runtime"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/format"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 )
 
 var _ = Describe("Infra/Config/ValidateJMX", func() {
@@ -46,7 +46,10 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 	Describe("Dependencies()", func() {
 		It("Should return an expected slice of dependencies", func() {
-			expectedDependencies := []string{"Infra/Config/IntegrationsMatch"}
+			expectedDependencies := []string{
+				"Infra/Config/IntegrationsMatch",
+				"Java/Env/Version",
+			}
 			Expect(p.Dependencies()).To(Equal(expectedDependencies))
 		})
 	})
@@ -198,7 +201,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-config.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
 				}
-				p.mCmdExecutor = func(cmdWrapper, cmdWrapper) ([]byte, error) {
+				p.mCmdExecutor = func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error) {
 					return []byte("success"), nil
 				}
 
@@ -215,7 +218,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			It("should redact auth from payload JSON", func() {
 				resultPayload := result.Payload.(JmxConfig)
 				payloadJSON, _ := json.MarshalIndent(resultPayload, "", "	")
-				expectedPayloadJSON := "{\n\t\"jmx_host\": \"jmx-host.localnet\",\n\t\"jmx_port\": \"9999\",\n\t\"jmx_user\": \"_REDACTED_\",\n\t\"jmx_pass\": \"_REDACTED_\",\n\t\"collection_files\": \"/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml\"\n}"
+				expectedPayloadJSON := "{\n\t\"jmx_host\": \"jmx-host.localnet\",\n\t\"jmx_port\": \"9999\",\n\t\"jmx_user\": \"_REDACTED_\",\n\t\"jmx_pass\": \"_REDACTED_\",\n\t\"collection_files\": \"/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml\",\n\t\"java_version\": \"\",\n\t\"ps_ef_grep_jmx\": \"success\"\n}"
 				Expect(string(payloadJSON)).To(Equal(expectedPayloadJSON))
 			})
 		})
@@ -230,7 +233,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-partial.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
 				}
-				p.mCmdExecutor = func(cmdWrapper, cmdWrapper) ([]byte, error) {
+				p.mCmdExecutor = func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error) {
 					return []byte("success"), nil
 				}
 			})
@@ -278,7 +281,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-partial.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
 				}
-				p.mCmdExecutor = func(cmdWrapper, cmdWrapper) ([]byte, error) {
+				p.mCmdExecutor = func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error) {
 					errorString := "Apr 25, 2019 9:47:20 PM org.newrelic.nrjmx.Application main\nSEVERE: Can't connect to JMX server: service:jmx:rmi:///jndi/rmi://localhost:999/jmxrmi"
 					return []byte(errorString), errors.New("error connecting blarg")
 				}
@@ -293,7 +296,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 			It("should return an expected Failure result summary", func() {
 				var expectedSummary strings.Builder
-				expectedSummary.WriteString("Error connecting to local JMXServer:\n")
+				expectedSummary.WriteString("We tested the JMX integration connection to local JMXServer by running the command echo '*:*' | nrjmx -H localhost -P 8080 -v -d - and we found this error:\n")
 				expectedSummary.WriteString("Apr 25, 2019 9:47:20 PM org.newrelic.nrjmx.Application main\n")
 				expectedSummary.WriteString("SEVERE: Can't connect to JMX server: service:jmx:rmi:///jndi/rmi://localhost:999/jmxrmi")
 				Expect(result.Summary).To(Equal(expectedSummary.String()))
@@ -310,7 +313,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-default-parms.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
 				}
-				p.mCmdExecutor = func(cmdWrapper, cmdWrapper) ([]byte, error) {
+				p.mCmdExecutor = func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error) {
 					return []byte("success"), nil
 				}
 			})
@@ -358,42 +361,42 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 	// wrap this all in non-windows since os specific functions are difficult to cross-test
 	if runtime.GOOS != "windows" {
-		Describe("multiCmdExecutor", func() {
+		Describe("tasks.MultiCmdExecutor", func() {
 			Context("When testing real functions", func() {
-				cmdWrapper1 := cmdWrapper{
-					cmd:  "echo",
-					args: []string{"11"},
+				cmdWrapper1 := tasks.CmdWrapper{
+					Cmd:  "echo",
+					Args: []string{"11"},
 				}
-				cmdWrapper2 := cmdWrapper{
-					cmd: "base64",
+				cmdWrapper2 := tasks.CmdWrapper{
+					Cmd: "base64",
 				}
-				output, _ := multiCmdExecutor(cmdWrapper1, cmdWrapper2)
+				output, _ := tasks.MultiCmdExecutor(cmdWrapper1, cmdWrapper2)
 				It("Should return valid output", func() {
 					Expect(string(output)).To(Equal("MTEK\n"))
 				})
 			})
 			Context("When returning an error from cmd1", func() {
-				cmdWrapper1 := cmdWrapper{
-					cmd: "nonsense garbage",
+				cmdWrapper1 := tasks.CmdWrapper{
+					Cmd: "nonsense garbage",
 				}
-				cmdWrapper2 := cmdWrapper{
-					cmd: "base64",
+				cmdWrapper2 := tasks.CmdWrapper{
+					Cmd: "base64",
 				}
-				_, err := multiCmdExecutor(cmdWrapper1, cmdWrapper2)
+				_, err := tasks.MultiCmdExecutor(cmdWrapper1, cmdWrapper2)
 				It("Should return valid output", func() {
 					Expect(err.Error()).To(ContainSubstring("not found"))
 				})
 			})
 
 			Context("When returning an error from cmd2", func() {
-				cmdWrapper1 := cmdWrapper{
-					cmd:  "echo",
-					args: []string{"11"},
+				cmdWrapper1 := tasks.CmdWrapper{
+					Cmd:  "echo",
+					Args: []string{"11"},
 				}
-				cmdWrapper2 := cmdWrapper{
-					cmd: "I've got a lovely bunch of coconuts",
+				cmdWrapper2 := tasks.CmdWrapper{
+					Cmd: "I've got a lovely bunch of coconuts",
 				}
-				_, err := multiCmdExecutor(cmdWrapper1, cmdWrapper2)
+				_, err := tasks.MultiCmdExecutor(cmdWrapper1, cmdWrapper2)
 				It("Should return valid output", func() {
 					Expect(err.Error()).To(ContainSubstring("not found"))
 				})
@@ -413,7 +416,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 				Password:        "admin",
 				CollectionFiles: "file1, file2",
 			}
-			p.mCmdExecutor = func(cmdWrapper1, cmdWrapper2 cmdWrapper) ([]byte, error) {
+			p.mCmdExecutor = func(cmdWrapper1, cmdWrapper2 tasks.CmdWrapper) ([]byte, error) {
 				return []byte("success"), nil
 			}
 			err := p.checkJMXServer(jmxKeys)
