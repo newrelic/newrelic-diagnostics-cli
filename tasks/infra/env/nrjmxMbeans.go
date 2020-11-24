@@ -27,7 +27,8 @@ type beanDefinitionParser struct {
 
 // InfraEnvNrjmxMbeans - This struct defines the task
 type InfraEnvNrjmxMbeans struct {
-	mCmdExecutor func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
+	getMBeanQueriesFromJMVMetricsYml func(string) ([]string, error)
+	executeNrjmxCmdToFindBeans func([]string, infraConfig.JmxConfig) ([]string, map[string]string)
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -65,7 +66,7 @@ func (p InfraEnvNrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 		}
 	}
 
-	mbeanQueries, parseYmlErr := getMBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
+	mbeanQueries, parseYmlErr := p.getMBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
 
 	if parseYmlErr != nil {
 		//This may overkill as we expect that any parsing issues get caught early by the integration itself: https://github.com/newrelic/nri-jmx/blob/master/src/config_parse.go#L62
@@ -84,7 +85,7 @@ func (p InfraEnvNrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 
 	mbeansNotFound, mbeansWithErr := p.executeNrjmxCmdToFindBeans(mbeanQueries, jmxConfig)
 
-	summaryIntro := fmt.Sprintf("In order to validate your queries defined in your metrics yml file against our JMX integration, we attempted to parsed them and ran each of them with the command echo {yourquery} | ./nrjmx -H %s -P %s -v -d -\n", jmxConfig.Host, jmxConfig.Port)
+	summaryIntro := fmt.Sprintf("In order to validate your queries defined in your metrics yml file against our JMX integration, we attempted to parsed them and ran each of them with the command echo {yourquery} | nrjmx -H %s -P %s -v -d -\n", jmxConfig.Host, jmxConfig.Port)
 
 	var summaryFailure string
 	if len(mbeansNotFound) > 0 {
@@ -153,7 +154,7 @@ func getMBeanQueriesFromJMVMetricsYml(collectionFilesStr string) ([]string, erro
 	return formattedQueries, nil
 }
 
-func (p InfraEnvNrjmxMbeans) executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig config.JmxConfig) ([]string, map[string]string) {
+func executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig config.JmxConfig) ([]string, map[string]string) {
 
 	errorCmdOutputs := make(map[string]string)
 	emptyCmdOutputs := []string{}
@@ -170,7 +171,7 @@ func (p InfraEnvNrjmxMbeans) executeNrjmxCmdToFindBeans(mBeanQueries []string, j
 		}
 
 		//We perform a cmd that looks like this: echo 'Glassbox:type=OfflineHandler,name=Offline_client_clingine' | ./nrjmx -H localhost -P 5002 -v -d -
-		cmdOutput, err := p.mCmdExecutor(cmd1, cmd2)
+		cmdOutput, err := tasks.MultiCmdExecutor(cmd1, cmd2)
 		log.Debug("cmdOutput", string(cmdOutput))
 
 		if err != nil {

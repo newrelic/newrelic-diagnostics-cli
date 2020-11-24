@@ -18,6 +18,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		runtimeOS:         runtime.GOOS,
 	}, true)
 	registrationFunc(InfraEnvNrjmxMbeans{
-		mCmdExecutor: tasks.MultiCmdExecutor,
+		getMBeanQueriesFromJMVMetricsYml: getMBeanQueriesFromJMVMetricsYml,
+		executeNrjmxCmdToFindBeans:       executeNrjmxCmdToFindBeans,
 	}, true)
 }
