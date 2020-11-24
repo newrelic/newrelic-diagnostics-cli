@@ -952,6 +952,38 @@ func CmdExecutor(name string, arg ...string) ([]byte, error) {
 	return cmdBuild.CombinedOutput()
 }
 
+//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
+//allowing for: cmd1 args | cmd2 args
+type CmdWrapper struct {
+	Cmd  string
+	Args []string
+}
+
+// takes multiple commands and pipes the first into the second
+func MultiCmdExecutor(cmdWrapper1, cmdWrapper2 CmdWrapper) ([]byte, error) {
+
+	cmd1 := exec.Command(cmdWrapper1.Cmd, cmdWrapper1.Args...)
+	cmd2 := exec.Command(cmdWrapper2.Cmd, cmdWrapper2.Args...)
+
+	// Get the pipe of Stdout from cmd1 and assign it
+	// to the Stdin of cmd2.
+	pipe, err := cmd1.StdoutPipe()
+	if err != nil {
+		return []byte{}, err
+	}
+	cmd2.Stdin = pipe
+
+	// Start() cmd1, so we don't block on it.
+	err = cmd1.Start()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	// Run Output() on cmd2 to capture the output.
+	return cmd2.CombinedOutput()
+
+}
+
 // HTTPRequestFunc represents a type that matches the signature of the httpHelper.MakeHTTPRequest
 // to be used a struct field for dependency injecting httpHelper.MakeHTTPRequest.
 type HTTPRequestFunc func(wrapper httpHelper.RequestWrapper) (*http.Response, error)

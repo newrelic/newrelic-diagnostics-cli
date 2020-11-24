@@ -2,55 +2,60 @@ package env
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
+	"io/ioutil"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	baseConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/Base/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
 	infraConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
+	"gopkg.in/yaml.v2"
 )
 
-// InfraEnvnrjmxMbeans - This struct defines the task
-type InfraEnvnrjmxMbeans struct {
-	mCmdExecutor               func(cmdWrapper, cmdWrapper) ([]byte, error)
-	executeNrjmxCmdToFindBeans func(string) (string, error)
+type collectionDefinitionParser struct {
+	Collect []struct {
+		Domain    string                 `yaml:"domain"`
+		EventType string                 `yaml:"event_type"`
+		Beans     []beanDefinitionParser `yaml:"beans"`
+	}
+}
+type beanDefinitionParser struct {
+	Query      string        `yaml:"query"`
+	Exclude    interface{}   `yaml:"exclude_regex"`
+	Attributes []interface{} `yaml:"attributes"`
 }
 
-//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
-//allowing for: cmd1 args | cmd2 args
-type cmdWrapper struct {
-	cmd  string
-	args []string
+// InfraEnvNrjmxMbeans - This struct defines the task
+type InfraEnvNrjmxMbeans struct {
+	mCmdExecutor func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
-func (p InfraEnvnrjmxMbeans) Identifier() tasks.Identifier {
-	return tasks.IdentifierFromString("Infra/Env/nrjmxMbeans")
+func (p InfraEnvNrjmxMbeans) Identifier() tasks.Identifier {
+	return tasks.IdentifierFromString("Infra/Env/NrjmxMbeans")
 }
 
 // Explain - Returns the help text for each individual task
-func (p InfraEnvnrjmxMbeans) Explain() string {
+func (p InfraEnvNrjmxMbeans) Explain() string {
 	return "Validate list of Mbeans against JMX integrations"
 }
 
 // Dependencies - Returns the dependencies for each task.
-func (p InfraEnvnrjmxMbeans) Dependencies() []string {
+func (p InfraEnvNrjmxMbeans) Dependencies() []string {
 	return []string{
 		"Infra/Config/ValidateJMX",
 	}
 }
 
-func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	if upstream["Infra/Config/ValidateJMX"].Status != tasks.Warning || upstream["Infra/Config/ValidateJMX"].Status != tasks.Success {
+func (p InfraEnvNrjmxMbeans) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
+
+	if upstream["Infra/Config/ValidateJMX"].Status == tasks.None || upstream["Infra/Config/ValidateJMX"].Status == tasks.Failure {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Infra/Config/ValidateJMX did not pass our validation. That issue will need to be resolved first before this task can be executed.",
+			Summary: "No jmx-config.yml was found or Infra/Config/ValidateJMX did not pass our validation (in which case, the issue will need to be resolved first before this task can be executed.)",
 		}
 	}
-	//We are able to run our nrjmx integration directly against your JMX server
+
 	jmxConfig, ok := upstream["Infra/Config/ValidateJMX"].Payload.(infraConfig.JmxConfig)
 
 	if !ok {
@@ -60,32 +65,38 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 		}
 	}
 
-	mbeanQueries, parseYmlErr := getBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
+	mbeanQueries, parseYmlErr := getMBeanQueriesFromJMVMetricsYml(jmxConfig.CollectionFiles)
 
 	if parseYmlErr != nil {
-
+		//This may overkill as we expect that any parsing issues get caught early by the integration itself: https://github.com/newrelic/nri-jmx/blob/master/src/config_parse.go#L62
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: parseYmlErr.Error(),
+		}
 	}
 
 	if len(mbeanQueries) < 1 {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "No queries have been defined yet in jvm-metrics.yml. This task did not run.",
+			Summary: "No queries have been configured yet through the JMX integration files. This task did not run.",
 		}
 	}
 
-	mbeansFound, mbeansNotFound, mbeansWithErr := executeNrjmxCmdToFindBeans(mbeanQueries, jmxConfig)
+	mbeansNotFound, mbeansWithErr := p.executeNrjmxCmdToFindBeans(mbeanQueries, jmxConfig)
 
-	summaryIntro := fmt.Sprintf("In order to validate your queries defined in your jvm-metrics.yml against our JMX integration, we parse them from the yml file, ran them with the cmd echo {yourquery} | ./nrjmx -H %s -P %s -v -d -, and found the following: \n", jmxConfig.Host, jmxConfig.Port)
+	summaryIntro := fmt.Sprintf("In order to validate your queries defined in your metrics yml file against our JMX integration, we attempted to parsed them and ran each of them with the command echo {yourquery} | ./nrjmx -H %s -P %s -v -d -\n", jmxConfig.Host, jmxConfig.Port)
 
 	var summaryFailure string
 	if len(mbeansNotFound) > 0 {
-		summaryFailure = fmt.Sprintf("Unsuccessful queries - %s - They may not exist or they will need to be redefined in the yml file because we are unable to find them among the MBeans listed on your server.", strings.Join(mbeansNotFound, ", "))
+		summaryFailure = fmt.Sprintf("These queries returned an empty object({}): %s\nThis can mean that either those mBeans are not available to this JMX server or that the queries targetting them may need to be reformatted in the metrics yml file.\n", strings.Join(mbeansNotFound, ", "))
 	}
+
 	var summaryErr string
 	if len(summaryErr) > 0 {
-		summaryErr = "Errors coming from - \n"
+		//timeout error: point them out to docs about how to fix timeout error
+		summaryErr = "These queries returned an error:\n"
 		for query, errMsg := range mbeansWithErr {
-			summaryErr = summaryErr + query + ": " + errMsg + "\n"
+			summaryErr = summaryErr + query + " - " + errMsg + "\n"
 		}
 	}
 
@@ -93,10 +104,11 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 		return tasks.Result{
 			Status:  tasks.Failure,
 			Summary: summaryIntro + summaryErr + summaryFailure,
+			URL:     "https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/jmx-monitoring-integration#troubleshoot",
 		}
 	}
 
-	summarySuccess := fmt.Sprintf("All successful queries - %s - They are available and ready to report to New Relic", strings.Join(mbeansFound, ", "))
+	summarySuccess := "All queries returned successful metrics! The nrjmx integration is able to connect to the JMX server and query all the Mbeans that you had configured through your collection files."
 	return tasks.Result{
 		Status:  tasks.Success,
 		Summary: summaryIntro + summarySuccess,
@@ -104,93 +116,75 @@ func (p InfraEnvnrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 
 }
 
-func getBeanQueriesFromJMVMetricsYml(pathToJvmMetricsYml string) ([]string, error) {
+func getMBeanQueriesFromJMVMetricsYml(collectionFilesStr string) ([]string, error) {
 
-	if pathToJvmMetricsYml == "" {
+	if collectionFilesStr == "" {
 		return []string{}, nil
 	}
-	file, err := os.Open(pathToJvmMetricsYml)
-	defer file.Close()
-	if err != nil {
-		log.Debugf("Unable to open '%s': %s\n", pathToJvmMetricsYml, err.Error())
-		return []string{}, err
-	}
-	//Sample file: https://github.com/newrelic/nri-jmx/blob/master/jvm-metrics.yml.sample
-	parsedFile, err := baseConfig.ParseYaml(file)
-	if err != nil {
-		log.Debugf("Unable to parse '%s': %s\n", pathToJvmMetricsYml, err.Error())
-		return []string{}, err
-	}
-	domainKey := parsedFile.FindKey("domain") //we expect only one
-	if len(domainKey) > 1 {
 
-	}
+	paths := strings.Split(collectionFilesStr, ",") //collection_files: "/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml"
+
 	formattedQueries := []string{}
-	queryValues := parsedFile.FindKey("query")  //we expect one or more
-	for _,query := range queryValues {
-		formattedQueries = append(formattedQueries, domain + ":" + query.Value())
-	}
-	return formattedQueries
+	for _, path := range paths {
+		//I am not doing a check for absolute path because the integration already is checking for that: https://github.com/newrelic/nri-jmx/blob/master/src/jmx.go#L103
+		// Parse the yaml file into a raw definition
+		yamlFile, err := ioutil.ReadFile(path)
+		if err != nil {
+			log.Debugf("failed to open %s: %s", path, err)
+			return []string{}, fmt.Errorf("We got a parsing error from %s: %s", path, err.Error())
+		}
+		// Parse the file (Sample file: https://github.com/newrelic/nri-jmx/blob/master/jvm-metrics.yml.sample)
+		var c collectionDefinitionParser
+		if err := yaml.Unmarshal(yamlFile, &c); err != nil {
+			log.Debugf("failed to parse collection: %s", err)
+			return []string{}, err
+		}
+
+		for _, domain := range c.Collect {
+			domainName := domain.Domain
+			// For each bean in the domain
+			for _, bean := range domain.Beans {
+				queryName := bean.Query
+				formattedQueries = append(formattedQueries, domainName+":"+queryName)
+			}
+		}
+	} //end of looping through all metrics files found in collection_files
+
+	return formattedQueries, nil
 }
 
-func executeNrjmxCmdToFindBeans(beanQueries []string, jmxConfig config.JmxConfig) ([]string, []string, map[string]string) {
+func (p InfraEnvNrjmxMbeans) executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig config.JmxConfig) ([]string, map[string]string) {
 
-	//echo 'Glassbox:type=OfflineHandler,name=Offline_client_clingine' | ./nrjmx -H localhost -P 5002 -v -d -
-	//{}
-	successCmdOutputs := []string{}
 	errorCmdOutputs := make(map[string]string)
 	emptyCmdOutputs := []string{}
-	for _, query := range beanQueries {
-		cmd1 := cmdWrapper{
-			cmd:  "echo",
-			args: []string{query},
+
+	for _, query := range mBeanQueries {
+		cmd1 := tasks.CmdWrapper{
+			Cmd:  "echo",
+			Args: []string{query},
 		}
 		jmxArgs := []string{"-hostname", jmxConfig.Host, "-port", jmxConfig.Port, "-v", "-d", "-"}
-		cmd2 := cmdWrapper{
-			cmd:  "./nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
-			args: jmxArgs,
+		cmd2 := tasks.CmdWrapper{
+			Cmd:  "nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
+			Args: jmxArgs,
 		}
 
-		output, err := multiCmdExecutor(cmd1, cmd2)
-		log.Debug("output", string(output))
-		//nrjmx returns an error exit code (in err) and the meaningful error in output if there is a failure connecting
-		//if nrjmx is not installed, output will be empty and the meaninful msg will be in err
+		//We perform a cmd that looks like this: echo 'Glassbox:type=OfflineHandler,name=Offline_client_clingine' | ./nrjmx -H localhost -P 5002 -v -d -
+		cmdOutput, err := p.mCmdExecutor(cmd1, cmd2)
+		log.Debug("cmdOutput", string(cmdOutput))
+
 		if err != nil {
-			if len(output) == 0 {
+			if len(cmdOutput) == 0 {
 				errorCmdOutputs[query] = err.Error()
 			}
-			errorCmdOutputs[query] = err.Error() + ": " + string(output)
+			errorCmdOutputs[query] = err.Error() + ": " + string(cmdOutput)
 		}
-		if strings.TrimSpace(string(output)) == "{}" {
+
+		if strings.Contains(string(cmdOutput), "{}") {
+			//it means data does not exist for that query, they should check query in jconsole and verify existing of Mbean
 			emptyCmdOutputs = append(emptyCmdOutputs, query)
-		} else {
-			successCmdOutputs = append(successCmdOutputs, query)
 		}
 	}
-	return successCmdOutputs, emptyCmdOutputs, errorCmdOutputs
-}
 
-// takes multiple commands and pipes the first into the second
-func multiCmdExecutor(cmdWrapper1, cmdWrapper2 cmdWrapper) ([]byte, error) {
-
-	cmd1 := exec.Command(cmdWrapper1.cmd, cmdWrapper1.args...)
-	cmd2 := exec.Command(cmdWrapper2.cmd, cmdWrapper2.args...)
-
-	// Get the pipe of Stdout from cmd1 and assign it
-	// to the Stdin of cmd2.
-	pipe, err := cmd1.StdoutPipe()
-	if err != nil {
-		return []byte{}, err
-	}
-	cmd2.Stdin = pipe
-
-	// Start() cmd1, so we don't block on it.
-	err = cmd1.Start()
-	if err != nil {
-		return []byte{}, err
-	}
-
-	// Run Output() on cmd2 to capture the output.
-	return cmd2.CombinedOutput()
-
+	return emptyCmdOutputs, errorCmdOutputs
 }

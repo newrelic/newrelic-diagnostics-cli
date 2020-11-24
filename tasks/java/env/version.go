@@ -25,7 +25,8 @@ func (p JavaEnvVersion) Explain() string {
 // Dependencies - Returns the dependencies for each task. When executed by name each dependency will be executed as well and the results from that dependency passed in to the downstream task
 func (p JavaEnvVersion) Dependencies() []string {
 	return []string{
-		"Java/Config/Agent", //This identifies this task as dependent on "Java/Config/Agent" and so the results from that task will be passed to this task. See the execute method to see how to interact with the results.
+		"Java/Config/Agent",
+		"Infra/Config/Agent",
 	}
 }
 
@@ -34,7 +35,7 @@ func (p JavaEnvVersion) Dependencies() []string {
 func (p JavaEnvVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
 
-	if upstream["Java/Config/Agent"].Status == tasks.Success {
+	if upstream["Java/Config/Agent"].Status == tasks.Success || upstream["Infra/Config/Agent"].Status == tasks.Success {
 		version, err := getJREVersion()
 		if err != nil {
 			result.Summary = "Java not found in PATH"

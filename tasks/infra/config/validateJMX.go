@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os/exec"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -16,22 +15,17 @@ const defaultJMXport = "9999"
 
 // InfraConfigValidateJMX - This struct defines the task
 type InfraConfigValidateJMX struct {
-	mCmdExecutor func(cmdWrapper, cmdWrapper) ([]byte, error)
-}
-
-//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
-//allowing for: cmd1 args | cmd2 args
-type cmdWrapper struct {
-	cmd  string
-	args []string
+	mCmdExecutor func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
 }
 
 type JmxConfig struct {
-	Host            string
-	Port            string
-	User            string
-	Password        string
-	CollectionFiles string
+	Host                  string
+	Port                  string
+	User                  string
+	Password              string
+	CollectionFiles       string
+	JavaVersion           string
+	JmxProcessCmdlineArgs string
 }
 
 func (j JmxConfig) MarshalJSON() ([]byte, error) {
@@ -45,19 +39,23 @@ func (j JmxConfig) MarshalJSON() ([]byte, error) {
 	if j.Password != "" {
 		sanitizedPasswordString = "_REDACTED_"
 	}
-
+	//ps -ef | grep jmx
 	return json.Marshal(&struct {
-		Host            string `json:"jmx_host"`
-		Port            string `json:"jmx_port"`
-		User            string `json:"jmx_user"`
-		Password        string `json:"jmx_pass"`
-		CollectionFiles string `json:"collection_files"`
+		Host                  string `json:"jmx_host"`
+		Port                  string `json:"jmx_port"`
+		User                  string `json:"jmx_user"`
+		Password              string `json:"jmx_pass"`
+		CollectionFiles       string `json:"collection_files"`
+		JavaVersion           string `json:"java_version"`
+		JmxProcessCmdlineArgs string `json:"ps_ef_grep_jmx"`
 	}{
-		Host:            j.Host,
-		Port:            j.Port,
-		User:            sanitizedUserString,
-		Password:        sanitizedPasswordString,
-		CollectionFiles: j.CollectionFiles,
+		Host:                  j.Host,
+		Port:                  j.Port,
+		User:                  sanitizedUserString,
+		Password:              sanitizedPasswordString,
+		CollectionFiles:       j.CollectionFiles,
+		JavaVersion:           j.JavaVersion,
+		JmxProcessCmdlineArgs: j.JmxProcessCmdlineArgs,
 	})
 }
 
@@ -75,6 +73,7 @@ func (p InfraConfigValidateJMX) Explain() string {
 func (p InfraConfigValidateJMX) Dependencies() []string {
 	return []string{
 		"Infra/Config/IntegrationsMatch",
+		"Java/Env/Version",
 	}
 }
 
@@ -112,17 +111,31 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 		}
 	}
 
+	//This data (JavaVersion and JmxProcessCmdlineArgs) it's relevant for TSE troubleshooting process
+	if upstream["Java/Env/Version"].Status != tasks.None {
+		javaVersion, ok := upstream["Java/Env/Version"].Payload.(string)
+		if ok {
+			jmxKeys.JavaVersion = javaVersion
+		}
+	}
+	portCmdlineArgs, err := p.getPortCmdlineArgs() //run ps -ef | grep jmx
+	if err != nil {
+		jmxKeys.JmxProcessCmdlineArgs = "We ran the command ps -ef | grep jmx and are unable to find a running process with JMX enabled: " + err.Error()
+	} else {
+		jmxKeys.JmxProcessCmdlineArgs = portCmdlineArgs
+	}
+
 	nrjmxErr := p.checkJMXServer(jmxKeys)
 	if nrjmxErr != nil {
 		log.Debug("nrjmxErr", nrjmxErr)
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "Error connecting to local JMXServer:\n" + nrjmxErr.Error(),
+			Summary: "We tested the JMX integration connection to local JMXServer by running the command echo '*:*' | nrjmx -H localhost -P 8080 -v -d - and we found this error:\n" + nrjmxErr.Error(),
 			URL:     "https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/jmx-monitoring-integration#troubleshoot",
 			Payload: jmxKeys,
 		}
 	}
-
+	//We are able to run our nrjmx integration directly against their JMX server
 	if jmxKeys.Host == "" || jmxKeys.Port == "" {
 		return tasks.Result{
 			Status:  tasks.Warning,
@@ -138,6 +151,28 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 		Payload: jmxKeys,
 	}
 
+}
+
+func (p InfraConfigValidateJMX) getPortCmdlineArgs() (string, error) {
+	cmd1 := tasks.CmdWrapper{
+		Cmd:  "ps",
+		Args: []string{"-ef"},
+	}
+	cmd2 := tasks.CmdWrapper{
+		Cmd:  "grep",
+		Args: []string{"jmx"},
+	}
+	output, err := p.mCmdExecutor(cmd1, cmd2)
+	log.Debug("output", string(output))
+
+	if err != nil {
+		if len(output) == 0 {
+			return "", err
+		}
+		return "", errors.New(string(output))
+	}
+
+	return string(output), nil
 }
 
 func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
@@ -183,15 +218,15 @@ func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
 
 	// echo "*:type=*,name=*" | nrjmx -hostname 127.0.0.1 -port 9999 --verbose true // basic command that returns all the things
 	// this queries for all beans, and givens back all types and all names
-	cmd1 := cmdWrapper{
-		cmd:  "echo",
-		args: []string{"*:type=*,name=*"},
+	cmd1 := tasks.CmdWrapper{
+		Cmd:  "echo",
+		Args: []string{"*:type=*,name=*"},
 	}
 
 	jmxArgs := buildNrjmxArgs(detectedConfig)
-	cmd2 := cmdWrapper{
-		cmd:  "nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
-		args: jmxArgs,
+	cmd2 := tasks.CmdWrapper{
+		Cmd:  "nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
+		Args: jmxArgs,
 	}
 
 	output, err := p.mCmdExecutor(cmd1, cmd2)
@@ -206,31 +241,6 @@ func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
 	}
 
 	return nil
-}
-
-// takes multiple commands and pipes the first into the second
-func multiCmdExecutor(cmdWrapper1, cmdWrapper2 cmdWrapper) ([]byte, error) {
-
-	cmd1 := exec.Command(cmdWrapper1.cmd, cmdWrapper1.args...)
-	cmd2 := exec.Command(cmdWrapper2.cmd, cmdWrapper2.args...)
-
-	// Get the pipe of Stdout from cmd1 and assign it
-	// to the Stdin of cmd2.
-	pipe, err := cmd1.StdoutPipe()
-	if err != nil {
-		return []byte{}, err
-	}
-	cmd2.Stdin = pipe
-
-	// Start() cmd1, so we don't block on it.
-	err = cmd1.Start()
-	if err != nil {
-		return []byte{}, err
-	}
-
-	// Run Output() on cmd2 to capture the output.
-	return cmd2.CombinedOutput()
-
 }
 
 func buildNrjmxArgs(detectedConfig JmxConfig) []string {
