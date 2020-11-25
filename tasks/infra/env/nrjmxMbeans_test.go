@@ -38,13 +38,19 @@ var _ = Describe("Infra/Env/NrjmxMbeans", func() {
 					"Infra/Config/ValidateJMX": tasks.Result{
 						Status: tasks.Success,
 						Payload: infraConfig.JmxConfig{
-							Host:                  "localhost",
-							Port:                  "8080",
-							User:                  "Admin",
-							Password:              "Admin",
-							CollectionFiles:       "/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml",
-							JavaVersion:           "openjdk version \"11.0.9.1\" 2020-11-04\nOpenJDK Runtime Environment (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04)\nOpenJDK 64-Bit Server VM (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04, mixed mode, sharing)\n",
-							JmxProcessCmdlineArgs: "vagrant   8599  2741  0 Nov23 pts/0    00:00:39 java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.ssl=false -jar -javaagent:newrelic/newrelic.jar build/libs/lucessqs-1.0-SNAPSHOT.jar\nroot     24530 24451  0 01:27 pts/1    00:00:00 grep jmx\n",
+							Host:            "localhost",
+							Port:            "8080",
+							User:            "Admin",
+							Password:        "Admin",
+							CollectionFiles: "/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml",
+							JavaVersion:     "openjdk version \"11.0.9.1\" 2020-11-04\nOpenJDK Runtime Environment (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04)\nOpenJDK 64-Bit Server VM (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04, mixed mode, sharing)\n",
+							JmxProcessCmdlineArgs: []string{
+								"-Dcom.sun.management.jmxremote.password.file=_REDACTED_",
+								"-Dcom.sun.management.jmxremote",
+								"-Dcom.sun.management.jmxremote.authenticate=true",
+								"-Dcom.sun.management.jmxremote.port=9010",
+								"-Dcom.sun.management.jmxremote.ssl=false",
+							},
 						},
 					},
 				}
@@ -75,13 +81,19 @@ var _ = Describe("Infra/Env/NrjmxMbeans", func() {
 					"Infra/Config/ValidateJMX": tasks.Result{
 						Status: tasks.Success,
 						Payload: infraConfig.JmxConfig{
-							Host:                  "localhost",
-							Port:                  "8080",
-							User:                  "Admin",
-							Password:              "Admin",
-							CollectionFiles:       "/etc/newrelic-infra/integrations.d/jvm-metrics.yml",
-							JavaVersion:           "openjdk version \"11.0.9.1\" 2020-11-04\nOpenJDK Runtime Environment (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04)\nOpenJDK 64-Bit Server VM (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04, mixed mode, sharing)\n",
-							JmxProcessCmdlineArgs: "vagrant   8599  2741  0 Nov23 pts/0    00:00:39 java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.ssl=false -jar -javaagent:newrelic/newrelic.jar build/libs/lucessqs-1.0-SNAPSHOT.jar\nroot     24530 24451  0 01:27 pts/1    00:00:00 grep jmx\n",
+							Host:            "localhost",
+							Port:            "8080",
+							User:            "Admin",
+							Password:        "Admin",
+							CollectionFiles: "/etc/newrelic-infra/integrations.d/jvm-metrics.yml",
+							JavaVersion:     "openjdk version \"11.0.9.1\" 2020-11-04\nOpenJDK Runtime Environment (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04)\nOpenJDK 64-Bit Server VM (build 11.0.9.1+1-Ubuntu-0ubuntu1.18.04, mixed mode, sharing)\n",
+							JmxProcessCmdlineArgs: []string{
+								"-Dcom.sun.management.jmxremote.password.file=_REDACTED_",
+								"-Dcom.sun.management.jmxremote",
+								"-Dcom.sun.management.jmxremote.authenticate=true",
+								"-Dcom.sun.management.jmxremote.port=9010",
+								"-Dcom.sun.management.jmxremote.ssl=false",
+							},
 						},
 					},
 				}
