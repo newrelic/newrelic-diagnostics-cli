@@ -69,7 +69,7 @@ func FindFiles(patterns []string, paths []string) []string {
 // FindProcessByNameFunc - allows FindProcessByName to be dependency injected
 type FindProcessByNameFunc func(string) ([]process.Process, error)
 
-// FindProcessByName - returns array of processes matching string name, or an error if we can't gather a list of processes
+// FindProcessByName - returns array of processes matching string name, or an error if we can't gather a list of processes, or an empty slice and nil if we found no processes with that specific name
 func FindProcessByName(name string) ([]process.Process, error) {
 	var processList []process.Process
 
@@ -745,11 +745,11 @@ type JavaProcArgs struct {
 	Args   []string
 }
 
-// GetJavaProcArgs return a slice of JavaProcArgs
+// GetJavaProcArgs returns a slice of JavaProcArgs struct with two fields: ProcID(int32) and Args([]string)
 func GetJavaProcArgs() []JavaProcArgs {
 	javaProcs, err := FindProcessByName("java")
 	if err != nil {
-		log.Debug("We encountered an error while detecting all running Java processes: " + err.Error())
+		log.Info("We encountered an error while detecting all running Java processes: " + err.Error())
 	}
 	if javaProcs == nil {
 		return []JavaProcArgs{}
@@ -758,7 +758,7 @@ func GetJavaProcArgs() []JavaProcArgs {
 	for _, proc := range javaProcs {
 		cmdLineArgsSlice, err := GetCmdLineArgs(proc)
 		if err != nil {
-			log.Debug("Error getting command line options while running GetCmdLineArgs(proc)")
+			log.Info("Error getting command line options while running GetCmdLineArgs(proc)")
 		}
 		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsSlice})
 	}

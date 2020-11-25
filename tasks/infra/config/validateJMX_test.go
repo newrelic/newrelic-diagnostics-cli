@@ -218,7 +218,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			It("should redact auth from payload JSON", func() {
 				resultPayload := result.Payload.(JmxConfig)
 				payloadJSON, _ := json.MarshalIndent(resultPayload, "", "	")
-				expectedPayloadJSON := "{\n\t\"jmx_host\": \"jmx-host.localnet\",\n\t\"jmx_port\": \"9999\",\n\t\"jmx_user\": \"_REDACTED_\",\n\t\"jmx_pass\": \"_REDACTED_\",\n\t\"collection_files\": \"/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml\",\n\t\"java_version\": \"\",\n\t\"ps_ef_grep_jmx\": \"success\"\n}"
+				expectedPayloadJSON := "{\n\t\"jmx_host\": \"jmx-host.localnet\",\n\t\"jmx_port\": \"9999\",\n\t\"jmx_user\": \"_REDACTED_\",\n\t\"jmx_pass\": \"_REDACTED_\",\n\t\"collection_files\": \"/etc/newrelic-infra/integrations.d/jvm-metrics.yml,/etc/newrelic-infra/integrations.d/tomcat-metrics.yml\",\n\t\"java_version\": \"Unable to find a Java path/version after running the command: java -version\",\n\t\"jmx_process_arguments\": [\n\t\t\"Unable to find a running JVM process that has JMX enabled or configured in its arguments\"\n\t]\n}"
 				Expect(string(payloadJSON)).To(Equal(expectedPayloadJSON))
 			})
 		})

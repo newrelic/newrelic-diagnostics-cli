@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -25,7 +26,7 @@ type JmxConfig struct {
 	Password              string
 	CollectionFiles       string
 	JavaVersion           string
-	JmxProcessCmdlineArgs string
+	JmxProcessCmdlineArgs []string
 }
 
 func (j JmxConfig) MarshalJSON() ([]byte, error) {
@@ -41,13 +42,13 @@ func (j JmxConfig) MarshalJSON() ([]byte, error) {
 	}
 	//ps -ef | grep jmx
 	return json.Marshal(&struct {
-		Host                  string `json:"jmx_host"`
-		Port                  string `json:"jmx_port"`
-		User                  string `json:"jmx_user"`
-		Password              string `json:"jmx_pass"`
-		CollectionFiles       string `json:"collection_files"`
-		JavaVersion           string `json:"java_version"`
-		JmxProcessCmdlineArgs string `json:"ps_ef_grep_jmx"`
+		Host                  string   `json:"jmx_host"`
+		Port                  string   `json:"jmx_port"`
+		User                  string   `json:"jmx_user"`
+		Password              string   `json:"jmx_pass"`
+		CollectionFiles       string   `json:"collection_files"`
+		JavaVersion           string   `json:"java_version"`
+		JmxProcessCmdlineArgs []string `json:"jmx_process_arguments"`
 	}{
 		Host:                  j.Host,
 		Port:                  j.Port,
@@ -112,17 +113,19 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 	}
 
 	//This data (JavaVersion and JmxProcessCmdlineArgs) it's relevant for TSE troubleshooting process
-	if upstream["Java/Env/Version"].Status != tasks.None {
+	if upstream["Java/Env/Version"].Status == tasks.Success {
 		javaVersion, ok := upstream["Java/Env/Version"].Payload.(string)
 		if ok {
 			jmxKeys.JavaVersion = javaVersion
 		}
+	} else { //this implies tasks.Warning and not tasks.None because that task would definitely attempt to run once Infra/Config/Agent was found
+		jmxKeys.JavaVersion = "Unable to find a Java path/version after running the command: java -version"
 	}
-	portCmdlineArgs, err := p.getPortCmdlineArgs() //run ps -ef | grep jmx
-	if err != nil {
-		jmxKeys.JmxProcessCmdlineArgs = "We ran the command ps -ef | grep jmx and are unable to find a running process with JMX enabled: " + err.Error()
+	jmxCmdlineArgs := p.getJMXProcessCmdlineArgs()
+	if len(jmxCmdlineArgs) < 1 {
+		jmxKeys.JmxProcessCmdlineArgs = []string{"Unable to find a running JVM process that has JMX enabled or configured in its arguments"}
 	} else {
-		jmxKeys.JmxProcessCmdlineArgs = portCmdlineArgs
+		jmxKeys.JmxProcessCmdlineArgs = jmxCmdlineArgs
 	}
 
 	nrjmxErr := p.checkJMXServer(jmxKeys)
@@ -153,26 +156,32 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 
 }
 
-func (p InfraConfigValidateJMX) getPortCmdlineArgs() (string, error) {
-	cmd1 := tasks.CmdWrapper{
-		Cmd:  "ps",
-		Args: []string{"-ef"},
-	}
-	cmd2 := tasks.CmdWrapper{
-		Cmd:  "grep",
-		Args: []string{"jmx"},
-	}
-	output, err := p.mCmdExecutor(cmd1, cmd2)
-	log.Debug("output", string(output))
+func (p InfraConfigValidateJMX) getJMXProcessCmdlineArgs() []string {
+	collectedJmxArgs := []string{}
 
-	if err != nil {
-		if len(output) == 0 {
-			return "", err
+	javaProcs := tasks.GetJavaProcArgs()
+	for _, proc := range javaProcs {
+		for _, arg := range proc.Args {
+			//We only capture jvm args that are jmx configuration related
+			if !(strings.Contains(arg, "jmx")) {
+				continue
+			}
+			if strings.Contains(arg, "password") || strings.Contains(arg, "access") || strings.Contains(arg, "login") {
+				/* Remove values from sensitive arguments
+				https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html
+				com.sun.management.jmxremote.login.config
+				com.sun.management.jmxremote.access.file
+				com.sun.management.jmxremote.password.file
+				*/
+				keyVal := strings.Split(arg, "=")
+				collectedJmxArgs = append(collectedJmxArgs, keyVal[0]+"="+"_REDACTED_")
+			} else {
+				collectedJmxArgs = append(collectedJmxArgs, arg)
+			}
 		}
-		return "", errors.New(string(output))
 	}
 
-	return string(output), nil
+	return collectedJmxArgs
 }
 
 func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {

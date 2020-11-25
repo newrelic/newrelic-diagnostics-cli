@@ -39,7 +39,7 @@ func (p JavaEnvVersion) Execute(options tasks.Options, upstream map[string]tasks
 		version, err := getJREVersion()
 		if err != nil {
 			result.Summary = "Java not found in PATH"
-			result.Status = tasks.Warning //Do we want a URL in this one?
+			result.Status = tasks.Warning
 		} else {
 			result.Summary = version
 			result.Status = tasks.Info

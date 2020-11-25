@@ -9,7 +9,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
 	infraConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type collectionDefinitionParser struct {
@@ -28,7 +28,7 @@ type beanDefinitionParser struct {
 // InfraEnvNrjmxMbeans - This struct defines the task
 type InfraEnvNrjmxMbeans struct {
 	getMBeanQueriesFromJMVMetricsYml func(string) ([]string, error)
-	executeNrjmxCmdToFindBeans func([]string, infraConfig.JmxConfig) ([]string, map[string]string)
+	executeNrjmxCmdToFindBeans       func([]string, infraConfig.JmxConfig) ([]string, map[string]string)
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
