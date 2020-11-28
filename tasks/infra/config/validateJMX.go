@@ -232,7 +232,7 @@ func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
 		//The first argument passed to exec.Command is the name of an executable (somefile.exe) and "echo" is not. To use shell commands, call the shell executable, and pass in the built-in command (and parameters)
 		cmd1 = tasks.CmdWrapper{
 			Cmd:  "cmd.exe",
-			Args: []string{"/C", "echo *:type=*,name=*"},
+			Args: []string{"/C", "echo", "*:type=*,name=*"},
 		}
 	} else {
 		cmd1 = tasks.CmdWrapper{
