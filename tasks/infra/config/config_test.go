@@ -26,12 +26,7 @@ func TestRegisterWithCount(t *testing.T) {
 		registrationFunc func(tasks.Task, bool)
 	}
 
-	var expectedRegisteredTaskCount int
-	if runtime.GOOS == "windows" { //we don't register InfraConfigValidateJMX in windows due to bug
-		expectedRegisteredTaskCount = 6
-	} else {
-		expectedRegisteredTaskCount = 7
-	}
+	expectedRegisteredTaskCount := 7
 
 	tests := []struct {
 		name      string
@@ -70,12 +65,7 @@ func TestRegisterWith(t *testing.T) {
 		InfraConfigIntegrationsValidate{fileReader: os.Open},
 		InfraConfigIntegrationsMatch{runtimeOS: runtime.GOOS},
 		InfraConfigIntegrationsValidateJson{},
-	}
-
-	if runtime.GOOS != "windows" { //we don't register InfraConfigValidateJMX in windows due to bug
-		expectedRegisteredTasks = append(expectedRegisteredTasks, InfraConfigValidateJMX{
-			mCmdExecutor: tasks.MultiCmdExecutor,
-		})
+		InfraConfigValidateJMX{mCmdExecutor: tasks.MultiCmdExecutor},
 	}
 
 	tests := []struct {
