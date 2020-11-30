@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestInfraConfigIntegrations(t *testing.T) {
@@ -74,7 +74,7 @@ func TestRegisterWith(t *testing.T) {
 
 	if runtime.GOOS != "windows" { //we don't register InfraConfigValidateJMX in windows due to bug
 		expectedRegisteredTasks = append(expectedRegisteredTasks, InfraConfigValidateJMX{
-			mCmdExecutor: multiCmdExecutor,
+			mCmdExecutor: tasks.MultiCmdExecutor,
 		})
 	}
 

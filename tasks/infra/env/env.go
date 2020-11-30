@@ -17,5 +17,8 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		checkForClockSkew: checkForClockSkew,
 		runtimeOS:         runtime.GOOS,
 	}, true)
-
+	registrationFunc(InfraEnvNrjmxMbeans{
+		getMBeanQueriesFromJMVMetricsYml: getMBeanQueriesFromJMVMetricsYml,
+		executeNrjmxCmdToFindBeans:       executeNrjmxCmdToFindBeans,
+	}, true)
 }

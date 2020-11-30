@@ -69,7 +69,7 @@ func FindFiles(patterns []string, paths []string) []string {
 // FindProcessByNameFunc - allows FindProcessByName to be dependency injected
 type FindProcessByNameFunc func(string) ([]process.Process, error)
 
-// FindProcessByName - returns array of processes matching string name, or an error if we can't gather a list of processes
+// FindProcessByName - returns array of processes matching string name, or an error if we can't gather a list of processes, or an empty slice and nil if we found no processes with that specific name
 func FindProcessByName(name string) ([]process.Process, error) {
 	var processList []process.Process
 
@@ -745,11 +745,11 @@ type JavaProcArgs struct {
 	Args   []string
 }
 
-// GetJavaProcArgs return a slice of JavaProcArgs
+// GetJavaProcArgs returns a slice of JavaProcArgs struct with two fields: ProcID(int32) and Args([]string)
 func GetJavaProcArgs() []JavaProcArgs {
 	javaProcs, err := FindProcessByName("java")
 	if err != nil {
-		log.Debug("We encountered an error while detecting all running Java processes: " + err.Error())
+		log.Info("We encountered an error while detecting all running Java processes: " + err.Error())
 	}
 	if javaProcs == nil {
 		return []JavaProcArgs{}
@@ -758,7 +758,7 @@ func GetJavaProcArgs() []JavaProcArgs {
 	for _, proc := range javaProcs {
 		cmdLineArgsSlice, err := GetCmdLineArgs(proc)
 		if err != nil {
-			log.Debug("Error getting command line options while running GetCmdLineArgs(proc)")
+			log.Info("Error getting command line options while running GetCmdLineArgs(proc)")
 		}
 		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsSlice})
 	}
@@ -950,6 +950,38 @@ type CmdExecFunc func(name string, arg ...string) ([]byte, error)
 func CmdExecutor(name string, arg ...string) ([]byte, error) {
 	cmdBuild := exec.Command(name, arg...)
 	return cmdBuild.CombinedOutput()
+}
+
+//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
+//allowing for: cmd1 args | cmd2 args
+type CmdWrapper struct {
+	Cmd  string
+	Args []string
+}
+
+// takes multiple commands and pipes the first into the second
+func MultiCmdExecutor(cmdWrapper1, cmdWrapper2 CmdWrapper) ([]byte, error) {
+
+	cmd1 := exec.Command(cmdWrapper1.Cmd, cmdWrapper1.Args...)
+	cmd2 := exec.Command(cmdWrapper2.Cmd, cmdWrapper2.Args...)
+
+	// Get the pipe of Stdout from cmd1 and assign it
+	// to the Stdin of cmd2.
+	pipe, err := cmd1.StdoutPipe()
+	if err != nil {
+		return []byte{}, err
+	}
+	cmd2.Stdin = pipe
+
+	// Start() cmd1, so we don't block on it.
+	err = cmd1.Start()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	// Run Output() on cmd2 to capture the output.
+	return cmd2.CombinedOutput()
+
 }
 
 // HTTPRequestFunc represents a type that matches the signature of the httpHelper.MakeHTTPRequest
