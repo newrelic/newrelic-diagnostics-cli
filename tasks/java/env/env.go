@@ -15,5 +15,5 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	registrationFunc(JavaEnvProcess{
 		findProcByName: tasks.FindProcessByName,
 		getCmdLineArgs: getCmdLineArgs,
-		getCurrentDir:  getCurrentDir}, true)
+		getCwd:         getCwd}, true)
 }
