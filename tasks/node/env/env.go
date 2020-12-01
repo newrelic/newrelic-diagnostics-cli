@@ -22,10 +22,6 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		cmdExec: tasks.CmdExecutor,
 	}, true)
 
-	registrationFunc(NodeEnvVersionCompatibility{
-		supportedNodeVersions: []string{"6.0+"},
-	}, true)
-
 	registrationFunc(NodeEnvNpmPackage{
 		Getwd:      os.Getwd,
 		fileFinder: tasks.FindFiles,

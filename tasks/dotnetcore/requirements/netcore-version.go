@@ -2,6 +2,7 @@ package requirements
 
 import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
 
 // DotNetCoreRequirementsNetCoreVersion - This task checks the .NET Core version against the .Net Core Agent requirements
@@ -56,7 +57,7 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 func checkVersion(installedVersions []string) (result tasks.Result) {
 	for _, version := range installedVersions {
 		majorVer, _, _, _ := tasks.GetVersionSplit(version)
-		if majorVer >= 2 {
+		if majorVer >= compatibilityVars.DotnetCoreSupportedVersions {
 			result.Status = tasks.Success
 			result.Summary = ".NET Core 2.0 or higher detected."
 			return

@@ -6,20 +6,10 @@ import (
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
 
 //https://github.com/edmorley/newrelic-python-agent/blame/master/newrelic/setup.py#L100
-var pythonVersionAgentSupportability = map[string][]string{
-	//the keys are the python version and the values are the agent versions that support that specific version
-	"3.8": []string{"5.2.3.131+"},
-	"3.7": []string{"3.4.0.95+"},
-	"3.6": []string{"2.80.0.60+"},
-	"3.5": []string{"2.78.0.57+"},
-	"3.4": []string{"2.42.0.35-4.20.0.120"},
-	"3.3": []string{"2.42.0.35-3.4.0.95"},
-	"2.7": []string{"2.42.0.35+"},
-	"2.6": []string{"2.42.0.35-3.4.0.95"},
-}
 
 // PythonRequirementsPythonVersion  - This struct defines the Python Version requirement
 type PythonRequirementsPythonVersion struct {
@@ -65,7 +55,7 @@ func (t PythonRequirementsPythonVersion) Execute(options tasks.Options, upstream
 
 	sanitizedPyVersion := removePyVersionPatch(pyVersion)
 
-	requiredAgentVersions, isPythonVersionSupported := pythonVersionAgentSupportability[sanitizedPyVersion]
+	requiredAgentVersions, isPythonVersionSupported := compatibilityVars.PythonVersionAgentSupportability[sanitizedPyVersion]
 
 	if !isPythonVersionSupported {
 		return tasks.Result{
