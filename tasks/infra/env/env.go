@@ -21,5 +21,5 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		getMBeanQueriesFromJMVMetricsYml: getMBeanQueriesFromJMVMetricsYml,
 		executeNrjmxCmdToFindBeans:       executeNrjmxCmdToFindBeans,
 	}, true)
-	registrationFunc(InfraEnvKafkaBrokers{}, true)
+	registrationFunc(InfraEnvValidateZookeeperPath{}, true)
 }

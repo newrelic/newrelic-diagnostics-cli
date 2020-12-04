@@ -170,7 +170,7 @@ func executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig config.JmxConfi
 			Args: jmxArgs,
 		}
 
-		//We perform a cmd that looks like this: echo 'Glassbox:type=OfflineHandler,name=Offline_client_clingine' | ./nrjmx -H localhost -P 5002 -v -d -
+		//We perform a cmd that looks like this: echo 'Glassbox:type=OfflineHandler,name=Offline_client_query' | ./nrjmx -H localhost -P 5002 -v -d -
 		cmdOutput, err := tasks.MultiCmdExecutor(cmd1, cmd2)
 		log.Debug("cmdOutput", string(cmdOutput))
 

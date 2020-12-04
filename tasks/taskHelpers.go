@@ -603,7 +603,10 @@ var defaultEnvVarFilter = []string{
 	"^ProgramData$",
 	"^APPDATA$",
 	"^JBOSS_HOME$",
-	"^WEBSITE_SITE_NAME$", //Needed for detecting Azure environment
+	"^WEBSITE_SITE_NAME$", //Needed for detecting Azure environment,
+	"^KAFKA_HOME$",
+	"^ZOOKEEPER_HOME$",
+	"^JAVA_HOME$",
 }
 
 // GetDefaultFilterRegex - returns the default filter string array with regex included
@@ -720,6 +723,7 @@ func GetProcessEnvVars(pid int32) (envVars EnvironmentVariables, retErr error) {
 func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 	envVars.All = make(map[string]string)
 	envVars.Scope = Shell
+
 	for _, e := range os.Environ() {
 		pair := strings.Split(e, "=")
 		envVars.All[pair[0]] = pair[1]
