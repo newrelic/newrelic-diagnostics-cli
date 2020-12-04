@@ -21,5 +21,4 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		getMBeanQueriesFromJMVMetricsYml: getMBeanQueriesFromJMVMetricsYml,
 		executeNrjmxCmdToFindBeans:       executeNrjmxCmdToFindBeans,
 	}, true)
-	registrationFunc(InfraEnvValidateZookeeperPath{}, true)
 }

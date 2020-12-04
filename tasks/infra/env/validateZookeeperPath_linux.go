@@ -1,3 +1,4 @@
+
 package env
 
 import (
@@ -13,6 +14,7 @@ import (
 
 // InfraEnvValidateZookeeperPath - This struct defines the task
 type InfraEnvValidateZookeeperPath struct {
+	cmdExec tasks.CmdExecFunc
 }
 
 const (
@@ -107,7 +109,7 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 		brokersArg = "/brokers/ids"
 	}
 
-	hasBrokerList, resultSummary := getKafkaBrokersList(zookeeperConfig, zookeeperShellPath, getArg, brokersArg)
+	hasBrokerList, resultSummary := p.getKafkaBrokersList(zookeeperConfig, zookeeperShellPath, getArg, brokersArg)
 
 	if !hasBrokerList {
 		return tasks.Result{
@@ -169,7 +171,7 @@ func getZookeeperShellScriptPath(envVars map[string]string) (string, bool) {
 	return "", false
 }
 
-func getKafkaBrokersList(zookeeperConfig ZookeeperConfig, zookeeperShellPath string, getArg string, brokersArg string) (bool, string) {
+func (p InfraEnvValidateZookeeperPath) getKafkaBrokersList(zookeeperConfig ZookeeperConfig, zookeeperShellPath string, getArg string, brokersArg string) (bool, string) {
 	var hostPortArg string
 	if len(zookeeperConfig.Port) > 0 {
 		hostPortArg = "localhost:" + zookeeperConfig.Port
@@ -184,9 +186,9 @@ func getKafkaBrokersList(zookeeperConfig ZookeeperConfig, zookeeperShellPath str
 		$ /path-to/zookeeper-shell.sh localhost:2181 ls {my-zookeeper_path-value}/brokers/ids
 		*/
 		cmd := zookeeperShellPath + " " + hostPortArg + " " + getArg + " " + brokersArg
-		cmdOutput, cmdErr := tasks.CmdExecutor("/bin/bash", "-c", cmd)
+		cmdOutput, cmdErr := p.cmdExec("/bin/bash", "-c", cmd)
 		if cmdErr != nil {
-			return false, fmt.Sprintf("We ran the command %s and were unable to locate a list of brokers: %s\n%s\nThis might be due to the Zookeeper nodes not being network accessible to where the integration is in place, or Kafka is not running, or it could be that the Zookeeper namespace has your broker information kept under a different path other than the default. Keep in mind that an alternative Zookeeper path can be set in the kafka-config.yml: https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/kafka-monitoring-integration#arguments", cmd, cmdErr, string(cmdOutput))
+			return false, fmt.Sprintf("We ran the command - %s - and were unable to locate a list of brokers:\n%s\n%s\nThis might be due to the Zookeeper nodes not being network accessible to where the integration is in place, or Zookeeper is not running, or it could be that the Zookeeper namespace has your broker information kept under a different path other than the default. Keep in mind that an alternative Zookeeper path can be set in the kafka-config.yml: https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/kafka-monitoring-integration#arguments", cmd, cmdErr, string(cmdOutput))
 		}
 		//is not our job to validate those brokers IDs, just to make sure they are accessible
 		return true, fmt.Sprintf("We ran the command %s and succesfully connected to a broker or list of brokers:\n%s", cmd, string(cmdOutput))
@@ -194,14 +196,14 @@ func getKafkaBrokersList(zookeeperConfig ZookeeperConfig, zookeeperShellPath str
 	//We found a path set in config file (Example, zookeeper_path: "/kafka-root"), so we'll append it to the brokers argument: zookeeper-shell.sh localhost:2181 ls /kafka-root/brokers/ids
 	customBrokersArg := zookeeperConfig.Path + brokersArg
 	customCmd := zookeeperShellPath + " " + hostPortArg + " " + getArg + " " + customBrokersArg
-	customCmdOutput, customCmdErr := tasks.CmdExecutor("/bin/bash", "-c", customCmd)
+	customCmdOutput, customCmdErr := p.cmdExec("/bin/bash", "-c", customCmd)
 
 	if customCmdErr != nil {
 		//The path set in config file is likely an invalid path; let's attempt to connect to zookeeper using the default path: /brokers/ids
 		defaultCmd := zookeeperShellPath + " " + hostPortArg + " " + getArg + " " + brokersArg
-		defaultCmdOutput, defaultCmdErr := tasks.CmdExecutor("/bin/bash", "-c", defaultCmd)
+		defaultCmdOutput, defaultCmdErr := p.cmdExec("/bin/bash", "-c", defaultCmd)
 		if defaultCmdErr != nil {
-			return false, fmt.Sprintf("We ran the command %s and were unable to locate a list of brokers: %s\n%s\nJust in case, we also attempted to run the same command with the zookeeper default path (%s), but we also got an error:%s\nThis might be due to the Zookeeper nodes not being network accessible to where the integration is in place, or Kafka is not running, or it could be that the Zookeeper namespace has your broker information kept under a different path. An alternative configuration you can try is to the bootstrap discovery mechanism, which will cause the integration to instead reach out to your defined bootstrap broker(s) to collect information on the other brokers in your cluster\nhttps://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/kafka-monitoring-integration#arguments", customCmd, customCmdErr, string(customCmdOutput), defaultCmd, defaultCmdErr)
+			return false, fmt.Sprintf("We ran the command %s and were unable to locate a list of brokers:\n%s\n%s\nJust in case, we also attempted to run the same command with the zookeeper default path (%s), but we also got an error:%s\nThis might be due to the Zookeeper nodes not being network accessible to where the integration is in place, or Zookeeper is not running, or it could be that the Zookeeper namespace has your broker information kept under a different path. An alternative configuration you can try is to the bootstrap discovery mechanism, which will cause the integration to instead reach out to your defined bootstrap broker(s) to collect information on the other brokers in your cluster\nhttps://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/kafka-monitoring-integration#arguments", customCmd, customCmdErr, string(customCmdOutput), defaultCmd, defaultCmdErr)
 		}
 		//though we were able to access brokers through an alternative path, we still want to set this as a failure status to let the user know the path set in the config file will no provide the connection to zookeeper they are expecting
 		return false, fmt.Sprintf("First we ran the command - %s - using the value found for zookeeper_path in the kafka config file, and this path did not connect us to your list of brokers IDs:\n%s\n%s\nHowever, when we ran the same command using the kafka integration default path for zookeeper - %s -, we were able to connect to your brokers:\n%s\nWe recommend commenting out the zookeeper_path setting and letting the integration automatically connect to the default path.", customCmd, customCmdErr, string(customCmdOutput), defaultCmd, string(defaultCmdOutput))
