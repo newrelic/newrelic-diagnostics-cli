@@ -1,4 +1,3 @@
-
 package env
 
 import (
@@ -87,6 +86,13 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Task did not meet requirements necessary to run: type assertion failure for task Base/Env/CollectEnvVars",
+		}
+	}
+
 	zookeeperShellPath, isOlderShellVersion := getZookeeperShellScriptPath(envVars) //zookeeper-shell.sh is a popular CLI tool to connect to zookeeper. We are going to run it passing some arguments to get a list of kafka brokers IDs. Getting the list is our way of validating that the New Relic Kafka integration can connect to Zookeeper/kafka
 
 	if zookeeperShellPath == "" {
@@ -103,10 +109,10 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 	var getArg, brokersArg string
 	if isOlderShellVersion {
 		getArg = "get"
-		brokersArg = "/brokers/ids/0"
+		brokersArg = defaultZookeeperPath + "/0"
 	} else {
 		getArg = "ls"
-		brokersArg = "/brokers/ids"
+		brokersArg = defaultZookeeperPath
 	}
 
 	hasBrokerList, resultSummary := p.getKafkaBrokersList(zookeeperConfig, zookeeperShellPath, getArg, brokersArg)
@@ -240,6 +246,7 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 }
 
 //not been used currently, though it may come handy later if we encounter bugs:
+//nolint
 func cmdOutputHasBrokerIds(cmdOutput string) bool {
 	captureGroup := `\[([0-9]|,|\s)+\]`
 	re := regexp.MustCompile(captureGroup)
