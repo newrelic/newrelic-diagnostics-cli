@@ -3,6 +3,7 @@ package env
 import (
 	"fmt"
 	"io/ioutil"
+	"runtime"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -160,13 +161,28 @@ func executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig config.JmxConfi
 	emptyCmdOutputs := []string{}
 
 	for _, query := range mBeanQueries {
-		cmd1 := tasks.CmdWrapper{
-			Cmd:  "echo",
-			Args: []string{query},
+		var cmd1 tasks.CmdWrapper
+		if runtime.GOOS == "windows" {
+			cmd1 = tasks.CmdWrapper{
+				Cmd:  "cmd.exe",
+				Args: []string{"/C", "echo", query},
+			}
+		} else {
+			cmd1 = tasks.CmdWrapper{
+				Cmd:  "echo",
+				Args: []string{query},
+			}
 		}
+
 		jmxArgs := []string{"-hostname", jmxConfig.Host, "-port", jmxConfig.Port, "-v", "-d", "-"}
+		var nrjmxCmd string
+		if runtime.GOOS == "windows" {
+			nrjmxCmd = `C:\Program Files\New Relic\nrjmx\nrjmx` //backticks to escape backslashes
+		} else {
+			nrjmxCmd = "nrjmx"
+		}
 		cmd2 := tasks.CmdWrapper{
-			Cmd:  "nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
+			Cmd:  nrjmxCmd,
 			Args: jmxArgs,
 		}
 
