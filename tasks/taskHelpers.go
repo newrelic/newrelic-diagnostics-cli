@@ -783,7 +783,7 @@ func GetNewRelicSystemProps() []ProcIDSysProps {
 
 			sysPropsKeyToVal := make(map[string]string)
 			for _, arg := range proc.Args {
-				if strings.Contains(arg, "-Dnewrelic") {
+				if strings.Contains(arg, "-Dnewrelic") || strings.Contains(arg, "-Djava.io.tmpdir") {
 					keyVal := strings.Split(arg, "=")
 					sysPropsKeyToVal[keyVal[0]] = keyVal[1]
 					procIDSysProps = append(procIDSysProps, ProcIDSysProps{ProcID: proc.ProcID, SysPropsKeyToVal: sysPropsKeyToVal})
