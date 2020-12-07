@@ -17,6 +17,7 @@ type ProcIdAndArgs struct {
 	Proc        process.Process
 	CmdLineArgs []string
 	Cwd         string
+	JarPath     string
 	EnvVars     map[string]string
 }
 
@@ -81,7 +82,7 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 
 		if strings.Contains(cmdLineArgsStr, "-javaagent") {
 
-			cwdFromCmdLineArgs, newRelicAgentNotFoundErr := getCwdFromCmdLineArgs(cmdLineArgsStr)
+			cwdFromCmdLineArgs, jarFilename, newRelicAgentNotFoundErr := getCwdFromCmdLineArgs(cmdLineArgsStr)
 			if newRelicAgentNotFoundErr != nil {
 				return tasks.Result{
 					Status:  tasks.Failure,
@@ -96,7 +97,7 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 			}
 
 			CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
-			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, EnvVars: envVars})
+			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, JarPath: cwd + jarFilename, EnvVars: envVars})
 		}
 	}
 
@@ -120,7 +121,7 @@ func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }
 
-func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, error) {
+func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, string, error) {
 	var err error
 
 	javaAgentCmd := "javaagent:"
@@ -154,7 +155,7 @@ func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, error) {
 	if !strings.Contains(path, "/") {
 		path = "./"
 	}
-	return path, err
+	return path, fileName, err
 }
 
 func getCwd(proc process.Process) (string, error) {

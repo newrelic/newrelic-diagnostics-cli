@@ -58,10 +58,12 @@ func FindFiles(patterns []string, paths []string) []string {
 			return nil
 		})
 	}
-
 	var uniqueFoundFiles []string
-	for fileLocation := range foundFiles {
-		uniqueFoundFiles = append(uniqueFoundFiles, fileLocation)
+
+	if len(foundFiles) > 0 {
+		for fileLocation := range foundFiles {
+			uniqueFoundFiles = append(uniqueFoundFiles, fileLocation)
+		}
 	}
 	return uniqueFoundFiles
 }
