@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
-	log "go.datanerd.us/p/support-tools/nr-diagnostics/logger"
 )
 
 // DotnetRequirementsNetTargetAgentVerValidate - This struct defines the task
