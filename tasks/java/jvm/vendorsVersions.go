@@ -5,10 +5,10 @@ import (
 	"regexp"
 	"strings"
 
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 	"github.com/shirou/gopsutil/process"
-	log "go.datanerd.us/p/support-tools/nr-diagnostics/logger"
 )
 
 type supportabilityStatus int
