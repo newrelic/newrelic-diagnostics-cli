@@ -55,15 +55,17 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 		log.Debug("type assertion failure")
 	}
 
-	//attempt to find payload in system properties
-	var foundSysPropPath string
+	//attempt to find system properties related to logs in payload
+	foundSysProps := make(map[string]string)
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
 		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
 			for _, process := range proccesses {
-				sysPropVal, isPresent := process.SysPropsKeyToVal[logSysProp]
-				if isPresent {
-					foundSysPropPath = sysPropVal
+				for _, sysPropKey := range logSysProps {
+					sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
+					if isPresent {
+						foundSysProps[sysPropKey] = sysPropVal
+					}
 				}
 			}
 		}
@@ -74,13 +76,14 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 	var logs []LogElement
 	if options.Options["logpath"] != "" {
 		logs = append(logs, LogElement{
-			Source:           "Defined by user through the Diagnostics CLI flag: logpath",
-			Value:            options.Options["logpath"],
+			Source: LogSourceData{
+				FoundBy: logPathDiagnosticsFlagSource,
+			},
 			IsSecureLocation: false,
 		})
 	} else {
 		//ignoring secure logs for now
-		logs = collectFilePaths(envVars, configElements, foundSysPropPath)
+		logs = collectFilePaths(envVars, configElements, foundSysProps)
 	}
 
 	if len(logs) > 0 {
@@ -88,12 +91,12 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 		// format the output of the result to return the files found and their content
 
 		for _, log := range logs {
-			dir, fileName := filepath.Split(log.Value)
+			dir, fileName := filepath.Split(log.Source.FullPath)
 			log.FileName = fileName
 			log.FilePath = dir
-			ch, _ := prunedReader(log.Value)
+			ch, _ := prunedReader(log.Source.FullPath)
 
-			filesToCopy = append(filesToCopy, tasks.FileCopyEnvelope{Path: log.Value, Stream: ch, Identifier: p.Identifier().String()})
+			filesToCopy = append(filesToCopy, tasks.FileCopyEnvelope{Path: log.Source.FullPath, Stream: ch, Identifier: p.Identifier().String()})
 
 		}
 		// now add the results into a single json string

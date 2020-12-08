@@ -55,37 +55,35 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 	}
 
-	var invalidLogSources []string //will be use to name the log locations we were unable to collect from
-	var validLogPaths []string     //will be use to list the filesToCopy into nrdiag.zip
+	var invalidLogPaths []string //will be use to name the log locations we were unable to collect from
+	var validLogPaths []string   //will be use to list the filesToCopy into nrdiag.zip
 	var failureSummary string
 
 	for idx, logElem := range logElementsFound {
 		if logElem.CanCollect {
-			logFileStatus := tasks.ValidatePath(logElem.Value)
+			logFileStatus := tasks.ValidatePath(logElem.Source.FullPath)
 			if !logFileStatus.IsValid {
-				invalidLogSources = append(invalidLogSources, logElem.Source)
+				invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
 				failureSummary += fmt.Sprintf(tasks.ThisProgramFullName+" cannot collect New Relic log files from the provided path(%s):%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logFileStatus.Path, (logFileStatus.ErrorMsg).Error())
 				//update our log element to inform that we cannot collect it
 				logElementsFound[idx] = LogElement{
 					FileName:           logElem.FileName,
 					FilePath:           logElem.FilePath,
 					Source:             logElem.Source,
-					Value:              logElem.Value,
 					IsSecureLocation:   logElem.IsSecureLocation,
 					CanCollect:         false,
 					ReasonToNotCollect: (logFileStatus.ErrorMsg).Error(),
 				}
 			} else {
-				validLogPaths = append(validLogPaths, logElem.Value)
+				validLogPaths = append(validLogPaths, logElem.Source.FullPath)
 			}
 		} else {
-			invalidLogSources = append(invalidLogSources, logElem.Source)
-			failureSummary += fmt.Sprintf(tasks.ThisProgramFullName+" will not collect the following New Relic log file:%s\n%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logElem.Value, logElem.ReasonToNotCollect)
+			invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
+			failureSummary += fmt.Sprintf("%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logElem.ReasonToNotCollect)
 			logElementsFound[idx] = LogElement{
 				FileName:           logElem.FileName,
 				FilePath:           logElem.FilePath,
 				Source:             logElem.Source,
-				Value:              logElem.Value,
 				IsSecureLocation:   logElem.IsSecureLocation,
 				CanCollect:         false,
 				ReasonToNotCollect: logElem.ReasonToNotCollect,
@@ -93,7 +91,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 	}
 
-	if len(invalidLogSources) > 0 && len(validLogPaths) == 0 {
+	if len(invalidLogPaths) > 0 && len(validLogPaths) == 0 {
 		return tasks.Result{
 			Status:  tasks.Failure,
 			Summary: failureSummary,
@@ -121,15 +119,15 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		successSummary += fmt.Sprintf("We found at least one old New Relic log file (modified more than 7 days ago):\n%s", mostRecentOldLogFile)
 	}
 
-	if len(filesToCopyToResult) > 0 && len(invalidLogSources) == 0 {
+	if len(filesToCopyToResult) > 0 && len(invalidLogPaths) == 0 {
 		return tasks.Result{
 			Status:      tasks.Success,
 			Summary:     successSummary,
 			Payload:     logElementsFound,
 			FilesToCopy: filesToCopyToResult,
 		}
-	} else if len(filesToCopyToResult) > 0 && len(invalidLogSources) > 0 {
-		warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf you can see those New Relic logs being generated and they are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support", strings.Join(invalidLogSources, ", "))
+	} else if len(filesToCopyToResult) > 0 && len(invalidLogPaths) > 0 {
+		warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf you can see those New Relic logs being generated and they are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support", strings.Join(invalidLogPaths, ", "))
 		return tasks.Result{
 			Status:      tasks.Warning,
 			Summary:     successSummary + "\n" + warningSummary,
@@ -173,15 +171,17 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 	if !ok {
 		log.Debug("type assertion failure")
 	}
-	//attempt to find payload in system properties
-	var foundSysPropPath string
+	//attempt to find system properties related to logs in payload
+	foundSysProps := make(map[string]string)
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
 		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
 			for _, process := range proccesses {
-				sysPropVal, isPresent := process.SysPropsKeyToVal[logSysProp]
-				if isPresent {
-					foundSysPropPath = sysPropVal
+				for _, sysPropKey := range logSysProps {
+					sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
+					if isPresent {
+						foundSysProps[sysPropKey] = sysPropVal
+					}
 				}
 			}
 		}
@@ -190,20 +190,25 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 	var logFilesFound []LogElement
 	if options.Options["logpath"] != "" {
 		logFilesFound = append(logFilesFound, LogElement{
-			Source:           "Defined by user through the " + tasks.ThisProgramFullName + " flag: logpath",
-			Value:            options.Options["logpath"],
+			Source: LogSourceData{
+				FoundBy:  logPathDiagnosticsFlagSource,
+				FullPath: options.Options["logpath"],
+				KeyVals: map[string]string{
+					"logpath": options.Options["logpath"],
+				},
+			},
 			IsSecureLocation: false,
+			CanCollect:       true,
 		})
 	} else {
-		logFilesFound = collectFilePaths(envVars, configElements, foundSysPropPath) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
+		logFilesFound = collectFilePaths(envVars, configElements, foundSysProps) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
 		for i, logFileFound := range logFilesFound {
 			if logFileFound.IsSecureLocation {
-				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", logFileFound.Value) +
+				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", logFileFound.Source.FullPath) +
 					"Include this file in nrdiag-output.zip?"
 				if !(tasks.PromptUser(question, options)) {
 					logFilesFound[i] = LogElement{
 						Source:             logFileFound.Source,
-						Value:              logFileFound.Value,
 						CanCollect:         false,
 						ReasonToNotCollect: "User opted out when " + tasks.ThisProgramFullName + " asked if it can collect this file that may contain secure information.",
 					}

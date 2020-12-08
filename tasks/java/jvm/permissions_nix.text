@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"path/filepath"
 	"regexp"
 	"syscall"
 
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
 	"github.com/shirou/gopsutil/process"
@@ -39,23 +41,21 @@ type payloadField struct {
 	Value    string
 }
 
-var logFile = map[string]string{
-	"envVar":     "NEW_RELIC_LOG",      //The unqualified log file name(not a path) or the string STDOUT which will log to standard out. The latter would inmediately give a "permission denied" error so no much need to troubleshoot for this option
-	"sysProp":    "-Dnewrelic.logfile", //EX: Dnewrelic.logfile=/opt/newrelic/java/logs/newrelic/somenewnameformylogs.log
-	"configFile": "log_file_path",      ////Java, ruby: "/Users/shuayhuaca/Desktop/
-	//if log_file_path is specified, the directory must already exist. If the default value is used, the agent will attempt to create the directory.
-}
-
 var tempDir = []string{
 	"-Dnewrelic.tempdir", //can only be set as sys prop not as an env var neither the config file
 	"-Djava.io.tmpdir",   //On UNIX systems the default value of this property can be "/tmp" or "/var/tmp"; on Windows "c:\temp". A different path value may be given through this system property
 }
 
 var (
-	envVarSource  = "environment variable"
-	sysPropSource = "system property or JVM arg"
-	yamlSource    = "configuration file"
-	defaultSource = "New Relic Java Agent Default"
+	//will import logPathConfigFileSource which uses log_file_path + log_filename. If the former has been is specified, the directory must already exist
+	logPathDefaultSource = "/logs/" //there will a logs dir in the same location where jar was found.Ex: newrelic/newrelic.jar/logs/newrelic_agent.log
+	logPathEnvVarSource  = "NEW_RELIC_LOG"//The unqualified log file name(not a path) or the string STDOUT which will log to standard out. The latter would inmediately give a "permission denied" error so no much need to troubleshoot for this option
+	logPathSysPropSource = "-Dnewrelic.logfile"//EX: Dnewrelic.logfile=/opt/newrelic/java/logs/newrelic/somenewnameformylogs.log
+	logPathConfigFileSource = "log_file_path"
+	envVarSource         = "environment variable"
+	sysPropSource        = "system property or JVM arg"
+	yamlSource           = "configuration file"
+	defaultSource        = "New Relic Java Agent Default"
 )
 
 type JavaJVMPermissions struct {
@@ -76,6 +76,7 @@ func (p JavaJVMPermissions) Dependencies() []string {
 	return []string{
 		"Base/Env/CollectEnvVars",
 		"Base/Env/CollectSysProps",
+		"Base/Log/Copy",
 		"Java/Env/Process",
 	}
 }
@@ -116,7 +117,7 @@ func determineLogDirPermissions(proc process.Process, upstream map[string]tasks.
 	var logPath string
 	//though env var takes precedence over sys prop, it is not possible to set log directory through env var, only log filename
 	sysPropLogPath := findPathInSysProp(upstream, proc)
-	
+
 	if sysPropLogPath != "" {
 		logPath = sysPropLogPath
 	} else {
@@ -129,11 +130,11 @@ func determineLogDirPermissions(proc process.Process, upstream map[string]tasks.
 	// }
 }
 
-func findPathInSysProp(upstream map[string]tasks.Result, proc process.Process) string{
+func findPathInSysProp(upstream map[string]tasks.Result, proc process.Process) string {
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
 		processes, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
-			for _, process := range processes{
+			for _, process := range processes {
 				if process.ProcID == proc.Pid {
 					logPathKey := logFile["sysProp"]
 					logPathVal, isPresent := process.SysPropsKeyToVal[logPathKey]
