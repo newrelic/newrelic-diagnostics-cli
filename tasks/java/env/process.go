@@ -5,6 +5,7 @@ package env
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -97,7 +98,7 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 			}
 
 			CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
-			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, JarPath: cwd + jarFilename, EnvVars: envVars})
+			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, JarPath: filepath.Join(cwd, jarFilename), EnvVars: envVars})
 		}
 	}
 

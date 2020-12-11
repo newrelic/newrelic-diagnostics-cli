@@ -116,7 +116,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if len(appNameInfosFromConfig) == 0 {
 		return tasks.Result{
 			Status:  tasks.Warning,
-			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME).",
+			Summary: "No New Relic app names were found. Please ensure an app name is set in your New Relic agent configuration file or as a New Relic environment variable (NEW_RELIC_APP_NAME). Ignore this warning if you are troubleshooting for a non APM Agent.",
 			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/app-naming/name-your-application",
 		}
 	}

@@ -55,18 +55,20 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 	}
 
+	logElements := dedupeLogPaths(logElementsFound)
+
 	var invalidLogPaths []string //will be use to name the log locations we were unable to collect from
 	var validLogPaths []string   //will be use to list the filesToCopy into nrdiag.zip
 	var failureSummary string
 
-	for idx, logElem := range logElementsFound {
+	for idx, logElem := range logElements {
 		if logElem.CanCollect {
 			logFileStatus := tasks.ValidatePath(logElem.Source.FullPath)
 			if !logFileStatus.IsValid {
 				invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
 				failureSummary += fmt.Sprintf(tasks.ThisProgramFullName+" cannot collect New Relic log files from the provided path(%s):%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logFileStatus.Path, (logFileStatus.ErrorMsg).Error())
 				//update our log element to inform that we cannot collect it
-				logElementsFound[idx] = LogElement{
+				logElements[idx] = LogElement{
 					FileName:           logElem.FileName,
 					FilePath:           logElem.FilePath,
 					Source:             logElem.Source,
@@ -80,7 +82,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		} else {
 			invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
 			failureSummary += fmt.Sprintf("%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logElem.ReasonToNotCollect)
-			logElementsFound[idx] = LogElement{
+			logElements[idx] = LogElement{
 				FileName:           logElem.FileName,
 				FilePath:           logElem.FilePath,
 				Source:             logElem.Source,
@@ -95,7 +97,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		return tasks.Result{
 			Status:  tasks.Failure,
 			Summary: failureSummary,
-			Payload: logElementsFound,
+			Payload: logElements,
 			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 		}
 	}
@@ -123,15 +125,15 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		return tasks.Result{
 			Status:      tasks.Success,
 			Summary:     successSummary,
-			Payload:     logElementsFound,
+			Payload:     logElements,
 			FilesToCopy: filesToCopyToResult,
 		}
 	} else if len(filesToCopyToResult) > 0 && len(invalidLogPaths) > 0 {
-		warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf you can see those New Relic logs being generated and they are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support", strings.Join(invalidLogPaths, ", "))
+		warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support.", strings.Join(invalidLogPaths, ", "))
 		return tasks.Result{
 			Status:      tasks.Warning,
 			Summary:     successSummary + "\n" + warningSummary,
-			Payload:     logElementsFound,
+			Payload:     logElements,
 			FilesToCopy: filesToCopyToResult,
 			URL:         "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 		}
@@ -139,24 +141,11 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 
 	return tasks.Result{
 		Status:  tasks.Warning,
-		Payload: logElementsFound,
+		Payload: logElements,
 		Summary: failureSummary,
 		URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 	}
 
-}
-
-func initializeDependencies(upstream map[string]tasks.Result) (map[string]string, []baseConfig.ValidateElement) {
-	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
-	if !ok {
-		log.Debug("Could not get envVars from upstream")
-	}
-
-	configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
-	if !ok {
-		log.Debug("type assertion failure")
-	}
-	return envVars, configElements
 }
 
 func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) []LogElement {
@@ -169,7 +158,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 	//get payload from config files
 	configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
 	if !ok {
-		log.Debug("type assertion failure")
+		log.Debug("type assertion failure for Base/Config/Validate Payload")
 	}
 	//attempt to find system properties related to logs in payload
 	foundSysProps := make(map[string]string)

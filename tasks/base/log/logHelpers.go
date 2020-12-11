@@ -44,7 +44,7 @@ var logEnvVars = []string{
 
 var keysInConfigFile = map[string][]string{
 	"fullpaths": []string{
-		"log_file",                //Python: "tmp/newrelic-python-agent.log"
+		"log_file",                //Python: "tmp/newrelic-python-agent.log" and Infra: /var/log/newrelic-infra/newrelic-infra.log (Linux: If not defined, it logs only in the standard output.)
 		"newrelic.daemon.logfile", //PHP daemon default val: "/var/log/newrelic/newrelic-daemon.log"
 		"newrelic.logfile",        //PHP: "/var/log/newrelic/newrelic-daemon.log",
 		"logging.filepath",        // Node: "node/app/newrelic_agent.log"
@@ -76,7 +76,7 @@ type LogSourceData struct {
 }
 
 var (
-	logPathDefaultSource         = "Found by looking at New Relic default paths"
+	logPathDefaultSource         = "Found by looking at standard locations"
 	logPathConfigFileSource      = "Found by looking at values in New Relic config file settings"
 	logPathEnvVarSource          = "Found by looking at New Relic environment variables"
 	logPathSysPropSource         = "Found by looking at JVM arguments"
@@ -129,17 +129,28 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		paths = append(paths, "/usr/local/newrelic-netcore20-agent/logs") // for dotnetcore
 	}
 	/*
-		Look for new relic log files in this order:
+		Collect log file paths in this order
+		1.Non-new relic log files, such as docker and syslog, by looking in the standard, expected locations
+		2.New Relic log files by looking at the path customized by the user using any of the following configuration options:
 		env vars
 		system properties
 		settings defined in new relic config files
-		standard locations, only if we didn't find any of the above
+		3.New Relic log files by looking at standard locations
+		4.Dedupe if there any repeats of the same path
 	*/
-	var logFilesFound []LogElement //logEnvVars contains OS-agnostic Environment variables (full path to the log or only log filename) Any filepaths found in env vars will be automatically collected without prompting the user for permissions to collect file
-	unmatchedDirKeyToVal := make(map[string]string)
-	unmatchedFilenameKeyToVal := make(map[string]string)
+
+	var logFilesFound []LogElement
+
+	//collect the paths to non New Relic log files
+	nonNRLogElements := getLogPathsFromSecureLocations(paths)
+	if len(nonNRLogElements) > 0 {
+		logFilesFound = append(logFilesFound, nonNRLogElements...)
+	}
 
 	//collect log paths from new relic environment variables
+	unmatchedDirKeyToVal := make(map[string]string)
+	unmatchedFilenameKeyToVal := make(map[string]string)
+	//logEnvVars contains OS-agnostic Environment variables (full path to the log or only log filename)
 	for _, logEnvVar := range logEnvVars {
 		logPath, isPresent := envVars[logEnvVar]
 		if isPresent {
@@ -174,26 +185,47 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		}
 	}
 
-	if len(logFilesFound) < 1 {
-		if len(unmatchedDirKeyToVal) > 0 && len(unmatchedFilenameKeyToVal) > 0 {
-			logElements := getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
-			if len(logElements) > 0 {
-				logFilesFound = append(logFilesFound, logElements...)
-				return logFilesFound
-			}
+	//collect a full log path by putting together a filename and directory path that come from different sources, such as a dir path that comes system prop (Dnewrelic.config.log_file_path:path/todir) and filename that comes a config file setting (log_file_name:somecustomlogname)
+	if len(unmatchedDirKeyToVal) > 0 && len(unmatchedFilenameKeyToVal) > 0 {
+		logElements := getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
+		if len(logElements) > 0 {
+			logFilesFound = append(logFilesFound, logElements...)
 		}
-		//Last attempt to find full path by looking for given filename in current path or by looking for logFilenamePatterns inside of a given directory
+	} else if len(unmatchedDirKeyToVal) > 0 || len(unmatchedFilenameKeyToVal) > 0 {
 		logElements := getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath)
 		if len(logElements) > 0 {
 			logFilesFound = append(logFilesFound, logElements...)
-			return logFilesFound
 		}
-		//If at this point we haven't found any log files, then we can make effort of seraching in all standard new relic locations using all standard new relic log file names
-		backupLogElements := getLogPathsFromStandardLocations(paths)
-		logFilesFound = append(logFilesFound, backupLogElements...)
+	}
+
+	//collect paths to New Relic log Files by looking into standard directories
+	logElements := getLogPathsFromStandardLocations(paths)
+	if len(logElements) > 0 {
+		logFilesFound = append(logFilesFound, logElements...)
 	}
 
 	return logFilesFound
+}
+
+func getLogPathsFromSecureLocations(paths []string) []LogElement {
+	var logElements []LogElement
+	secureFileLocations := tasks.FindFiles(secureLogFilenamePatterns, paths)
+	if len(secureFileLocations) > 0 {
+		for _, fileLocation := range secureFileLocations {
+			dir, fileName := filepath.Split(fileLocation)
+			logElements = append(logElements, LogElement{
+				FileName: fileName,
+				FilePath: dir,
+				Source: LogSourceData{
+					FoundBy:  logPathDefaultSource,
+					FullPath: fileLocation,
+				},
+				IsSecureLocation: true,
+				CanCollect:       true,
+			})
+		}
+	}
+	return logElements
 }
 
 func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal map[string]string, currentPath string) []LogElement {
@@ -300,24 +332,6 @@ func getLogPathsFromStandardLocations(paths []string) []LogElement {
 			})
 		}
 	}
-
-	secureFileLocations := tasks.FindFiles(secureLogFilenamePatterns, paths)
-	if len(secureFileLocations) > 0 {
-		for _, fileLocation := range secureFileLocations {
-			dir, fileName := filepath.Split(fileLocation)
-			logElements = append(logElements, LogElement{
-				FileName: fileName,
-				FilePath: dir,
-				Source: LogSourceData{
-					FoundBy:  logPathDefaultSource,
-					FullPath: fileLocation,
-				},
-				IsSecureLocation: true,
-				CanCollect:       true,
-			})
-		}
-	}
-
 	return logElements
 }
 
@@ -339,7 +353,7 @@ func getLogPathFromSysProp(sysPropKey, sysPropVal string) LogElement {
 }
 
 func getLogPathFromEnvVar(logPath string, logEnvVar string, unmatchedFilenameKeyToVal map[string]string) (LogElement, bool) {
-	if logPath == "stdout" || logPath == "stderr" {
+	if strings.ToLower(logPath) == "stdout" || strings.ToLower(logPath) == "stderr" {
 		return LogElement{
 			Source: LogSourceData{
 				FoundBy: logPathEnvVarSource,
@@ -401,13 +415,13 @@ func getLogPathFromConfigSysProps(configSysProps, unmatchedDirKeyToVal, unmatche
 }
 
 func getLogPathsFromConfigFile(configElements []baseConfig.ValidateElement, unmatchedDirKeyToVal, unmatchedFilenameKeyToVal map[string]string) []LogElement {
-	configMap := make(map[string]string)
 	var logElements []LogElement
 
 	for _, configFile := range configElements {
 		var fullPath, filename, dir, configKey string
+		configMap := make(map[string]string)
 		//search for nr log keys that contain fullPath to the logs
-		for _, v := range keysInConfigFile["fullPaths"] {
+		for _, v := range keysInConfigFile["fullpaths"] { //Caution! linux is case sensitive. Until recently this logic was failing because the `P` was capitalized in some places and not in others, ugh
 			foundKeys := configFile.ParsedResult.FindKey(v)
 			for _, key := range foundKeys {
 				val := key.Value() //"myapp/newrelic_agent.log"
@@ -479,7 +493,6 @@ func getLogPathsFromConfigFile(configElements []baseConfig.ValidateElement, unma
 }
 
 //Similar to tasks.FindFiles except that it does not traverse through sub-directories to find those filenames provided
-//nolint
 func findLogFiles(patterns []string, dir string) []string {
 	pathsToFiles := getFilesFromDir(dir)
 
@@ -520,4 +533,22 @@ func getFilesFromDir(dir string) []string {
 		}
 	}
 	return potentialLogFiles
+}
+
+func dedupeLogPaths(logElements []LogElement) []LogElement {
+	deDuped := []LogElement{}
+	uniques := map[string]LogElement{}
+
+	for _, logElement := range logElements {
+		//If fullpath value already exists in dedupe map skip it
+		_, isPresent := uniques[logElement.Source.FullPath]
+		if !isPresent {
+			uniques[logElement.Source.FullPath] = logElement
+		}
+	}
+
+	for _, logElem := range uniques {
+		deDuped = append(deDuped, logElem)
+	}
+	return deDuped
 }
