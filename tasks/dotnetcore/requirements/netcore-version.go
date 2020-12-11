@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"strconv"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
@@ -24,6 +25,7 @@ func (t DotNetCoreRequirementsNetCoreVersion) Dependencies() []string {
 	return []string{
 		"DotNetCore/Agent/Installed",
 		"DotNetCore/Env/Versions",
+		"DotNet/"
 	}
 }
 
@@ -42,7 +44,9 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 		return
 	}
 
-	installedVersions, ok := upstream["DotNetCore/Env/Versions"].Payload.([]string)
+	coreInstalledVersions, ok := upstream["DotNetCore/Env/Versions"].Payload.([]string)
+
+	// dotnetCoreVers, ok := upstream["DotNetCore/Agent/Installed"].Payload.([]string)
 
 	if !ok {
 		result.Status = tasks.Error
@@ -50,18 +54,37 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 		return
 	}
 
-	result = checkVersion(installedVersions)
-	return
+	if isDotnetCoreVerSupported(coreInstalledVersions) {
+		return tasks.Result{
+			Status: tasks.Success,
+			Summary: fmt.Sprintf(".NET Core 2.0 or higher detected: %s", strings.Join(coreInstalledVersions, ", ")),
+		}
+	}
+
+	return tasks.Result{
+		Status: tasks.Warning,
+		Summary: fmt.Sprintf("One or more .NET Core versions did not meet our agent version requirements: %s", strings.Join(installedVersions, ", ")),
+		URL: "https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-core#net-version",
+	}
 }
 
-func checkVersion(installedVersions []string) (result tasks.Result) {
-	for _, version := range installedVersions {
-		majorVer, _, _, _ := tasks.GetVersionSplit(version)
-		if majorVer >= compatibilityVars.DotnetCoreSupportedVersions {
-			result.Status = tasks.Success
-			result.Summary = ".NET Core 2.0 or higher detected."
-			return
+func isDotnetCoreVerSupported(dotnetCoreInstalledVers []string) (result tasks.Result) {
+	var successfulDotnetCoreVers []string
+	for _, dotnetCoreVer := range dotnetCoreInstalledVers {
+		majorVer, _, _, _ := tasks.GetVersionSplit(dotnetCoreVer)
+		majorVerToStr := strconv.Itoa(majorVer)
+
+		minimumAgentVer, isPresent := compatibilityVars.DotnetCoreSupportedVersions[majorVerToStr]
+
+		if isPresent {
+			successfulDotnetCoreVers = append(successfulDotnetCoreVers, majorVerToStr)
 		}
+
+		// if majorVer >= compatibilityVars.DotnetCoreSupportedVersions {
+		// 	result.Status = tasks.Success
+		// 	result.Summary = ".NET Core 2.0 or higher detected."
+		// 	return
+		// }
 	}
 
 	result.Status = tasks.Failure
