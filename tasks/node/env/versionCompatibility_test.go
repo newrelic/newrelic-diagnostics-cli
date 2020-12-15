@@ -79,7 +79,12 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{10, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 10, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status: tasks.None,
@@ -127,11 +132,21 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{10, 6, 7, 456},
+						Payload: tasks.Ver{
+							Major: 10, 
+							Minor: 6, 
+							Patch: 7, 
+							Build: 456,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{6, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 6, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 				}
 			})
@@ -151,7 +166,12 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{11, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 11, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
@@ -176,7 +196,12 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{8, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 8, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
@@ -201,7 +226,12 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{10, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 10, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
@@ -226,7 +256,12 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{12, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 12, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
@@ -251,7 +286,12 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
 						Status:  tasks.Info,
-						Payload: tasks.Ver{12, 0, 0, 0},
+						Payload: tasks.Ver{
+							Major: 12, 
+							Minor: 0, 
+							Patch: 0, 
+							Build: 0,
+						},
 					},
 					"Node/Agent/Version": tasks.Result{
 						Status:  tasks.Info,

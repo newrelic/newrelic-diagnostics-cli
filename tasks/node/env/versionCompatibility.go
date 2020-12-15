@@ -106,8 +106,5 @@ func sanitizeNodeVersion(nodeVersion string) string {
 
 func isOddVersion(nodeVersion string) bool {
 	i, _ := strconv.Atoi(nodeVersion)
-	if i%2 == 0 {
-		return false
-	}
-	return true
+	return i%2 != 0
 }
