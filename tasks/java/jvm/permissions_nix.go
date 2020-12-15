@@ -28,7 +28,7 @@ var (
 	logPathDefaultLocation  = "/logs/newrelic_agent.log"
 	nrTempDirKey            = "-Dnewrelic.tempdir" //can only be set as sys prop not as an env var neither the config file
 	javaTmpDirKey           = "-Djava.io.tmpdir"   //On UNIX systems the default value of this property can be "/tmp" or "/var/tmp"; on Windows "c:\temp". A different path value may be given through this system property
-	ubuntuTmpDirPath        = "/tmp/"              //On linux Ubuntu
+
 	//expected permissions users must have to get the Java agent configuration to work:
 	fileOwnerPermissionsRgx          = "-r.+"
 	fileGroupPermissionsRgx          = "[rwx-]{4}r.+"

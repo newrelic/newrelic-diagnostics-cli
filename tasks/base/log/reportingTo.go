@@ -44,7 +44,7 @@ func (t BaseLogReportingTo) Execute(options tasks.Options, upstream map[string]t
 	var logs []LogElement
 	for _, log := range logElements{
 		//IsSecureLocation represents non-new relic log files such as docker syslog
-		if log.CanCollect == false || len(log.FileName) == 0 || len(log.FilePath) == 0 || log.IsSecureLocation == true {
+		if !log.CanCollect || len(log.FileName) == 0 || len(log.FilePath) == 0 || log.IsSecureLocation {
 			continue
 		}
 		logs = append(logs, log)
