@@ -36,7 +36,7 @@ var (
 	dirOwnerPermissionsRgx           = "[drwx-]{2}wx.+"
 	dirGroupPermissionsRgx           = "[drwx-]{5}wx.+"
 	dirPublicPermissionsRgx          = "[drwx-]{8}wx"
-	errPermissionsCannotBeDetermined = errors.New("Permissions could not be determined")
+	errPermissionsCannotBeDetermined = errors.New("Permissions cannot be determined")
 	errTempDirDoesNotExist           = errors.New("Diagnostics CLi was unable to find the temp directory location for this host")
 	errTempDirHasNoJars              = errors.New("Diagnostics CLi was unable to find the New Relic tmp jar files")
 	tempDirRecommendation            = "If you are seeing a java.io.IOException in the New Relic logs, we recommend to manually create the tmp directory passing -Djava.io.tmpdir or -Dnewrelic.tempdir as a JVM argument at runtime. The Java Agent needs this temp directory to create temp JAR files"
@@ -114,9 +114,8 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	}
 
 	failureCount := 0
-	failureSummary := ""
 	warningCount := 0
-	warningSummary := ""
+	var failureSummary, warningSummary string
 	payloadResult := []*JavaAgentPermissions{}
 
 	for _, process := range javaAgentProcs { //though we expect to find one single process running the new relic agent, it is not un-heard of users running multiple agents in different processes
@@ -124,55 +123,38 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 		/* Can the user read the Agent JAR */
 		determineJarPermissions(process.Proc, process.JarPath, &j)
 		/* Can the user create the log directory/file for the agent */
-		determineLogPermissions(process.Proc, process.Cwd, upstream, &j)
+		determineLogPermissions(process.Proc, process.JarPath, upstream, &j)
 		/* Can the user create jar files within the tmp directory */
 		determineTmpDirPermissions(process.Proc, upstream, &j)
 
 		payloadResult = append(payloadResult, &j)
 
-		fmt.Println("luces javaAgentPermissions:", j)
+		anyPermissionDenied := (j.AgentJarCanRead.SuccessLevel == denied || j.LogCanCreate.SuccessLevel == denied || j.TempFilesCanCreate.SuccessLevel == denied)
 
-		if j.AgentJarCanRead.SuccessLevel == denied || j.LogCanCreate.SuccessLevel == denied || j.TempFilesCanCreate.SuccessLevel == denied {
+		anyPermissionUndetermined := (j.AgentJarCanRead.SuccessLevel == undetermined || j.LogCanCreate.SuccessLevel == undetermined || j.TempFilesCanCreate.SuccessLevel == undetermined)
+
+		if anyPermissionDenied {
 			failureCount++
-			errorsFound := (j.AgentJarCanRead.ErrorMsg).Error() + "\n" + (j.LogCanCreate.ErrorMsg).Error() + "\n" + (j.TempFilesCanCreate.ErrorMsg).Error()
-			failureSummary += fmt.Sprintf("The process for the for PID %d did not meet the New Relic Java Agent permissions requirements. Errors found:\n%s", process.Proc.Pid, errorsFound)
-		} else if j.AgentJarCanRead.SuccessLevel == undetermined || j.LogCanCreate.SuccessLevel == undetermined || j.TempFilesCanCreate.SuccessLevel == undetermined {
+			failureSummary += fmt.Sprintf("The process for the for PID %d did not meet the New Relic Java Agent permissions requirements. Errors found:\n%s", process.Proc.Pid, buildErrMsg(&j))
+		} else if anyPermissionUndetermined {
 			warningCount++
-			if errors.Is(j.TempFilesCanCreate.ErrorMsg, errTempDirHasNoJars) {
-				warningSummary += (j.TempFilesCanCreate.ErrorMsg).Error() + "\n" + tempDirRecommendation //this in only undetermined permissions case that is worth giving a warning. The other undetermined cases are due to our program running into error beyond the user's control
-			}
+			warningSummary += fmt.Sprintf(tasks.ThisProgramFullName+" ran into some unexpected errors and was unable to verify that your application meets the Java agent permissions requirements for the following reasons:\n%s", buildErrMsg(&j))
 		}
 	}
-	fmt.Println("luces sumaries and counts:", warningCount, warningSummary, failureCount, failureSummary)
+
 	if failureCount > 0 {
-		if warningCount > 0 {
-			return tasks.Result{
-				Status:  tasks.Failure,
-				Summary: failureSummary + warningSummary,
-				Payload: payloadResult,
-				URL:     "https://docs.newrelic.com/docs/agents/java-agent/troubleshooting/determine-permissions-requirements-java",
-			}
-		}
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: failureSummary,
+			Summary: failureSummary + warningSummary,
 			Payload: payloadResult,
 			URL:     "https://docs.newrelic.com/docs/agents/java-agent/troubleshooting/determine-permissions-requirements-java",
 		}
 	}
 
 	if warningCount > 0 {
-		if len(warningSummary) > 0 {
-			return tasks.Result{
-				Status:  tasks.Warning,
-				Summary: warningSummary,
-				Payload: payloadResult,
-				URL:     "https://docs.newrelic.com/docs/agents/java-agent/troubleshooting/determine-permissions-requirements-java",
-			}
-		}
 		return tasks.Result{
 			Status:  tasks.Warning,
-			Summary: tasks.ThisProgramFullName + " ran into some unexpected errors and was unable to fully verify that your application meets the permissions requirements for the Java agent. This health check can be ignore unless your are not seeing new relic logs or you are seeing the java.io.IOException error in your logs. More details can be found on the nrdiag-output.json",
+			Summary: warningSummary,
 			Payload: payloadResult,
 			URL:     "https://docs.newrelic.com/docs/agents/java-agent/troubleshooting/determine-permissions-requirements-java",
 		}
@@ -181,11 +163,32 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 		Status:  tasks.Success,
 		Summary: "All running Java Agent environments meet minimum permissions requirements",
 		URL:     "https://docs.newrelic.com/docs/agents/java-agent/troubleshooting/determine-permissions-requirements-java",
+		Payload: payloadResult,
 	}
 
 }
 
-func determineTmpDirPermissions(proc process.Process, upstream map[string]tasks.Result, javaAgentPermissions *JavaAgentPermissions) {
+func buildErrMsg(j *JavaAgentPermissions) string {
+	var errorsFound string
+
+	if j.AgentJarCanRead.ErrorMsg != nil {
+		errorsFound += (j.AgentJarCanRead.ErrorMsg).Error() + "\n"
+	}
+	if j.LogCanCreate.ErrorMsg != nil {
+		errorsFound += (j.LogCanCreate.ErrorMsg).Error() + "\n"
+	}
+	if (j.TempFilesCanCreate.ErrorMsg) != nil {
+		if errors.Is(j.TempFilesCanCreate.ErrorMsg, errTempDirHasNoJars) {
+			errorsFound += (j.TempFilesCanCreate.ErrorMsg).Error() + "\n" + tempDirRecommendation
+		} else {
+			errorsFound += (j.TempFilesCanCreate.ErrorMsg).Error() + "\n"
+		}
+	}
+	return errorsFound
+
+}
+
+func determineTmpDirPermissions(proc process.Process, upstream map[string]tasks.Result, j *JavaAgentPermissions) {
 	var tempDir, tempDirSource string
 	//Find location of tempDir in System Properties. New Relic sys prop should take precedence over standard java tmp files directory sys prop
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
@@ -214,26 +217,25 @@ func determineTmpDirPermissions(proc process.Process, upstream map[string]tasks.
 		tempDir = os.TempDir() //may return a directory that does not exist but soon we'll find out as we check for this directory's permissions
 		tempDirSource = "the default tmp directory for the Operation System"
 	}
-	fmt.Println("luces tempdir:", tempDir)
 	//start assigning javaAgentPermissions values to temp directory
-	javaAgentPermissions.TempFilesCanCreate.Source = tempDirSource
-	javaAgentPermissions.TempFilesCanCreate.Value = tempDir
+	j.TempFilesCanCreate.Source = tempDirSource
+	j.TempFilesCanCreate.Value = tempDir
 
 	err := canCreateFilesInTempDir(proc, tempDir)
 
 	if err != nil {
-		javaAgentPermissions.TempFilesCanCreate.ErrorMsg = err
+		j.TempFilesCanCreate.ErrorMsg = err
 		if errors.Is(err, errPermissionsCannotBeDetermined) {
-			javaAgentPermissions.TempFilesCanCreate.SuccessLevel = undetermined
+			j.TempFilesCanCreate.SuccessLevel = undetermined
 		} else {
-			javaAgentPermissions.TempFilesCanCreate.SuccessLevel = denied
+			j.TempFilesCanCreate.SuccessLevel = denied
 		}
 	} else {
 		//now before we can declare victory, let's peak in that tmp directory. We expect to see at least one temporary jar file name that includes the word "newrelic" in it
 		files, err := ioutil.ReadDir(tempDir)
 		if err != nil {
-			javaAgentPermissions.TempFilesCanCreate.SuccessLevel = undetermined
-			javaAgentPermissions.TempFilesCanCreate.ErrorMsg = err
+			j.TempFilesCanCreate.SuccessLevel = undetermined
+			j.TempFilesCanCreate.ErrorMsg = err
 		}
 		var foundTmpJar string
 		for _, f := range files {
@@ -243,10 +245,10 @@ func determineTmpDirPermissions(proc process.Process, upstream map[string]tasks.
 			}
 		}
 		if len(foundTmpJar) > 0 {
-			javaAgentPermissions.TempFilesCanCreate.SuccessLevel = granted
+			j.TempFilesCanCreate.SuccessLevel = granted
 		} else {
-			javaAgentPermissions.TempFilesCanCreate.SuccessLevel = undetermined
-			javaAgentPermissions.TempFilesCanCreate.ErrorMsg = errTempDirHasNoJars
+			j.TempFilesCanCreate.SuccessLevel = undetermined
+			j.TempFilesCanCreate.ErrorMsg = errTempDirHasNoJars
 		}
 
 	}
@@ -255,7 +257,7 @@ func determineTmpDirPermissions(proc process.Process, upstream map[string]tasks.
 /* need write/execute access to temp dir */
 func canCreateFilesInTempDir(proc process.Process, tempDir string) (err error) {
 	procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err := getUIDsGIDs(proc, tempDir)
-	fmt.Println("luces cancreateFilesIntempDir:", procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err)
+
 	if err != nil {
 		return err
 	}
@@ -264,9 +266,7 @@ func canCreateFilesInTempDir(proc process.Process, tempDir string) (err error) {
 	if os.IsNotExist(errStatTempDir) {
 		return errTempDirDoesNotExist
 	}
-	// if errStatTempDir != nil {
-	// 	return errStatTempDir
-	// }
+
 	filePerm := info.Mode().Perm()
 	var matchedPermissions bool
 	var errRegexMatch error
@@ -282,7 +282,7 @@ func canCreateFilesInTempDir(proc process.Process, tempDir string) (err error) {
 	}
 
 	if errRegexMatch != nil {
-		return fmt.Errorf("Permissions could not be determined for tmp directory at %s. Error is: %w", tempDir, errRegexMatch)
+		return fmt.Errorf("%s: %w for %s", errRegexMatch.Error(), errPermissionsCannotBeDetermined, tempDir)
 	}
 	if !matchedPermissions {
 		/* the process/file owner has no write/execute permissions */
@@ -292,7 +292,7 @@ func canCreateFilesInTempDir(proc process.Process, tempDir string) (err error) {
 	return nil
 }
 
-func determineLogPermissions(proc process.Process, jarDir string, upstream map[string]tasks.Result, javaAgentPermissions *JavaAgentPermissions) {
+func determineLogPermissions(proc process.Process, jarPath string, upstream map[string]tasks.Result, j *JavaAgentPermissions) {
 	logElements, ok := upstream["Base/Log/Copy"].Payload.([]baseLog.LogElement)
 
 	if !ok {
@@ -307,53 +307,61 @@ func determineLogPermissions(proc process.Process, jarDir string, upstream map[s
 			if configKey == logPathEnvVarSource || strings.Contains(configKey, logPathSysPropSource) || configKey == logPathConfigFileSource {
 				if configVal == "stdout" {
 					isLogStdout = true
-					javaAgentPermissions.LogCanCreate.SuccessLevel = undetermined
+					j.LogCanCreate.SuccessLevel = undetermined
 				}
 				logFilePath = logElement.Source.FullPath
 				logFilePathSource = logElement.Source.FoundBy
 			} else {
-				logFilePath = filepath.Join(jarDir, logPathDefaultLocation)
+				logFilePath = filepath.Join(filepath.Dir(jarPath), logPathDefaultLocation)
 				logFilePathSource = "Default location (directory where newrelic.jar is) in which the New Relic java agent will create its logs directory."
 			}
 		}
 	}
 	//assign javaAgentPermissions values for new relic log file
-	javaAgentPermissions.LogCanCreate.Source = logFilePathSource
-	javaAgentPermissions.LogCanCreate.Value = logFilePath
-	javaAgentPermissions.PID = proc.Pid
+	j.LogCanCreate.Source = logFilePathSource
+	j.LogCanCreate.Value = logFilePath
+	j.PID = proc.Pid
 
 	if !isLogStdout {
-		errLogWriteExec := canCreateAgentLog(proc, logFilePath)
-		if errLogWriteExec != nil {
-			javaAgentPermissions.LogCanCreate.SuccessLevel = denied
-			javaAgentPermissions.LogCanCreate.ErrorMsg = errLogWriteExec
+		err := canCreateAgentLog(proc, logFilePath)
+		if err != nil {
+			if errors.Is(err, errPermissionsCannotBeDetermined) {
+				j.LogCanCreate.SuccessLevel = undetermined
+				j.LogCanCreate.ErrorMsg = err
+			} else {
+				j.LogCanCreate.SuccessLevel = denied
+				j.LogCanCreate.ErrorMsg = err
+			}
+		} else {
+			j.LogCanCreate.SuccessLevel = granted
 		}
-		javaAgentPermissions.LogCanCreate.SuccessLevel = granted
 	}
 }
 
 /* need write/execute access to log dir */
 func canCreateAgentLog(proc process.Process, logFilePath string) (err error) {
 	/* logs file already exists; return success */
-	if _, errFileExist := os.Stat(logFilePath); errFileExist == nil {
+	_, errFileExist := os.Stat(logFilePath)
+
+	if errFileExist == nil {
 		return nil
 	}
+	//if errFileExist != nil and file does not exist, we are going to ignore it assuming that they may not have generated logs yet, so we should still check that the directory has the permissions to write logs
 
 	logDir := filepath.Dir(logFilePath)
-	/* if logs directory doesn't exist, log file cannot be created */
+
 	if _, errDirExist := os.Stat(logDir); errDirExist != nil {
-		return errDirExist
+		return fmt.Errorf("%s: %w for %s", errDirExist.Error(), errPermissionsCannotBeDetermined, logDir)
 	}
 
 	procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err := getUIDsGIDs(proc, logDir)
-	fmt.Println("luces cancreateAgentLog:", procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err)
 	if err != nil {
-		return fmt.Errorf("Permissions could not be determined for Agent log file creation at %s for PID %d: %w", logFilePath, proc.Pid, err)
+		return fmt.Errorf("%s: %w for %s", err.Error(), errPermissionsCannotBeDetermined, logDir)
 	}
 
 	info, errStatDir := os.Stat(logDir)
 	if errStatDir != nil {
-		return fmt.Errorf("Permissions could not be determined for Agent log file at %s for PID %d: %w", logDir, proc.Pid, errStatDir)
+		return fmt.Errorf("%s: %w for %s", errStatDir.Error(), errPermissionsCannotBeDetermined, logDir)
 	}
 	filePerm := info.Mode().Perm()
 	var matchedPermissions bool
@@ -370,7 +378,7 @@ func canCreateAgentLog(proc process.Process, logFilePath string) (err error) {
 	}
 
 	if errRegexMatch != nil {
-		return fmt.Errorf("Permissions could not be determined for writing the Agent log file at %s. Error is: %w", logFilePath, errRegexMatch)
+		return fmt.Errorf("%s: %w for %s", errRegexMatch.Error(), errPermissionsCannotBeDetermined, logDir)
 	}
 	if !matchedPermissions {
 		return fmt.Errorf("The owner of the process for PID %d does not have permissions to create the Agent log file located at %s: %s", proc.Pid, logFilePath, fmt.Sprint(filePerm))
@@ -385,17 +393,15 @@ func canReadAgentJar(proc process.Process, jarLoc string) (err error) {
 		return fmt.Errorf(`Agent JAR does not exist for PID %d. This location is at %s: %w`, proc.Pid, jarLoc, errJarNotExist)
 	}
 	procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err := getUIDsGIDs(proc, jarLoc)
-	fmt.Println("luces 0:", procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err)
 	if err != nil {
 		return err
 	}
 
 	info, errGettingJarPerms := os.Stat(jarLoc)
 	if errGettingJarPerms != nil {
-		return fmt.Errorf("Permissions could not be determined for JAR at %s. Error is: %w", jarLoc, errGettingJarPerms)
+		return fmt.Errorf("%s: %w for %s", errGettingJarPerms.Error(), errPermissionsCannotBeDetermined, jarLoc)
 	}
 	filePerm := info.Mode().Perm()
-	fmt.Println("luces 1:", jarLoc, filePerm)
 
 	var matchedPermissions bool
 	var errRegexMatch error
@@ -411,7 +417,7 @@ func canReadAgentJar(proc process.Process, jarLoc string) (err error) {
 	}
 
 	if errRegexMatch != nil {
-		return fmt.Errorf("Permissions could not be determined for JAR at %s. Error is: %w", jarLoc, errRegexMatch)
+		return fmt.Errorf("%s: %w for %s", errRegexMatch.Error(), errPermissionsCannotBeDetermined, jarLoc)
 	}
 	if !matchedPermissions {
 		/* the process/file owner has no read permissions */
@@ -420,28 +426,25 @@ func canReadAgentJar(proc process.Process, jarLoc string) (err error) {
 	return nil
 }
 
-func determineJarPermissions(proc process.Process, jarLoc string, javaAgentPermissions *JavaAgentPermissions) {
+func determineJarPermissions(proc process.Process, jarLoc string, j *JavaAgentPermissions) {
 	err := canReadAgentJar(proc, jarLoc)
 
 	//assign javaAgentPermissions values to Jar
 
 	if err != nil {
 		if errors.Is(err, errPermissionsCannotBeDetermined) {
-			javaAgentPermissions.AgentJarCanRead.SuccessLevel = undetermined
+			j.AgentJarCanRead.SuccessLevel = undetermined
 		} else {
-			fmt.Println("luces fatal 1")
-			javaAgentPermissions.AgentJarCanRead.SuccessLevel = denied
-			fmt.Println("luces fatal 2")
-
+			j.AgentJarCanRead.SuccessLevel = denied
 		}
-		javaAgentPermissions.AgentJarCanRead.ErrorMsg = err
+		j.AgentJarCanRead.ErrorMsg = err
 	} else {
-		javaAgentPermissions.AgentJarCanRead.SuccessLevel = granted
+		j.AgentJarCanRead.SuccessLevel = granted
 	}
 
-	javaAgentPermissions.PID = proc.Pid
-	javaAgentPermissions.AgentJarCanRead.Source = jarPathSysPropSource
-	javaAgentPermissions.AgentJarCanRead.Value = jarLoc
+	j.PID = proc.Pid
+	j.AgentJarCanRead.Source = jarPathSysPropSource
+	j.AgentJarCanRead.Value = jarLoc
 }
 
 func getUIDsGIDs(proc process.Process, fileOrDirPath string) (string, string, string, string, error) {
@@ -460,5 +463,6 @@ func getUIDsGIDs(proc process.Process, fileOrDirPath string) (string, string, st
 	fileDirOwner := modeInfo.(*syscall.Stat_t)
 	fileDirOwnerUID := fmt.Sprint(fileDirOwner.Uid)
 	fileDirOwnerGID := fmt.Sprint(fileDirOwner.Gid)
+
 	return procOwnerUID, procOwnerGID, fileDirOwnerUID, fileDirOwnerGID, nil
 }

@@ -83,7 +83,7 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 
 		if strings.Contains(cmdLineArgsStr, "-javaagent") {
 
-			cwdFromCmdLineArgs, jarFilename, newRelicAgentNotFoundErr := getCwdFromCmdLineArgs(cmdLineArgsStr)
+			jarPath, jarFilename, newRelicAgentNotFoundErr := getJarInfoFromCmdLineArgs(cmdLineArgsStr)
 			if newRelicAgentNotFoundErr != nil {
 				return tasks.Result{
 					Status:  tasks.Failure,
@@ -92,13 +92,13 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 			}
 
 			cwd, cwdErr := p.getCwd(proc)
-			// getCwd() does not work properly on darwin and will return an error. If that's the case, we get the cwd from the command line script.
+			// getCwd() does not work properly on darwin and will return an error. If that's the case, we can use the jar path as fallback
 			if cwdErr != nil {
-				cwd = cwdFromCmdLineArgs
+				cwd = jarPath
 			}
 
 			CmdLineArgsList := strings.Split(cmdLineArgsStr, " ")
-			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, JarPath: filepath.Join(cwd, jarFilename), EnvVars: envVars})
+			javaAgentProcsIdArgs = append(javaAgentProcsIdArgs, ProcIdAndArgs{Proc: proc, CmdLineArgs: CmdLineArgsList, Cwd: cwd, JarPath: filepath.Join(jarPath, jarFilename), EnvVars: envVars})
 		}
 	}
 
@@ -122,7 +122,7 @@ func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }
 
-func getCwdFromCmdLineArgs(cmdLineArgsString string) (string, string, error) {
+func getJarInfoFromCmdLineArgs(cmdLineArgsString string) (string, string, error) {
 	var err error
 
 	javaAgentCmd := "javaagent:"
