@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
@@ -35,29 +34,29 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Dependencies() []string {
 // Execute - The core work within this task
 func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	depsOK, failureSummary := checkDependencies(upstream)
+	depsOK, thisTaskDidNotRunSummary := checkDependencies(upstream)
 
 	if !depsOK {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: failureSummary,
+			Summary: thisTaskDidNotRunSummary,
 		}
 	}
 
-	agentVersion, ok := upstream["DotNet/Agent/Version"].Payload.(string)//Examples of how this string looks like: 8.30.0.0 or 8.3.360.0
+	agentVersion, ok := upstream["DotNet/Agent/Version"].Payload.(string) //Examples of how this string looks like: 8.30.0.0 or 8.3.360.0
 
 	if !ok {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: "Type Assertion failure from upstream task DotNet/Agent/Version in DotNet/Requirements/NetTargetAgentVersionValidate",
 		}
 	}
 
 	frameworkVersions, ok := upstream["DotNet/Env/TargetVersion"].Payload.([]string) //gets a slice containing multiple dotnet versions: .Net Targets detected as 4.6,4.6,4.6,4.7.2,4.6
 
-	if !ok{
+	if !ok {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: "Type Assertion failure from upstream task DotNet/Env/TargetVersion in DotNet/Requirements/NetTargetAgentVersionValidate",
 		}
 	}
@@ -67,22 +66,29 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 
 	for _, frameworkVer := range frameworkVersions {
 		isFrameworkVerSupported, requiredAgentVersions := checkFrameworkVerIsSupported(frameworkVer)
-		if !isFrameworkVerSupported{
+		if !isFrameworkVerSupported {
 			unsupportedFrameworkVersions = append(unsupportedFrameworkVersions, frameworkVer)
 			continue
 		}
-		isCompatibleWithAgent:= checkCompatibilityWithAgentVer(requiredAgentVersions, agentVersion)
-		if !isCompatibleWithAgent{
+		isCompatibleWithAgent, err := checkCompatibilityWithAgentVer(requiredAgentVersions, agentVersion)
+
+		if err != nil {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: tasks.ThisProgramFullName + " was unable to validate that your .NET agent version is compatible with your .NET target version because it ran into an unexpected error: " + err.Error(),
+			}
+		}
+		if !isCompatibleWithAgent {
 			incompatibleFrameworkVersions = append(incompatibleFrameworkVersions, frameworkVer)
-		}		
+		}
 	}
 
 	var failureSummary string
 	if len(unsupportedFrameworkVersions) > 0 {
-		warningSummary += fmt.Sprintf("We found a Target Framework version(s) that is not supported by the New Relic .NET agent: %s", strings.Join(unsupportedFrameworkVersions, ", "))
+		failureSummary += fmt.Sprintf("We found a Target Framework version(s) that is not supported by the New Relic .NET agent: %s", strings.Join(unsupportedFrameworkVersions, ", "))
 	}
 	if len(incompatibleFrameworkVersions) > 0 {
-		warningSummary += fmt.Sprintf("We found that your New Relic .NET agent version %s is not compatible with the following Target .NET version(s): %s", agentVersion, strings.Join(incompatibleFrameworkVersions, ", "))
+		failureSummary += fmt.Sprintf("We found that your New Relic .NET agent version %s is not compatible with the following Target .NET version(s): %s", agentVersion, strings.Join(incompatibleFrameworkVersions, ", "))
 	}
 
 	legacyDocURL := "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/technical-support-net-framework-40-or-lower"
@@ -90,27 +96,35 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 
 	if len(failureSummary) > 0 {
 		return tasks.Result{
-			Status: tasks.Failure,
+			Status:  tasks.Failure,
 			Summary: failureSummary,
-			URL: requirementsDocURL + "\n" + legacyDocURL,
+			URL:     requirementsDocURL + "\n" + legacyDocURL,
 		}
 	}
 
 	return tasks.Result{
-		Status: tasks.Success,
-		Summary: fmt.Sprintf("Your .NET agent version % is fully compatible with the following found Target .NET version(s): %s", agentVersion, strings.Join(frameworkVersions, ", "))
+		Status:  tasks.Success,
+		Summary: fmt.Sprintf("Your .NET agent version %s is fully compatible with the following found Target .NET version(s): %s", agentVersion, strings.Join(frameworkVersions, ", ")),
 	}
 
 }
 
-func checkFrameworkVerIsSupported(frameworkVer) (bool, []string){
+func checkCompatibilityWithAgentVer(requiredAgentVersions []string, agentVersion string) (bool, error) {
+	isCompatible, err := tasks.VersionIsCompatible(agentVersion, requiredAgentVersions)
+	if err != nil {
+		return false, err
+	}
+	return isCompatible, nil
+}
+
+func checkFrameworkVerIsSupported(frameworkVer string) (bool, []string) {
 	requiredAgentVersions, isFrameworkVerSupported := compatibilityVars.DotnetFrameworkSupportedVersions[frameworkVer]
-	if isFrameworkVerSupported{
+	if isFrameworkVerSupported {
 		return true, requiredAgentVersions
 	}
 	requiredLegacyAgentVersions, isOldFrameworkVerSupported := compatibilityVars.DotnetFrameworkOldVersions[frameworkVer]
 
-	return isOldFrameworkVerSupported, requiredLegacyAgentVersions		
+	return isOldFrameworkVerSupported, requiredLegacyAgentVersions
 }
 
 func checkDependencies(upstream map[string]tasks.Result) (bool, string) {
