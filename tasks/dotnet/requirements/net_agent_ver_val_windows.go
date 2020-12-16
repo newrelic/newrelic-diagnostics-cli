@@ -67,12 +67,12 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 
 	for _, frameworkVer := range frameworkVersions {
 		isFrameworkVerSupported, requiredAgentVersions := checkFrameworkVerIsSupported(frameworkVer)
-		!isFrameworkVerSupported{
+		if !isFrameworkVerSupported{
 			unsupportedFrameworkVersions = append(unsupportedFrameworkVersions, frameworkVer)
 			continue
 		}
 		isCompatibleWithAgent:= checkCompatibilityWithAgentVer(requiredAgentVersions, agentVersion)
-		!isCompatibleWithAgent{
+		if !isCompatibleWithAgent{
 			incompatibleFrameworkVersions = append(incompatibleFrameworkVersions, frameworkVer)
 		}		
 	}
