@@ -73,10 +73,9 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 func checkCoreVersionsAreSupported(dotnetCoreInstalledVers []string) (bool, []string) {
 	var unsupportedVers []string
 	for _, coreVersion := range dotnetCoreInstalledVers {
-		majorVer, _, _, _ := tasks.GetVersionSplit(coreVersion)
-		majorVerToStr := strconv.Itoa(majorVer)
-
-		_, isPresent := compatibilityVars.DotnetCoreSupportedVersions[majorVerToStr]
+		majorVer, minorVer, _, _ := tasks.GetVersionSplit(coreVersion)
+		majorMinorVer := strconv.Itoa(majorVer) + "." + strconv.Itoa(minorVer)
+		_, isPresent := compatibilityVars.DotnetCoreSupportedVersions[majorMinorVer]
 
 		if !isPresent {
 			unsupportedVers = append(unsupportedVers, coreVersion)

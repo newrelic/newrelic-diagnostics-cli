@@ -80,11 +80,12 @@ var DotnetFrameworkSupportedVersions = map[string][]string{
 //.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
 
 var DotnetCoreSupportedVersions = map[string][]string{
-	"3.1": []string{"6.19.0+"},
-	"3.0": []string{"6.19.0+"},
-	"2.2": []string{"6.19.0+"},
-	"2.1": []string{"6.19.0+"},
-	"2.0": []string{"6.19.0+"},
+	"5.0": []string{"8.35.0+"},
+	"3.1": []string{"8.21.34.0+"},
+	"3.0": []string{"8.21.34.0+"},
+	"2.2": []string{"8.19.353.0+"},
+	"2.1": []string{"8.19.353.0+"},
+	"2.0": []string{"8.19.353.0+"},
 }
 
 //https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-core#net-version

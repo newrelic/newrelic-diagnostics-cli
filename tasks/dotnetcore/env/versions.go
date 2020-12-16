@@ -81,11 +81,15 @@ func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[strin
 func checkVersions(envVars map[string]string) (versions []string, countErrors int, retErr error) {
 	countErrors = 0
 
-	// first check if version is in env vars
-	versionFromEnvVars := envVars["DOTNET_SDK_VERSION"]
-	if versionFromEnvVars != "" {
-		logger.Debug("DotNetCoreVersions - found .NET Core version in DOTNET_SDK_VERSION Env Var")
-		return append(versions, versionFromEnvVars), countErrors, retErr
+	// first check if version is accesible through the cmdline
+	//dotnet --version will Display .NET Core SDK version. Ex: 5.0.101
+	version, err := tasks.CmdExecutor("dotnet", "--version")
+
+	if err != nil{
+		countErrors++
+		logger.Debug("unable to get the version with the cmd dotnet --version:", err)
+	} else {
+		return []string{string(version)}, countErrors, nil
 	}
 
 	// check dirs
