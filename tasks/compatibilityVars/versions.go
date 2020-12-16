@@ -68,12 +68,17 @@ var NodeSupportedVersions = map[string][]string{
 	"10": []string{"4.6.0+"},
 }
 
+// .NET framework as keys and .NET agent as values
 var DotnetFrameworkSupportedVersions = map[string][]string{
 	"4.7": []string{"7.0.0+"},
-	"4.6": []string{"7.0.0+"},
+	"4.6": []string{"7.0.0+"}, //should be inclusive of version such as 4.6.1
 	"4.5": []string{"7.0.0+"},
-	"4.0": []string{"6.*"}, //TODO: check if these last two need to be more specific. Example: []string{"4.0.0-6.*"}
-	"3.5": []string{"6.*"},
+}
+
+var DotnetFrameworkOldVersions = map[string][]string{
+	//To instrument applications running on .NET Framework version 4.0 and lower, you must run a version of the New Relic .NET agent earlier than 7.0
+	"4.0": []string{"5.1.*-6.*"}, //5.0 and lower are EOL versions
+	"3.5": []string{"5.1.*-6.*"},
 	//Doc says .NET Framework 3.0 and 2.0 are no longer supported as September 2020:https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework
 }
 
