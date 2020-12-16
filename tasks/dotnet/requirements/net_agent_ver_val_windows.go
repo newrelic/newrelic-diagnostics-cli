@@ -2,6 +2,7 @@ package requirements
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -44,7 +45,6 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 	}
 
 	agentVersion, ok := upstream["DotNet/Agent/Version"].Payload.(string) //Examples of how this string looks like: 8.30.0.0 or 8.3.360.0
-
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -53,7 +53,6 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 	}
 
 	frameworkVersions, ok := upstream["DotNet/Env/TargetVersion"].Payload.([]string) //gets a slice containing multiple dotnet versions: .Net Targets detected as 4.6,4.6,4.6,4.7.2,4.6
-
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -61,10 +60,20 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 		}
 	}
 
+	//truncate framework versions to only use two digits (if they happen to be more than two) because both our map and documentation ignores any patch version to assess if it is supported
+	truncatedFrameworkVersions, err := removePatchBuildDigits(frameworkVersions)
+
+	if err != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.ThisProgramFullName + " was unable to validate that your .NET agent version is compatible with your .NET target version because it ran into an unexpected error: " + err.Error(),
+		}
+	}
+
 	var unsupportedFrameworkVersions []string
 	var incompatibleFrameworkVersions []string
 
-	for _, frameworkVer := range frameworkVersions {
+	for _, frameworkVer := range truncatedFrameworkVersions {
 		isFrameworkVerSupported, requiredAgentVersions := checkFrameworkVerIsSupported(frameworkVer)
 		if !isFrameworkVerSupported {
 			unsupportedFrameworkVersions = append(unsupportedFrameworkVersions, frameworkVer)
@@ -109,11 +118,27 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 
 }
 
+func removePatchBuildDigits(frameworkVersions []string) ([]string, error) {
+	var truncatedVersions []string
+	for _, version := range frameworkVersions {
+		v, err := tasks.ParseVersion(version)
+		if err != nil {
+			return truncatedVersions, err
+		}
+		truncatedVersion := strconv.Itoa(v.Major) + "." + strconv.Itoa(v.Minor)
+		truncatedVersions = append(truncatedVersions, truncatedVersion)
+
+	}
+	return truncatedVersions, nil
+
+}
+
 func checkCompatibilityWithAgentVer(requiredAgentVersions []string, agentVersion string) (bool, error) {
 	isCompatible, err := tasks.VersionIsCompatible(agentVersion, requiredAgentVersions)
 	if err != nil {
 		return false, err
 	}
+
 	return isCompatible, nil
 }
 
