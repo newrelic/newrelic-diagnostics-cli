@@ -14,7 +14,7 @@ As you read through, you are welcome to substitute the names/locations with ones
 
 ## Steps
 
-### Decide what you want your task to do...
+### Decide what you want your task to do
 
 For this HOW-TO we'll create a task that checks on how our coffee at work tastes. Looking at the folder structure already in the project, it seems the best place to put our new task would be in the `java` folder. Since our coffee maker can produce different brews the correct sub-folder might be `jvm`; which obviously stands for "Java Varieties Maker".
 
@@ -55,7 +55,7 @@ From the main directory of the project, type:
 
 You should see a result that looks something like:
 
-```
+```bash
 Check Results
 -------------------------------------------------
 
@@ -73,7 +73,7 @@ If you are getting a compile error, it's likely there is a minor typo somewhere 
 
 If it compiled and your result looked more like this:
 
-```
+```bash
 Check Results
 -------------------------------------------------
 
@@ -93,7 +93,7 @@ You might get a hint of what went wrong by looking at the help screen that lists
 
 Along with all the other output, you should see:
 
-```
+```bash
 |- Java
 |     |- Config
 |     |     \- Agent                - Detects if the Java agent is installed.
@@ -109,7 +109,7 @@ Go find the `Execute()` method. There is a lot of stuff passed in, but we're not
 
 You should see this:
 
-```
+```go
 	result := tasks.Result{
 		Status:  tasks.None,
 		Summary: "I succeeded in doing nothing.",
@@ -118,13 +118,13 @@ You should see this:
 
 Keep that; it just declares a variable that we'll fill with data and return later.  For example, the next line:
 
-```
+```go
 	return result
 ```
 
 Let's do something a little more interesting... let's figure out where we're running from. After all, your perspective can influence your taste for coffee. Try adding this code in between the variable declaration and the return statement:
 
-```
+```go
 	if hostname, _ := os.Hostname(); hostname == "teapot" {
 		result.Status = tasks.Failure
 		result.Summary = "I'm a teapot."
@@ -149,8 +149,7 @@ If you are not running `gofmt`... you should. (No really, we want consistency!) 
 
 Run the same commands as above, you should see:
 
-```
-
+```bash
 Check Results
 -------------------------------------------------
 
@@ -161,7 +160,7 @@ No Issues Found
 
 However, if your hostname happens to be "teapot" you'd see:
 
-```
+```bash
 Check Results
 -------------------------------------------------
 
@@ -170,7 +169,7 @@ Java/JVM/Taste: Failure
 Issues Found
 -------------------------------------------------
 Failure
-I'm a teapot.
+I am a teapot.
 See https://httpstatuses.com/418 for more information.
 ```
 

@@ -1,7 +1,8 @@
 # Anatomy of a Task
 
 ## Naming
-The name is a critical part of the nrdiag task and will drive both the file name itself, it's identity and the identifier. 
+
+The name is a critical part of the nrdiag task and will drive both the file name itself, it's identity and the identifier.
 
 Example of a task name: Node/Env/Version
 
@@ -24,8 +25,7 @@ Within each category, we typically have the following subcategories:
  * Config - This deals with config file tasks
  * Log - This deals with log errors and other tasks related to log files
  * Agent - This deals with running agent configuration tasks
- 
- 
+
  Other example sub-categories that aren't as general as the above ones:
 
  * Collector - This deals with connections to the New Relic collector
@@ -34,8 +34,6 @@ Within each category, we typically have the following subcategories:
  * JVM - Specific to Java JVM tasks
  * Daemon - Specific to PHP Daemon tasks
  * Minion - Specific to Synthetics private minion tasks
-
-
 
 ## Locations
 
@@ -51,7 +49,7 @@ If you were making a task that checked if the Morty agent is installed, the path
 tasks/morty/agent/installed.go
 ```
 
-... and the package name would be `agent`. 
+... and the package name would be `agent`.
 
 
 The registration file to add your task to this package would be:

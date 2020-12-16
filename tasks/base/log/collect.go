@@ -36,6 +36,7 @@ func (p BaseLogCollect) Dependencies() []string {
 	// no dependencies!
 	return []string{
 		"Base/Env/CollectEnvVars",
+		"Base/Env/CollectSysProps",
 		"Base/Config/Validate",
 	}
 }
@@ -54,6 +55,20 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 		log.Debug("type assertion failure")
 	}
 
+	//attempt to find payload in system properties
+	var foundSysPropPath string
+	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
+		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		if ok {
+			for _, process := range proccesses {
+				sysPropVal, isPresent := process.SysPropsKeyToVal[logSysProp]
+				if isPresent {
+					foundSysPropPath = sysPropVal
+				}
+			}
+		}
+	}
+
 	results := []LogElement{}
 	filesToCopy := []tasks.FileCopyEnvelope{}
 
@@ -62,7 +77,7 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 		logs = []string{options.Options["logpath"]}
 	} else {
 		//ignoring secure logs for now
-		logs, _ = collectFilePaths(envVars, configElements)
+		logs, _ = collectFilePaths(envVars, configElements, foundSysPropPath)
 	}
 
 	if logs != nil {

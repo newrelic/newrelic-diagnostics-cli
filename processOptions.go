@@ -19,6 +19,9 @@ import (
 func validateHTTPProxy(proxy string) (bool, error) {
 
 	//Check just for instance of '//'
+	if !(strings.Contains(proxy, "//")) {
+		log.Fatalf("Your proxy URL does not include a protocol: %s\nPlease override this issue by running nrdiag with our proxy flag using a similar proxy format: ./nrdiag -proxy http://poxy_host:proxy_port", proxy)
+	}
 	splitURL := strings.Split(proxy, "//")
 	if len(splitURL) != 2 {
 		return false, errors.New("Proxy url expecting exactly one instance of '//'")
@@ -66,7 +69,6 @@ func processHTTPProxy() (bool, error) {
 	}
 	envProxy := os.Getenv("HTTP_PROXY")
 	if envProxy != "" {
-
 		//Check the final env proxy.
 		_, err := validateHTTPProxy(envProxy)
 		if err != nil {

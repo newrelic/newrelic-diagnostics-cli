@@ -19,9 +19,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/shirou/gopsutil/process"
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/shirou/gopsutil/process"
 )
 
 // OsFunc - for dependency injecting osGetwd
@@ -69,7 +69,7 @@ func FindFiles(patterns []string, paths []string) []string {
 // FindProcessByNameFunc - allows FindProcessByName to be dependency injected
 type FindProcessByNameFunc func(string) ([]process.Process, error)
 
-// FindProcessByName - returns array of processes matching string name, or an error if we can't gather a list of processes
+// FindProcessByName - returns array of processes matching string name, or an error if we can't gather a list of processes, or an empty slice and nil if we found no processes with that specific name
 func FindProcessByName(name string) ([]process.Process, error) {
 	var processList []process.Process
 
@@ -734,6 +734,69 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 	return
 }
 
+// GetCmdLineArgs is a wrapper for Process.Cmdline
+func GetCmdLineArgs(proc process.Process) ([]string, error) {
+	return proc.CmdlineSlice() //Keep in mind that If an single argument looked like this: -Dnewrelic.config.app_name="my appname", Go for darwin will still separate by spaces and will split it into 2 arguments even if they were enclosed by quotes.
+}
+
+// JavaProcArgs has a Java process id with its associated cmdline arguments
+type JavaProcArgs struct {
+	ProcID int32
+	Args   []string
+}
+
+// GetJavaProcArgs returns a slice of JavaProcArgs struct with two fields: ProcID(int32) and Args([]string)
+func GetJavaProcArgs() []JavaProcArgs {
+	javaProcs, err := FindProcessByName("java")
+	if err != nil {
+		log.Info("We encountered an error while detecting all running Java processes: " + err.Error())
+	}
+	if javaProcs == nil {
+		return []JavaProcArgs{}
+	}
+	javaProcArgs := []JavaProcArgs{}
+	for _, proc := range javaProcs {
+		cmdLineArgsSlice, err := GetCmdLineArgs(proc)
+		if err != nil {
+			log.Info("Error getting command line options while running GetCmdLineArgs(proc)")
+		}
+		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsSlice})
+	}
+	return javaProcArgs
+}
+
+// ProcIDSysProps has a running java process id and its associated system properties organized as map of key system property and the value of the system property
+type ProcIDSysProps struct {
+	ProcID           int32
+	SysPropsKeyToVal map[string]string
+}
+
+// GetNewRelicSystemProps - gathers a given process's System Properties that are New Relic related
+func GetNewRelicSystemProps() []ProcIDSysProps {
+
+	javaProcessesArgs := GetJavaProcArgs()
+
+	if len(javaProcessesArgs) > 0 {
+		procIDSysProps := []ProcIDSysProps{}
+
+		for _, proc := range javaProcessesArgs {
+
+			sysPropsKeyToVal := make(map[string]string)
+			for _, arg := range proc.Args {
+				if strings.Contains(arg, "-Dnewrelic") {
+					keyVal := strings.Split(arg, "=")
+					sysPropsKeyToVal[keyVal[0]] = keyVal[1]
+					procIDSysProps = append(procIDSysProps, ProcIDSysProps{ProcID: proc.ProcID, SysPropsKeyToVal: sysPropsKeyToVal})
+				}
+			}
+		}
+
+		return procIDSysProps
+	}
+	// no java processes running :(
+	return []ProcIDSysProps{}
+}
+
 // TrimQuotes helper func for cleaning up single and double quoted yml values
 // from ValidateBlobs when it's time to use them (filepaths for example)
 func TrimQuotes(s string) string {
@@ -887,6 +950,38 @@ type CmdExecFunc func(name string, arg ...string) ([]byte, error)
 func CmdExecutor(name string, arg ...string) ([]byte, error) {
 	cmdBuild := exec.Command(name, arg...)
 	return cmdBuild.CombinedOutput()
+}
+
+//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
+//allowing for: cmd1 args | cmd2 args
+type CmdWrapper struct {
+	Cmd  string
+	Args []string
+}
+
+// takes multiple commands and pipes the first into the second
+func MultiCmdExecutor(cmdWrapper1, cmdWrapper2 CmdWrapper) ([]byte, error) {
+
+	cmd1 := exec.Command(cmdWrapper1.Cmd, cmdWrapper1.Args...)
+	cmd2 := exec.Command(cmdWrapper2.Cmd, cmdWrapper2.Args...)
+
+	// Get the pipe of Stdout from cmd1 and assign it
+	// to the Stdin of cmd2.
+	pipe, err := cmd1.StdoutPipe()
+	if err != nil {
+		return []byte{}, err
+	}
+	cmd2.Stdin = pipe
+
+	// Start() cmd1, so we don't block on it.
+	err = cmd1.Start()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	// Run Output() on cmd2 to capture the output.
+	return cmd2.CombinedOutput()
+
 }
 
 // HTTPRequestFunc represents a type that matches the signature of the httpHelper.MakeHTTPRequest

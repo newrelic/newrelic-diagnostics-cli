@@ -5,9 +5,9 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var expectedLicenseKeys = []string{
@@ -236,7 +236,6 @@ func Test_detectEnvLicenseKey(t *testing.T) {
 	}
 }
 
-
 func mockOsGetenv(envKey string) string {
 	// passthrough mock function standing in for os.Getenv
 	return envKey
@@ -287,16 +286,98 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 
 	var p BaseConfigLicenseKey
 
+	Describe("Dependencies()", func() {
+		It("Should return a slice with dependencies", func() {
+			expectedDependencies := []string{
+				"Base/Config/Validate",
+				"Base/Env/CollectEnvVars",
+				"Base/Env/CollectSysProps",
+			}
+			Expect(p.Dependencies()).To(Equal(expectedDependencies))
+		})
+	})
+
 	Describe("Execute()", func() {
 
 		var (
-			result   tasks.Result
 			options  tasks.Options
 			upstream map[string]tasks.Result
+			result   tasks.Result
 		)
 
 		JustBeforeEach(func() {
 			result = p.Execute(options, upstream)
+		})
+
+		Context("When we have license key through a system property and a config file and they have the same value", func() {
+			BeforeEach(func() {
+				upstream = map[string]tasks.Result{
+					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
+						Payload: []ValidateElement{
+							ValidateElement{
+								ParsedResult: tasks.ValidateBlob{
+									Key:      "newrelic.license",
+									RawValue: "Schnauzer12",
+								},
+								Config: ConfigElement{
+									FileName: "newrelic.ini",
+									FilePath: "/app/",
+								},
+							}, ValidateElement{
+								ParsedResult: tasks.ValidateBlob{
+									Key:      "license_key",
+									RawValue: "Schnauzer12",
+								},
+								Config: ConfigElement{
+									FileName: "newrelic.yml",
+									FilePath: "/etc/",
+								},
+							},
+						},
+					},
+					"Base/Env/CollectSysProps": tasks.Result{
+						Status: tasks.Info,
+						Payload: []tasks.ProcIDSysProps{
+							tasks.ProcIDSysProps{
+								ProcID: 40149,
+								SysPropsKeyToVal: map[string]string{
+									"-Dnewrelic.config.license_key": "Schnauzer12",
+								},
+							},
+						},
+					},
+				}
+			})
+
+			expectedResult := tasks.Result{
+				Status:  tasks.Success,
+				Summary: "1 unique New Relic license key(s) found.\n     'Schnauzer12' from '-Dnewrelic.config.license_key' will be used by New Relic APM Agents",
+				Payload: []LicenseKey{
+					{
+						Value:  "Schnauzer12",
+						Source: "/etc/newrelic.yml",
+					},
+					{
+						Value:  "Schnauzer12",
+						Source: "/app/newrelic.ini",
+					},
+					{
+						Value:  "Schnauzer12",
+						Source: "-Dnewrelic.config.license_key",
+					},
+				},
+			}
+
+			It("Should return a success status", func() {
+				Expect(result.Status).To(Equal(expectedResult.Status))
+			})
+			It("Should return a summary", func() {
+				Expect(result.Summary).To(Equal(expectedResult.Summary))
+			})
+			It("Should have a payload of found LicenseKeys", func() {
+				Expect(result.Payload).To(ConsistOf(expectedResult.Payload))
+			})
 		})
 
 		Context("When multiple license key sources are found but all use same license key", func() {
@@ -327,6 +408,17 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 							},
 						},
 					},
+					"Base/Env/CollectSysProps": tasks.Result{
+						Status: tasks.Info,
+						Payload: []tasks.ProcIDSysProps{
+							tasks.ProcIDSysProps{
+								ProcID: 40149,
+								SysPropsKeyToVal: map[string]string{
+									"-Dnewrelic.config.license_key": "Schnauzer12",
+								},
+							},
+						},
+					},
 					"Base/Env/CollectEnvVars": tasks.Result{
 						Status: tasks.Success,
 						Payload: map[string]string{
@@ -338,7 +430,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 
 			expectedResult := tasks.Result{
 				Status:  tasks.Success,
-				Summary: "1 unique New Relic license key(s) found.\n     'Schnauzer12' will be used by New Relic APM Agents",
+				Summary: "1 unique New Relic license key(s) found.\n     'Schnauzer12' from 'NEW_RELIC_LICENSE_KEY' will be used by New Relic APM Agents",
 				Payload: []LicenseKey{
 					{
 						Value:  "Schnauzer12",
@@ -347,9 +439,14 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 					{
 						Value:  "Schnauzer12",
 						Source: "/etc/newrelic.yml",
-					}, {
+					},
+					{
 						Value:  "Schnauzer12",
 						Source: "NEW_RELIC_LICENSE_KEY",
+					},
+					{
+						Value:  "Schnauzer12",
+						Source: "-Dnewrelic.config.license_key",
 					},
 				},
 			}
@@ -368,7 +465,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 
 		})
 
-		Context("When multiple license key sources are found and all use different license keys", func() {
+		Context("When we have 3 license key sources and one of them has a different value", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
@@ -378,7 +475,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 							ValidateElement{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "newrelic.license",
-									RawValue: "Banana",
+									RawValue: "Schnauzer12",
 								},
 								Config: ConfigElement{
 									FileName: "newrelic.ini",
@@ -396,29 +493,105 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 							},
 						},
 					},
+					"Base/Env/CollectSysProps": tasks.Result{
+						Status: tasks.Info,
+						Payload: []tasks.ProcIDSysProps{
+							tasks.ProcIDSysProps{
+								ProcID: 40149,
+								SysPropsKeyToVal: map[string]string{
+									"-Dnewrelic.config.license_key": "mylicensekey",
+								},
+							},
+						},
+					},
 					"Base/Env/CollectEnvVars": tasks.Result{
 						Status: tasks.Success,
 						Payload: map[string]string{
-							"NEW_RELIC_LICENSE_KEY": "Banana",
+							"NEW_RELIC_LICENSE_KEY": "mylicensekey",
 						},
 					},
 				}
 			})
 
 			expectedResult := tasks.Result{
-				Status:  tasks.Warning,
-				Summary: "Multiple license keys detected:\n" + "     'Schnauzer12' from '/etc/newrelic.yml'\n     'Banana' from 'NEW_RELIC_LICENSE_KEY'\n\n     'Banana' will be used by New Relic APM Agents",
+				Status: tasks.Warning,
 				Payload: []LicenseKey{
 					{
-						Value:  "Banana",
+						Value:  "Schnauzer12",
 						Source: "/app/newrelic.ini",
 					},
 					{
 						Value:  "Schnauzer12",
 						Source: "/etc/newrelic.yml",
-					}, {
-						Value:  "Banana",
+					},
+					{
+						Value:  "mylicensekey",
 						Source: "NEW_RELIC_LICENSE_KEY",
+					},
+					{
+						Value:  "mylicensekey",
+						Source: "-Dnewrelic.config.license_key",
+					},
+				},
+			}
+
+			It("Should return a success status", func() {
+				Expect(result.Status).To(Equal(expectedResult.Status))
+			})
+
+			It("Should return a summary reporting unique license keys", func() {
+				Expect(result.Summary).To(ContainSubstring("'mylicensekey' from 'NEW_RELIC_LICENSE_KEY' will be used by New Relic APM Agents"))
+			})
+
+			It("Should have a payload of found LicenseKeys", func() {
+				Expect(result.Payload).To(ConsistOf(expectedResult.Payload))
+			})
+
+		})
+
+		Context("When we have 2 license key sources and both have different values", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
+						Payload: []ValidateElement{
+							ValidateElement{
+								ParsedResult: tasks.ValidateBlob{
+									Key:      "license_key",
+									RawValue: "<%license_key goes here%>",
+								},
+								Config: ConfigElement{
+									FileName: "newrelic.yml",
+									FilePath: "/newrelic/",
+								},
+							},
+						},
+					},
+					"Base/Env/CollectSysProps": tasks.Result{
+						Status: tasks.Info,
+						Payload: []tasks.ProcIDSysProps{
+							tasks.ProcIDSysProps{
+								ProcID: 40149,
+								SysPropsKeyToVal: map[string]string{
+									"-Dnewrelic.config.license_key": "mylicensekey",
+								},
+							},
+						},
+					},
+				}
+			})
+
+			expectedResult := tasks.Result{
+				Status: tasks.Warning,
+				Payload: []LicenseKey{
+					{
+						Value:  "<%license_key goes here%>",
+						Source: "/newrelic/newrelic.yml",
+					},
+					{
+						Value:  "mylicensekey",
+						Source: "-Dnewrelic.config.license_key",
 					},
 				},
 			}
@@ -428,10 +601,8 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 			})
 
 			It("Should return a summary reporting unique license keys count along with each unique key", func() {
-				Expect(result.Summary).To(ContainSubstring("Multiple license keys detected:"))
-				Expect(result.Summary).To(ContainSubstring("'Schnauzer12' from '/etc/newrelic.yml'"))
-				Expect(result.Summary).To(ContainSubstring("'Banana' from 'NEW_RELIC_LICENSE_KEY'"))
-				Expect(result.Summary).To(ContainSubstring("'Banana' will be used by New Relic APM Agents"))
+				Expect(result.Summary).To(ContainSubstring("'mylicensekey' from '-Dnewrelic.config.license_key'"))
+				// Expect(result.Summary).To(ContainSubstring("'mylicensekey' from -Dnewrelic.config.license_key will be used by New Relic APM Agents"))
 			})
 
 			It("Should have a payload of found LicenseKeys", func() {
@@ -449,13 +620,13 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 						Payload: []ValidateElement{
 							ValidateElement{
 								ParsedResult: tasks.ValidateBlob{
-									Key:      "root",
+									Key: "root",
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob {
+										tasks.ValidateBlob{
 											Key:      "newrelic.license",
 											RawValue: "Banana",
 										},
-										tasks.ValidateBlob {
+										tasks.ValidateBlob{
 											Key:      "newrelic.license",
 											RawValue: "Banana",
 										},
@@ -467,13 +638,13 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 								},
 							}, ValidateElement{
 								ParsedResult: tasks.ValidateBlob{
-									Key:      "root",
+									Key: "root",
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob {
+										tasks.ValidateBlob{
 											Key:      "license_key",
 											RawValue: "Schnauzer12",
 										},
-										tasks.ValidateBlob {
+										tasks.ValidateBlob{
 											Key:      "license_key",
 											RawValue: "Schnauzer13",
 										},
@@ -500,11 +671,11 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 					{
 						Value:  "Schnauzer12",
 						Source: "/etc/newrelic.yml",
-					}, 
+					},
 					{
 						Value:  "Schnauzer13",
 						Source: "/etc/newrelic.yml",
-					}, 
+					},
 				},
 			}
 
@@ -530,11 +701,11 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
-						Status: tasks.None,
+						Status:  tasks.None,
 						Payload: []ValidateElement{},
 					},
 					"Base/Env/CollectEnvVars": tasks.Result{
-						Status: tasks.Success,
+						Status:  tasks.Success,
 						Payload: map[string]string{},
 					},
 				}

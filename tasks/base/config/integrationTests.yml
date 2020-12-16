@@ -105,16 +105,13 @@
      - Success.*Base/Collector/Connect
      - http://user:password@hostname:port
     docker_cmd: ./nrdiag -p http://127.0.0.1:8888 && cat nrdiag-output.json
- -  test_name: ProxyDetectEnvironmentOverride
+ -  test_name: ProxyDetectwithHTTPProxyEnvVar
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
     log_entry_expected:
+     - Success.*Base/Config/ProxyDetect
      - Failure.*Base/Collector/Connect
      - tcp 127.0.0.1:8888
-    log_entry_not_expected:
-     - Success.*Base/Config/ProxyDetect
-     - Success.*Base/Collector/Connect
-     - http://user:password@hostname:port
     docker_cmd: HTTP_PROXY=http://127.0.0.1:8888 ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectCLIEnvironmentOverride
     dockerfile_lines:
