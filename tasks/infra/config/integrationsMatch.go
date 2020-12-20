@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
@@ -52,6 +53,8 @@ var (
 	definitionFilepathsWindows   = []string{"C:\\Program Files\\New Relic\\newrelic-infra\\custom-integrations\\", "C:\\Program Files\\New Relic\\newrelic-infra\\newrelic-integrations\\"}
 	configurationFilepathLinux   = "/etc/newrelic-infra/integrations.d/"
 	configurationFilepathWindows = "C:\\Program Files\\New Relic\\newrelic-infra\\integrations.d\\"
+	//integration config files that do not come with a definition files
+	configWithNoDefinition = []string{"docker-config.yml"}
 )
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -66,7 +69,10 @@ func (p InfraConfigIntegrationsMatch) Explain() string {
 
 // Dependencies - Returns the dependencies for each task.
 func (p InfraConfigIntegrationsMatch) Dependencies() []string {
-	return []string{"Infra/Config/IntegrationsValidate"}
+	return []string{
+		"Infra/Config/IntegrationsValidate",
+		"Infra/Agent/Version",
+	}
 }
 
 // Execute - The core work within each task
@@ -95,10 +101,21 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 	//matchFilePairs will also validate filepath of the integration file. Filepath errors get collected in matchErrors
 	filePairs, matchErrors := p.matchFilePairs(integrationFiles)
 
+	//In December 2019, Infrastructure agent version 1.8.0 began supporting a newer configuration format that makes use of a single configuration file. Most integrations may still install a definition file though their usage is optional and the file can be removed. The docker-config.yml does not install a definition file at all.
+
+	isNewerInfraVersion, err := checkInfraVersion(upstream)
+
+	if err != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.ThisProgramFullName + " was unable to validate this health check because it ran into an unexpect error: " + err.Error(),
+		}
+	}
+
 	//Validate found IntegrationFilePairs to make sure they actually are pairs of definition and configuration files.
 	//If orphan definition or configuration files are found they are removed from the map and collected as IntegrationMatchErrors
 	//Valid filePairs have their yaml integration names validated for a match, else they are also collected into IntegrationMatchErrors
-	filePairs, validationErrors := validateIntegrationPairs(filePairs)
+	filePairs, validationErrors := validateIntegrationPairs(filePairs, isNewerInfraVersion)
 
 	//Merge all found IntegrationMatchErrors
 	matchErrors = append(matchErrors, validationErrors...)
@@ -244,9 +261,9 @@ func (p InfraConfigIntegrationsMatch) isValidIntegrationFilePath(integrationFile
 }
 
 //Valdates that a map of IntegrationFilePair actually have defined Configuration and Definition files.
-//If IntegrationFilePair only has one file, it is removed from the map and captued as an IntegrationMatchError
+//If IntegrationFilePair only has one file, it is removed from the map and captured as an IntegrationMatchError
 //If IntegrationFilePair has two files, this will validate that their integration names as parsed from the yaml match
-func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair) (map[string]*IntegrationFilePair, []IntegrationMatchError) {
+func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewerVersion bool) (map[string]*IntegrationFilePair, []IntegrationMatchError) {
 	matchErrors := []IntegrationMatchError{}
 
 	for integration, pair := range filePairs {
@@ -254,20 +271,24 @@ func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair) (map[st
 		if pair.Configuration.Config == (config.ValidateElement{}.Config) {
 			matchErrors = append(matchErrors, IntegrationMatchError{
 				IntegrationFile: pair.Definition,
-				Reason:          fmt.Sprintf("Definition file '%s%s' does not have matching Configuration file", pair.Definition.Config.FilePath, pair.Definition.Config.FileName),
+				Reason:          fmt.Sprintf("Definition file '%s%s' does not have matching Configuration file (%s-config.yml)", pair.Definition.Config.FilePath, pair.Definition.Config.FileName, integration),
 			})
 			delete(filePairs, integration)
 			continue
 			// if pair is missing definition
-		} else if pair.Definition.Config == (config.ValidateElement{}.Config) {
+		} else if pair.Definition.Config == (config.ValidateElement{}.Config) && isNewerVersion {
+			//version 1.8.0 and higher do not require a definition file
+			continue
+		} else if pair.Definition.Config == (config.ValidateElement{}.Config) && !isNewerVersion {
 			matchErrors = append(matchErrors, IntegrationMatchError{
 				IntegrationFile: pair.Configuration,
-				Reason:          fmt.Sprintf("Configuration file '%s%s' does not have matching Definition file", pair.Configuration.Config.FilePath, pair.Configuration.Config.FileName),
+				Reason:          fmt.Sprintf("Configuration file '%s%s' does not have matching Definition file (%s-definition.yml)", pair.Configuration.Config.FilePath, pair.Configuration.Config.FileName, integration),
 			})
 			delete(filePairs, integration)
 			continue
 		}
-		// we have two files, do their names match?
+
+		// Both files(config and definition) exist, do their names match?
 		isMatchedPair, nameMatchError := validateConfigPairNames(pair)
 		if !isMatchedPair {
 			matchErrors = append(matchErrors, nameMatchError...)
@@ -276,6 +297,19 @@ func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair) (map[st
 	}
 
 	return filePairs, matchErrors
+}
+
+func checkInfraVersion(upstream map[string]tasks.Result) (bool, error) {
+	installedInfraVersion, ok := upstream["Infra/Agent/Version"].Payload.(tasks.Ver)
+	if !ok {
+		log.Debug("failed for payload type assertion for Infra/Agent/Version task in Infra/Config/IntegrationsMatch")
+	}
+	infraVersionWithNewConfigFormat, err := tasks.ParseVersion("1.8.0")
+	if err != nil {
+		return false, err
+	}
+	isRecentVersion := installedInfraVersion.IsGreaterThanEq(infraVersionWithNewConfigFormat)
+	return isRecentVersion, nil
 }
 
 //Validates that IntegrationPair ValidateElements have matching integration names parsed from their yamls
