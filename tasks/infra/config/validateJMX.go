@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -224,17 +225,31 @@ func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
 }
 
 func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
-
 	// echo "*:type=*,name=*" | nrjmx -hostname 127.0.0.1 -port 9999 --verbose true // basic command that returns all the things
 	// this queries for all beans, and givens back all types and all names
-	cmd1 := tasks.CmdWrapper{
-		Cmd:  "echo",
-		Args: []string{"*:type=*,name=*"},
+	var cmd1 tasks.CmdWrapper
+	if runtime.GOOS == "windows" {
+		//The first argument passed to exec.Command is the name of an executable (somefile.exe) and "echo" is not. To use shell commands, call the shell executable, and pass in the built-in command (and parameters)
+		cmd1 = tasks.CmdWrapper{
+			Cmd:  "cmd.exe",
+			Args: []string{"/C", "echo", "*:type=*,name=*"},
+		}
+	} else {
+		cmd1 = tasks.CmdWrapper{
+			Cmd:  "echo",
+			Args: []string{"*:type=*,name=*"},
+		}
 	}
 
 	jmxArgs := buildNrjmxArgs(detectedConfig)
+	var nrjmxCmd string
+	if runtime.GOOS == "windows" {
+		nrjmxCmd = `C:\Program Files\New Relic\nrjmx\nrjmx` //backticks to escape backslashes
+	} else {
+		nrjmxCmd = "nrjmx"
+	}
 	cmd2 := tasks.CmdWrapper{
-		Cmd:  "nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
+		Cmd:  nrjmxCmd, // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
 		Args: jmxArgs,
 	}
 
