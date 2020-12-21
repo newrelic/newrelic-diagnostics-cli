@@ -591,7 +591,6 @@ var defaultEnvVarFilter = []string{
 	"^APP_ENV$",
 	"^RACK_ENV$",
 	"^LOCALAPPDATA$",
-	"^DOTNET_SDK_VERSION$",
 	"^DOTNET_INSTALL_PATH$",
 	"^COR_PROFILER$",
 	"^COR_PROFILER_PATH$",

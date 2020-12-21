@@ -1,9 +1,9 @@
 package env
 
 import (
-	"os"
 	"errors"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -51,7 +51,6 @@ func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[strin
 
 	if versions == nil || len(versions) < 1 {
 		if checkVersionsErrorDetails != nil || checkVersionErrorCount > 0 {
-			logger.Debug("DotNetCoreVersions - Error determining the version .NET Core installed. There were", checkVersionErrorCount, "errors. Please check previous log entries for other errors. The last error seen was: ", checkVersionsErrorDetails.Error())
 			result.Status = tasks.Error
 			result.Summary = "Error determining the version .NET Core installed."
 			return result
@@ -81,18 +80,22 @@ func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[strin
 func checkVersions(envVars map[string]string) (versions []string, countErrors int, retErr error) {
 	countErrors = 0
 
-	// first check if version is in env vars
-	versionFromEnvVars := envVars["DOTNET_SDK_VERSION"]
-	if versionFromEnvVars != "" {
-		logger.Debug("DotNetCoreVersions - found .NET Core version in DOTNET_SDK_VERSION Env Var")
-		return append(versions, versionFromEnvVars), countErrors, retErr
+	// first check if version is accesible through the cmdline
+	//dotnet --version will Display .NET Core SDK version. Ex: 5.0.101
+	version, err := tasks.CmdExecutor("dotnet", "--version")
+
+	if err != nil {
+		countErrors++
+		logger.Debug("unable to get the version with the cmd dotnet --version:", err)
+	} else {
+		return []string{string(version)}, countErrors, nil
 	}
 
 	// check dirs
 	dirsToRead, retErr := buildDirsToRead(envVars)
 	if retErr != nil {
 		countErrors++
-		return nil, countErrors, retErr
+		return []string{}, countErrors, retErr
 	}
 
 	logger.Debug("DotNetCoreVersions - dirs to read:", dirsToRead)
