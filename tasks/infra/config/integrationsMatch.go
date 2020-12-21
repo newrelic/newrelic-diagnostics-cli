@@ -53,8 +53,6 @@ var (
 	definitionFilepathsWindows   = []string{"C:\\Program Files\\New Relic\\newrelic-infra\\custom-integrations\\", "C:\\Program Files\\New Relic\\newrelic-infra\\newrelic-integrations\\"}
 	configurationFilepathLinux   = "/etc/newrelic-infra/integrations.d/"
 	configurationFilepathWindows = "C:\\Program Files\\New Relic\\newrelic-infra\\integrations.d\\"
-	//integration config files that do not come with a definition files
-	configWithNoDefinition = []string{"docker-config.yml"}
 )
 
 // Identifier - This returns the Category, Subcategory and Name of each task
