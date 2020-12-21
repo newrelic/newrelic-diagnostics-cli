@@ -8,9 +8,9 @@ import (
 
 // RegisterWith - will register any plugins in this package
 func RegisterLinuxWith(registrationFunc func(tasks.Task, bool)) {
-	log.Debug("Registering Base/Env/*")
+	log.Debug("Registering Infra/Env/*")
 
-	registrationFunc(BaseEnvCheckSELinux{
+	registrationFunc(InfraEnvValidateZookeeperPath{
 		cmdExec: tasks.CmdExecutor,
 	}, true)
 }
