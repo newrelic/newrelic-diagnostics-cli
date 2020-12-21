@@ -90,11 +90,11 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
 					"DotNet/Env/TargetVersion": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "3.0",
+						Payload: []string{"3.0"},
 					},
 					"DotNet/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "7.0.2.0",
+						Payload: "8.3.360.0",
 					},
 				}
 			})
@@ -102,31 +102,10 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("The detected Target .NET version is not supported by any .NET agent version: 3.0"))
+				Expect(result.Summary).To(Equal("We found a Target Framework version(s) that is not supported by the New Relic .NET agent: 3.0"))
 			})
 		})
-		Context("With error parsing dotnet framework", func() {
-			BeforeEach(func() {
-				options = tasks.Options{}
-				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{
-						Status:  tasks.Info,
-						Summary: "4.0",
-					},
-					"DotNet/Agent/Version": tasks.Result{
-						Status:  tasks.Info,
-						Summary: "hot dogs and baloney",
-					},
-				}
-			})
-			It("Should return Error status", func() {
-				Expect(result.Status).To(Equal(tasks.Error))
-			})
-			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Error parsing Target .Net Agent version Unable to convert hot dogs and baloney to an integer"))
-			})
-		})
+
 		Context("With multiple target frameworks and only one is supported", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
@@ -134,19 +113,19 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
 					"DotNet/Env/TargetVersion": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "4.5,4.0",
+						Payload: []string{"4.5", "4.0"},
 					},
 					"DotNet/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "7.0.2.0",
+						Payload: "7.0.2.0",
 					},
 				}
 			})
 			It("Should return Warning status", func() {
-				Expect(result.Status).To(Equal(tasks.Warning))
+				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Detected multiple target .NET versions.\nThe target .NET versions detected as: 4.5,4.0 and Agent version detected as: 7.0.2.0\nIncompatible Version detected: 4.0\nCompatible Version detected: 4.5\n"))
+				Expect(result.Summary).To(Equal("We found that your New Relic .NET agent version 7.0.2.0 is not compatible with the following Target .NET version(s): 4.0"))
 			})
 		})
 		Context("With success for one target framework version", func() {
@@ -156,11 +135,11 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
 					"DotNet/Env/TargetVersion": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "4.5",
+						Payload: []string{"4.5", "4.6"},
 					},
 					"DotNet/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "7.0.2.0",
+						Payload: "7.0.2.0",
 					},
 				}
 			})
@@ -168,31 +147,10 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Compatible Version detected: 4.5\n"))
+				Expect(result.Summary).To(Equal("Your .NET agent version 7.0.2.0 is fully compatible with the following found Target .NET version(s): 4.5, 4.6"))
 			})
 		})
-		Context("With success for multiple target framework versions", func() {
-			BeforeEach(func() {
-				options = tasks.Options{}
-				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{
-						Status:  tasks.Info,
-						Summary: "4.5, 4.6",
-					},
-					"DotNet/Agent/Version": tasks.Result{
-						Status:  tasks.Info,
-						Summary: "7.0.2.0",
-					},
-				}
-			})
-			It("Should return Success status", func() {
-				Expect(result.Status).To(Equal(tasks.Success))
-			})
-			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Compatible Version detected: 4.5\nCompatible Version detected: 4.6\n"))
-			})
-		})
+
 		Context("With multiple dotnet target versions detected and neither are compatible", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
@@ -200,11 +158,11 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
 					"DotNet/Env/TargetVersion": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "3.5, 4.0",
+						Payload: []string{"3.5", "4.0"},
 					},
 					"DotNet/Agent/Version": tasks.Result{
 						Status:  tasks.Info,
-						Summary: "7.0.2.0",
+						Payload: "7.0.2.0",
 					},
 				}
 			})
@@ -212,54 +170,9 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Detected multiple target .NET versions.\nThe target .NET versions detected as: 3.5,4.0 and Agent version detected as: 7.0.2.0\nIncompatible Version detected: 3.5\nIncompatible Version detected: 4.0\n"))
+				Expect(result.Summary).To(Equal("We found that your New Relic .NET agent version 7.0.2.0 is not compatible with the following Target .NET version(s): 3.5, 4.0"))
 			})
 		})
-		/*
-			Context("With compatible versions multiple dotnet targets", func() {
-				BeforeEach(func() {
-					options = tasks.Options{}
-					upstream = map[string]tasks.Result{
-						"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-						"DotNet/Env/TargetVersion": tasks.Result{
-							Status:  tasks.Info,
-							Summary: "4.5, 4.5",
-						},
-						"DotNet/Agent/Version": tasks.Result{
-							Status:  tasks.Info,
-							Summary: "6.18",
-						},
-					}
-				})
-				It("Should return Success status", func() {
-					Expect(result.Status).To(Equal(tasks.Success))
-				})
-				It("Should return expected summary", func() {
-					Expect(result.Summary).To(Equal(".Net target and Agent version compatible. .Net Target detected as 4.5, Agent version detected as 6.18"))
-				})
-			})
-			Context("With invalid combination of versions", func() {
-				BeforeEach(func() {
-					options = tasks.Options{}
-					upstream = map[string]tasks.Result{
-						"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-						"DotNet/Env/TargetVersion": tasks.Result{
-							Status:  tasks.Info,
-							Summary: "4",
-						},
-						"DotNet/Agent/Version": tasks.Result{
-							Status:  tasks.Info,
-							Summary: "7.0.2.0",
-						},
-					}
-				})
-				It("Should return Failure status", func() {
-					Expect(result.Status).To(Equal(tasks.Failure))
-				})
-				It("Should return expected summary", func() {
-					Expect(result.Summary).To(Equal("App detected as targeting a version of .Net below 4.5 with an Agent version of 7 or above. .Net Target detected as 4, Agent version detected as 7.0.2.0"))
-				})
-			})*/
 
 	})
 })
