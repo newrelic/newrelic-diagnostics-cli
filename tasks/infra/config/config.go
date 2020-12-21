@@ -20,10 +20,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		runtimeOS: runtime.GOOS,
 	}, true)
 	registrationFunc(InfraConfigIntegrationsValidateJson{}, true)
-
-	if runtime.GOOS != "windows" {
-		registrationFunc(InfraConfigValidateJMX{
-			mCmdExecutor: tasks.MultiCmdExecutor,
-		}, true)
-	}
+	registrationFunc(InfraConfigValidateJMX{
+		mCmdExecutor: tasks.MultiCmdExecutor,
+	}, true)
 }
