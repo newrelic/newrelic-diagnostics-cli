@@ -94,3 +94,4 @@ var DotnetCoreSupportedVersions = map[string][]string{
 }
 
 //https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-core#net-version
+//Make sure to add more Variables as they change
