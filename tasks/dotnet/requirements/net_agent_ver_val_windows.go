@@ -1,9 +1,12 @@
 package requirements
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
 
 // DotnetRequirementsNetTargetAgentVerValidate - This struct defines the task
@@ -17,7 +20,7 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Identifier() tasks.Identifi
 
 // Explain - Returns the help text for this task
 func (t DotnetRequirementsNetTargetAgentVerValidate) Explain() string {
-	return "Check application's .NET version compatibility with New Relic .NET agent"
+	return "Check application's .NET Framework version compatibility with New Relic .NET agent"
 }
 
 // Dependencies - Returns the dependencies for this task.
@@ -32,65 +35,121 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Dependencies() []string {
 // Execute - The core work within this task
 func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	depsOK, failureSummary := checkDependencies(upstream)
+	depsOK, thisTaskDidNotRunSummary := checkDependencies(upstream)
 
 	if !depsOK {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: failureSummary,
+			Summary: thisTaskDidNotRunSummary,
 		}
 	}
 
-	agentVer := upstream["DotNet/Agent/Version"].Summary
-	appTarget := strings.Replace(upstream["DotNet/Env/TargetVersion"].Summary, " ", "", -1)
-	targetSplitList := strings.Split(appTarget, ",")
-
-	//The .Net target version check can pick up multiple config files
-	//If there are multiple versions of .Net targeted it indicates an issue
-
-	if !checkConsistentTargets(targetSplitList) {
+	agentVersion, ok := upstream["DotNet/Agent/Version"].Payload.(string) //Examples of how this string looks like: 8.30.0.0 or 8.3.360.0
+	if !ok {
 		return tasks.Result{
-			Status:  tasks.Warning,
-			Summary: "Detected multiple versions for .Net Target or unable to determine targets. .Net Targets detected as " + appTarget + ", Agent version detected as " + agentVer,
+			Status:  tasks.None,
+			Summary: "Type Assertion failure from upstream task DotNet/Agent/Version in DotNet/Requirements/NetTargetAgentVersionValidate",
 		}
 	}
-	dotnetTargetVersion, err := tasks.ParseVersion(targetSplitList[0])
+
+	frameworkVersions, ok := upstream["DotNet/Env/TargetVersion"].Payload.([]string) //gets a slice containing multiple dotnet versions: .Net Targets detected as 4.6,4.6,4.6,4.7.2,4.6
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Type Assertion failure from upstream task DotNet/Env/TargetVersion in DotNet/Requirements/NetTargetAgentVersionValidate",
+		}
+	}
+
+	//truncate framework versions to only use two digits (if they happen to be more than two) because both our map and documentation ignores any patch version to assess if it is supported
+	truncatedFrameworkVersions, err := removePatchBuildDigits(frameworkVersions)
+
 	if err != nil {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Error parsing Target .Net version " + err.Error(),
+			Summary: tasks.ThisProgramFullName + " was unable to validate that your .NET agent version is compatible with your .NET target version because it ran into an unexpected error: " + err.Error(),
 		}
 	}
 
-	//If the app targets a below 2.0, none of our Agents will support it
-	minTargetVersion := []string{"2+"}
-	isCompatible, _ := dotnetTargetVersion.CheckCompatibility(minTargetVersion)
-	if !isCompatible {
+	var unsupportedFrameworkVersions []string
+	var incompatibleFrameworkVersions []string
+
+	for _, frameworkVer := range truncatedFrameworkVersions {
+		isFrameworkVerSupported, requiredAgentVersions := checkFrameworkVerIsSupported(frameworkVer)
+		if !isFrameworkVerSupported {
+			unsupportedFrameworkVersions = append(unsupportedFrameworkVersions, frameworkVer)
+			continue
+		}
+		isCompatibleWithAgent, err := checkCompatibilityWithAgentVer(requiredAgentVersions, agentVersion)
+
+		if err != nil {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: tasks.ThisProgramFullName + " was unable to validate that your .NET agent version is compatible with your .NET target version because it ran into an unexpected error: " + err.Error(),
+			}
+		}
+		if !isCompatibleWithAgent {
+			incompatibleFrameworkVersions = append(incompatibleFrameworkVersions, frameworkVer)
+		}
+	}
+
+	var failureSummary string
+	if len(unsupportedFrameworkVersions) > 0 {
+		failureSummary += fmt.Sprintf("We found a Target Framework version(s) that is not supported by the New Relic .NET agent: %s", strings.Join(unsupportedFrameworkVersions, ", "))
+	}
+	if len(incompatibleFrameworkVersions) > 0 {
+		failureSummary += fmt.Sprintf("We found that your New Relic .NET agent version %s is not compatible with the following Target .NET version(s): %s", agentVersion, strings.Join(incompatibleFrameworkVersions, ", "))
+	}
+
+	legacyDocURL := "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/technical-support-net-framework-40-or-lower"
+	requirementsDocURL := "https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework"
+
+	if len(failureSummary) > 0 {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "Target .Net version detected as below 2.0. This version of .Net is not supported by any agent versions",
+			Summary: failureSummary,
+			URL:     requirementsDocURL + "\n" + legacyDocURL,
 		}
 	}
 
-	agentVersion, err := tasks.ParseVersion(agentVer)
-	if err != nil {
-		return tasks.Result{
-			Status:  tasks.Error,
-			Summary: "Error parsing Agent version",
-		}
-	}
-
-	//Only the major version of the Agent matters for this check
-	if checkVersionOk(dotnetTargetVersion, agentVersion.Major) {
-		return tasks.Result{
-			Status:  tasks.Success,
-			Summary: ".Net target and Agent version compatible. .Net Target detected as " + targetSplitList[0] + ", Agent version detected as " + agentVer,
-		}
-	}
 	return tasks.Result{
-		Status:  tasks.Failure,
-		Summary: "App detected as targeting a version of .Net below 4.5 with an Agent version of 7 or above. .Net Target detected as " + targetSplitList[0] + ", Agent version detected as " + agentVer,
+		Status:  tasks.Success,
+		Summary: fmt.Sprintf("Your .NET agent version %s is fully compatible with the following found Target .NET version(s): %s", agentVersion, strings.Join(frameworkVersions, ", ")),
 	}
+
+}
+
+func removePatchBuildDigits(frameworkVersions []string) ([]string, error) {
+	var truncatedVersions []string
+	for _, version := range frameworkVersions {
+		v, err := tasks.ParseVersion(version)
+		if err != nil {
+			return truncatedVersions, err
+		}
+		truncatedVersion := strconv.Itoa(v.Major) + "." + strconv.Itoa(v.Minor)
+		truncatedVersions = append(truncatedVersions, truncatedVersion)
+
+	}
+	return truncatedVersions, nil
+
+}
+
+func checkCompatibilityWithAgentVer(requiredAgentVersions []string, agentVersion string) (bool, error) {
+	isCompatible, err := tasks.VersionIsCompatible(agentVersion, requiredAgentVersions)
+	if err != nil {
+		return false, err
+	}
+
+	return isCompatible, nil
+}
+
+func checkFrameworkVerIsSupported(frameworkVer string) (bool, []string) {
+	requiredAgentVersions, isFrameworkVerSupported := compatibilityVars.DotnetFrameworkSupportedVersions[frameworkVer]
+	if isFrameworkVerSupported {
+		return true, requiredAgentVersions
+	}
+	requiredLegacyAgentVersions, isOldFrameworkVerSupported := compatibilityVars.DotnetFrameworkOldVersions[frameworkVer]
+
+	return isOldFrameworkVerSupported, requiredLegacyAgentVersions
 }
 
 func checkDependencies(upstream map[string]tasks.Result) (bool, string) {
@@ -106,28 +165,4 @@ func checkDependencies(upstream map[string]tasks.Result) (bool, string) {
 		return false, "Did not detect .Net Agent version, this check did not run"
 	}
 	return true, ""
-}
-
-func checkVersionOk(appTarget tasks.Ver, AgentVersion int) bool {
-	//This is the only combination that will cause issues, so everything else is fine
-	// minAppTarget := tasks.Ver{Major: 4, Minor: 4, Patch: 999} //This allows us to compare to less than 4.5 with less than or equal
-	minAppTarget := []string{"4.5+"}
-	isCompatible, _ := appTarget.CheckCompatibility(minAppTarget)
-	if !isCompatible && AgentVersion >= 7 {
-		return false
-	}
-	return true
-}
-
-func checkConsistentTargets(targetSplitList []string) bool {
-	if len(targetSplitList) > 1 {
-		for _, v := range targetSplitList {
-			for _, subV := range targetSplitList {
-				if v != subV {
-					return false
-				}
-			}
-		}
-	}
-	return true
 }

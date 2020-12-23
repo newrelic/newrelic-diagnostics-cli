@@ -4,28 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 	"strconv"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
 
 //https://github.com/edmorley/newrelic-python-agent/blame/master/newrelic/setup.py#L100
-var rubyVersionAgentSupportability = map[string][]string{
-	//the keys are the ruby version and the values are the agent versions that support that specific version
-	"2.7":   []string{"6.9.0.363+"},
-	"2.6":   []string{"5.7.0.350+"},
-	"2.5":   []string{"4.8.0.341+"},
-	"2.4":   []string{"3.18.0.329+"},
-	"2.3":   []string{"3.9.9.275+"},
-	"2.2":   []string{"3.9.9.275+"},
-	"2.1":   []string{"3.9.9.275+"},
-	"2.0":   []string{"3.9.6.257+"},
-	"1.9.3": []string{"3.9.6.257-3.18.1.330"},
-	"1.9.2": []string{"3.9.6.257-3.18.1.330"},
-	"1.8.7": []string{"3.9.6.257-3.18.1.330"},
-}
 
 // RubyRequirementsVersion  - This struct defines the Ruby Version requirement
 type RubyRequirementsVersion struct {
@@ -78,7 +65,7 @@ func (t RubyRequirementsVersion) Execute(options tasks.Options, upstream map[str
 		}
 	}
 
-	requiredAgentVersions, isRubyVersionSupported := rubyVersionAgentSupportability[sanitizedRubyVersion]
+	requiredAgentVersions, isRubyVersionSupported := compatibilityVars.RubyVersionAgentSupportability[sanitizedRubyVersion]
 
 	if !isRubyVersionSupported {
 		return tasks.Result{

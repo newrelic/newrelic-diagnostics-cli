@@ -3,9 +3,9 @@ package requirements
 import (
 	"fmt"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Python/Requirements/PythonVersion", func() {

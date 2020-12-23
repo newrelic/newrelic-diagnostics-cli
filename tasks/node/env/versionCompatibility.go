@@ -2,16 +2,15 @@ package env
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
-
-// To update compatibility requirements, modify what's the contents of supportedNodeVersions
-// which are passed to this task's registrationFunc in this package's defintiion file (./env.go)
 
 // NodeEnvVersionCompatibility - This struct defines Node.js version compatibility
 type NodeEnvVersionCompatibility struct {
-	supportedNodeVersions []string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -26,7 +25,10 @@ func (p NodeEnvVersionCompatibility) Explain() string {
 
 // Dependencies - Returns the dependencies for each task.
 func (p NodeEnvVersionCompatibility) Dependencies() []string {
-	return []string{"Node/Env/Version"}
+	return []string{
+		"Node/Env/Version",
+		"Node/Agent/Version",
+	}
 }
 
 // Execute - The core work within each task
@@ -39,15 +41,42 @@ func (p NodeEnvVersionCompatibility) Execute(options tasks.Options, upstream map
 		}
 	}
 
+	if upstream["Node/Agent/Version"].Status != tasks.Info {
+		return tasks.Result{
+			Summary: "Node Agent Version not detected. This task didn't run.",
+			Status:  tasks.None,
+		}
+	}
+
 	nodeVersion, ok := upstream["Node/Env/Version"].Payload.(tasks.Ver)
-	if !ok {
+	agentVersion, valid := upstream["Node/Agent/Version"].Payload.(string)
+	if !ok || !valid {
 		return tasks.Result{
 			Summary: "Task did not meet requirements necessary to run: type assertion failure",
 			Status:  tasks.None,
 		}
 	}
+	sanitizedNodeVersion := sanitizeNodeVersion(nodeVersion.String())
 
-	isItCompatible, err := nodeVersion.CheckCompatibility(p.supportedNodeVersions)
+	requiredAgentVersions, isNodeVersionSupported := compatibilityVars.NodeSupportedVersions[sanitizedNodeVersion]
+
+	if !isNodeVersionSupported {
+		if isOddVersion(sanitizedNodeVersion) {
+			return tasks.Result{
+				Status:  tasks.Warning,
+				Summary: fmt.Sprintf("Your %s Node Version is not officially supported by the Node Agent because odd versions are considered unstable/experimental releases", sanitizedNodeVersion),
+			}
+		}
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: fmt.Sprintf("Your %s Node version is not in the list of supported versions by the Node Agent. Please review our documentation on version requirements", nodeVersion),
+			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+		}
+	}
+
+	//we are dealing with a supported node version, but is it compatible with the agent version they are using?
+	isAgentVersionCompatible, err := tasks.VersionIsCompatible(agentVersion, requiredAgentVersions)
+
 	if err != nil {
 		return tasks.Result{
 			Summary: "There was an issue when checking for Node.js Version compatibility: " + err.Error(),
@@ -55,7 +84,7 @@ func (p NodeEnvVersionCompatibility) Execute(options tasks.Options, upstream map
 		}
 	}
 
-	if !isItCompatible {
+	if !isAgentVersionCompatible {
 		return tasks.Result{
 			Summary: fmt.Sprintf("Your current Node.js version, %v, is not compatible with New Relic's Node.js agent", nodeVersion),
 			Status:  tasks.Failure,
@@ -68,4 +97,14 @@ func (p NodeEnvVersionCompatibility) Execute(options tasks.Options, upstream map
 		Status:  tasks.Success,
 	}
 
+}
+
+func sanitizeNodeVersion(nodeVersion string) string {
+	versionDigits := strings.Split(nodeVersion, ".")
+	return versionDigits[0]
+}
+
+func isOddVersion(nodeVersion string) bool {
+	i, _ := strconv.Atoi(nodeVersion)
+	return i%2 != 0
 }
