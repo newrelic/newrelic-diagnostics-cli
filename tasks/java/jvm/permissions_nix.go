@@ -27,7 +27,7 @@ var (
 	logPathSysPropSource    = "-Dnewrelic"
 	logPathDefaultLocation  = "/logs/newrelic_agent.log"
 	nrTempDirKey            = "-Dnewrelic.tempdir" //can only be set as sys prop not as an env var neither the config file
-	javaTmpDirKey           = "-Djava.io.tmpdir"   //On UNIX systems the default value of this property can be "/tmp" or "/var/tmp"; on Windows "c:\temp". A different path value may be given through this system property
+	javaTmpDirKey           = "-Djava.io.tmpdir"   //On UNIX systems the default value of this property can be "/tmp" or "/var/tmp" or "/var/folders/"; on Windows "c:\temp". A different path value may be given through this system property
 
 	//expected permissions users must have to get the Java agent configuration to work:
 	fileOwnerPermissionsRgx          = "-r.+"
@@ -38,8 +38,8 @@ var (
 	dirPublicPermissionsRgx          = "[drwx-]{8}wx"
 	errPermissionsCannotBeDetermined = errors.New("Permissions cannot be determined")
 	errTempDirDoesNotExist           = errors.New("Diagnostics CLi was unable to find the temp directory location for this host")
-	errTempDirHasNoJars              = errors.New("Diagnostics CLi was unable to find the New Relic tmp jar files")
-	tempDirRecommendation            = "If you are seeing a java.io.IOException in the New Relic logs, we recommend to manually create the tmp directory passing -Djava.io.tmpdir or -Dnewrelic.tempdir as a JVM argument at runtime. The Java Agent needs this temp directory to create temp JAR files"
+	errTempDirHasNoJars              = errors.New("Diagnostics CLi was unable to find the New Relic tmp jar files or the directory where they are located")
+	tempDirRecommendation            = "ONLY if you are seeing a java.io.IOException in the New Relic logs, manually create the tmp directory passing -Djava.io.tmpdir or -Dnewrelic.tempdir as a JVM argument at runtime (the Java Agent uses this temp directory to create temporary JAR files)."
 )
 
 /* JavaAgentPermissions - struct used to construct the eventual result payload */
@@ -135,7 +135,7 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 
 		if anyPermissionDenied {
 			failureCount++
-			failureSummary += fmt.Sprintf("The process for the for PID %d did not meet the New Relic Java Agent permissions requirements. Errors found:\n%s", process.Proc.Pid, buildErrMsg(&j))
+			failureSummary += fmt.Sprintf("The process for the for PID %d did not meet the New Relic Java Agent permissions requirements. Errors found:\n\n%s", process.Proc.Pid, buildErrMsg(&j))
 		} else if anyPermissionUndetermined {
 			warningCount++
 			warningSummary += fmt.Sprintf(tasks.ThisProgramFullName+" ran into some unexpected errors and was unable to verify that your application meets the Java agent permissions requirements for the following reasons:\n%s", buildErrMsg(&j))
@@ -172,16 +172,16 @@ func buildErrMsg(j *JavaAgentPermissions) string {
 	var errorsFound string
 
 	if j.AgentJarCanRead.ErrorMsg != nil {
-		errorsFound += (j.AgentJarCanRead.ErrorMsg).Error() + "\n"
+		errorsFound += (j.AgentJarCanRead.ErrorMsg).Error() + "\n\n"
 	}
 	if j.LogCanCreate.ErrorMsg != nil {
-		errorsFound += (j.LogCanCreate.ErrorMsg).Error() + "\n"
+		errorsFound += (j.LogCanCreate.ErrorMsg).Error() + "\n\n"
 	}
 	if (j.TempFilesCanCreate.ErrorMsg) != nil {
 		if errors.Is(j.TempFilesCanCreate.ErrorMsg, errTempDirHasNoJars) {
-			errorsFound += (j.TempFilesCanCreate.ErrorMsg).Error() + "\n" + tempDirRecommendation
+			errorsFound += (j.TempFilesCanCreate.ErrorMsg).Error() + ": " + tempDirRecommendation
 		} else {
-			errorsFound += (j.TempFilesCanCreate.ErrorMsg).Error() + "\n"
+			errorsFound += (j.TempFilesCanCreate.ErrorMsg).Error() + "\n\n"
 		}
 	}
 	return errorsFound
@@ -293,65 +293,62 @@ func canCreateFilesInTempDir(proc process.Process, tempDir string) (err error) {
 }
 
 func determineLogPermissions(proc process.Process, jarPath string, upstream map[string]tasks.Result, j *JavaAgentPermissions) {
+	//attempt to get the log file path by looking into the logElements provided by the Base/Log/Copy task
 	logElements, ok := upstream["Base/Log/Copy"].Payload.([]baseLog.LogElement)
-
 	if !ok {
 		log.Debug("We ran into an type assertion error for Base/Log/Copy payload in JavaJVMPermissions task")
 	}
 
 	var logFilePath, logFilePathSource string
-	var isLogStdout bool
+
 	for _, logElement := range logElements {
 		configMap := logElement.Source.KeyVals
 		for configKey, configVal := range configMap {
 			if configKey == logPathEnvVarSource || strings.Contains(configKey, logPathSysPropSource) || configKey == logPathConfigFileSource {
 				if configVal == "stdout" {
-					isLogStdout = true
-					j.LogCanCreate.SuccessLevel = undetermined
+					j.LogCanCreate.SuccessLevel = granted
+					j.LogCanCreate.Source = configKey
+					j.LogCanCreate.Value = configVal
+					return
 				}
 				logFilePath = logElement.Source.FullPath
 				logFilePathSource = logElement.Source.FoundBy
-			} else {
-				logFilePath = filepath.Join(filepath.Dir(jarPath), logPathDefaultLocation)
-				logFilePathSource = "Default location (directory where newrelic.jar is) in which the New Relic java agent will create its logs directory."
 			}
 		}
 	}
+
+	if len(logFilePath) < 1 {
+		logFilePath = filepath.Join(filepath.Dir(jarPath), logPathDefaultLocation)
+		logFilePathSource = "Default location (directory where newrelic.jar is) in which the New Relic java agent would attempt to create its log file"
+	}
+
 	//assign javaAgentPermissions values for new relic log file
 	j.LogCanCreate.Source = logFilePathSource
 	j.LogCanCreate.Value = logFilePath
 	j.PID = proc.Pid
-
-	if !isLogStdout {
-		err := canCreateAgentLog(proc, logFilePath)
-		if err != nil {
-			if errors.Is(err, errPermissionsCannotBeDetermined) {
-				j.LogCanCreate.SuccessLevel = undetermined
-				j.LogCanCreate.ErrorMsg = err
-			} else {
-				j.LogCanCreate.SuccessLevel = denied
-				j.LogCanCreate.ErrorMsg = err
-			}
+	err := canCreateAgentLog(proc, logFilePath, jarPath)
+	if err != nil {
+		if errors.Is(err, errPermissionsCannotBeDetermined) {
+			j.LogCanCreate.SuccessLevel = undetermined
+			j.LogCanCreate.ErrorMsg = err
 		} else {
-			j.LogCanCreate.SuccessLevel = granted
+			j.LogCanCreate.SuccessLevel = denied
+			j.LogCanCreate.ErrorMsg = err
 		}
+	} else {
+		j.LogCanCreate.SuccessLevel = granted
 	}
 }
 
-/* need write/execute access to log dir */
-func canCreateAgentLog(proc process.Process, logFilePath string) (err error) {
-	/* logs file already exists; return success */
-	_, errFileExist := os.Stat(logFilePath)
-
-	if errFileExist == nil {
-		return nil
-	}
-	//if errFileExist != nil and file does not exist, we are going to ignore it assuming that they may not have generated logs yet, so we should still check that the directory has the permissions to write logs
-
+/* need write/execute access to log directory */
+func canCreateAgentLog(proc process.Process, logFilePath, jarPath string) (err error) {
 	logDir := filepath.Dir(logFilePath)
-
-	if _, errDirExist := os.Stat(logDir); errDirExist != nil {
-		return fmt.Errorf("%s: %w for %s", errDirExist.Error(), errPermissionsCannotBeDetermined, logDir)
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		log.Debug("logs directory does not exist: ", logDir)
+		logDir = filepath.Dir(jarPath) //check if we have permissions to write /logs/ directory in the directory where jar lives
+		if _, errJarPath := os.Stat(logDir); os.IsNotExist(errJarPath) {
+			return fmt.Errorf("%s: %w for %s", err.Error(), errPermissionsCannotBeDetermined, logDir)
+		}
 	}
 
 	procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err := getUIDsGIDs(proc, logDir)
@@ -381,7 +378,7 @@ func canCreateAgentLog(proc process.Process, logFilePath string) (err error) {
 		return fmt.Errorf("%s: %w for %s", errRegexMatch.Error(), errPermissionsCannotBeDetermined, logDir)
 	}
 	if !matchedPermissions {
-		return fmt.Errorf("The owner of the process for PID %d does not have permissions to create the Agent log file located at %s: %s", proc.Pid, logFilePath, fmt.Sprint(filePerm))
+		return fmt.Errorf("The owner of the process for PID %d does not have permissions to create the Agent log file in the directory %s: %s", proc.Pid, logDir, fmt.Sprint(filePerm))
 	}
 	return nil
 }
