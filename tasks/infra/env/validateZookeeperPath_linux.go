@@ -98,7 +98,7 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 	if zookeeperShellPath == "" {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: `This health check cannot be completed because it requires running the zookeeper-shell script and we were unable to locate your Kafka directory through the current $PATH. If you are sure to have it, and happen to be running "sudo" alongside our Diagnostics CLI tool, keep in mind that "sudo" will reset your path. You can avoid this with: sudo env "PATH=$PATH"`,
+			Summary: `This health check cannot be completed because it requires running the zookeeper-shell script and we were unable to locate your Kafka directory through the current $PATH. If you are sure to have it, and happen to be running "sudo" alongside our Diagnostics CLI tool, keep in mind that "sudo" will reset your path. You can avoid this with: sudo -E`,
 		}
 	}
 	/*how we pass the args to the zk shell may differ depending on the version of the shell:
