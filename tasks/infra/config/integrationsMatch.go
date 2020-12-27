@@ -274,16 +274,17 @@ func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewer
 			delete(filePairs, integration)
 			continue
 			// if pair is missing definition
-		} else if pair.Definition.Config == (config.ValidateElement{}.Config) && isNewerVersion {
-			//version 1.8.0 and higher do not require a definition file
-			continue
-		} else if pair.Definition.Config == (config.ValidateElement{}.Config) && !isNewerVersion {
-			matchErrors = append(matchErrors, IntegrationMatchError{
-				IntegrationFile: pair.Configuration,
-				Reason:          fmt.Sprintf("Configuration file '%s%s' does not have matching Definition file (%s-definition.yml)", pair.Configuration.Config.FilePath, pair.Configuration.Config.FileName, integration),
-			})
-			delete(filePairs, integration)
-			continue
+		} else if pair.Definition.Config == (config.ValidateElement{}.Config) {
+			if isNewerVersion && isConfigFileV4(pair.Configuration) { //version 1.8.0 and higher do not require a definition file as long as user has updated the config file to the format v4
+				continue
+			} else {
+				matchErrors = append(matchErrors, IntegrationMatchError{
+					IntegrationFile: pair.Configuration,
+					Reason:          fmt.Sprintf("Configuration file '%s%s' does not have matching Definition file (%s-definition.yml)", pair.Configuration.Config.FilePath, pair.Configuration.Config.FileName, integration),
+				})
+				delete(filePairs, integration)
+				continue
+			}
 		}
 
 		// Both files(config and definition) exist, do their names match?
@@ -297,6 +298,22 @@ func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewer
 	return filePairs, matchErrors
 }
 
+func isConfigFileV4(configElement config.ValidateElement) bool {
+	/*
+		To update an older integration configuration to the new format, you must perform two steps. 1)Rename the "instances" top-level section to "integrations" 2)Remove the "integration_name" top-level section and add it to each integration entry (adding it is optional though)
+		https://docs.newrelic.com/docs/create-integrations/infrastructure-integrations-sdk/specifications/host-integrations-newer-configuration-format#update
+	*/
+	integrationsKeys := configElement.ParsedResult.FindKey("integrations")
+	/* Expect to find at least one. Example:
+		/integrations/0/name: nri-docker
+		/integrations/0/when/feature: docker_enabled */
+	instancesKeys := configElement.ParsedResult.FindKey("instances")
+	// Expect to find none
+	if len(integrationsKeys) > 0 && len(instancesKeys) == 0 {
+		return true
+	}
+	return false
+}
 func checkInfraVersion(upstream map[string]tasks.Result) (bool, error) {
 	installedInfraVersion, ok := upstream["Infra/Agent/Version"].Payload.(tasks.Ver)
 	if !ok {
