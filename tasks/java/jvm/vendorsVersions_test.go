@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/shirou/gopsutil/process"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestJavaJVMVendorsVersion(t *testing.T) {

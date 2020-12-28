@@ -7,42 +7,9 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 	"github.com/shirou/gopsutil/process"
 )
-
-/*
-	List of supported JRE distributions
-	The keys to this map are used verbatim to generate
-	a regular expression in `extractVendorFromJavaExecutable`
-	They should exactly match how they appear in the output
-	of `java -version.`
-
-	Any vendors not found in this map will be flagged as
-	unsupported. Known unsupported vendors can be called out
-	explicitly by using an empty slice of compatibility
-	requirements.
-
-*/
-var supportedVersions = map[string][]string{
-	// supported vendors
-	"OpenJDK":    []string{"1.7-1.9.*", "7-14.*"},
-	"HotSpot":    []string{"1.7-1.9.*", "7-14.*"},
-	"JRockit":    []string{"1-1.6.0.50"},
-	"Coretto":    []string{"1.8-1.9.*", "8-11.*"},
-	"Zulu":       []string{"1.8-1.9.*", "8-12.*"},
-	"IBM":        []string{"1.7-1.8.*", "7-8.*"},
-	"Oracle":     []string{"1.5.*", "5.0.*"},
-	"Zing":       []string{"1.8-1.9.*", "8-11.*"},
-	"OpenJ9":     []string{"1.8-1.9.*", "8-13.*"},
-	"Dragonwell": []string{"1.8-1.9.*", "8-11.*"},
-}
-
-//Supported only with Java agent 4.3.x:
-var supportedForJavaAgent4 = map[string][]string{
-	"Apple":   []string{"1.6.*", "6.*"},
-	"IBM":     []string{"1.6.*", "6.*"},
-	"HotSpot": []string{"1.6.*", "6.*"},
-}
 
 type supportabilityStatus int
 
@@ -383,11 +350,11 @@ func extractVendorFromJavaExecutable(execOutput string) (vendor string) {
 	}
 
 	uniqueVendors := map[string]interface{}{}
-	for v := range supportedVersions {
+	for v := range compatibilityVars.SupportedJavaVersions {
 		uniqueVendors[v] = struct{}{}
 	}
 
-	for v := range supportedForJavaAgent4 {
+	for v := range compatibilityVars.SupportedForJavaAgent4 {
 		uniqueVendors[v] = struct{}{}
 	}
 
@@ -445,7 +412,7 @@ func extractVersionFromArgs(cmdLineArgs string) (version string) {
 			return
 		/* e.g. -Djava.vm.version=Oracle JRockit(R) (R28.0.0-617-125986-1.6.0_17-20091215-2120-windows-x86_64, compiled mode) */
 		case strings.Contains(cmdLineArg, "java.vm.version"):
-			matchVendorString := regexp.MustCompile(".*([0-9]{1}\\.[0-9]{1}\\.[0-9]{1}[_0-9]{0,3}).*") //nolint
+			matchVendorString := regexp.MustCompile(`.*([0-9]{1}\.[0-9]{1}\.[0-9]{1}[_0-9]{0,3}).*`)
 			version = matchVendorString.FindStringSubmatch(cmdLineArg)[1]
 			return
 		}
@@ -544,7 +511,7 @@ func (p JavaJVMVendorsVersions) isFullySupported(vendor string, version string) 
 		return false
 	}
 
-	requirements := supportedVersions[vendor]
+	requirements := compatibilityVars.SupportedJavaVersions[vendor]
 
 	if requirements != nil {
 		return isItCompatible(version, requirements)
@@ -566,7 +533,7 @@ func (p JavaJVMVendorsVersions) isLegacySupported(vendor string, version string)
 		return false
 	}
 
-	requirements := supportedForJavaAgent4[vendor]
+	requirements := compatibilityVars.SupportedForJavaAgent4[vendor]
 
 	if requirements != nil {
 		return isItCompatible(version, requirements)

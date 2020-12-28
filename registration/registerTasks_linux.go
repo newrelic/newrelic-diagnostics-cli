@@ -3,10 +3,11 @@
 package registration
 
 import (
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
+	baseEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
+	infraEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/env"
 )
 
 func init() {
-	env.RegisterLinuxWith(Register)
-
+	baseEnv.RegisterLinuxWith(Register)
+	infraEnv.RegisterLinuxWith(Register)
 }
