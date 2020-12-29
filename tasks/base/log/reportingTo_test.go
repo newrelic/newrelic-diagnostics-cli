@@ -3,9 +3,9 @@ package log
 import (
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestBaseLog(t *testing.T) {
@@ -27,14 +27,21 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			result = p.Execute(options, upstream)
 		})
 
-		Context("When upstream provides an empty payload", func() {
+		Context("When upstream provides a payload that had a log that we were not able to collect", func() {
 
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Log/Copy": tasks.Result{
-						Status:  tasks.Success,
-						Payload: []LogElement{},
+						Status: tasks.Success,
+						Payload: []LogElement{
+							{
+								Source: LogSourceData{
+									FullPath: "stdout",
+								},
+								CanCollect: false,
+							},
+						},
 					},
 				}
 			})
@@ -44,7 +51,7 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			})
 
 			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("Logs not found"))
+				Expect(result.Summary).To(Equal("New Relic logs not found"))
 			})
 
 		})
@@ -58,8 +65,10 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
-								FileName: "reportingTo_empty.log",
-								FilePath: "./fixtures/",
+								FileName:         "reportingTo_empty.log",
+								FilePath:         "./fixtures/",
+								IsSecureLocation: false,
+								CanCollect:       true,
 							},
 						},
 					},
@@ -85,8 +94,10 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
-								FileName: "reportingTo_plain.log",
-								FilePath: "./fixtures/",
+								FileName:         "reportingTo_plain.log",
+								FilePath:         "./fixtures/",
+								CanCollect:       true,
+								IsSecureLocation: false,
 							},
 						},
 					},
@@ -111,8 +122,10 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
-								FileName: "reportingTo_json.log",
-								FilePath: "./fixtures/",
+								FileName:         "reportingTo_json.log",
+								FilePath:         "./fixtures/",
+								CanCollect:       true,
+								IsSecureLocation: false,
 							},
 						},
 					},
@@ -142,16 +155,22 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
-								FileName: "reportingTo_plain.log",
-								FilePath: "./fixtures/",
+								FileName:         "reportingTo_plain.log",
+								FilePath:         "./fixtures/",
+								CanCollect:       true,
+								IsSecureLocation: false,
 							},
 							{
-								FileName: "reportingTo_json.log",
-								FilePath: "./fixtures/",
+								FileName:         "reportingTo_json.log",
+								FilePath:         "./fixtures/",
+								CanCollect:       true,
+								IsSecureLocation: false,
 							},
 							{
-								FileName: "reportingTo_empty.log",
-								FilePath: "./fixtures/",
+								FileName:         "reportingTo_empty.log",
+								FilePath:         "./fixtures/",
+								CanCollect:       true,
+								IsSecureLocation: false,
 							},
 						},
 					},

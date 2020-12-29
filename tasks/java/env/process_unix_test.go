@@ -120,7 +120,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				p.getCwd = func(process.Process) (string, error) {
 					return "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", nil
 				}
-				expectedPayload = append(expectedPayload, ProcIdAndArgs{Proc: javaProcesses[0], CmdLineArgs: cmdLineArgsList, Cwd: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", EnvVars: envVarsPayload})
+				expectedPayload = append(expectedPayload, ProcIdAndArgs{Proc: javaProcesses[0], CmdLineArgs: cmdLineArgsList, Cwd: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", JarPath: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli/newrelic.jar", EnvVars: envVarsPayload})
 			})
 
 			It("should return a tasks.Result with a success status, a summary and a payload", func() {
@@ -173,7 +173,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				p.getCwd = func(process.Process) (string, error) {
 					return "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", nil
 				}
-				expectedPayload = append(expectedPayload, ProcIdAndArgs{Proc: javaProcesses[0], CmdLineArgs: cmdLineArgsList, Cwd: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", EnvVars: envVarsPayload})
+				expectedPayload = append(expectedPayload, ProcIdAndArgs{Proc: javaProcesses[0], CmdLineArgs: cmdLineArgsList, Cwd: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli", JarPath: "/root/go/src/github.com/newrelic/newrelic-diagnostics-cli/newrelic-1.8.0.jar", EnvVars: envVarsPayload})
 			})
 
 			It("should return a tasks.Result with a success status, a summary and a payload", func() {
@@ -232,7 +232,7 @@ var _ = Describe("JavaEnvProcess", func() {
 		})
 	})
 
-	Describe("getCwdFromCmdLineArgs", func() {
+	Describe("getJarInfoFromCmdLineArgs", func() {
 		command := "-javaagent:"
 
 		Context("When given a cmdLineArgsStr that contains a path and an agent name of newrelic.jar", func() {
@@ -241,7 +241,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "newrelic.jar"
 				commandLineArgsStr := command + path + javaAgent
 
-				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
+				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 				Expect(result).To(Equal(path))
 				Expect(err).To(BeNil())
 			})
@@ -253,7 +253,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "newrelic-1.8.3.jar"
 				commandLineArgsStr := command + path + javaAgent
 
-				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
+				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 				Expect(result).To(Equal(path))
 				Expect(err).To(BeNil())
 			})
@@ -267,7 +267,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				otherAfter := " build/libs/lucessqs-1.0-SNAPSHOT.jar"
 				commandLineArgsStr := otherBefore + command + path + javaAgent + otherAfter
 
-				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
+				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 				Expect(result).To(Equal(path))
 				Expect(err).To(BeNil())
 			})
@@ -278,7 +278,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "newrelic-1.8.3.jar"
 				commandLineArgsStr := command + javaAgent
 
-				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
+				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 				Expect(result).To(Equal("./"))
 				Expect(err).To(BeNil())
 			})
@@ -290,7 +290,7 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "bluerelic.jar"
 				commandLineArgsStr := command + path + javaAgent
 
-				result, err := getCwdFromCmdLineArgs(commandLineArgsStr)
+				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 				Expect(result).To(Equal(path))
 				Expect(err.Error()).To(Equal(commandLineArgsStr))
 			})
