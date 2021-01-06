@@ -3,10 +3,10 @@ package config
 import (
 	"sort"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 type byFileName []IntegrationMatchError
@@ -46,7 +46,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 
 	Describe("Dependencies()", func() {
 		It("Should return a slice with dependencies", func() {
-			expectedDependencies := []string{"Infra/Config/IntegrationsValidate"}
+			expectedDependencies := []string{"Infra/Config/IntegrationsValidate", "Infra/Agent/Version"}
 			Expect(p.Dependencies()).To(Equal(expectedDependencies))
 		})
 	})
@@ -178,7 +178,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								},
 							},
 						},
-						Reason: "Configuration file '/etc/newrelic-infra/integrations.d/banana-config.yml' does not have matching Definition file",
+						Reason: "Configuration file '/etc/newrelic-infra/integrations.d/banana-config.yml' does not have matching Definition file (banana-definition.yml)",
 					},
 					IntegrationMatchError{
 						IntegrationFile: config.ValidateElement{
@@ -200,7 +200,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								},
 							},
 						},
-						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/kafka-definition.yml' does not have matching Configuration file",
+						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/kafka-definition.yml' does not have matching Configuration file (kafka-config.yml)",
 					},
 					IntegrationMatchError{
 						IntegrationFile: config.ValidateElement{
@@ -222,16 +222,16 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								},
 							},
 						},
-						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/apache-definition.yml' does not have matching Configuration file",
+						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/apache-definition.yml' does not have matching Configuration file (apache-config.yml)",
 					},
 				}
 
 				expectedResult := tasks.Result{
 					Status: tasks.Failure,
 					Summary: "No matching integration files found" +
-						"\nConfiguration file '/etc/newrelic-infra/integrations.d/banana-config.yml' does not have matching Definition file" +
-						"\nDefinition file '/var/db/newrelic-infra/custom-integrations/kafka-definition.yml' does not have matching Configuration file" +
-						"\nDefinition file '/var/db/newrelic-infra/custom-integrations/apache-definition.yml' does not have matching Configuration file",
+						"\nConfiguration file '/etc/newrelic-infra/integrations.d/banana-config.yml' does not have matching Definition file (banana-definition.yml)" +
+						"\nDefinition file '/var/db/newrelic-infra/custom-integrations/kafka-definition.yml' does not have matching Configuration file (kafka-config.yml)" +
+						"\nDefinition file '/var/db/newrelic-infra/custom-integrations/apache-definition.yml' does not have matching Configuration file (apache-config.yml)",
 					URL: "https://docs.newrelic.com/docs/integrations/integrations-sdk/getting-started/integration-file-structure-activation",
 				}
 				result := p.Execute(executeOptions, executeUpstream)
@@ -373,7 +373,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								},
 							},
 						},
-						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/banana-definition.yml' does not have matching Configuration file",
+						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/banana-definition.yml' does not have matching Configuration file (banana-config.yml)",
 					},
 				}
 
@@ -467,7 +467,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				expectedResult := tasks.Result{
 					Status: tasks.Failure,
 					Summary: "Found matching integration files with some errors: " +
-						"\nDefinition file '/var/db/newrelic-infra/custom-integrations/banana-definition.yml' does not have matching Configuration file",
+						"\nDefinition file '/var/db/newrelic-infra/custom-integrations/banana-definition.yml' does not have matching Configuration file (banana-config.yml)",
 					Payload: expectedPayload,
 					URL:     "https://docs.newrelic.com/docs/integrations/integrations-sdk/getting-started/integration-file-structure-activation",
 				}
