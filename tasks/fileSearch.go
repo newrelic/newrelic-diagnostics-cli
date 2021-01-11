@@ -86,16 +86,3 @@ func ReturnStringSubmatchInFile(search string, filepath string) ([]string, error
 	}
 	return fullResult[0], nil
 }
-
-// ReturnLastStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relavtive or absolute path.
-//Returns the last matching line if found.
-func ReturnLastStringSubmatchInFile(search string, filepath string) ([]string, error) {
-	fullResult, err := ReturnStringSubmatchInFileAllMatches(search, filepath)
-	if err != nil {
-		return nil, err
-	}
-	if len(fullResult) == 0 {
-		return []string{}, nil
-	}
-	return fullResult[len(fullResult)-1], nil
-}

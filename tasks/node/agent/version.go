@@ -74,49 +74,18 @@ func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tas
 }
 
 func getNodeVerFromPayload(payload []NodeModuleVersion) (string) {
-	// for _, logElement := range logs {
-	// 	logAgentVersion, errSearchLogs := searchLogs(logElement)
-	// 	var logElementNode logNodeAgentVersion
-	// 	if errSearchLogs != nil || logAgentVersion == "" {
-	// 		logElementNode.Logfile = logElement.FilePath + logElement.FileName
-	// 		logElementNode.AgentVersion = ""
-	// 		logElementNode.MatchFound = false
-	// 	} else {
-	// 		logElementNode.Logfile = logElement.FilePath + logElement.FileName
-	// 		logElementNode.AgentVersion = logAgentVersion
-	// 		logElementNode.MatchFound = true
-	// 	}
-	// 	agentVersion = append(agentVersion, logElementNode)
-	// 	log.Debug("Agent version is", logAgentVersion)
-	// }
-	// return
-	payload
-
-
-}
-
-func searchLogs(logElement logtask.LogElement) (string, error) {
-	searchString := `Node[.]js[.] Agent version:\s*([0-9.]+);`
-	filepath := logElement.FilePath + logElement.FileName
-	agentVersion, err := tasks.ReturnLastStringSubmatchInFile(searchString, filepath)
-
-
-
-	// cmdOutput, cmdError := p.cmdExec("npm", "ls", "--parseable=true", "--long=true", "--depth=0")
-	// modulesList := string(cmdOutput)
-	// if cmdError != nil {
-	// 	return modulesList, cmdError
-	// }
-	// return modulesList, nil
-
-	if err != nil {
-		return "", err
+	var results [][]string
+	regexKey, err := regexp.Compile(`Node[.]js[.] Agent`)
+	for _, nodeModuleVersion := range payload {
+		matches := regexKey.FindStringSubmatch(nodeModuleVersion.Module)
+			if len(matches) > 0 {
+				results = append(results, nodeModuleVersion.Module + NodeModuleVersion.Version)
+			}
+		}
+		if len(results) > 0 {
+			return results, nil
+		}
+		log.Debug("Node Agent not found in Node Modules")
+		return [][]string{}, nil
 	}
-
-	if len(agentVersion) > 0 {
-		// we've got a match, return the first capture group
-		return agentVersion[1], nil
-	}
-
-	return "", nil
 }
