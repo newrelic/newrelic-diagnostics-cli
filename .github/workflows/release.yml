@@ -23,6 +23,12 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          PROD_HABERDASHER_URL: ${{ secrets.PROD_HABERDASHER_URL }}
+          PROD_ATTACHMENT_ENDPOINT: ${{ secrets.PROD_ATTACHMENT_ENDPOINT }}
+          PROD_USAGE_ENDPOINT: ${{ secrets.PROD_USAGE_ENDPOINT }}
+          STAGING_USAGE_ENDPOINT: ${{ secrets.STAGING_USAGE_ENDPOINT }}
+          STAGING_ATTACHMENT_ENDPOINT: ${{ secrets.STAGING_ATTACHMENT_ENDPOINT }}
+          STAGING_HABERDASHER_URL: ${{ secrets.STAGING_HABERDASHER_URL }}
         run: |
             echo "release with following build version:"
             echo ${{ github.event.release.name }}
