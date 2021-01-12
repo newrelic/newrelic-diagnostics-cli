@@ -16,7 +16,7 @@ if [ -z "$BUILD_NUMBER" ]
     VERSION_NUMBER="DEVELOP"
 fi
 
-VERSION=`cat majorMinorVersion.txt| awk -F'=' '{print$2}'`
+VERSION=`cat releaseVersion.txt| awk -F'majorMinor=' '{printf$2}'`
 
 ZIPFILENAME="nrdiag_${VERSION}.${BUILD_NUMBER}.zip"
 

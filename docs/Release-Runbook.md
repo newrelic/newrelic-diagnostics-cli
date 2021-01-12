@@ -14,9 +14,9 @@ Focus on the new tasks that are included in this release. Run the binary on a re
 
 2. Draft the release notes for discuss.newrelic.com and for docs.newrelic.com
 
-3. Create a branch to bump version in majorMinorVersion.txt and open a PR.
+3. Create a branch to bump majorMinor version in releaseVersion.txt and open a PR.
 
-4. After the PR gets merged, publish a new release(https://github.com/newrelic/newrelic-diagnostics-cli/releases/new) with this tag version format: v.major.minor_buildnumber. The "Release title" MUST only include the build number.
+4. After the PR gets merged, wait for all the GH workflow checks to have passed. Only then publish a new release(https://github.com/newrelic/newrelic-diagnostics-cli/releases/new) with this tag version format: v.major.minor_buildnumber. The "Release title" MUST only include the build number.
 
 ![release image](./images/release.png)
 

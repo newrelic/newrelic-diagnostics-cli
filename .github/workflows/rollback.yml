@@ -1,0 +1,37 @@
+name: Rollback
+
+on:
+  release:
+    types: [deleted]
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: fetch latest release
+        uses: thebritican/fetch-latest-release@v1
+        id: flr
+        with:
+          github_token: ${{ github.token }}
+      - name: delete latest release tag
+        shell: bash
+        run: |
+            echo "deleting tag associated with latest release:"
+            echo ${{ steps.flr.outputs.tag_name }}
+            git push --delete origin ${{ steps.flr.outputs.tag_name }}
+      - name: Debug data around fetch-latest-release
+        run: echo {{ steps.flr.outputs }}
+      - name: remove nrdiag zip files from download.newrelic.com related to last release
+        shell: bash
+        run : |
+            CURRENT=$(cat releaseVersion.txt | awk -F'currentReleaseVersion=' '{printf$2}')
+            CURRENTZIP="nrdiag_${CURRENT}.zip"
+            PREV=$(cat releaseVersion.txt | awk -F'prevReleaseVersion=' '{printf$2}')
+            PREVZIP="nrdiag_${PREV}.zip"
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws s3 rm s3://${{ secrets.S3_BUCKET }}/nrdiag/${CURRENTZIP}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws s3 cp s3://${{ secrets.S3_BUCKET }}/nrdiag/PREVZIP s3://${{ secrets.S3_BUCKET }}/nrdiag/nrdiag_latest.zip
+            echo ${PREV} >> version.txt
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} version.txt s3://${{ secrets.S3_BUCKET }}/nrdiag/
+
+
+
