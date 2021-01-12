@@ -1,9 +1,11 @@
 package agent
 
 import (
+	"fmt"
+
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
+	NodeEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
 )
 
 // NodeAgentVersion - This struct defines the function to collect the current running Node agent version from its logfile.
@@ -36,56 +38,45 @@ func (t NodeAgentVersion) Dependencies() []string {
 
 // Execute - The core work within this task
 func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var result tasks.Result
-	var nodeModuleVersions []NodeModuleVersion
+	var nodeModuleVersions []NodeEnv.NodeModuleVersion
+	var ok bool
 
 	if upstream["Node/Config/Agent"].Status != tasks.Success {
-		result.Status = tasks.None
-		result.Summary = "Node agent not detected"
-		return result
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Node agent not detected",
+		}
 	}
-	if upstream["Node/Env/Dependencies"].Status == tasks.Success {
-		nodeModuleVersions, ok = upstream["Node/Env/Dependencies"].Payload.([]NodeModuleVersion) 
+	if upstream["Node/Env/Dependencies"].Status == tasks.Info {
+		nodeModuleVersions, ok = upstream["Node/Env/Dependencies"].Payload.([]NodeEnv.NodeModuleVersion)
 		if !ok {
-			return tasks.result {
-				Status: tasks.None,
-				Summary:  "Node module version not detected",
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: "Node module version not detected",
 			}
 		}
 	}
 
-	logs, ok := upstream["Base/Log/Copy"].Payload.([]logtask.LogElement)
-	if !ok {
-		result.Status = tasks.None
-		result.Summary = "Node agent version not detected"
-		return result
-	}
-	agentVersion := getNodeVerFromLog(logs)
-	log.Debug("Agent version", agentVersion)
-	for _, nodeLog := range agentVersion {
-		if nodeLog.MatchFound == true {
-			result.Status = tasks.Info
-			result.Summary = nodeLog.AgentVersion
-			result.Payload = nodeLog.AgentVersion
-			return result
+	agentVersion := getNodeVerFromPayload(nodeModuleVersions)
+	if agentVersion == "" {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: "Node Agent Module not found for newrelic",
 		}
 	}
-	return result
+	log.Debug("Agent version", agentVersion)
+	return tasks.Result{
+		Status:  tasks.Info,
+		Summary: fmt.Sprintf("Node Agent Version  %s found", agentVersion),
+	}
 }
 
-func getNodeVerFromPayload(payload []NodeModuleVersion) (string) {
-	var results [][]string
-	regexKey, err := regexp.Compile(`Node[.]js[.] Agent`)
+func getNodeVerFromPayload(payload []NodeEnv.NodeModuleVersion) string {
 	for _, nodeModuleVersion := range payload {
-		matches := regexKey.FindStringSubmatch(nodeModuleVersion.Module)
-			if len(matches) > 0 {
-				results = append(results, nodeModuleVersion.Module + NodeModuleVersion.Version)
-			}
+		if nodeModuleVersion.Module == "newrelic" {
+			return fmt.Sprintf("%s %s", nodeModuleVersion.Module, nodeModuleVersion.Version)
 		}
-		if len(results) > 0 {
-			return results, nil
-		}
-		log.Debug("Node Agent not found in Node Modules")
-		return [][]string{}, nil
 	}
+	log.Debug("Node Agent not found in Node Modules")
+	return ""
 }
