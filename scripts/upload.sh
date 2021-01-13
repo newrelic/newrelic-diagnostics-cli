@@ -45,4 +45,4 @@ aws s3 cp bin/version.txt s3://${S3_BUCKET}/nrdiag/
 
 fi
 
-#[YOUR-CREDENTIALS-HERE] aws s3 ls s3://bucketname/nrdiag/
+#AWS_ACCESS_KEY_ID=abc AWS_SECRET_ACCESS_KEY=123 aws s3 ls s3://bucketname/nrdiag/

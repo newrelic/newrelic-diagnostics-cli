@@ -23,15 +23,26 @@ jobs:
         run: echo {{ steps.flr.outputs }}
       - name: remove nrdiag zip files from download.newrelic.com related to last release
         shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run : |
+            set -e
             CURRENT=$(cat releaseVersion.txt | awk -F'currentReleaseVersion=' '{printf$2}')
             CURRENTZIP="nrdiag_${CURRENT}.zip"
+            echo "my currentzip:"
+            echo nrdiag_${CURRENT}.zip
+            echo $CURRENTZIP
             PREV=$(cat releaseVersion.txt | awk -F'prevReleaseVersion=' '{printf$2}')
             PREVZIP="nrdiag_${PREV}.zip"
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws s3 rm s3://${{ secrets.S3_BUCKET }}/nrdiag/${CURRENTZIP}
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} aws s3 cp s3://${{ secrets.S3_BUCKET }}/nrdiag/PREVZIP s3://${{ secrets.S3_BUCKET }}/nrdiag/nrdiag_latest.zip
+            echo "my prevzip:"
+            echo nrdiag_${PREV}.zip
+            aws s3 rm s3://${{ secrets.S3_BUCKET }}/nrdiag/test/${CURRENTZIP}
+            echo "current release was removed"
+            aws s3 cp s3://${{ secrets.S3_BUCKET }}/nrdiag/test/${PREVZIP} s3://${{ secrets.S3_BUCKET }}/nrdiag/test/nrdiag_latest.zip
+            echo "previous release is now latest zip"
             echo ${PREV} >> version.txt
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} version.txt s3://${{ secrets.S3_BUCKET }}/nrdiag/
+            aws s3 cp version.txt s3://${{ secrets.S3_BUCKET }}/nrdiag/test/version.txt
 
 
 
