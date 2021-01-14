@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-    # if: contains(github.event.pull_request.labels.*.name, 'build')
+    if: contains(github.event.release.tag_name, "v.")
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
