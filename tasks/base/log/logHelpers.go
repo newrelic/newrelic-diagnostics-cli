@@ -503,6 +503,9 @@ func findLogFiles(patterns []string, dir string) []string {
 		for _, pattern := range patterns {
 			regex := regexp.MustCompile(pattern)
 			if regex.MatchString(file) {
+				//check date was modified
+				//if file name net profile default current 4 days or newer for other file names current is 7 or newer
+				//else add those paths to a list called oldlogfiles, we'll keep it as back if currentlogfiles is empty
 				foundLogFiles[file] = struct{}{} // empty struct is smallest memory footprint
 			}
 		}

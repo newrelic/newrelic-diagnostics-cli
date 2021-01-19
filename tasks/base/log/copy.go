@@ -108,12 +108,10 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 	var filesToCopyToResult []tasks.FileCopyEnvelope
 	var successSummary string
 	if len(recentLogFiles) > 0 {
-		var logPathsList string
 		for _, recentLogFile := range recentLogFiles {
-			logPathsList = logPathsList + (recentLogFile + "\n")
 			filesToCopyToResult = append(filesToCopyToResult, tasks.FileCopyEnvelope{Path: recentLogFile, Identifier: p.Identifier().String()})
 		}
-		successSummary += fmt.Sprintf("We found at least one recent New Relic log file (modified less than 7 days ago):\n%s", logPathsList)
+		successSummary += "We found one or more recent New Relic log files (modified less than 7 days ago)\n"
 	}
 	if len(oldLogFiles) > 0 {
 		mostRecentOldLogFile := selectMostRecentOldLogs(oldLogFiles)
