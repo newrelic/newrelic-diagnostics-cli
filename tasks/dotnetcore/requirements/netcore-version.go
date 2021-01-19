@@ -54,9 +54,16 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 		return
 	}
 
-	areSupported, unsupportedVersions := checkCoreVersionsAreSupported(coreInstalledVersions)
+	unsupportedVersions, errorMessage := checkCoreVersionsAreSupported(coreInstalledVersions)
 
-	if areSupported {
+	if len(errorMessage) > 0 {
+		return tasks.Result{
+			Status: tasks.Error,
+			Summary: errorMessage,
+		}
+	} 
+
+	if len(unsupportedVersions) == 0 {
 		return tasks.Result{
 			Status:  tasks.Success,
 			Summary: fmt.Sprintf(".NET Core 2.0 or higher detected: %s", strings.Join(coreInstalledVersions, ", ")),
@@ -70,21 +77,29 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 	}
 }
 
-func checkCoreVersionsAreSupported(dotnetCoreInstalledVers []string) (bool, []string) {
+func checkCoreVersionsAreSupported(dotnetCoreInstalledVers []string) ([]string, string) {
 	var unsupportedVers []string
+	var supportedVers []string
+	errorMessage := "We were unable to validate if this application is using a supported .NET core version because we ran into some unexpected error(s)\n"
 	for _, coreVersion := range dotnetCoreInstalledVers {
-		majorVer, minorVer, _, _ := tasks.GetVersionSplit(coreVersion)
+		parsedVersion, err := tasks.ParseVersion(coreVersion)
+		if err != nil {
+			errorMessage += err.Error() + "\n"
+			continue
+		}
+		majorVer, minorVer, _, _ := tasks.GetVersionSplit(parsedVersion.String())
 		majorMinorVer := strconv.Itoa(majorVer) + "." + strconv.Itoa(minorVer)
 		_, isPresent := compatibilityVars.DotnetCoreSupportedVersions[majorMinorVer]
-
 		if !isPresent {
 			unsupportedVers = append(unsupportedVers, coreVersion)
+		} else {
+			supportedVers = append(supportedVers, coreVersion)
 		}
 	}
 
-	if len(unsupportedVers) > 0 {
-		return false, unsupportedVers
+	if len(unsupportedVers) == 0 && len(supportedVers) == 0 {
+		//looks like we were unable to parse any version from the slice of strings we received from payload
+		return unsupportedVers, errorMessage
 	}
-	return true, unsupportedVers
-
+	return unsupportedVers, ""//we are going to ignore errorMessage because we were able to parse at least one version from the slice payload
 }
