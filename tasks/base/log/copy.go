@@ -94,8 +94,8 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 	}
 
-	hasInvalidLogs = len(invalidLogPaths) > 0
-	hasValidLogs = len(validLogPaths) > 0
+	hasInvalidLogs := len(invalidLogPaths) > 0
+	hasValidLogs := len(validLogPaths) > 0
 
 	if hasValidLogs {
 		var filesToCopyToResult []tasks.FileCopyEnvelope
