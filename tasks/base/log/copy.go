@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"strconv"
@@ -79,7 +80,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 			} else {
 				validLogPaths = append(validLogPaths, logElem.Source.FullPath)
 			}
-		} else {
+		} else { //cases where customer rejected the prompt to collect the file
 			invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
 			failureSummary += fmt.Sprintf("%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logElem.ReasonToNotCollect)
 			logElements[idx] = LogElement{
@@ -93,57 +94,43 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 	}
 
-	if len(invalidLogPaths) > 0 && len(validLogPaths) == 0 {
-		return tasks.Result{
-			Status:  tasks.Failure,
-			Summary: failureSummary,
-			Payload: logElements,
-			URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
-		}
-	}
+	hasInvalidLogs = len(invalidLogPaths) > 0
+	hasValidLogs = len(validLogPaths) > 0
 
-	//Let's check the age of those valid files and determine which ones to collect
-	lastModifiedDate := getLastModifiedDate(options)
-	recentLogFiles, oldLogFiles := determineFilesDate(validLogPaths, lastModifiedDate)
-	var filesToCopyToResult []tasks.FileCopyEnvelope
-	var successSummary string
-	if len(recentLogFiles) > 0 {
-		for _, recentLogFile := range recentLogFiles {
-			filesToCopyToResult = append(filesToCopyToResult, tasks.FileCopyEnvelope{Path: recentLogFile, Identifier: p.Identifier().String()})
+	if hasValidLogs {
+		var filesToCopyToResult []tasks.FileCopyEnvelope
+		var successSummary = "Succesfully collected one or more New Relic Log file(s). Those file names will be listed in the payload with the field 'CanCollect' set to true\n"
+		for _, validPath := range validLogPaths {
+			filesToCopyToResult = append(filesToCopyToResult, tasks.FileCopyEnvelope{
+				Path:       validPath,
+				Identifier: p.Identifier().String(),
+			})
 		}
-		successSummary += "We found one or more recent New Relic log files (modified less than 7 days ago)\n"
-	}
-	if len(oldLogFiles) > 0 {
-		mostRecentOldLogFile := selectMostRecentOldLogs(oldLogFiles)
-		filesToCopyToResult = append(filesToCopyToResult, tasks.FileCopyEnvelope{Path: mostRecentOldLogFile, Identifier: p.Identifier().String()})
-		successSummary += fmt.Sprintf("We found at least one old New Relic log file (modified more than 7 days ago):\n%s", mostRecentOldLogFile)
-	}
-
-	if len(filesToCopyToResult) > 0 && len(invalidLogPaths) == 0 {
+		if hasInvalidLogs {
+			warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support.", strings.Join(invalidLogPaths, ", "))
+			return tasks.Result{
+				Status:      tasks.Warning,
+				Summary:     successSummary + "\n" + warningSummary,
+				Payload:     logElements,
+				FilesToCopy: filesToCopyToResult,
+				URL:         "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
+			}
+		}
+		//we only have valid logs
 		return tasks.Result{
 			Status:      tasks.Success,
 			Summary:     successSummary,
 			Payload:     logElements,
 			FilesToCopy: filesToCopyToResult,
 		}
-	} else if len(filesToCopyToResult) > 0 && len(invalidLogPaths) > 0 {
-		warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support.", strings.Join(invalidLogPaths, ", "))
-		return tasks.Result{
-			Status:      tasks.Warning,
-			Summary:     successSummary + "\n" + warningSummary,
-			Payload:     logElements,
-			FilesToCopy: filesToCopyToResult,
-			URL:         "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
-		}
 	}
-
+	// we have no valid logs, only invalid
 	return tasks.Result{
-		Status:  tasks.Warning,
-		Payload: logElements,
+		Status:  tasks.Failure,
 		Summary: failureSummary,
+		Payload: logElements,
 		URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 	}
-
 }
 
 func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) []LogElement {
@@ -188,7 +175,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 			CanCollect:       true,
 		})
 	} else {
-		logFilesFound = collectFilePaths(envVars, configElements, foundSysProps) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
+		logFilesFound = collectFilePaths(envVars, configElements, foundSysProps, options) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
 		for i, logFileFound := range logFilesFound {
 			if logFileFound.IsSecureLocation {
 				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", logFileFound.Source.FullPath) +
@@ -210,9 +197,12 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 func determineFilesDate(logFilePaths []string, lastModifiedDate time.Time) ([]string, []string) {
 	var recentLogFilePaths []string
 	var oldLogFilePaths []string
-
+	profilerRgx := regexp.MustCompile(profilerLogName)
 	for _, logFilePath := range logFilePaths {
-
+		//overwrite lastModifiedDate for .NET profiler logs because it produces too many files. We'll only collect profiler logs produced in the last 4 days instead of 7.
+		if profilerRgx.MatchString(logFilePath) {
+			lastModifiedDate = time.Now().AddDate(0, 0, -profilerMaxNumDays)
+		}
 		if isLogFileRecent(logFilePath, lastModifiedDate) {
 			recentLogFilePaths = append(recentLogFilePaths, logFilePath)
 		} else {
@@ -232,7 +222,7 @@ func getLastModifiedDate(options tasks.Options) time.Time {
 		}
 		log.Debug("setting override lastModifiedDate to:", lastModifiedDate)
 	} else {
-		lastModifiedDate = time.Now().AddDate(0, 0, -7)
+		lastModifiedDate = time.Now().AddDate(0, 0, -DefaultMaxNumDays)
 		log.Debug("Default last modified date is:", lastModifiedDate)
 	}
 	return lastModifiedDate
@@ -245,7 +235,6 @@ func isLogFileRecent(inputFilePath string, minimumModTime time.Time) bool {
 		log.Debug("Error reading file", inputFilePath)
 		return true
 	}
-
 	return fileInfo.ModTime().After(minimumModTime)
 }
 

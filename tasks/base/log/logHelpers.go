@@ -33,9 +33,14 @@ var logSysProps = []string{
 	"-Dnewrelic.config.log_file_path", //JAVA_OPTS="${JAVA_OPTS} -Dnewrelic.config.log_file_path=/srv/common-api-gateway"
 }
 
-var logDirSysProp = "-Dnewrelic.config.log_file_path"
-var logNameSysProp = "-Dnewrelic.config.log_file_name"
-var logFullPathSysProp = "-Dnewrelic.logfile"
+var (
+	logDirSysProp        = "-Dnewrelic.config.log_file_path"
+	logNameSysProp       = "-Dnewrelic.config.log_file_name"
+	logFullPathSysProp   = "-Dnewrelic.logfile"
+	profilerLogName    = "NewRelic[.]Profiler.*[.]log$"
+	profilerMaxNumDays = 4
+	DefaultMaxNumDays    = 7
+)
 
 var logEnvVars = []string{
 	"NRIA_LOG_FILE", // Infra agent
@@ -83,7 +88,7 @@ var (
 	logPathDiagnosticsFlagSource = "Found by looking at the path defined by user through the " + tasks.ThisProgramFullName + " command line flag: logpath"
 )
 
-func collectFilePaths(envVars map[string]string, configElements []baseConfig.ValidateElement, foundSysProps map[string]string) []LogElement {
+func collectFilePaths(envVars map[string]string, configElements []baseConfig.ValidateElement, foundSysProps map[string]string, options tasks.Options) []LogElement {
 	var paths []string
 	currentPath, err := os.Getwd()
 	if err != nil {
@@ -169,7 +174,7 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 			logElement := getLogPathFromSysProp(logFullPathSysProp, logFullPathSysPropVal)
 			logFilesFound = append(logFilesFound, logElement)
 		} else {
-			//These system properties(-Dnewrelic.config.log_file_path and -Dnewrelic.config.log_file_name) mimic the behavior these config file settings(log_file_path and log_file_name). But config file settings will take precedence over this type of system props
+			//ConfigSysProps refer to those special system properties(-Dnewrelic.config.log_file_path and -Dnewrelic.config.log_file_name) that mimic the behavior of certain config file settings(such as log_file_path and log_file_name). Beware: config file settings will take precedence over this type of system props
 			logElement, isIncompletePath := getLogPathFromConfigSysProps(foundSysProps, unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
 			if !isIncompletePath {
 				logFilesFound = append(logFilesFound, logElement)
@@ -198,8 +203,8 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		}
 	}
 
-	//collect paths to New Relic log Files by looking into standard directories
-	logElements := getLogPathsFromStandardLocations(paths)
+	//collect paths to New Relic log Files by looking into standard directories. By looking at standard locations we take the risk of collecting old log files that the user is no longer working with. We'll add a check here for making sure we only collect recent files based on their modified date
+	logElements := getLogPathsFromStandardLocations(paths, options)
 	if len(logElements) > 0 {
 		logFilesFound = append(logFilesFound, logElements...)
 	}
@@ -313,12 +318,16 @@ func getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatched
 	return logElements
 }
 
-func getLogPathsFromStandardLocations(paths []string) []LogElement {
+func getLogPathsFromStandardLocations(paths []string, options tasks.Options) []LogElement {
 	var logElements []LogElement
 	//findFiles will return a full path that include filename
 	fileLocations := tasks.FindFiles(logFilenamePatterns, paths)
-	if len(fileLocations) > 0 {
-		for _, fileLocation := range fileLocations {
+	// assess how old those files are
+	lastModifiedDate := getLastModifiedDate(options)
+	recentLogFiles, oldLogFiles := determineFilesDate(fileLocations, lastModifiedDate)
+
+	if len(recentLogFiles) > 0 {
+		for _, fileLocation := range recentLogFiles {
 			dir, fileName := filepath.Split(fileLocation)
 			logElements = append(logElements, LogElement{
 				FileName: fileName,
@@ -331,6 +340,19 @@ func getLogPathsFromStandardLocations(paths []string) []LogElement {
 				CanCollect:       true,
 			})
 		}
+	} else {
+		mostRecentOldLog := selectMostRecentOldLogs(oldLogFiles)
+		dir, fileName := filepath.Split(mostRecentOldLog)
+		logElements = append(logElements, LogElement{
+			FileName: fileName,
+			FilePath: dir,
+			Source: LogSourceData{
+				FoundBy:  logPathDefaultSource,
+				FullPath: mostRecentOldLog,
+			},
+			IsSecureLocation: false,
+			CanCollect:       true,
+		})
 	}
 	return logElements
 }

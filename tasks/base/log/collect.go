@@ -83,7 +83,7 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 		})
 	} else {
 		//ignoring secure logs for now
-		logs = collectFilePaths(envVars, configElements, foundSysProps)
+		logs = collectFilePaths(envVars, configElements, foundSysProps, options)
 	}
 
 	if len(logs) > 0 {
