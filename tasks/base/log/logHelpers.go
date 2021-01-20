@@ -238,7 +238,6 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 	if len(unmatchedDirKeyToVal) > 0 {
 		for dirKey, dirVal := range unmatchedDirKeyToVal {
 			logPaths := findLogFiles(logFilenamePatterns, dirVal)
-			fmt.Println(len(logPaths) == 0)
 			if len(logPaths) > 0 {
 				for _, fullPath := range logPaths {
 					dir, fileName := filepath.Split(fullPath)
