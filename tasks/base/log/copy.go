@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -69,28 +70,14 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 				invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
 				failureSummary += fmt.Sprintf(tasks.ThisProgramFullName+" cannot collect New Relic log files from the provided path(%s):%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logFileStatus.Path, (logFileStatus.ErrorMsg).Error())
 				//update our log element to inform that we cannot collect it
-				logElements[idx] = LogElement{
-					FileName:           logElem.FileName,
-					FilePath:           logElem.FilePath,
-					Source:             logElem.Source,
-					IsSecureLocation:   logElem.IsSecureLocation,
-					CanCollect:         false,
-					ReasonToNotCollect: (logFileStatus.ErrorMsg).Error(),
-				}
+				logElements[idx] = setLogElement(logElem.FileName, logElem.FilePath, logElem.Source, logElem.IsSecureLocation, false, (logFileStatus.ErrorMsg).Error())
 			} else {
 				validLogPaths = append(validLogPaths, logElem.Source.FullPath)
 			}
 		} else { //cases where customer rejected the prompt to collect the file
 			invalidLogPaths = append(invalidLogPaths, logElem.Source.FullPath)
 			failureSummary += fmt.Sprintf("%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting\n", logElem.ReasonToNotCollect)
-			logElements[idx] = LogElement{
-				FileName:           logElem.FileName,
-				FilePath:           logElem.FilePath,
-				Source:             logElem.Source,
-				IsSecureLocation:   logElem.IsSecureLocation,
-				CanCollect:         false,
-				ReasonToNotCollect: logElem.ReasonToNotCollect,
-			}
+			logElements[idx] = setLogElement(logElem.FileName, logElem.FilePath, logElem.Source, logElem.IsSecureLocation, false, logElem.ReasonToNotCollect)
 		}
 	}
 
@@ -163,17 +150,15 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 
 	var logFilesFound []LogElement
 	if options.Options["logpath"] != "" {
-		logFilesFound = append(logFilesFound, LogElement{
-			Source: LogSourceData{
-				FoundBy:  logPathDiagnosticsFlagSource,
-				FullPath: options.Options["logpath"],
-				KeyVals: map[string]string{
-					"logpath": options.Options["logpath"],
-				},
+		logSourceData := LogSourceData{
+			FoundBy:  logPathDiagnosticsFlagSource,
+			FullPath: options.Options["logpath"],
+			KeyVals: map[string]string{
+				"logpath": options.Options["logpath"],
 			},
-			IsSecureLocation: false,
-			CanCollect:       true,
-		})
+		}
+		dir, fileName := filepath.Split(options.Options["logpath"])
+		logFilesFound = append(logFilesFound, setLogElement(fileName, dir, logSourceData, false, true, ""))
 	} else {
 		logFilesFound = collectFilePaths(envVars, configElements, foundSysProps, options) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
 		for i, logFileFound := range logFilesFound {
@@ -181,11 +166,9 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", logFileFound.Source.FullPath) +
 					"Include this file in nrdiag-output.zip?"
 				if !(tasks.PromptUser(question, options)) {
-					logFilesFound[i] = LogElement{
-						Source:             logFileFound.Source,
-						CanCollect:         false,
-						ReasonToNotCollect: "User opted out when " + tasks.ThisProgramFullName + " asked if it can collect this file that may contain secure information.",
-					}
+					//update logElement with new data
+					reasonCannotCollect := "User opted out when " + tasks.ThisProgramFullName + " asked if it can collect this file that may contain secure information."
+					logFilesFound[i] = setLogElement(logFileFound.FileName, logFileFound.FilePath, logFileFound.Source, true, false, reasonCannotCollect)
 				}
 			}
 

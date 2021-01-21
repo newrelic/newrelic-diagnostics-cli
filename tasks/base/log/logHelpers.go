@@ -34,12 +34,12 @@ var logSysProps = []string{
 }
 
 var (
-	logDirSysProp        = "-Dnewrelic.config.log_file_path"
-	logNameSysProp       = "-Dnewrelic.config.log_file_name"
-	logFullPathSysProp   = "-Dnewrelic.logfile"
+	logDirSysProp      = "-Dnewrelic.config.log_file_path"
+	logNameSysProp     = "-Dnewrelic.config.log_file_name"
+	logFullPathSysProp = "-Dnewrelic.logfile"
 	profilerLogName    = "NewRelic[.]Profiler.*[.]log$"
 	profilerMaxNumDays = 4
-	DefaultMaxNumDays    = 7
+	DefaultMaxNumDays  = 7
 )
 
 var logEnvVars = []string{
@@ -218,16 +218,12 @@ func getLogPathsFromSecureLocations(paths []string) []LogElement {
 	if len(secureFileLocations) > 0 {
 		for _, fileLocation := range secureFileLocations {
 			dir, fileName := filepath.Split(fileLocation)
-			logElements = append(logElements, LogElement{
-				FileName: fileName,
-				FilePath: dir,
-				Source: LogSourceData{
-					FoundBy:  logPathDefaultSource,
-					FullPath: fileLocation,
-				},
-				IsSecureLocation: true,
-				CanCollect:       true,
-			})
+			logSourceData := LogSourceData{
+				FoundBy: logPathDefaultSource,
+				KeyVals: nil,
+				FullPath: fileLocation,
+			}
+			logElements = append(logElements, setLogElement(fileName, dir, logSourceData, true, true, ""))
 		}
 	}
 	return logElements
@@ -241,20 +237,14 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 			if len(logPaths) > 0 {
 				for _, fullPath := range logPaths {
 					dir, fileName := filepath.Split(fullPath)
-					logElements = append(logElements, LogElement{
-						FileName: fileName,
-						FilePath: dir,
-						Source: LogSourceData{
-							FoundBy: fmt.Sprintf("Found by looking for standard names for New Relic log files in the provided directory value %s for the key %s", dirVal, dirKey),
-							KeyVals: map[string]string{
-								dirKey: dirVal,
-							},
-							FullPath: fullPath,
+					logSourceData := LogSourceData{
+						FoundBy: fmt.Sprintf("Found by looking for standard names for New Relic log files in the provided directory value %s for the key %s", dirVal, dirKey),
+						KeyVals: map[string]string{
+							dirKey: dirVal,
 						},
-						IsSecureLocation: false,
-						CanCollect:       true,
-					})
-
+						FullPath: fullPath,
+					}					
+					logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 				}
 			}
 		}
@@ -266,19 +256,14 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 			if len(logPaths) > 0 {
 				for _, fullPath := range logPaths {
 					dir, fileName := filepath.Split(fullPath)
-					logElements = append(logElements, LogElement{
-						FileName: fileName,
-						FilePath: dir,
-						Source: LogSourceData{
-							FoundBy: fmt.Sprintf("Found by looking in the current directory for the provided log filename(%s) through the key %s", filenameVal, filenameKey),
-							KeyVals: map[string]string{
-								filenameKey: filenameVal,
-							},
-							FullPath: fullPath,
+					logSourceData := LogSourceData{
+						FoundBy: fmt.Sprintf("Found by looking in the current directory for the provided log filename(%s) through the key %s", filenameVal, filenameKey),
+						KeyVals: map[string]string{
+							filenameKey: filenameVal,
 						},
-						IsSecureLocation: false,
-						CanCollect:       true,
-					})
+						FullPath: fullPath,
+					}
+					logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 				}
 			}
 		}
@@ -295,20 +280,15 @@ func getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatched
 			for filenameKey, filenameVal := range unmatchedFilenameKeyToVal {
 				regex := regexp.MustCompile(filenameVal)
 				if regex.MatchString(pathToFile) {
-					logElements = append(logElements, LogElement{
-						FileName: filenameVal,
-						FilePath: dirVal,
-						Source: LogSourceData{
-							FoundBy: fmt.Sprintf("Found by looking for a file named %s in the directory path %s", filenameVal, dirVal),
-							KeyVals: map[string]string{
-								dirKey:      dirVal,
-								filenameKey: filenameVal,
-							},
-							FullPath: pathToFile,
+					logSourceData := LogSourceData{
+						FoundBy: fmt.Sprintf("Found by looking for a file named %s in the directory path %s", filenameVal, dirVal),
+						KeyVals: map[string]string{
+							dirKey:      dirVal,
+							filenameKey: filenameVal,
 						},
-						IsSecureLocation: false,
-						CanCollect:       true,
-					})
+						FullPath: pathToFile,
+					}
+					logElements = append(logElements, setLogElement(filenameVal, dirVal, logSourceData, false, true, ""))
 				}
 			}
 		}
@@ -328,82 +308,71 @@ func getLogPathsFromStandardLocations(paths []string, options tasks.Options) []L
 	if len(recentLogFiles) > 0 {
 		for _, fileLocation := range recentLogFiles {
 			dir, fileName := filepath.Split(fileLocation)
-			logElements = append(logElements, LogElement{
-				FileName: fileName,
-				FilePath: dir,
-				Source: LogSourceData{
-					FoundBy:  logPathDefaultSource,
-					FullPath: fileLocation,
-				},
-				IsSecureLocation: false,
-				CanCollect:       true,
-			})
+			logSourceData := LogSourceData{
+				FoundBy:  logPathDefaultSource,
+				KeyVals:  nil,
+				FullPath: fileLocation,
+			}
+			logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 		}
 	} else {
 		mostRecentOldLog := selectMostRecentOldLogs(oldLogFiles)
 		dir, fileName := filepath.Split(mostRecentOldLog)
-		logElements = append(logElements, LogElement{
-			FileName: fileName,
-			FilePath: dir,
-			Source: LogSourceData{
-				FoundBy:  logPathDefaultSource,
-				FullPath: mostRecentOldLog,
-			},
-			IsSecureLocation: false,
-			CanCollect:       true,
-		})
+		logSourceData := LogSourceData{
+			FoundBy: logPathDefaultSource,
+			KeyVals: nil,
+			FullPath: mostRecentOldLog,
+		}
+		logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 	}
 	return logElements
 }
 
+func setLogElement(filename string, dir string, logSourceData LogSourceData, isSecureLocation bool, canCollect bool, reasonCannotCollect string) LogElement {
+	return LogElement{
+		FileName:           filename,
+		FilePath:           dir,
+		Source:             logSourceData,
+		IsSecureLocation:   isSecureLocation,
+		CanCollect:         canCollect,
+		ReasonToNotCollect: reasonCannotCollect,
+	}
+}
+
 func getLogPathFromSysProp(sysPropKey, sysPropVal string) LogElement {
 	dir, fileName := filepath.Split(sysPropVal)
-	return LogElement{
-		FileName: fileName,
-		FilePath: dir,
-		Source: LogSourceData{
-			FoundBy: logPathSysPropSource,
-			KeyVals: map[string]string{
-				sysPropKey: sysPropVal,
-			},
-			FullPath: sysPropVal,
+	logSourceData := LogSourceData{
+		FoundBy: logPathSysPropSource,
+		KeyVals: map[string]string{
+			sysPropKey: sysPropVal,
 		},
-		IsSecureLocation: false,
-		CanCollect:       true,
+		FullPath: sysPropVal,
 	}
+	return setLogElement(fileName, dir, logSourceData, false, true, "")
 }
 
 func getLogPathFromEnvVar(logPath string, logEnvVar string, unmatchedFilenameKeyToVal map[string]string) (LogElement, bool) {
 	if strings.ToLower(logPath) == "stdout" || strings.ToLower(logPath) == "stderr" {
-		return LogElement{
-			Source: LogSourceData{
-				FoundBy: logPathEnvVarSource,
-				KeyVals: map[string]string{
-					logEnvVar: logPath,
-				},
-				FullPath: logPath,
+		logSourceData := LogSourceData{
+			FoundBy: logPathEnvVarSource,
+			KeyVals: map[string]string{
+				logEnvVar: logPath,
 			},
-			IsSecureLocation:   false,
-			CanCollect:         false,
-			ReasonToNotCollect: tasks.ThisProgramFullName + " cannot collect logs that have been set to STDOUT OR STDERR",
-		}, false
+			FullPath: logPath,
+		}
+		reasonToNotCollect := tasks.ThisProgramFullName + " cannot collect logs that have been set to STDOUT OR STDERR"
+		return setLogElement(logPath, logPath, logSourceData, false, false, reasonToNotCollect), false
 	}
-
 	dir, fileName := filepath.Split(logPath)
 	if len(dir) > 0 { //path is a directory or a fullpath that includes filename
-		return LogElement{
-			FileName: fileName,
-			FilePath: dir,
-			Source: LogSourceData{
-				FoundBy: logPathEnvVarSource,
-				KeyVals: map[string]string{
-					logEnvVar: logPath,
-				},
-				FullPath: logPath,
+		logSourceData := LogSourceData{
+			FoundBy: logPathEnvVarSource,
+			KeyVals: map[string]string{
+				logEnvVar: logPath,
 			},
-			IsSecureLocation: false,
-			CanCollect:       true,
-		}, false
+			FullPath: logPath,
+		}
+		return setLogElement(fileName, dir, logSourceData, false, true, ""), false
 	}
 	unmatchedFilenameKeyToVal[logEnvVar] = fileName
 	return LogElement{}, true
@@ -414,16 +383,12 @@ func getLogPathFromConfigSysProps(configSysProps, unmatchedDirKeyToVal, unmatche
 	filename, isNamePresent := configSysProps[logNameSysProp]
 
 	if isDirPresent && isNamePresent {
-		fullpath := filepath.Join(dir, filename)
-		return LogElement{
-			Source: LogSourceData{
-				FoundBy:  logPathSysPropSource,
-				KeyVals:  configSysProps,
-				FullPath: fullpath,
-			},
-			IsSecureLocation: false,
-			CanCollect:       true,
-		}, false
+		logSourceData := LogSourceData{
+			FoundBy:  logPathSysPropSource,
+			KeyVals:  configSysProps,
+			FullPath: filepath.Join(dir, filename),
+		}	
+		return setLogElement(filename, dir, logSourceData, false, true, ""), false
 	}
 
 	if isDirPresent {
@@ -483,23 +448,13 @@ func getLogPathsFromConfigFile(configElements []baseConfig.ValidateElement, unma
 
 		if len(fullPath) > 0 {
 			dir, fileName := filepath.Split(fullPath)
-			logElements = append(logElements, LogElement{
-				FileName:         fileName,
-				FilePath:         dir,
-				Source:           LogSourceData{FoundBy: logPathConfigFileSource, KeyVals: configMap, FullPath: fullPath},
-				IsSecureLocation: false,
-				CanCollect:       true,
-			})
+			logSourceData := LogSourceData{FoundBy: logPathConfigFileSource, KeyVals: configMap, FullPath: fullPath}
+			logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 		}
 		if len(dir) > 0 && len(filename) > 0 {
 			fullPath := filepath.Join(dir, filename) //we are doing this instead of dir+filename because dir may not have a trailing slash at the end
-			logElements = append(logElements, LogElement{
-				FileName:         filename,
-				FilePath:         dir,
-				Source:           LogSourceData{FoundBy: logPathConfigFileSource, KeyVals: configMap, FullPath: fullPath},
-				IsSecureLocation: false,
-				CanCollect:       true,
-			})
+			logSourceData := LogSourceData{FoundBy: logPathConfigFileSource, KeyVals: configMap, FullPath: fullPath}
+			logElements = append(logElements, setLogElement(filename, dir, logSourceData, false, true, ""))
 		} else {
 			if len(dir) > 0 {
 				unmatchedDirKeyToVal[configKey] = dir
