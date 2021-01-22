@@ -1,6 +1,7 @@
 package env
 
 import (
+	"fmt"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -40,17 +41,26 @@ func (p NodeEnvYarnVersion) Execute(options tasks.Options, upstream map[string]t
 		}
 	}
 
-	// yarnVersion, err := yarnVersionGetter()
+	yarnVersion, err := getYarnVersion()
+
+	if err != nil {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Yarn is not installed",
+		}
+	}
+
 	return tasks.Result{
 		Status:  tasks.Info,
-		Summary: "We found yarn version: ",
+		Summary: fmt.Sprintf("We found yarn version: %s", yarnVersion),
+		Payload: yarnVersion,
 	}
 }
 
 func getYarnVersion() (string, error) {
-	version, err := tasks.CmdExecutor("npm", "-v")
+	version, err := tasks.CmdExecutor("yarn", "-v") //output example:1.22.5
 	if err != nil {
-		log.Debug("Error running npm -v ", version)
+		log.Debug("Error running npm -v ", version) //-bash: yarn: command not found
 		return "", err
 	}
 	return strings.TrimSpace(string(version)), nil
