@@ -94,7 +94,7 @@ func (p BaseConfigValidateLicenseKey) Execute(options tasks.Options, upstream ma
 
 		if err != nil {
 			for lk, sources := range validFormatLKToSources {
-				warningSummary += fmt.Sprintf("The license key found in %s has a valid New Relic format: %s. \nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n\n", strings.Join(sources, ",\n "), lk, err.Error())
+				warningSummary += fmt.Sprintf("The license key found in\n%s\nhas a valid New Relic format: %s\nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n", strings.Join(sources, "\n"), lk, err.Error())
 			}
 			resultsPayload = validFormatLKToSources
 		}
@@ -139,7 +139,7 @@ func findLKFromEnvVarSources(licenseKeys []LicenseKey) []LicenseKey {
 
 func checkEnvVarFormat(licenseKey LicenseKey) (bool, string) {
 	if licenseKeyUsingQuotes(licenseKey.Value) {
-		errMsg := fmt.Sprintf(`Using quotes around %s may cause inconsistent behavior. We highly recommend removing those quotes, and running the ` + tasks.ThisProgramFullName + ` again.`+"\n\n", licenseKey.Source)
+		errMsg := fmt.Sprintf(`Using quotes around %s may cause inconsistent behavior. We highly recommend removing those quotes, and running the `+tasks.ThisProgramFullName+` again.`+"\n\n", licenseKey.Source)
 		return false, errMsg
 	}
 	if isFormatValid(strings.TrimSpace(licenseKey.Value)) {

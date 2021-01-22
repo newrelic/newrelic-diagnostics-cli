@@ -86,7 +86,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 
 	if hasValidLogs {
 		var filesToCopyToResult []tasks.FileCopyEnvelope
-		var successSummary = "Succesfully collected one or more New Relic Log file(s). Those file names will be listed in the payload with the field 'CanCollect' set to true\n"
+		var successSummary = "Succesfully collected one or more New Relic Log file(s). Those file names will be listed in the nrdiag-output.json, under the payload section with the field 'CanCollect' set to true.\n"
 		for _, validPath := range validLogPaths {
 			filesToCopyToResult = append(filesToCopyToResult, tasks.FileCopyEnvelope{
 				Path:       validPath,
