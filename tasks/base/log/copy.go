@@ -93,12 +93,20 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 				Identifier: p.Identifier().String(),
 			})
 		}
+		//Look for NET log files. There are too many so we'll only include one file in the payload. By now all files should had been captured as part of filesToCopyToResult
+		var resultPayload interface{}
+		if hasDotnetLogs(logElements) {
+			resultPayload = filterDotnetLogElements(logElements)
+		} else {
+			resultPayload = logElements
+		}
+
 		if hasInvalidLogs {
 			warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support.", strings.Join(invalidLogPaths, ", "))
 			return tasks.Result{
 				Status:      tasks.Warning,
 				Summary:     successSummary + "\n" + warningSummary,
-				Payload:     logElements,
+				Payload:     resultPayload,
 				FilesToCopy: filesToCopyToResult,
 				URL:         "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 			}
@@ -107,7 +115,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		return tasks.Result{
 			Status:      tasks.Success,
 			Summary:     successSummary,
-			Payload:     logElements,
+			Payload:     resultPayload,
 			FilesToCopy: filesToCopyToResult,
 		}
 	}
@@ -118,6 +126,33 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		Payload: logElements,
 		URL:     "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/generate-new-relic-agent-logs-troubleshooting",
 	}
+}
+
+func filterDotnetLogElements(logElements []LogElement) []LogElement {
+	var filteredLogElements []LogElement
+	profilerRgx := regexp.MustCompile(profilerLogName)
+	foundFirstDotnetLog := false
+	for _, log := range logElements {
+		if profilerRgx.MatchString(log.FileName) {
+			if !foundFirstDotnetLog {
+				filteredLogElements = append(filteredLogElements, setLogElement(log.FileName, log.FilePath, log.Source, log.IsSecureLocation, true, dotnetLogsDownsizeExplanation))
+				foundFirstDotnetLog = true
+			}
+			continue
+		}
+		filteredLogElements = append(filteredLogElements, log)
+	}
+	// filteredLogElements = append(filteredLogElements, setLogElement())
+	return filteredLogElements
+}
+func hasDotnetLogs(logElements []LogElement) bool {
+	profilerRgx := regexp.MustCompile(profilerLogName)
+	for _, log := range logElements {
+		if profilerRgx.MatchString(log.FileName) {
+			return true
+		}
+	}
+	return false
 }
 
 func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) []LogElement {
@@ -205,7 +240,7 @@ func getLastModifiedDate(options tasks.Options) time.Time {
 		}
 		log.Debug("setting override lastModifiedDate to:", lastModifiedDate)
 	} else {
-		lastModifiedDate = time.Now().AddDate(0, 0, -DefaultMaxNumDays)
+		lastModifiedDate = time.Now().AddDate(0, 0, -defaultMaxNumDays)
 		log.Debug("Default last modified date is:", lastModifiedDate)
 	}
 	return lastModifiedDate

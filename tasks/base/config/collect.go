@@ -54,8 +54,9 @@ var secureFilePatterns = []string{
 	"gradle[.]properties",
 	"build[.]gradle",
 	"project[.]pbxproj",
-	"^(?i)web[.]config$",
+	"^(?i)(web|app)[.]config$",
 	"(?i).+[.]exe[.]config$", //  app.config files are almost always app-me.exe.config. filter NewRelicStatusMonitor.exe.config later
+	"(.+).csproj$",           //project file use to configure NET app
 	"(?i)appSettings[.]json$",
 }
 

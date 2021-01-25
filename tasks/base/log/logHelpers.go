@@ -39,12 +39,13 @@ var (
 	logFullPathSysProp = "-Dnewrelic.logfile"
 	profilerLogName    = "NewRelic[.]Profiler.*[.]log$"
 	profilerMaxNumDays = 4
-	DefaultMaxNumDays  = 7
+	defaultMaxNumDays  = 7
 )
 
 var logEnvVars = []string{
-	"NRIA_LOG_FILE", // Infra agent
-	"NEW_RELIC_LOG", //Java, Node and python agent paths
+	"NRIA_LOG_FILE",                   // Infra agent
+	"NEW_RELIC_LOG",                   //.NET, Java, Node and python agent paths
+	"NEWRELIC_PROFILER_LOG_DIRECTORY", //.NET path\to\agent\directory (not configurable via config file)
 }
 
 var keysInConfigFile = map[string][]string{
@@ -62,7 +63,9 @@ var keysInConfigFile = map[string][]string{
 		"log_file_path", //Java, ruby: "/Users/shuayhuaca/Desktop/"
 		"-directory",    //.NET "PATH\TO\LOG\DIRECTORY"
 	},
-	//"log.directory", //NET: how do we parse XML files?
+	/* NET agent configuration:
+	<log level="info" directory="PATH\TO\LOG\DIRECTORY" fileName="newrelic.log" />
+	*/
 }
 
 type LogElement struct {
@@ -81,11 +84,12 @@ type LogSourceData struct {
 }
 
 var (
-	logPathDefaultSource         = "Found by looking at standard locations"
-	logPathConfigFileSource      = "Found by looking at values in New Relic config file settings"
-	logPathEnvVarSource          = "Found by looking at New Relic environment variables"
-	logPathSysPropSource         = "Found by looking at JVM arguments"
-	logPathDiagnosticsFlagSource = "Found by looking at the path defined by user through the " + tasks.ThisProgramFullName + " command line flag: logpath"
+	logPathDefaultSource          = "Found by looking at standard locations"
+	logPathConfigFileSource       = "Found by looking at values in New Relic config file settings"
+	logPathEnvVarSource           = "Found by looking at New Relic environment variables"
+	logPathSysPropSource          = "Found by looking at JVM arguments"
+	logPathDiagnosticsFlagSource  = "Found by looking at the path defined by user through the " + tasks.ThisProgramFullName + " command line flag: logpath"
+	dotnetLogsDownsizeExplanation = "Not all instances of .NET logs are listed here in the payload. To view the full list, review the FilesToCopy value or the nrdiag-filelist.txt"
 )
 
 func collectFilePaths(envVars map[string]string, configElements []baseConfig.ValidateElement, foundSysProps map[string]string, options tasks.Options) []LogElement {
@@ -160,13 +164,12 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		logPath, isPresent := envVars[logEnvVar]
 		if isPresent {
 			//isIncompletePath represent those path value founds that did not provides full path to log file but only a directory path or a filename. Those incomplete paths are getting collected in a map called unmatchedDirKeyToVal or unmatchedFilenameKeyToVal
-			logElement, isIncompletePath := getLogPathFromEnvVar(logPath, logEnvVar, unmatchedFilenameKeyToVal)
+			logElement, isIncompletePath := getLogPathFromEnvVar(logPath, logEnvVar, unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
 			if !isIncompletePath {
 				logFilesFound = append(logFilesFound, logElement)
 			}
 		}
 	}
-
 	//collect log paths from new relic JVM arguments
 	if len(foundSysProps) > 0 {
 		logFullPathSysPropVal, isPresent := foundSysProps[logFullPathSysProp]
@@ -191,18 +194,12 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 	}
 
 	//collect a full log path by putting together a filename and directory path that come from different sources, such as a dir path that comes system prop (Dnewrelic.config.log_file_path:path/todir) and filename that comes a config file setting (log_file_name:somecustomlogname)
-	if len(unmatchedDirKeyToVal) > 0 && len(unmatchedFilenameKeyToVal) > 0 {
-		logElements := getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
-		if len(logElements) > 0 {
-			logFilesFound = append(logFilesFound, logElements...)
-		}
-	} else if len(unmatchedDirKeyToVal) > 0 || len(unmatchedFilenameKeyToVal) > 0 {
-		logElements := getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath)
+	if len(unmatchedDirKeyToVal) > 0 || len(unmatchedFilenameKeyToVal) > 0 {
+		logElements := getLogPathFromUnmatchedKeys(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath)
 		if len(logElements) > 0 {
 			logFilesFound = append(logFilesFound, logElements...)
 		}
 	}
-
 	//collect paths to New Relic log Files by looking into standard directories. By looking at standard locations we take the risk of collecting old log files that the user is no longer working with. We'll add a check here for making sure we only collect recent files based on their modified date
 	logElements := getLogPathsFromStandardLocations(paths, options)
 	if len(logElements) > 0 {
@@ -212,6 +209,20 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 	return logFilesFound
 }
 
+func getLogPathFromUnmatchedKeys(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal map[string]string, currentPath string) []LogElement {
+	if len(unmatchedDirKeyToVal) > 0 && len(unmatchedFilenameKeyToVal) > 0 {
+		logElements := getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
+		if len(logElements) > 0 {
+			return logElements
+		}	
+	} 
+	logElements := getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath)
+	if len(logElements) > 0 {
+		return logElements
+	}
+	return []LogElement{}
+}
+
 func getLogPathsFromSecureLocations(paths []string) []LogElement {
 	var logElements []LogElement
 	secureFileLocations := tasks.FindFiles(secureLogFilenamePatterns, paths)
@@ -219,8 +230,8 @@ func getLogPathsFromSecureLocations(paths []string) []LogElement {
 		for _, fileLocation := range secureFileLocations {
 			dir, fileName := filepath.Split(fileLocation)
 			logSourceData := LogSourceData{
-				FoundBy: logPathDefaultSource,
-				KeyVals: nil,
+				FoundBy:  logPathDefaultSource,
+				KeyVals:  nil,
 				FullPath: fileLocation,
 			}
 			logElements = append(logElements, setLogElement(fileName, dir, logSourceData, true, true, ""))
@@ -238,12 +249,12 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 				for _, fullPath := range logPaths {
 					dir, fileName := filepath.Split(fullPath)
 					logSourceData := LogSourceData{
-						FoundBy: fmt.Sprintf("Found by looking for standard names for New Relic log files in the provided directory value %s for the key %s", dirVal, dirKey),
+						FoundBy: fmt.Sprintf("Found by looking for standard New Relic log file names in the provided directory value (%s) for the key %s", dirVal, dirKey),
 						KeyVals: map[string]string{
 							dirKey: dirVal,
 						},
 						FullPath: fullPath,
-					}					
+					}
 					logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 				}
 			}
@@ -319,8 +330,8 @@ func getLogPathsFromStandardLocations(paths []string, options tasks.Options) []L
 		mostRecentOldLog := selectMostRecentOldLogs(oldLogFiles)
 		dir, fileName := filepath.Split(mostRecentOldLog)
 		logSourceData := LogSourceData{
-			FoundBy: logPathDefaultSource,
-			KeyVals: nil,
+			FoundBy:  logPathDefaultSource,
+			KeyVals:  nil,
 			FullPath: mostRecentOldLog,
 		}
 		logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
@@ -351,7 +362,7 @@ func getLogPathFromSysProp(sysPropKey, sysPropVal string) LogElement {
 	return setLogElement(fileName, dir, logSourceData, false, true, "")
 }
 
-func getLogPathFromEnvVar(logPath string, logEnvVar string, unmatchedFilenameKeyToVal map[string]string) (LogElement, bool) {
+func getLogPathFromEnvVar(logPath string, logEnvVar string, unmatchedDirKeyToVal, unmatchedFilenameKeyToVal map[string]string) (LogElement, bool) {
 	if strings.ToLower(logPath) == "stdout" || strings.ToLower(logPath) == "stderr" {
 		logSourceData := LogSourceData{
 			FoundBy: logPathEnvVarSource,
@@ -363,19 +374,27 @@ func getLogPathFromEnvVar(logPath string, logEnvVar string, unmatchedFilenameKey
 		reasonToNotCollect := tasks.ThisProgramFullName + " cannot collect logs that have been set to STDOUT OR STDERR"
 		return setLogElement(logPath, logPath, logSourceData, false, false, reasonToNotCollect), false
 	}
-	dir, fileName := filepath.Split(logPath)
-	if len(dir) > 0 { //path is a directory or a fullpath that includes filename
-		logSourceData := LogSourceData{
-			FoundBy: logPathEnvVarSource,
-			KeyVals: map[string]string{
-				logEnvVar: logPath,
-			},
-			FullPath: logPath,
-		}
-		return setLogElement(fileName, dir, logSourceData, false, true, ""), false
+	//check if path is a directory path
+	pathInfo, err := os.Stat(logPath)
+	if err != nil {
+		//if we got an error it means this is not a path but just a filename
+		unmatchedFilenameKeyToVal[logEnvVar] = logPath
+		return LogElement{}, true
 	}
-	unmatchedFilenameKeyToVal[logEnvVar] = fileName
-	return LogElement{}, true
+	if pathInfo.IsDir() {
+		unmatchedDirKeyToVal[logEnvVar] = logPath
+		return LogElement{}, true
+	}
+	//path is a fullpath that includes filename
+	dir, fileName := filepath.Split(logPath) //this method does not work on Windows. It will return an empty string for dir and return "C:\Users\Administrator\Desktop\nrlogs\newrelic.log" for fileName. And this should be fine because we'll collect the file by looking at the FullPath field
+	logSourceData := LogSourceData{
+		FoundBy: logPathEnvVarSource,
+		KeyVals: map[string]string{
+			logEnvVar: logPath,
+		},
+		FullPath: logPath,
+	}
+	return setLogElement(fileName, dir, logSourceData, false, true, ""), false
 }
 
 func getLogPathFromConfigSysProps(configSysProps, unmatchedDirKeyToVal, unmatchedFilenameKeyToVal map[string]string) (LogElement, bool) {
@@ -387,7 +406,7 @@ func getLogPathFromConfigSysProps(configSysProps, unmatchedDirKeyToVal, unmatche
 			FoundBy:  logPathSysPropSource,
 			KeyVals:  configSysProps,
 			FullPath: filepath.Join(dir, filename),
-		}	
+		}
 		return setLogElement(filename, dir, logSourceData, false, true, ""), false
 	}
 
