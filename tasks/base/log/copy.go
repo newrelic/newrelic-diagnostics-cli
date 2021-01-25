@@ -131,18 +131,19 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 func filterDotnetLogElements(logElements []LogElement) []LogElement {
 	var filteredLogElements []LogElement
 	profilerRgx := regexp.MustCompile(profilerLogName)
-	foundFirstDotnetLog := false
+	directoryToProfilerLog := make(map[string]string)
+
 	for _, log := range logElements {
 		if profilerRgx.MatchString(log.FileName) {
-			if !foundFirstDotnetLog {
+			_, isPresent := directoryToProfilerLog[log.FilePath]
+			if !isPresent {
 				filteredLogElements = append(filteredLogElements, setLogElement(log.FileName, log.FilePath, log.Source, log.IsSecureLocation, true, dotnetLogsDownsizeExplanation))
-				foundFirstDotnetLog = true
+				directoryToProfilerLog[log.FilePath] = log.FileName
 			}
 			continue
 		}
 		filteredLogElements = append(filteredLogElements, log)
 	}
-	// filteredLogElements = append(filteredLogElements, setLogElement())
 	return filteredLogElements
 }
 func hasDotnetLogs(logElements []LogElement) bool {
