@@ -44,8 +44,8 @@ var PythonVersionAgentSupportability = map[string][]string{
 
 var SupportedJavaVersions = map[string][]string{
 	// supported vendors
-	"OpenJDK":    []string{"1.7-1.9.*", "7-14.*"},
-	"HotSpot":    []string{"1.7-1.9.*", "7-14.*"},
+	"OpenJDK":    []string{"1.7-1.9.*", "7-15.*"},
+	"HotSpot":    []string{"1.7-1.9.*", "7-15.*"},
 	"JRockit":    []string{"1-1.6.0.50"},
 	"Coretto":    []string{"1.8-1.9.*", "8-11.*"},
 	"Zulu":       []string{"1.8-1.9.*", "8-12.*"},
