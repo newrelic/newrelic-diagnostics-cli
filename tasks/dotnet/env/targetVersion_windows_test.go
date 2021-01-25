@@ -4,11 +4,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-
-
 )
 
 func TestDotNetEnv(t *testing.T) {
@@ -25,7 +23,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 	})
 	Describe("Explain()", func() {
 		It("Should return Explain string", func() {
-			Expect(p.Explain()).To(Equal("Determine version of .NET application"))
+			Expect(p.Explain()).To(Equal("Determine framework version of .NET application"))
 		})
 	})
 
