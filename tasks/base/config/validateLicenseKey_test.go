@@ -115,7 +115,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
-				Expect(result.Summary).To(Equal("We validated 1 license key(s):\nThe license key found in\n/app/myappname/newrelic.ini\nhas a valid New Relic format: " + `"08a2ad66c637a29c3982469a3fe8d1982d00NRAL"` + "\n" + `Though we ran into an error (Expected StatusCode < 300 got 500: {"success":false,"error":"Could not resolve license keys") while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.` + "\n"))
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in /app/myappname/newrelic.ini has a valid New Relic format: "08a2ad66c637a29c3982469a3fe8d1982d00NRAL". ` + "\n" + `Though we ran into an error (Expected StatusCode < 300 got 500: {"success":false,"error":"Could not resolve license keys") while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.` + "\n\n"))
 
 			})
 		})

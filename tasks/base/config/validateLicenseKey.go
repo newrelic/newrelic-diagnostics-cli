@@ -94,7 +94,7 @@ func (p BaseConfigValidateLicenseKey) Execute(options tasks.Options, upstream ma
 
 		if err != nil {
 			for lk, sources := range validFormatLKToSources {
-				warningSummary += fmt.Sprintf("The license key found in\n%s\nhas a valid New Relic format: %s\nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n", strings.Join(sources, "\n"), lk, err.Error())
+				warningSummary += fmt.Sprintf("The license key found in %s has a valid New Relic format: %s. \nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n\n", strings.Join(sources, ",\n "), lk, err.Error())
 			}
 			resultsPayload = validFormatLKToSources
 		}
