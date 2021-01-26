@@ -79,12 +79,11 @@ func (p DotNetEnvTargetVersion) getNetConfigFiles(workingDir string) []string {
 	patterns := []string{`(.+).csproj$`, "^(?i)(web|app)[.]config$",
 		"(?i).+[.]exe[.]config$", //  app.config files are almost always app-me.exe.config. filter NewRelicStatusMonitor.exe.config later
 	}
-	paths := []string{workingDir}
-	configs := p.findFiles(patterns, paths)
+	configs := p.findFiles(patterns, []string{workingDir})
 
 	var configPaths []string
-	for _, paths := range configs {
-		splitPaths := strings.SplitAfterN(paths, "found file ", 1)
+	for _, path := range configs {
+		splitPaths := strings.SplitAfterN(path, "found file ", 1)
 		if len(splitPaths) < 1 {
 			continue
 		}
