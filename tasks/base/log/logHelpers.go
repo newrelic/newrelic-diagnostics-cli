@@ -88,7 +88,7 @@ var (
 	logPathConfigFileSource       = "Found by looking at values in New Relic config file settings"
 	logPathEnvVarSource           = "Found by looking at New Relic environment variables"
 	logPathSysPropSource          = "Found by looking at JVM arguments"
-	logPathDiagnosticsFlagSource  = "Found by looking at the path defined by user through the " + tasks.ThisProgramFullName + " command line flag: logpath"
+	logPathDiagnosticsFlagSource  = "Found by looking at the path defined by the user through the " + tasks.ThisProgramFullName + " command line flag '-logpath'"
 	dotnetLogsDownsizeExplanation = "Not all .NET profiler logs get listed here in the 'Payload'. To view the full list, review the 'FilesToCopy' value or the nrdiag-filelist.txt"
 )
 
@@ -193,14 +193,14 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		}
 	}
 
-	//collect a full log path by putting together a filename and directory path that come from different sources, such as a dir path that comes system prop (Dnewrelic.config.log_file_path:path/todir) and filename that comes a config file setting (log_file_name:somecustomlogname)
+	//collect a full log path by putting together a filename and directory path that come from different sources, such as a dir path that comes from a system prop (Dnewrelic.config.log_file_path:path/todir) and filename that comes from a config file setting (log_file_name:somecustomlogname)
 	if len(unmatchedDirKeyToVal) > 0 || len(unmatchedFilenameKeyToVal) > 0 {
 		logElements := getLogPathFromUnmatchedKeys(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath, options)
 		if len(logElements) > 0 {
 			logFilesFound = append(logFilesFound, logElements...)
 		}
 	}
-	//collect paths to New Relic log Files by looking into standard directories. By looking at standard locations we take the risk of collecting old log files that the user is no longer working with. We'll add a check here for making sure we only collect recent files based on their modified date
+	//collect paths to New Relic log Files by looking into standard locations
 	logElements := getLogPathsFromStandardLocations(paths, options)
 	if len(logElements) > 0 {
 		logFilesFound = append(logFilesFound, logElements...)
@@ -391,7 +391,7 @@ func getLogPathFromEnvVar(logPath string, logEnvVar string, unmatchedDirKeyToVal
 	//check if path is a directory path
 	pathInfo, err := os.Stat(logPath)
 	if err != nil {
-		//if we got an error it means this is not a path but just a filename
+		//if we got an error it means this is not a path but a filename
 		unmatchedFilenameKeyToVal[logEnvVar] = logPath
 		return LogElement{}, true
 	}
