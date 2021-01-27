@@ -13,14 +13,17 @@ jobs:
         id: flr
         with:
           github_token: ${{ github.token }}
-#       - name: delete latest release tag
-#         shell: bash
-#         run: |
-#             echo "deleting tag associated with latest release:"
-#             echo ${{ steps.flr.outputs.tag_name }}
+      - name: delete latest release tag
+        shell: bash
+        run: |
+            echo "deleting tag associated with latest release:"
+            echo ${{ steps.flr.outputs }}
+            echo ${{ steps.flr.outputs.tag_name }}
 #             git push --delete origin ${{ steps.flr.outputs.tag_name }}
-      - name: Debug data around fetch-latest-release
-        run: echo ${{ steps.flr.outputs }}
+      - name: Debug GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - name: Install Go
         uses: actions/setup-go@v2
         with:
