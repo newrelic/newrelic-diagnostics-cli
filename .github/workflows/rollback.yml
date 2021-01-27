@@ -1,0 +1,35 @@
+name: Rollback
+
+on:
+  release:
+    types: [deleted]
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: fetch latest release
+        uses: thebritican/fetch-latest-release@v2.0.0
+        id: flr
+        with:
+          github_token: ${{ github.token }}
+      - name: delete latest release tag
+        shell: bash
+        run: |
+            echo "deleting tag associated with latest release:"
+            echo ${{ steps.flr.outputs.tag_name }}
+            git push --delete origin ${{ steps.flr.outputs.tag_name }}
+      - name: Debug data around fetch-latest-release
+        run: echo {{ steps.flr.outputs }}
+      - name: remove nrdiag zip files from download.newrelic.com related to last release
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run : |
+          echo "starting release rollback process ..."
+          ./scripts/rollback.sh
+
+
+
