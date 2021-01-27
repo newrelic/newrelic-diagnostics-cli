@@ -7,6 +7,9 @@ CURRENTZIP="nrdiag_${CURRENT}.zip"
 PREV=$(cat releaseVersion.txt | awk -F'prevReleaseVersion=' '{printf$2}')
 PREVZIP="nrdiag_${PREV}.zip"
 
+echo "aws version is:"
+aws --version
+
 echo "deleting current release zip file ..."
 aws s3 rm s3://${S3_BUCKET}/nrdiag/test/${CURRENTZIP}
 
