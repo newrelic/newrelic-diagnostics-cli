@@ -13,12 +13,12 @@ jobs:
         id: flr
         with:
           github_token: ${{ github.token }}
-      - name: delete latest release tag
-        shell: bash
-        run: |
-            echo "deleting tag associated with latest release:"
-            echo ${{ steps.flr.outputs.tag_name }}
-            git push --delete origin ${{ steps.flr.outputs.tag_name }}
+#       - name: delete latest release tag
+#         shell: bash
+#         run: |
+#             echo "deleting tag associated with latest release:"
+#             echo ${{ steps.flr.outputs.tag_name }}
+#             git push --delete origin ${{ steps.flr.outputs.tag_name }}
       - name: Debug data around fetch-latest-release
         run: echo {{ steps.flr.outputs }}
       - name: remove nrdiag zip files from download.newrelic.com related to last release
