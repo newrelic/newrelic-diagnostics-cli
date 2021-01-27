@@ -3,9 +3,10 @@ package agent
 import (
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	NodeEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 func TestNodeAgentVersion(t *testing.T) {
@@ -15,132 +16,96 @@ func TestNodeAgentVersion(t *testing.T) {
 
 var _ = Describe("Node/Agent/Version", func() {
 
-	Describe("searchLogs", func() {
+	var p NodeAgentVersion
+	Describe("getNodeVerFromPayload()", func() {
 		var (
-			logElement logtask.LogElement
-			output     string
-			err        error
+			incomingPayload []NodeEnv.NodeModuleVersion
+			output          string
 		)
 
 		JustBeforeEach(func() {
-			output, err = searchLogs(logElement)
+			output = getNodeVerFromPayload(incomingPayload)
 		})
 
-		Context("When given a logElement containing a Node Agent Version", func() {
+		Context("When given a payload containing a Node Agent version", func() {
 			BeforeEach(func() {
-				logElement = logtask.LogElement{
-					FileName: "newrelic_agent.log",
-					FilePath: "../../fixtures/node/",
+				incomingPayload = []NodeEnv.NodeModuleVersion{
+					{
+						Module:  "Apollo",
+						Version: "1.2.3",
+					},
+					{
+						Module:  "newrelic",
+						Version: "2.1.4",
+					},
 				}
 			})
-			It("Should return the expected agent version and a nil error", func() {
-				Expect(output).To(Equal("1.38.2"))
-				Expect(err).To(BeNil())
-
-			})
-		})
-
-		Context("When given a malformed logElement path ", func() {
-			BeforeEach(func() {
-				logElement = logtask.LogElement{
-					FileName: "newrelic_agent.log",
-					FilePath: "../../../NonExistentDirectory/node/",
-				}
-			})
-			It("Should return an empty agent version and an error", func() {
-				Expect(output).To(Equal(""))
-				Expect(err).To(Not(BeNil()))
+			It("Should return the expected agent version", func() {
+				expectedReturn := "newrelic 2.1.4"
+				Expect(output).To(Equal(expectedReturn))
 			})
 		})
 
-		Context("When given a file with no Node Agent Version ", func() {
+		Context("When given a payload which does not contain a Node Agent Version", func() {
 			BeforeEach(func() {
-				logElement = logtask.LogElement{
-					FileName: "newrelic-python-agent.log",
-					FilePath: "../../fixtures/python/root/tmp/",
+				incomingPayload = []NodeEnv.NodeModuleVersion{
+					{
+						Module:  "Apollo",
+						Version: "1.2.3",
+					},
+					{
+						Module:  "lodash",
+						Version: "4.2.03",
+					},
 				}
 			})
-			It("Should return an empty agent version and no error", func() {
-				Expect(output).To(Equal(""))
-				Expect(err).To(BeNil())
+			It("Should return an empty Node agent version", func() {
+				expectedReturn := ""
+				Expect(output).To(Equal(expectedReturn))
 			})
 		})
 
 	})
 
-	Describe("getNodeVerFromLog()", func() {
+	Describe("Execute()", func() {
 		var (
-			incomingLogs []logtask.LogElement
-			output       []logNodeAgentVersion
+			options  tasks.Options
+			upstream map[string]tasks.Result
+			result   tasks.Result
 		)
 
 		JustBeforeEach(func() {
-			output = getNodeVerFromLog(incomingLogs)
+			result = p.Execute(options, upstream)
 		})
 
-		Context("When given a logElement containing a Node Agent version", func() {
+		Context("When given a Node Agent Module isn't found", func() {
 			BeforeEach(func() {
-				incomingLogs = []logtask.LogElement{
-					logtask.LogElement{
-						FileName: "newrelic_agent.log",
-						FilePath: "../../fixtures/node/",
+				upstream = map[string]tasks.Result{
+					"Node/Env/Dependencies": tasks.Result{
+						Status: tasks.Info,
+						Payload: []NodeEnv.NodeModuleVersion{
+							{
+								Module:  "Apollo",
+								Version: "1.2.3",
+							},
+							{
+								Module:  "lodash",
+								Version: "4.2.03",
+							},
+						},
+					},
+					"Node/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 					},
 				}
 			})
-			It("Should return the expected agent version, log file location, and true", func() {
-				expectedReturn := []logNodeAgentVersion{
-					logNodeAgentVersion{
-						Logfile:      "../../fixtures/node/newrelic_agent.log",
-						AgentVersion: "1.38.2",
-						MatchFound:   true,
-					},
+			It("Should return a tasks.Warning", func() {
+				expectedReturn := tasks.Result{
+					Status:  tasks.Warning,
+					Summary: "Node Agent Module not found for newrelic",
 				}
-				Expect(output).To(Equal(expectedReturn))
+				Expect(result).To(Equal(expectedReturn))
 			})
-		})
-
-		Context("When given a logElement which does not contain a Node Agent Version", func() {
-			BeforeEach(func() {
-				incomingLogs = []logtask.LogElement{
-					logtask.LogElement{
-						FileName: "newrelic-python-agent.log",
-						FilePath: "../../fixtures/python/root/tmp/",
-					},
-				}
-			})
-			It("Should return an empty Node agent version, the log file location, and false", func() {
-				expectedReturn := []logNodeAgentVersion{
-					logNodeAgentVersion{
-						Logfile:      "../../fixtures/python/root/tmp/newrelic-python-agent.log",
-						AgentVersion: "",
-						MatchFound:   false,
-					},
-				}
-				Expect(output).To(Equal(expectedReturn))
-			})
-		})
-
-		Context("When given a logElement with a malformed filepath", func() {
-			BeforeEach(func() {
-				incomingLogs = []logtask.LogElement{
-					logtask.LogElement{
-						FileName: "newrelic_agent.BADFILE.log",
-						FilePath: "../../fixtures/node/",
-					},
-				}
-			})
-			It("Should return an empty agent version, log file location, and false", func() {
-				expectedReturn := []logNodeAgentVersion{
-					logNodeAgentVersion{
-						Logfile:      "../../fixtures/node/newrelic_agent.BADFILE.log",
-						AgentVersion: "",
-						MatchFound:   false,
-					},
-				}
-				Expect(output).To(Equal(expectedReturn))
-			})
-
 		})
 	})
-
 })
