@@ -26,7 +26,7 @@ else
   HABERDASHER_URL="${PROD_HABERDASHER_URL}"
 fi
 
-VERSION=$(cat majorMinorVersion.txt | awk -F'=' '{print$2}')
+VERSION=$(cat releaseVersion.txt | awk -F'majorMinor=' '{printf$2}')
 
 BUILD_TIMESTAMP=$(date -u '+%Y-%m-%d_%I:%M:%S%p')
 LDFLAGS="-X ${CONFIG_PATH}.Version=${VERSION}.${VERSION_NUMBER} -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.UsageEndpoint=${USAGE_ENDPOINT} -X ${CONFIG_PATH}.AttachmentEndpoint=${ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.HaberdasherURL=${HABERDASHER_URL}"
