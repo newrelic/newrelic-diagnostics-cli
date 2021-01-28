@@ -8,6 +8,14 @@ jobs:
   rollback:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.13.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: fetch latest release
         uses: thebritican/fetch-latest-release@v2.0.0
         id: flr
@@ -26,14 +34,6 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Install Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.13.x
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: remove nrdiag zip files from download.newrelic.com related to last release
         shell: bash
         env:
