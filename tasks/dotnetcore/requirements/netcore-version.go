@@ -1,7 +1,12 @@
 package requirements
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
 )
 
 // DotNetCoreRequirementsNetCoreVersion - This task checks the .NET Core version against the .Net Core Agent requirements
@@ -26,7 +31,7 @@ func (t DotNetCoreRequirementsNetCoreVersion) Dependencies() []string {
 	}
 }
 
-const resultURL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#net-version"
+const resultURL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-core#net-version"
 
 // Execute - The core work within each task
 func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) (result tasks.Result) {
@@ -41,7 +46,7 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 		return
 	}
 
-	installedVersions, ok := upstream["DotNetCore/Env/Versions"].Payload.([]string)
+	coreInstalledVersions, ok := upstream["DotNetCore/Env/Versions"].Payload.([]string)
 
 	if !ok {
 		result.Status = tasks.Error
@@ -49,22 +54,52 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 		return
 	}
 
-	result = checkVersion(installedVersions)
-	return
-}
+	unsupportedVersions, errorMessage := checkCoreVersionsAreSupported(coreInstalledVersions)
 
-func checkVersion(installedVersions []string) (result tasks.Result) {
-	for _, version := range installedVersions {
-		majorVer, _, _, _ := tasks.GetVersionSplit(version)
-		if majorVer >= 2 {
-			result.Status = tasks.Success
-			result.Summary = ".NET Core 2.0 or higher detected."
-			return
+	if len(errorMessage) > 0 {
+		return tasks.Result{
+			Status: tasks.Error,
+			Summary: errorMessage,
+		}
+	} 
+
+	if len(unsupportedVersions) == 0 {
+		return tasks.Result{
+			Status:  tasks.Success,
+			Summary: fmt.Sprintf(".NET Core 2.0 or higher detected: %s", strings.Join(coreInstalledVersions, ", ")),
 		}
 	}
 
-	result.Status = tasks.Failure
-	result.Summary = ".NET Core 2.0 or higher not detected."
-	result.URL = resultURL
-	return
+	return tasks.Result{
+		Status:  tasks.Warning,
+		Summary: fmt.Sprintf("One or more .NET Core versions did not meet our agent version requirements: %s", strings.Join(unsupportedVersions, ", ")),
+		URL:     resultURL,
+	}
+}
+
+func checkCoreVersionsAreSupported(dotnetCoreInstalledVers []string) ([]string, string) {
+	var unsupportedVers []string
+	var supportedVers []string
+	errorMessage := "We were unable to validate if this application is using a supported .NET core version because we ran into some unexpected error(s)\n"
+	for _, coreVersion := range dotnetCoreInstalledVers {
+		parsedVersion, err := tasks.ParseVersion(coreVersion)
+		if err != nil {
+			errorMessage += err.Error() + "\n"
+			continue
+		}
+		majorVer, minorVer, _, _ := tasks.GetVersionSplit(parsedVersion.String())
+		majorMinorVer := strconv.Itoa(majorVer) + "." + strconv.Itoa(minorVer)
+		_, isPresent := compatibilityVars.DotnetCoreSupportedVersions[majorMinorVer]
+		if !isPresent {
+			unsupportedVers = append(unsupportedVers, coreVersion)
+		} else {
+			supportedVers = append(supportedVers, coreVersion)
+		}
+	}
+
+	if len(unsupportedVers) == 0 && len(supportedVers) == 0 {
+		//looks like we were unable to parse any version from the slice of strings we received from payload
+		return unsupportedVers, errorMessage
+	}
+	return unsupportedVers, ""//we are going to ignore errorMessage because we were able to parse at least one version from the slice payload
 }

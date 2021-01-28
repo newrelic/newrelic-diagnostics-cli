@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os/exec"
+	"runtime"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -16,22 +17,17 @@ const defaultJMXport = "9999"
 
 // InfraConfigValidateJMX - This struct defines the task
 type InfraConfigValidateJMX struct {
-	mCmdExecutor func(cmdWrapper, cmdWrapper) ([]byte, error)
-}
-
-//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
-//allowing for: cmd1 args | cmd2 args
-type cmdWrapper struct {
-	cmd  string
-	args []string
+	mCmdExecutor func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
 }
 
 type JmxConfig struct {
-	Host            string
-	Port            string
-	User            string
-	Password        string
-	CollectionFiles string
+	Host                  string
+	Port                  string
+	User                  string
+	Password              string
+	CollectionFiles       string
+	JavaVersion           string
+	JmxProcessCmdlineArgs []string
 }
 
 func (j JmxConfig) MarshalJSON() ([]byte, error) {
@@ -45,19 +41,23 @@ func (j JmxConfig) MarshalJSON() ([]byte, error) {
 	if j.Password != "" {
 		sanitizedPasswordString = "_REDACTED_"
 	}
-
+	//ps -ef | grep jmx
 	return json.Marshal(&struct {
-		Host            string `json:"jmx_host"`
-		Port            string `json:"jmx_port"`
-		User            string `json:"jmx_user"`
-		Password        string `json:"jmx_pass"`
-		CollectionFiles string `json:"collection_files"`
+		Host                  string   `json:"jmx_host"`
+		Port                  string   `json:"jmx_port"`
+		User                  string   `json:"jmx_user"`
+		Password              string   `json:"jmx_pass"`
+		CollectionFiles       string   `json:"collection_files"`
+		JavaVersion           string   `json:"java_version"`
+		JmxProcessCmdlineArgs []string `json:"jmx_process_arguments"`
 	}{
-		Host:            j.Host,
-		Port:            j.Port,
-		User:            sanitizedUserString,
-		Password:        sanitizedPasswordString,
-		CollectionFiles: j.CollectionFiles,
+		Host:                  j.Host,
+		Port:                  j.Port,
+		User:                  sanitizedUserString,
+		Password:              sanitizedPasswordString,
+		CollectionFiles:       j.CollectionFiles,
+		JavaVersion:           j.JavaVersion,
+		JmxProcessCmdlineArgs: j.JmxProcessCmdlineArgs,
 	})
 }
 
@@ -75,6 +75,7 @@ func (p InfraConfigValidateJMX) Explain() string {
 func (p InfraConfigValidateJMX) Dependencies() []string {
 	return []string{
 		"Infra/Config/IntegrationsMatch",
+		"Java/Env/Version",
 	}
 }
 
@@ -112,17 +113,33 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 		}
 	}
 
+	//This data (JavaVersion and JmxProcessCmdlineArgs) it's relevant for TSE troubleshooting process
+	if upstream["Java/Env/Version"].Status == tasks.Success {
+		javaVersion, ok := upstream["Java/Env/Version"].Payload.(string)
+		if ok {
+			jmxKeys.JavaVersion = javaVersion
+		}
+	} else { //this implies tasks.Warning and not tasks.None because that task would definitely attempt to run once Infra/Config/Agent was found
+		jmxKeys.JavaVersion = "Unable to find a Java path/version after running the command: java -version"
+	}
+	jmxCmdlineArgs := p.getJMXProcessCmdlineArgs()
+	if len(jmxCmdlineArgs) < 1 {
+		jmxKeys.JmxProcessCmdlineArgs = []string{"Unable to find a running JVM process that has JMX enabled or configured in its arguments"}
+	} else {
+		jmxKeys.JmxProcessCmdlineArgs = jmxCmdlineArgs
+	}
+
 	nrjmxErr := p.checkJMXServer(jmxKeys)
 	if nrjmxErr != nil {
 		log.Debug("nrjmxErr", nrjmxErr)
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "Error connecting to local JMXServer:\n" + nrjmxErr.Error(),
+			Summary: "We tested the JMX integration connection to local JMXServer by running the command echo '*:*' | nrjmx -H localhost -P 8080 -v -d - and we found this error:\n" + nrjmxErr.Error(),
 			URL:     "https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/jmx-monitoring-integration#troubleshoot",
 			Payload: jmxKeys,
 		}
 	}
-
+	//We are able to run our nrjmx integration directly against their JMX server
 	if jmxKeys.Host == "" || jmxKeys.Port == "" {
 		return tasks.Result{
 			Status:  tasks.Warning,
@@ -138,6 +155,34 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 		Payload: jmxKeys,
 	}
 
+}
+
+func (p InfraConfigValidateJMX) getJMXProcessCmdlineArgs() []string {
+	collectedJmxArgs := []string{}
+
+	javaProcs := tasks.GetJavaProcArgs()
+	for _, proc := range javaProcs {
+		for _, arg := range proc.Args {
+			//We only capture jvm args that are jmx configuration related
+			if !(strings.Contains(arg, "jmx")) {
+				continue
+			}
+			if strings.Contains(arg, "password") || strings.Contains(arg, "access") || strings.Contains(arg, "login") {
+				/* Remove values from sensitive arguments
+				https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html
+				com.sun.management.jmxremote.login.config
+				com.sun.management.jmxremote.access.file
+				com.sun.management.jmxremote.password.file
+				*/
+				keyVal := strings.Split(arg, "=")
+				collectedJmxArgs = append(collectedJmxArgs, keyVal[0]+"="+"_REDACTED_")
+			} else {
+				collectedJmxArgs = append(collectedJmxArgs, arg)
+			}
+		}
+	}
+
+	return collectedJmxArgs
 }
 
 func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
@@ -180,18 +225,32 @@ func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
 }
 
 func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
-
 	// echo "*:type=*,name=*" | nrjmx -hostname 127.0.0.1 -port 9999 --verbose true // basic command that returns all the things
 	// this queries for all beans, and givens back all types and all names
-	cmd1 := cmdWrapper{
-		cmd:  "echo",
-		args: []string{"*:type=*,name=*"},
+	var cmd1 tasks.CmdWrapper
+	if runtime.GOOS == "windows" {
+		//The first argument passed to exec.Command is the name of an executable (somefile.exe) and "echo" is not. To use shell commands, call the shell executable, and pass in the built-in command (and parameters)
+		cmd1 = tasks.CmdWrapper{
+			Cmd:  "cmd.exe",
+			Args: []string{"/C", "echo", "*:type=*,name=*"},
+		}
+	} else {
+		cmd1 = tasks.CmdWrapper{
+			Cmd:  "echo",
+			Args: []string{"*:type=*,name=*"},
+		}
 	}
 
 	jmxArgs := buildNrjmxArgs(detectedConfig)
-	cmd2 := cmdWrapper{
-		cmd:  "nrjmx", // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
-		args: jmxArgs,
+	var nrjmxCmd string
+	if runtime.GOOS == "windows" {
+		nrjmxCmd = `C:\Program Files\New Relic\nrjmx\nrjmx` //backticks to escape backslashes
+	} else {
+		nrjmxCmd = "nrjmx"
+	}
+	cmd2 := tasks.CmdWrapper{
+		Cmd:  nrjmxCmd, // note we're using nrjmx here instead of nr-jmx, nrjmx is the raw connect to JMX command while nr-jmx is the wrapper that queries based on collection files
+		Args: jmxArgs,
 	}
 
 	output, err := p.mCmdExecutor(cmd1, cmd2)
@@ -206,31 +265,6 @@ func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
 	}
 
 	return nil
-}
-
-// takes multiple commands and pipes the first into the second
-func multiCmdExecutor(cmdWrapper1, cmdWrapper2 cmdWrapper) ([]byte, error) {
-
-	cmd1 := exec.Command(cmdWrapper1.cmd, cmdWrapper1.args...)
-	cmd2 := exec.Command(cmdWrapper2.cmd, cmdWrapper2.args...)
-
-	// Get the pipe of Stdout from cmd1 and assign it
-	// to the Stdin of cmd2.
-	pipe, err := cmd1.StdoutPipe()
-	if err != nil {
-		return []byte{}, err
-	}
-	cmd2.Stdin = pipe
-
-	// Start() cmd1, so we don't block on it.
-	err = cmd1.Start()
-	if err != nil {
-		return []byte{}, err
-	}
-
-	// Run Output() on cmd2 to capture the output.
-	return cmd2.CombinedOutput()
-
 }
 
 func buildNrjmxArgs(detectedConfig JmxConfig) []string {

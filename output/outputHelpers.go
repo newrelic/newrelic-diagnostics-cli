@@ -17,7 +17,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-const permissionsError = "\n------Error creating output files.------\n Please check to ensure you have rights to creating files in the local directory or specify a different output directory with -output-path\n"
+const permissionsError = "\n------Error creating output files.------\nEnsure you have rights for creating files in the local directory or specify a different output directory with -output-path\nA 'permission denied' error may be solved by re-running this program prefixed by the command 'sudo -E'. The '-E' option will help preserve the environment variables needed for running this program."
 
 type resultsOutput struct {
 	RunDate       time.Time
@@ -85,7 +85,7 @@ func CloseZip(zipfile *zip.Writer) {
 	log.Debug("Done executing tasks, closing zip file")
 	zipErr := zipfile.Close()
 	if zipErr != nil {
-		log.Info("error closing zip file", zipErr)
+		log.Info("error closing zip file: ", zipErr)
 	}
 }
 
@@ -144,13 +144,13 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			writer, err := dst.CreateHeader(header)
 
 			if err != nil {
-				log.Info("Error writing results to zip file", err)
+				log.Info("Error writing results to zip file: ", err)
 				return
 			}
 
 			_, err = io.Copy(writer, fileHandle)
 			if err != nil {
-				log.Info("Error writing file into zip", err)
+				log.Info("Error writing file into zip: ", err)
 			}
 		}
 

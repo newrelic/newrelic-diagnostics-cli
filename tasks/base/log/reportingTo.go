@@ -33,7 +33,7 @@ func (t BaseLogReportingTo) Dependencies() []string {
 // Execute - The core work within each task
 // Calls taskHelpers.ReturnStringInFile with "Reporting to:[^\n]*" specified.
 func (t BaseLogReportingTo) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	logs, ok := upstream["Base/Log/Copy"].Payload.([]LogElement)
+	logElements, ok := upstream["Base/Log/Copy"].Payload.([]LogElement)
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -41,10 +41,19 @@ func (t BaseLogReportingTo) Execute(options tasks.Options, upstream map[string]t
 		}
 	}
 
+	var logs []LogElement
+	for _, log := range logElements{
+		//IsSecureLocation represents non-new relic log files such as docker syslog
+		if !log.CanCollect || len(log.FileName) == 0 || len(log.FilePath) == 0 || log.IsSecureLocation {
+			continue
+		}
+		logs = append(logs, log)
+	}
+
 	if len(logs) == 0 {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Logs not found",
+			Summary: "New Relic logs not found",
 		}
 	}
 
