@@ -44,7 +44,7 @@ func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tas
 	if upstream["Node/Config/Agent"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Node agent not detected",
+			Summary: "Node Agent not detected. This task did not run",
 		}
 	}
 	if upstream["Node/Env/Dependencies"].Status == tasks.Info {
@@ -52,7 +52,7 @@ func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tas
 		if !ok {
 			return tasks.Result{
 				Status:  tasks.None,
-				Summary: "Node module version not detected",
+				Summary: "We were unable to find the 'newrelic' module required for the Node Agent installation. Make sure to run 'npm install newrelic' and verify that 'newrelic' is listed in your package.json",
 			}
 		}
 	}
