@@ -19,6 +19,8 @@ jobs:
             echo "deleting tag associated with latest release:"
             echo ${{ steps.flr.outputs }}
             echo ${{ steps.flr.outputs.tag_name }}
+            git push --delete origin v.lasttest
+#"ref": "refs/tags/v.test"
 #             git push --delete origin ${{ steps.flr.outputs.tag_name }}
       - name: Debug GitHub context
         env:
