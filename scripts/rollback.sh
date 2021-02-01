@@ -7,21 +7,20 @@ CURRENTZIP="nrdiag_${CURRENT}.zip"
 PREV=$(cat releaseVersion.txt | awk -F'prevReleaseVersion=' '{printf$2}')
 PREVZIP="nrdiag_${PREV}.zip"
 
-echo "aws version is:"
+echo "current aws version is:"
 aws --version
 
 echo "deleting current release zip file ..."
-aws s3 rm s3://${S3_BUCKET}/nrdiag/test/${CURRENTZIP}
+aws s3 rm s3://${S3_BUCKET}/nrdiag/${CURRENTZIP}
 
 echo "deleting version.txt ..."
-aws s3 rm s3://${S3_BUCKET}/nrdiag/test/version.txt
+aws s3 rm s3://${S3_BUCKET}/nrdiag/version.txt
 echo "creating a new version.txt inserting the previous version ..."
 echo ${PREV} >> version.txt
-aws s3 cp version.txt s3://${S3_BUCKET}/nrdiag/test/version.txt
+aws s3 cp version.txt s3://${S3_BUCKET}/nrdiag/version.txt
 echo "version is now:"
-aws s3 cp s3://nr-downloads-main/nrdiag/test/version.txt -
+aws s3 cp s3://nr-downloads-main/nrdiag/version.txt -
 
 echo "replacing nrdiag_latest.zip to be the previous one ..."
-#--copy-props metadata-directive parameter is to avoid calling GetObjectTagging permission
-#Unknown options: --copy-props,s3://***/nrdiag/test/nrdiag_latest.zip
-aws s3 cp s3://${S3_BUCKET}/nrdiag/test/${PREVZIP} s3://${S3_BUCKET}/nrdiag/test/nrdiag_latest.zip
+#once ubuntu-latest image upgrades their aws version to version 2, we'll need to update this command to use "--copy-props metadata-directive" arguments to avoid calling GetObjectTagging permission when copying a  file from bucket to bucket:
+aws s3 cp s3://${S3_BUCKET}/nrdiag/${PREVZIP} s3://${S3_BUCKET}/nrdiag/nrdiag_latest.zip
