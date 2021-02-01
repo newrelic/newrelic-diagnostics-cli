@@ -25,15 +25,8 @@ jobs:
         shell: bash
         run: |
             echo "deleting tag associated with latest release:"
-            echo ${{ steps.flr.outputs }}
-            echo ${{ steps.flr.outputs.tag_name }}
-            git push --delete origin v.lasttest
-#"ref": "refs/tags/v.test"
-#             git push --delete origin ${{ steps.flr.outputs.tag_name }}
-      - name: Debug GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+            git push --delete origin ${{ steps.flr.outputs.tag_name }}
+#Alternatively we could use the Github Context ref("ref": "refs/tags/v.test") to delete the current tag_name we just deleted manually
       - name: remove nrdiag zip files from download.newrelic.com related to last release
         shell: bash
         env:
