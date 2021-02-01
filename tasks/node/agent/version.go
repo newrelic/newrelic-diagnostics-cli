@@ -55,7 +55,7 @@ func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tas
 	if agentVersion == "" {
 		return tasks.Result{
 			Status:  tasks.Warning,
-			Summary: "Node Agent Module not found for newrelic",
+			Summary: "We were unable to find the 'newrelic' module required for the Node Agent installation. Make sure to run 'npm install newrelic' and verify that 'newrelic' is listed in your package.json",
 		}
 	}
 	log.Debug("Agent version", agentVersion)
