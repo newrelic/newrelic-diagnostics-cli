@@ -12,12 +12,6 @@ import (
 type NodeAgentVersion struct {
 }
 
-type logNodeAgentVersion struct {
-	Logfile      string
-	AgentVersion string
-	MatchFound   bool
-}
-
 // Identifier - This returns the Category, Subcategory and Name of this task
 func (t NodeAgentVersion) Identifier() tasks.Identifier {
 	return tasks.IdentifierFromString("Node/Agent/Version")
