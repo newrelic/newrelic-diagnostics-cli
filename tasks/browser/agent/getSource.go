@@ -69,7 +69,7 @@ func (t BrowserAgentGetSource) Execute(options tasks.Options, upstream map[strin
 	if err != nil {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: fmt.Sprintf("Failed to connect to %s. Please check your URL and verify connectivity: %s", url, err.Error()),
+			Summary: fmt.Sprintf("Failed to connect to %s. Please make sure to add a protocol to the URL or verify connectivity. Encountered error: %s", url, err.Error()),
 		}
 	}
 
