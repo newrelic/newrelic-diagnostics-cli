@@ -102,7 +102,7 @@ var _ = Describe("Node/Agent/Version", func() {
 			It("Should return a tasks.Warning", func() {
 				expectedReturn := tasks.Result{
 					Status:  tasks.Warning,
-					Summary: "Node Agent Module not found for newrelic",
+					Summary: "We were unable to find the 'newrelic' module required for the Node Agent installation. Make sure to run 'npm install newrelic' and verify that 'newrelic' is listed in your package.json.",
 				}
 				Expect(result).To(Equal(expectedReturn))
 			})
