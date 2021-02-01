@@ -64,9 +64,8 @@ var _ = Describe("Browser/Agent/Detect", func() {
 					"Browser/Agent/GetSource": tasks.Result{
 						Status: tasks.Success,
 						Payload: BrowserAgentSourcePayload{
-							URL: "https://www.testingmctestface.com",
-							// TODO: Check with team to verify using real url in test mock is good practice
-							Source: BrowserFixtures.BrowserResponse,
+							URL:    "https://www.testingmctestface.com",
+							Source: BrowserFixtures.HTMLWithGoodLoader,
 							Loader: []string{BrowserFixtures.AgentScript},
 						},
 					},

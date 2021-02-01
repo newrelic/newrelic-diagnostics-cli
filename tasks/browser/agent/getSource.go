@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"regexp"
 
@@ -41,7 +41,7 @@ func (t BrowserAgentGetSource) Identifier() tasks.Identifier {
 // Explain - Returns the help text for each individual task
 func (t BrowserAgentGetSource) Explain() string {
 	return "Determine New Relic Browser agent loader script from provided URL"
-	// gorun -t browser/agent/detect -v -o Browser/Agent/Detect.url=http://localhost:3000
+	// ./nrdiag -browser-url http://thecustomers-website-url --suites browser
 }
 
 // Dependencies - Returns the dependencies for ech task.
@@ -51,9 +51,15 @@ func (t BrowserAgentGetSource) Dependencies() []string {
 
 // Execute - The core work within each task
 func (t BrowserAgentGetSource) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var result tasks.Result
 	log.Debug(options)
 	url := options.Options["url"]
+
+	if url == "" {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "This health check requires the usage of the command option '-browser-url'. Please re-run " + tasks.ThisProgramFullName + " using the flag in this manner: ./nrdiag -browser-url http://YOUR-WEBSITE-URL -suites browser",
+		}
+	}
 
 	request := httpHelper.RequestWrapper{
 		Method: "GET",
@@ -61,47 +67,73 @@ func (t BrowserAgentGetSource) Execute(options tasks.Options, upstream map[strin
 	}
 	resp, err := httpHelper.MakeHTTPRequest(request)
 	if err != nil {
-		log.Debug("Error was", err)
-		result.Status = tasks.Failure
-		result.Summary = "Failed to connect to " + url + " Please check your URL and verify connectivity"
-		return result
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: fmt.Sprintf("Failed to connect to %s. Please check your URL and verify connectivity: %s", url, err.Error()),
+		}
 	}
+
 	stream := make(chan string)
-	responseBody, er := ioutil.ReadAll(resp.Body)
+	responseBody, errReadingBody := ioutil.ReadAll(resp.Body)
 	go streamSource(responseBody, stream)
-	if er != nil {
-		log.Debug("Error reading body was", er)
-		result.Status = tasks.Failure
-		result.Summary = "Failed to connect to " + url + " Please check your URL and verify connectivity"
-		return result
+	if errReadingBody != nil {
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: fmt.Sprintf("Failed to connect to %s. Please check your URL and verify connectivity: %s", url, errReadingBody.Error()),
+		}
 	}
-	result.FilesToCopy = []tasks.FileCopyEnvelope{tasks.FileCopyEnvelope{Path: "nrdiag-output/source.html",
+	resultFilesToCopy := []tasks.FileCopyEnvelope{tasks.FileCopyEnvelope{Path: "nrdiag-output/source.html",
 		Stream:     stream,
 		Identifier: t.Identifier().String(),
 	}}
+	//goodScripts means that we 1 or more loader scripts inside the head tag and badScripts means that we found instance of loader scripts outside of the head tag
+	goodScripts, badScripts := getLoaderScript(string(responseBody))
 
-	scripts, loaderError := getLoader(string(responseBody))
-	if loaderError != nil {
+	loaderFoundInheadTag := len(goodScripts) > 0
+	loaderFoundOutsideHead := len(badScripts) > 0
+
+	if !loaderFoundInheadTag && !loaderFoundOutsideHead {
 		return tasks.Result{
-			Status:  tasks.Warning,
-			Summary: loaderError.Error(),
+			Status:      tasks.Failure,
+			Summary:     fmt.Sprintf("We were unable to find the Browser agent script in the HTML source code for %s. If this has not been added to the application yet, follow one of the deployment options suggested in our documentation. However, if the browser script is being loaded via an external file, keep in mind that this can cause issues in collecting the data for New Relic.", url),
+			URL:         "https://docs.newrelic.com/docs/browser/browser-monitoring/installation/install-browser-monitoring-agent",
+			FilesToCopy: resultFilesToCopy,
+		}
+	}
+
+	if loaderFoundInheadTag && loaderFoundOutsideHead {
+		return tasks.Result{
+			Status:      tasks.Warning,
+			Summary:     "We found at least one instance of the New Relic Browser script element outside of the </head> tag. This script should only be present in the </head> tag or it can cause monitoring issues.",
+			URL:         "https://docs.newrelic.com/docs/browser/browser-monitoring/installation/install-browser-monitoring-agent",
+			FilesToCopy: resultFilesToCopy,
 			Payload: BrowserAgentSourcePayload{
 				URL:    url,
 				Source: string(responseBody),
-				Loader: scripts,
+				Loader: goodScripts,
 			},
 		}
 	}
 
-	result.Payload = BrowserAgentSourcePayload{
-		URL:    url,
-		Source: string(responseBody),
-		Loader: scripts,
+	if loaderFoundOutsideHead {
+		return tasks.Result{
+			Status:      tasks.Failure,
+			Summary:     "We found the browser agent in the source code but it is not inline in the <head>. This can cause issues in collecting the data. The best practices for installation are to copy the snippet of code and paste it as close to the top of the HEAD as possible, but after any position-sensitive META tags (X-UA-Compatible and charset). The script needs to load very early in order to wrap the browser's built-in APIs",
+			URL:         "https://docs.newrelic.com/docs/browser/browser-monitoring/installation/install-browser-monitoring-agent",
+			FilesToCopy: resultFilesToCopy,
+		}
 	}
-	result.Status = tasks.Success
-	result.Summary = "Successfully downloaded source from " + url
-
-	return result
+	//Looks like we only have good scripts
+	return tasks.Result{
+		Status:      tasks.Success,
+		Summary:     "We successfully found the New Relic Browser script element in the following page's source: " + url + ". The body of the page has been included in the nrdiag-zip file",
+		FilesToCopy: resultFilesToCopy,
+		Payload: BrowserAgentSourcePayload{
+			URL:    url,
+			Source: string(responseBody),
+			Loader: goodScripts,
+		},
+	}
 }
 
 func streamSource(responseBody []byte, ch chan string) {
@@ -116,40 +148,31 @@ func streamSource(responseBody []byte, ch chan string) {
 
 }
 
-func getLoader(data string) ([]string, error) {
-	var scripts []string
+func getLoaderScript(data string) ([]string, []string) {
+	var goodScripts, badScripts []string
+	nrScriptRgx := regexp.MustCompile("window.NREUM")
 	// check for Browser agent in head tag
-	headTagRegex := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>[\s\S]*<\/head>)`)
-	headMatches := headTagRegex.FindAllString(data, -1)
-	//Now loop through matches
-	headNREUM := regexp.MustCompile("window.NREUM")
-	for _, script := range headMatches {
-		if headNREUM.MatchString(script) {
-			log.Debug("Browser Loader found in head ")
-			scripts = append(scripts, script)
-			return scripts, nil
+	scriptInHeadRgx := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>[\s\S]*<\/head>)`)
+	scriptInHeadMatches := scriptInHeadRgx.FindAllString(data, -1)
+
+	if len(scriptInHeadMatches) > 0 {
+		for _, match := range scriptInHeadMatches {
+			if nrScriptRgx.MatchString(match) {
+				// it is considered a good script because the loader was found inside the Head tag
+				goodScripts = append(goodScripts, match)
+			}
+		}
+	}
+	//This would match any script: (?m:<script\b[^>]*>([\s\S]*?)<\/script>)
+	scriptAfterHeadRgx := regexp.MustCompile(`(<\/head>[\s\S]*<script\b[^>]*>([\s\S]*?)<\/script>)`)
+	scriptAfterheadMatches := scriptAfterHeadRgx.FindAllString(data, -1)
+	// Now loop through scriptAfterheadMatches to find the browser agent loader outside of head tag
+	for _, match := range scriptAfterheadMatches {
+		if nrScriptRgx.MatchString(match) {
+			badScripts = append(badScripts, match)
 		}
 	}
 
-	// First we grab the script tags
-	outsideHeadRegex := regexp.MustCompile(`(?m:<script\b[^>]*>([\s\S]*?)<\/script>)`)
-
-	matches := outsideHeadRegex.FindAllString(data, -1)
-	// Now loop through matches to find the browser agent loader
-	nreum := regexp.MustCompile("window.NREUM")
-	var loaderError error
-	for _, script := range matches {
-		if nreum.MatchString(script) {
-			loaderError = errors.New("Browser Loader found but not in the head")
-			scripts = append(scripts, script)
-		}
-	}
-
-	if len(scripts) == 0 {
-		loaderError = errors.New("No loader found")
-		return scripts, loaderError
-	} else {
-		return scripts, loaderError
-	}
+	return goodScripts, badScripts
 
 }

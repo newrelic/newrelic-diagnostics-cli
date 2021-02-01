@@ -9,6 +9,6 @@ import (
 func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	log.Debug("Registering Browser/Agent/*")
 
-	registrationFunc(BrowserAgentDetect{}, false)
-	registrationFunc(BrowserAgentGetSource{}, false)
+	registrationFunc(BrowserAgentDetect{}, true)
+	registrationFunc(BrowserAgentGetSource{}, true)
 }
