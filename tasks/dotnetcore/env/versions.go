@@ -65,7 +65,7 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 	errorMessage := "Unable to complete this health check because we ran into some unexpected errors when attempting to collect this application's .NET Core SDK version:\n"
 	versions := []string{}
 	// first check if version is accesible through the cmdline
-	//dotnet --version will Display .NET Core SDK version. Ex: 5.0.101
+	//dotnet --version will Display .NET Core SDK version https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet. Ex: 5.0.101
 	version, err := tasks.CmdExecutor("dotnet", "--version")
 
 	if err != nil {

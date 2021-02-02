@@ -19,7 +19,7 @@ func (p DotNetEnvTargetVersion) Identifier() tasks.Identifier {
 }
 
 func (p DotNetEnvTargetVersion) Explain() string {
-	return "Determine version of .NET application"
+	return "Determine framework version of .NET application"
 }
 
 // Dependencies - Returns the dependencies for each task.
@@ -76,15 +76,14 @@ func (p DotNetEnvTargetVersion) Execute(options tasks.Options, upstream map[stri
 }
 
 func (p DotNetEnvTargetVersion) getNetConfigFiles(workingDir string) []string {
-	patterns := []string{"^(?i)web[.]config$",
+	patterns := []string{`(.+).csproj$`, "^(?i)(web|app)[.]config$",
 		"(?i).+[.]exe[.]config$", //  app.config files are almost always app-me.exe.config. filter NewRelicStatusMonitor.exe.config later
 	}
-	paths := []string{workingDir}
-	configs := p.findFiles(patterns, paths)
+	configs := p.findFiles(patterns, []string{workingDir})
 
 	var configPaths []string
-	for _, paths := range configs {
-		splitPaths := strings.SplitAfterN(paths, "found file ", 1)
+	for _, path := range configs {
+		splitPaths := strings.SplitAfterN(path, "found file ", 1)
 		if len(splitPaths) < 1 {
 			continue
 		}
@@ -101,6 +100,7 @@ func (p DotNetEnvTargetVersion) getNetVersionFromFiles(configPaths []string) ([]
 	var tmpNetVersion []string
 	var err error
 	for _, configFile := range configPaths {
+		//Sample from Web.config: <httpRuntime targetFramework="4.7" />
 		tmpNetVersion, err = p.returnStringInFile("httpRuntime targetFramework=\"([0-9.]+)", configFile)
 		if err != nil {
 			log.Debug("Error finding targetFramework", err)
@@ -109,6 +109,7 @@ func (p DotNetEnvTargetVersion) getNetVersionFromFiles(configPaths []string) ([]
 		}
 
 		if len(tmpNetVersion) == 0 {
+			//Sample from App.config: <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.6.1" />
 			tmpNetVersion, err = p.returnStringInFile(".NETFramework,Version=v([0-9.]+)", configFile)
 			if err != nil {
 				log.Debug("Error finding targetFramework", err)
@@ -124,7 +125,26 @@ func (p DotNetEnvTargetVersion) getNetVersionFromFiles(configPaths []string) ([]
 				log.Debug("Error parsing targetFramework version from value:", tmpNetVersion[0])
 				countErrors++
 			}
+		} else {
+			//Sample from a PRS.API.csproj: <TargetFramework>net5.0</TargetFramework>
+			tmpNetVersion, err = p.returnStringInFile(`<TargetFramework>net([0-9.]+)<\/TargetFramework>`, configFile)
+			if err != nil {
+				log.Debug("Error finding targetFramework", err)
+				countErrors++
+				continue
+			}
+			if len(tmpNetVersion) > 1 {
+				ver := tmpNetVersion[1] //version from the capture group 1
+				if len(ver) > 1 {
+					//remove word
+					netVersion = append(netVersion, ver)
+				} else {
+					log.Debug("Error parsing targetFramework version from value:", tmpNetVersion[0])
+					countErrors++
+				}
+			}
 		}
+
 	}
 	return netVersion, countErrors
 

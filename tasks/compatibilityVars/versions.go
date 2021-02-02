@@ -68,8 +68,11 @@ var NodeSupportedVersions = map[string][]string{
 	"10": []string{"4.6.0+"},
 }
 
+//https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
 // .NET framework as keys and .NET agent as values
 var DotnetFrameworkSupportedVersions = map[string][]string{
+	"5.0": []string{"7.0.0+"},
+	"4.8": []string{"7.0.0+"},
 	"4.7": []string{"7.0.0+"},
 	"4.6": []string{"7.0.0+"}, //should be inclusive of version such as 4.6.1
 	"4.5": []string{"7.0.0+"},
