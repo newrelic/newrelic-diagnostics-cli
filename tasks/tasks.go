@@ -23,6 +23,9 @@ type Status int
 //ThisProgramFullName is a constant for the name of the program to be used in task summaries
 const ThisProgramFullName = "Diagnostics CLI"
 
+//NotifyIssueSummary is the standarized message we can add to a tasks.Result summary to suggest users ways to reach out to us and notify about an nrdiag issue
+const NotifyIssueSummary = "\nPlease notify this issue to us whenever possible through https://discuss.newrelic.com/ by creating a new topic or through https://github.com/newrelic/newrelic-diagnostics-cli/issues\n"
+
 //Constants for use by the status property above
 const (
 	//None - this task does not apply to this system and has no meaninful data to report.

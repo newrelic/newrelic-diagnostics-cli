@@ -1,4 +1,0 @@
-majorMinor=1.12
-buildNumber=32
-currentReleaseVersion=1.12.32
-prevReleaseVersion=1.11.31

@@ -25,29 +25,25 @@ func (t NodeAgentVersion) Explain() string {
 // Dependencies - Returns the dependencies for this task.
 func (t NodeAgentVersion) Dependencies() []string {
 	return []string{
-		"Node/Config/Agent",
-		"Base/Log/Copy",
+		"Node/Env/Dependencies",
 	}
 }
 
 // Execute - The core work within this task
 func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var nodeModuleVersions []NodeEnv.NodeModuleVersion
-	var ok bool
-
-	if upstream["Node/Config/Agent"].Status != tasks.Success {
+	if upstream["Node/Env/Dependencies"].Status != tasks.Info {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Node Agent config file not detected. This task did not run.",
+			Summary: "Node Modules not detected. This task did not run.",
 		}
 	}
-	if upstream["Node/Env/Dependencies"].Status == tasks.Info {
-		nodeModuleVersions, ok = upstream["Node/Env/Dependencies"].Payload.([]NodeEnv.NodeModuleVersion)
-		if !ok {
-			return tasks.Result{
-				Status:  tasks.None,
-				Summary: "Node Modules not detected. This task did not run.",
-			}
+
+	nodeModuleVersions, ok := upstream["Node/Env/Dependencies"].Payload.([]NodeEnv.NodeModuleVersion)
+
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.ThisProgramFullName + " was unable to complete this health check because we ran into an unexpected type assertion error." + tasks. NotifyIssueSummary,
 		}
 	}
 
@@ -58,17 +54,19 @@ func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tas
 			Summary: "We were unable to find the 'newrelic' module required for the Node Agent installation. Make sure to run 'npm install newrelic' and verify that 'newrelic' is listed in your package.json.",
 		}
 	}
+
 	log.Debug("Agent version", agentVersion)
 	return tasks.Result{
 		Status:  tasks.Info,
-		Summary: fmt.Sprintf("Node Agent Version  %s found", agentVersion),
+		Summary: fmt.Sprintf("Node Agent Version %s found", agentVersion),
+		Payload: agentVersion,
 	}
 }
 
 func getNodeVerFromPayload(payload []NodeEnv.NodeModuleVersion) string {
 	for _, nodeModuleVersion := range payload {
 		if nodeModuleVersion.Module == "newrelic" {
-			return fmt.Sprintf("%s %s", nodeModuleVersion.Module, nodeModuleVersion.Version)
+			return nodeModuleVersion.Version
 		}
 	}
 

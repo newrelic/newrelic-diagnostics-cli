@@ -41,7 +41,7 @@ var _ = Describe("Node/Agent/Version", func() {
 				}
 			})
 			It("Should return the expected agent version", func() {
-				expectedReturn := "newrelic 2.1.4"
+				expectedReturn := "2.1.4"
 				Expect(output).To(Equal(expectedReturn))
 			})
 		})
@@ -103,6 +103,40 @@ var _ = Describe("Node/Agent/Version", func() {
 				expectedReturn := tasks.Result{
 					Status:  tasks.Warning,
 					Summary: "We were unable to find the 'newrelic' module required for the Node Agent installation. Make sure to run 'npm install newrelic' and verify that 'newrelic' is listed in your package.json.",
+				}
+				Expect(result).To(Equal(expectedReturn))
+			})
+		})
+		Context("When given a Node Agent Module is found", func() {
+			BeforeEach(func() {
+				upstream = map[string]tasks.Result{
+					"Node/Env/Dependencies": tasks.Result{
+						Status: tasks.Info,
+						Payload: []NodeEnv.NodeModuleVersion{
+							{
+								Module:  "Apollo",
+								Version: "1.2.3",
+							},
+							{
+								Module:  "lodash",
+								Version: "4.2.03",
+							},
+							{
+								Module:  "newrelic",
+								Version: "7.1.0",
+							},
+						},
+					},
+					"Node/Config/Agent": tasks.Result{
+						Status: tasks.Success,
+					},
+				}
+			})
+			It("Should return a tasks.Success and payload", func() {
+				expectedReturn := tasks.Result{
+					Status:  tasks.Info,
+					Summary: "Node Agent Version 7.1.0 found",
+					Payload: "7.1.0",
 				}
 				Expect(result).To(Equal(expectedReturn))
 			})
