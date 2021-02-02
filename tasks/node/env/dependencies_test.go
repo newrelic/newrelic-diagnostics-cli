@@ -62,7 +62,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return a None result summary", func() {
-				Expect(result.Summary).To(Equal("Node agent not detected. This task did not run"))
+				Expect(result.Summary).To(Equal("Node agent config file not detected. This task did not run"))
 			})
 		})
 

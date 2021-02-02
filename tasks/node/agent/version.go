@@ -1,19 +1,15 @@
 package agent
 
 import (
+	"fmt"
+
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
+	NodeEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
 )
 
 // NodeAgentVersion - This struct defines the function to collect the current running Node agent version from its logfile.
 type NodeAgentVersion struct {
-}
-
-type logNodeAgentVersion struct {
-	Logfile      string
-	AgentVersion string
-	MatchFound   bool
 }
 
 // Identifier - This returns the Category, Subcategory and Name of this task
@@ -29,70 +25,51 @@ func (t NodeAgentVersion) Explain() string {
 // Dependencies - Returns the dependencies for this task.
 func (t NodeAgentVersion) Dependencies() []string {
 	return []string{
-		"Node/Config/Agent",
-		"Base/Log/Copy",
+		"Node/Env/Dependencies",
 	}
 }
 
 // Execute - The core work within this task
 func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var result tasks.Result
-
-	if upstream["Node/Config/Agent"].Status != tasks.Success {
-		result.Status = tasks.None
-		result.Summary = "Node agent not detected"
-		return result
+	if upstream["Node/Env/Dependencies"].Status != tasks.Info {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Node Modules not detected. This task did not run.",
+		}
 	}
-	logs, ok := upstream["Base/Log/Copy"].Payload.([]logtask.LogElement)
+
+	nodeModuleVersions, ok := upstream["Node/Env/Dependencies"].Payload.([]NodeEnv.NodeModuleVersion)
+
 	if !ok {
-		result.Status = tasks.None
-		result.Summary = "Node agent version not detected"
-		return result
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.ThisProgramFullName + " was unable to complete this health check because we ran into an unexpected type assertion error." + tasks. NotifyIssueSummary,
+		}
 	}
-	agentVersion := getNodeVerFromLog(logs)
+
+	agentVersion := getNodeVerFromPayload(nodeModuleVersions)
+	if agentVersion == "" {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: "We were unable to find the 'newrelic' module required for the Node Agent installation. Make sure to run 'npm install newrelic' and verify that 'newrelic' is listed in your package.json.",
+		}
+	}
+
 	log.Debug("Agent version", agentVersion)
-	for _, nodeLog := range agentVersion {
-		if nodeLog.MatchFound == true {
-			result.Status = tasks.Info
-			result.Summary = nodeLog.AgentVersion
-			result.Payload = nodeLog.AgentVersion
-			return result
-		}
+	return tasks.Result{
+		Status:  tasks.Info,
+		Summary: fmt.Sprintf("Node Agent Version %s found", agentVersion),
+		Payload: agentVersion,
 	}
-	return result
 }
 
-func getNodeVerFromLog(logs []logtask.LogElement) (agentVersion []logNodeAgentVersion) {
-	for _, logElement := range logs {
-		logAgentVersion, errSearchLogs := searchLogs(logElement)
-		var logElementNode logNodeAgentVersion
-		if errSearchLogs != nil || logAgentVersion == "" {
-			logElementNode.Logfile = logElement.FilePath + logElement.FileName
-			logElementNode.AgentVersion = ""
-			logElementNode.MatchFound = false
-		} else {
-			logElementNode.Logfile = logElement.FilePath + logElement.FileName
-			logElementNode.AgentVersion = logAgentVersion
-			logElementNode.MatchFound = true
+func getNodeVerFromPayload(payload []NodeEnv.NodeModuleVersion) string {
+	for _, nodeModuleVersion := range payload {
+		if nodeModuleVersion.Module == "newrelic" {
+			return nodeModuleVersion.Version
 		}
-		agentVersion = append(agentVersion, logElementNode)
-		log.Debug("Agent version is", logAgentVersion)
-	}
-	return
-}
-
-func searchLogs(logElement logtask.LogElement) (string, error) {
-	searchString := `Node[.]js[.] Agent version:\s*([0-9.]+);`
-	filepath := logElement.FilePath + logElement.FileName
-	agentVersion, err := tasks.ReturnLastStringSubmatchInFile(searchString, filepath)
-	if err != nil {
-		return "", err
 	}
 
-	if len(agentVersion) > 0 {
-		// we've got a match, return the first capture group
-		return agentVersion[1], nil
-	}
-
-	return "", nil
+	log.Debug("Node Agent not found in Node Modules")
+	return ""
 }

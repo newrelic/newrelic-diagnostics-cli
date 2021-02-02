@@ -42,7 +42,7 @@ func (p NodeEnvNpmPackage) Execute(options tasks.Options, upstream map[string]ta
 	if upstream["Node/Config/Agent"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Node agent not detected. This task did not run",
+			Summary: "Node agent config file not detected. This task did not run",
 		}
 	}
 
