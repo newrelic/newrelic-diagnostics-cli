@@ -29,10 +29,10 @@ func (t BrowserAgentDetect) Identifier() tasks.Identifier {
 // Explain - Returns the help text for each individual task
 func (t BrowserAgentDetect) Explain() string {
 	return "Detect New Relic Browser agent from provided URL"
-	// gorun -t browser/agent/detect -v -o Browser/Agent/Detect.url=http://localhost:3000
+	// ./nrdiag -browser-url http://thecustomers-website-url --suites browser
 }
 
-// Dependencies - Returns the dependencies for ech task.
+// Dependencies - Returns the dependencies for each task.
 func (t BrowserAgentDetect) Dependencies() []string {
 	return []string{
 		"Browser/Agent/GetSource",
@@ -41,41 +41,44 @@ func (t BrowserAgentDetect) Dependencies() []string {
 
 // Execute - The core work within each task
 func (t BrowserAgentDetect) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var result tasks.Result
-	//log.Debug(upstream)
-	// first type assert upstream back into a payload we can work with
-	source, ok := upstream["Browser/Agent/GetSource"].Payload.(BrowserAgentSourcePayload)
-	if ok {
-		log.Debug("correct type")
-		//log.Debug(source)
+
+	if upstream["Browser/Agent/GetSource"].Status == tasks.Failure || upstream["Browser/Agent/GetSource"].Status == tasks.Error || upstream["Browser/Agent/GetSource"].Status == tasks.None {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "This tasks did not run because the previous task 'Browser/Agent/GetSource' either did not run or was not successful.",
+		}
 	}
-	log.Debug("source of loaders", len(source.Loader))
-	if len(source.Loader) == 0 {
-		log.Debug("No loaders detected, setting to failed")
-		result.Status = tasks.Failure
-		result.Summary = "Failed to detect browser agent"
-		result.URL = "https://docs.newrelic.com/docs/browser/new-relic-browser/installation/install-new-relic-browser-agent"
-		return result
-	} else if len(source.Loader) > 2 {
+
+	pageSourcePayload, ok := upstream["Browser/Agent/GetSource"].Payload.(BrowserAgentSourcePayload)
+
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "This task was unable to run because we ran into a Type Assertion error from the upstream task Browser/Agent/GetSource",
+		}
+	}
+
+	if len(pageSourcePayload.Loader) > 1 {
 		log.Debug("More than 1 browser agent detected")
-		result.Status = tasks.Warning
-		result.Summary = "More than one browser agent detected, please check to ensure only one browser agent is configured per page"
-	} else {
-		result.Status = tasks.Success
-		result.Summary = "Found values for browser agent"
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: "More than one browser agent detected, please check to ensure only one browser agent is configured per page",
+		}
 	}
 
 	var payload BrowserAgentPayload
-	payload.AgentVersion = getAgentVersion(source.Loader)
-	payload.AppReporting = getAppReporting(source.Loader)
-	payload.BrowserLicenseKey = getBrowserKey(source.Loader)
-	payload.BrowserLoader = getBrowserLoader(source.Loader)
-	payload.AgentType, payload.TransactionName = getAgentType(source.Loader)
+	payload.AgentVersion = getAgentVersion(pageSourcePayload.Loader)
+	payload.AppReporting = getAppReporting(pageSourcePayload.Loader)
+	payload.BrowserLicenseKey = getBrowserKey(pageSourcePayload.Loader)
+	payload.BrowserLoader = getBrowserLoader(pageSourcePayload.Loader)
+	payload.AgentType, payload.TransactionName = getAgentType(pageSourcePayload.Loader)
 	log.Debug("payload is ", payload)
 
-	result.Payload = payload
-
-	return result
+	return tasks.Result{
+		Status:  tasks.Success,
+		Summary: "Found values for browser agent",
+		Payload: payload,
+	}
 }
 
 func getAppReporting(scripts []string) string {

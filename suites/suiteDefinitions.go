@@ -111,14 +111,14 @@ var suiteDefinitions = []Suite{
 			"Synthetics/*",
 		},
 	},
-	// { //These require a special option for target URL to be provided when running: -o Browser/Agent/Detect.url=http://localhost:3000
-	// 	Identifier:  "browser",
-	// 	DisplayName: "Browser Agent",
-	// 	Description: "Diagnose Browser Agent installation",
-	// 	Tasks: []string{
-	// 		"Browser/*",
-	// 	},
-	// },
+	{
+		Identifier:  "browser",
+		DisplayName: "Browser Agent",
+		Description: "To diagnose Browser Agent installation issues, run './nrdiag -browser-url http://YOUR-WEBSITE-URL -suites browser'",
+		Tasks: []string{
+			"Browser/*",
+		},
+	},
 	{
 		Identifier:  "all",
 		DisplayName: "All New Relic Products",
