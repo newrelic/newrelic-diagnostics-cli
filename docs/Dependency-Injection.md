@@ -100,7 +100,7 @@ Here we have a struct field name `httpGetter` with the type: `httpRequestFunc`. 
 
 ### (2) Attach our `makeCollectorRequest()` to the task struct as a struct method (so it can reference its dependencies defined as struct fields)
 
-Next, we attach our `makeCollectorRequest` function to our task `struct` so it can reference dependencies that are fields on the struct instance. We do this by adding the struct as a receiver (`(p BaseCollectorConnect)`) in the function declaration:
+Next, we attach our `makeCollectorRequest` function to our task `struct` so it can reference dependencies that are fields on the struct instance. We do this by adding the struct as a receiver (`(p BaseCollectorConnectUS)`) in the function declaration:
 
 ```go
 func (p BaseCollectorConnectUS) makeCollectorRequest(collectorUrl string) (*http.Response, error) {
