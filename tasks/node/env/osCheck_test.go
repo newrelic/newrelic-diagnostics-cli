@@ -70,7 +70,7 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			})
 
 			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("Node agent not detected"))
+				Expect(result.Summary).To(Equal("Node agent config file not detected"))
 			})
 		})
 
