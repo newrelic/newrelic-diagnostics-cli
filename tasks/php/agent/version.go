@@ -50,8 +50,8 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 	validations, ok := upstream["PHP/Config/Agent"].Payload.([]config.ValidateElement)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

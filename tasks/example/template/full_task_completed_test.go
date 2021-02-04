@@ -89,11 +89,11 @@ var _ = Describe("Example/Template/FullTask", func() {
 			})
 
 			It("should return a result with None Status", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 
 			It("should return a result the expected Summary", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 

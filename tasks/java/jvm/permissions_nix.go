@@ -108,8 +108,8 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	javaAgentProcs, ok := upstream["Java/Env/Process"].Payload.([]env.ProcIdAndArgs)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "We were unable to run this health check due to an internal type assertion error for the task Java/Env/Process",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

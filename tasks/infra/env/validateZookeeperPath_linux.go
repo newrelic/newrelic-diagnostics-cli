@@ -63,8 +63,8 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -88,8 +88,8 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure for task Base/Env/CollectEnvVars",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

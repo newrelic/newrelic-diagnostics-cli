@@ -189,20 +189,36 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 	}{
 		{name: "It should return successful result from validation",
 			fields: fields{validationChecker: mockValidationTrue, configChecker: mockConfigTrue, binaryChecker: mockBinaryTrue},
-			args:   args{},
-			want:   successResultConfig},
+			args: args{upstream: map[string]tasks.Result{
+				"Base/Config/Collect": {
+					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+			}},
+			want: successResultConfig},
 		{name: "It should return successful result from parsed config",
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigTrue, binaryChecker: mockBinaryTrue},
-			args:   args{},
-			want:   successResultParsed},
+			args: args{upstream: map[string]tasks.Result{
+				"Base/Config/Collect": {
+					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+			}},
+			want: successResultParsed},
 		{name: "It should return successful result from binary file",
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigFalse, binaryChecker: mockBinaryTrue},
-			args:   args{},
-			want:   successResultBinary},
+			args: args{upstream: map[string]tasks.Result{
+				"Base/Config/Collect": {
+					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+			}},
+			want: successResultBinary},
 		{name: "It should return empty result from binary file not found",
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigFalse, binaryChecker: mockBinaryFalse},
-			args:   args{},
-			want:   emptyResult},
+			args: args{upstream: map[string]tasks.Result{
+				"Base/Config/Collect": {
+					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+			}},
+			want: emptyResult},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

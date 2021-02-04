@@ -40,7 +40,7 @@ func (t DotNetAgentVersion) Execute(options tasks.Options, upstream map[string]t
 	if !ok {
 		return tasks.Result{
 			Status: tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

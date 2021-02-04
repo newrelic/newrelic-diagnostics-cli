@@ -88,8 +88,8 @@ var _ = Describe("Infra/Env/ClockSkew", func() {
 			})
 
 			It("It should a return task.None and a Summary", func() {
-				Expect(result.Status).To(Equal(tasks.None))
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 

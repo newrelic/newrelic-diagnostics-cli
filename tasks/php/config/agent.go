@@ -44,9 +44,11 @@ func (p PHPConfigAgent) Execute(options tasks.Options, upstream map[string]tasks
 	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
 
 	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-	if ok {
-		log.Debug("Base/Config/Validate payload correct type")
-		//		log.Debug(configs) //This may be useful when debugging to log the entire results to the screen
+	if !ok {
+		return tasks.Result{
+			Status: tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
 	}
 
 	phpValidation, checkValidationTrue := checkValidation(validations)
@@ -61,9 +63,11 @@ func (p PHPConfigAgent) Execute(options tasks.Options, upstream map[string]tasks
 	//If this fails to identify the language, now check the raw file itself
 
 	configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-	if ok {
-		log.Debug("Base/Config/Collect payload correct type")
-		//		log.Debug(configs) //This may be useful when debugging to log the entire results to the screen
+	if !ok {
+		return tasks.Result{
+			Status: tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
 	}
 
 	phpConfig, checkConfigTrue := checkConfig(configs)

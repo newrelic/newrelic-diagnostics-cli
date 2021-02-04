@@ -45,8 +45,8 @@ func (t iOSAgentVersion) Execute(options tasks.Options, upstream map[string]task
 
 	configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) // This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 	if !ok {
-		result.Status = tasks.None
-		result.Summary = "Task did not meet requirements necessary to run: type assertion failure"
+		result.Status = tasks.Error
+		result.Summary = tasks.AssertionErrorSummary
 		return result
 	}
 

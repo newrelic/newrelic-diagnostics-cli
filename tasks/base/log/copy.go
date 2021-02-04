@@ -1,6 +1,7 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -47,7 +48,14 @@ func (p BaseLogCopy) Dependencies() []string {
 // Execute - This task will search for config files based on the string array defined and walk the directory tree from the working directory searching for additional matches
 func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	logElementsFound := searchForLogPaths(options, upstream)
+	logElementsFound, errTypeAssertion := searchForLogPaths(options, upstream)
+
+	if errTypeAssertion != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
+	}
 
 	if len(logElementsFound) < 1 {
 		return tasks.Result{
@@ -156,29 +164,30 @@ func hasDotnetLogs(logElements []LogElement) bool {
 	return false
 }
 
-func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) []LogElement {
+func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) ([]LogElement, error) {
 
 	//get payload from env vars
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 	if !ok {
-		log.Debug("Could not get envVars from upstream")
+		return []LogElement{}, errors.New("type assertion error")
 	}
 	//get payload from config files
 	configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
 	if !ok {
-		log.Debug("type assertion failure for Base/Config/Validate Payload")
+		return []LogElement{}, errors.New("type assertion error")
 	}
 	//attempt to find system properties related to logs in payload
 	foundSysProps := make(map[string]string)
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
 		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
-		if ok {
-			for _, process := range proccesses {
-				for _, sysPropKey := range logSysProps {
-					sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
-					if isPresent {
-						foundSysProps[sysPropKey] = sysPropVal
-					}
+		if !ok {
+			return []LogElement{}, errors.New("type assertion error")
+		}
+		for _, process := range proccesses {
+			for _, sysPropKey := range logSysProps {
+				sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
+				if isPresent {
+					foundSysProps[sysPropKey] = sysPropVal
 				}
 			}
 		}
@@ -210,7 +219,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 
 		}
 	}
-	return logFilesFound
+	return logFilesFound, nil
 }
 
 func determineFilesDate(logFilePaths []string, lastModifiedDate time.Time) ([]string, []string) {

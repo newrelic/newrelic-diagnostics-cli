@@ -32,9 +32,11 @@ func (p BaseConfigLogLevel) Execute(options tasks.Options, upstream map[string]t
 	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
 
 	validations, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-	if ok {
-		log.Debug("correct type")
-		//		log.Debug(validations) //This may be useful when debugging to log the entire results to the screen
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
 	}
 
 	if len(validations) == 0 {

@@ -50,8 +50,8 @@ func (p InfraConfigIntegrationsValidate) Execute(options tasks.Options, upstream
 	yamlLocations, ok := upstream["Infra/Config/IntegrationsCollect"].Payload.([]config.ConfigElement)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

@@ -49,8 +49,8 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 	configElements, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure.",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

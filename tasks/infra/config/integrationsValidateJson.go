@@ -60,8 +60,8 @@ func (p InfraConfigIntegrationsValidateJson) Execute(options tasks.Options, upst
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

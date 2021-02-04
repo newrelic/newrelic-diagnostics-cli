@@ -107,7 +107,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

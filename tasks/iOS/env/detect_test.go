@@ -145,8 +145,8 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 				upstream: errorUpstream,
 			},
 			want: tasks.Result{
-				Status:  tasks.None,
-				Summary: "Task did not meet requirements necessary to run: type assertion failure",
+				Status:  tasks.Error,
+				Summary: tasks.AssertionErrorSummary,
 			},
 		},
 	}

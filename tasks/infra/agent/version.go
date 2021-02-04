@@ -45,8 +45,8 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

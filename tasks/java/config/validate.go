@@ -78,8 +78,8 @@ func (t JavaConfigValidate) Execute(options tasks.Options, upstream map[string]t
 	processes, ok := upstream["Java/Env/Process"].Payload.([]env.ProcIdAndArgs)
 	if !ok {
 		log.Debug("No running processes found")
-		result.Status = tasks.None
-		result.Summary = "Running Java agent not detected"
+		result.Status = tasks.Error
+		result.Summary = tasks.AssertionErrorSummary
 		return result
 	}
 
