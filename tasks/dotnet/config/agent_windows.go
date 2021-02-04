@@ -44,16 +44,13 @@ var webAppConfigKeys = []string{
 
 // Execute - The core work within each task
 func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
-	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
-
-	// check if the agent is installed
-	checkInstalled := upstream["DotNet/Agent/Installed"].Status
-
+	
 	// abort if it isn't installed
-	if checkInstalled != tasks.Success {
-		result.Status = tasks.None
-		result.Summary = ".NET Agent not installed, not checking config"
-		return result
+	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		return tasks.Result{
+			Status: tasks.None,
+			Summary: ".NET Agent not installed, not checking config",
+		}
 	}
 
 	// get all the config files and elements to check them
@@ -75,10 +72,11 @@ func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 	// no error means at least one file validated
-	result.Status = tasks.Success
-	result.Summary = "Found" + strconv.FormatInt(int64(len(filesToAdd)), 10) + ".NET agent config files."
-	result.Payload = filesToAdd
-	return result
+	return tasks.Result{
+		Status: tasks.Success,
+		Summary: "Found" + strconv.FormatInt(int64(len(filesToAdd)), 10) + ".NET agent config files.",
+		Payload: filesToAdd
+	}
 }
 
 func checkConfigs(configFiles []config.ValidateElement) ([]config.ValidateElement, bool) {
