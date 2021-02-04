@@ -204,6 +204,9 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 				p.mCmdExecutor = func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error) {
 					return []byte("success"), nil
 				}
+				p.getJMXProcessCmdlineArgs = func() []string {
+					return []string{}
+				}
 
 			})
 

@@ -44,11 +44,11 @@ var webAppConfigKeys = []string{
 
 // Execute - The core work within each task
 func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
-	
+
 	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: ".NET Agent not installed, not checking config",
 		}
 	}
@@ -57,25 +57,25 @@ func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 	configFiles, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 	if !ok {
 		return tasks.Result{
-			Status: tasks.Error,
-			Summary: tasks.AssertionErrorSummary
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 	log.Debug("Successfully gathered config files from upstream.")
 
 	// validate the config files elements
-	filesToAdd, err := checkConfigs(configFiles)//err is a boolean
+	filesToAdd, err := checkConfigs(configFiles) //err is a boolean
 	if err {
 		return tasks.Result{
-			Status: tasks.Warning,
+			Status:  tasks.Warning,
 			Summary: "Unable to validate the .NET agent config files because the files do not contain typical .NET agent configuration settings.",
 		}
 	}
 	// no error means at least one file validated
 	return tasks.Result{
-		Status: tasks.Success,
+		Status:  tasks.Success,
 		Summary: "Found" + strconv.FormatInt(int64(len(filesToAdd)), 10) + ".NET agent config files.",
-		Payload: filesToAdd
+		Payload: filesToAdd,
 	}
 }
 

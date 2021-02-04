@@ -17,7 +17,8 @@ const defaultJMXport = "9999"
 
 // InfraConfigValidateJMX - This struct defines the task
 type InfraConfigValidateJMX struct {
-	mCmdExecutor func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
+	mCmdExecutor             func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
+	getJMXProcessCmdlineArgs func() []string
 }
 
 type JmxConfig struct {
@@ -157,12 +158,14 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 
 }
 
-func (p InfraConfigValidateJMX) getJMXProcessCmdlineArgs() []string {
+func getJMXProcessCmdlineArgs() []string {
 	collectedJmxArgs := []string{}
 
 	javaProcs := tasks.GetJavaProcArgs()
+	fmt.Println("luces proc:", javaProcs)
 	for _, proc := range javaProcs {
 		for _, arg := range proc.Args {
+			fmt.Println("luces arg:", arg)
 			//We only capture jvm args that are jmx configuration related
 			if !(strings.Contains(arg, "jmx")) {
 				continue
