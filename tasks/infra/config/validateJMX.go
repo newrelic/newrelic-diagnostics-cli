@@ -162,10 +162,8 @@ func getJMXProcessCmdlineArgs() []string {
 	collectedJmxArgs := []string{}
 
 	javaProcs := tasks.GetJavaProcArgs()
-	fmt.Println("luces proc:", javaProcs)
 	for _, proc := range javaProcs {
 		for _, arg := range proc.Args {
-			fmt.Println("luces arg:", arg)
 			//We only capture jvm args that are jmx configuration related
 			if !(strings.Contains(arg, "jmx")) {
 				continue
