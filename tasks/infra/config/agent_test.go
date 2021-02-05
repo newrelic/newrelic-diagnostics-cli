@@ -17,12 +17,13 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+var validationFromDefaultYML []config.ValidateElement
 func Test_checkValidation(t *testing.T) {
 	type args struct {
 		validations []config.ValidateElement
 	}
 
-	validationFromDefaultYML := validateElementFromFile("fixtures/default_infra_config/newrelic-infra.yml")
+	validationFromDefaultYML = validateElementFromFile("fixtures/default_infra_config/newrelic-infra.yml")
 	validationFromInvalidYML := validateElementFromFile("fixtures/invalid_infra_config/newrelic-infra.yml")
 	validationFromMinimalYML := validateElementFromFile("fixtures/minimal_infra_config/newrelic-infra.yml")
 	file, _ := os.Open("fixtures/java_config/newrelic.yml")
@@ -191,7 +192,12 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationTrue, configChecker: mockConfigTrue, binaryChecker: mockBinaryTrue},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
+					Status: tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+				"Base/Config/Validate": {
+					Status: tasks.Success,
+					Payload: validationFromDefaultYML,
 				},
 			}},
 			want: successResultConfig},
@@ -199,7 +205,11 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigTrue, binaryChecker: mockBinaryTrue},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
+					Status: tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+				"Base/Config/Validate": {
+					Status: tasks.Failure,
 				},
 			}},
 			want: successResultParsed},
@@ -207,7 +217,11 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigFalse, binaryChecker: mockBinaryTrue},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
+					Status: tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+				"Base/Config/Validate": {
+					Status: tasks.Failure,
 				},
 			}},
 			want: successResultBinary},
@@ -215,7 +229,11 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigFalse, binaryChecker: mockBinaryFalse},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
+					Status: tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
+				},
+				"Base/Config/Validate": {
+					Status: tasks.Failure,
 				},
 			}},
 			want: emptyResult},

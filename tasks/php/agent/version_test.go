@@ -32,11 +32,12 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []string{},
 					},
 				}
 			})
-			It("Should return task result status of none ", func() {
+			It("Should return task result status of error ", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return this task result summary  ", func() {
@@ -47,6 +48,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -68,6 +70,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElmentNoAgent,
 						},
@@ -91,6 +94,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElmentOneAgentFile,
 						},
@@ -132,6 +136,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElementVersionErrors,
 						},
@@ -167,6 +172,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElmentOneAgentFile,
 							mockValidateElementNoChildren,

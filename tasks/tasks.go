@@ -69,6 +69,11 @@ func (r Result) IsFailure() bool {
 	return r.Status != None && r.Status != Success && r.Status != Info
 }
 
+// HasPayload will check if a upstream task.Result has a payload we can work with. Notice status 'Warning' is not included here and it's because a lot of the time it has payload. But HasPayload may not be applicable to some tasks.
+func (r Result) HasPayload() bool {
+	return r.Status != None && r.Status != Error && r.Status != Failure
+}
+
 //MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
 func (s Status) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.StatusToString())

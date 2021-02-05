@@ -58,7 +58,12 @@ func (p DotNetCoreConfigAgent) Execute(options tasks.Options, upstream map[strin
 		result.Summary = ".NET Core Agent not installed, not checking config"
 		return result
 	}
-
+	if !upstream["Base/Config/Validate"].HasPayload() {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: ".NET Agent config file was not found and validated. This task did not run",
+		}
+	}
 	// get all the config files and elements to check them
 	configFiles, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 	if !ok {

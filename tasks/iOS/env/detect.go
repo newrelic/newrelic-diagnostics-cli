@@ -31,6 +31,13 @@ func (p iOSEnvDetect) Execute(options tasks.Options, upstream map[string]tasks.R
 		Summary: "iOS environment not detected",
 	}
 
+	if upstream["Base/Config/Collect"].Status != tasks.Success {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Android environment not detected",
+		}
+	}
+
 	configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement)
 
 	if !ok {

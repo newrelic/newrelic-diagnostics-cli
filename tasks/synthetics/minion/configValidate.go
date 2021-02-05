@@ -71,7 +71,7 @@ func (p SyntheticsMinionConfigValidate) Execute(options tasks.Options, upstream 
 		return result
 	}
 
-	if upstream["Base/Config/Validate"].Status != tasks.Success {
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		log.Debug("[SyntheticsMinionConfigValidate] - Failing because Base/Config/Validate failed")
 		result.Status = tasks.Failure
 		result.Summary = "private-location-settings.json file not found on private minion. \nCheck settings at: http://<MINION_IP_ADDRESS>/setup"

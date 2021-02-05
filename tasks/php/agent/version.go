@@ -47,6 +47,13 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 	  the structure of and can now work with. In this case, I'm casting it back
 	to the []validateElements{} I know it should return */
 
+	if upstream["PHP/Config/Agent"].Status != tasks.Success{
+		return tasks.Result{
+			Status: tasks.None,
+			Summary: "No validations detect from PHP/Config/Agent. This task did not run",
+		}
+	}
+
 	validations, ok := upstream["PHP/Config/Agent"].Payload.([]config.ValidateElement)
 	if !ok {
 		return tasks.Result{

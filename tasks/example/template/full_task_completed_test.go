@@ -60,6 +60,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -83,6 +84,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Warning,
 						Payload: "I should be a slice of validate elements, but I'm not",
 					},
 				}
@@ -105,6 +107,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{
@@ -134,6 +137,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{
@@ -163,6 +167,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{
@@ -192,6 +197,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{

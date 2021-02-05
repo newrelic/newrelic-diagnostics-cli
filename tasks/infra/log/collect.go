@@ -39,7 +39,7 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 		}
 	}
 
-	if upstream["Base/Config/Validate"].Status != tasks.Success && upstream["Base/Config/Validate"].Status != tasks.Warning {
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		return tasks.Result{
 			Status:  tasks.None,
 			Summary: "Not executing task. Infra config file not found.",

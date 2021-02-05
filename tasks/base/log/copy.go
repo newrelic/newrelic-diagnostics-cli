@@ -177,7 +177,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 	}
 	//get payload from config files
 	foundConfigElements := []baseConfig.ValidateElement{}
-	if upstream["Base/Config/Validate"].Status == tasks.Success || upstream["Base/Config/Validate"].Status == tasks.Warning {
+	if upstream["Base/Config/Validate"].HasPayload() {
 		configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
 		if !ok {
 			return []LogElement{}, errors.New("type assertion error")

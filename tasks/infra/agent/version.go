@@ -35,6 +35,14 @@ func (p InfraAgentVersion) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
+
+	if upstream["Infra/Config/Agent"].Status != tasks.Success {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Task did not meet requirements necessary to run: Infrastructure Agent not detected on system",
+		}
+	}
+
 	if upstream["Base/Env/CollectEnvVars"].Status != tasks.Info {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -47,13 +55,6 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: tasks.AssertionErrorSummary,
-		}
-	}
-
-	if upstream["Infra/Config/Agent"].Status != tasks.Success {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: Infrastructure Agent not detected on system",
 		}
 	}
 

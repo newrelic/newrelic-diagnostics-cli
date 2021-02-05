@@ -50,7 +50,7 @@ func (p DotNetAgentInstalled) Dependencies() []string {
 }
 
 func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	if upstream["Base/Config/Validate"].Status != tasks.Success && upstream["Base/Config/Validate"].Status != tasks.Warning {
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		return tasks.Result{
 			Status:  tasks.None,
 			Summary: "Not executing task: .NET agent config file not found.",
