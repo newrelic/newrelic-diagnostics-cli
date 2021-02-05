@@ -45,7 +45,7 @@ func (p NodeConfigAgent) Execute(options tasks.Options, upstream map[string]task
 		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -61,14 +61,13 @@ func (p NodeConfigAgent) Execute(options tasks.Options, upstream map[string]task
 		}
 	}
 
-	
 	//If this fails to identify the language, now check the raw file itself
 
 	if upstream["Base/Config/Collect"].Status == tasks.Success {
 		configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -86,6 +85,7 @@ func (p NodeConfigAgent) Execute(options tasks.Options, upstream map[string]task
 				nodeItem := config.ValidateElement{Config: configItem, Status: tasks.None} //This defines the mocked validate element we'll put in the results that is empty expect the config element
 				validationResults = append(validationResults, nodeItem)
 			}
+			result.Payload = validationResults
 			return result
 		}
 	}
@@ -103,7 +103,6 @@ func checkValidation(validations []config.ValidateElement) ([]config.ValidateEle
 
 	//Check the validated yml for some node attributes that don't exist in Ruby
 
-
 	for _, validation := range validations {
 		if filepath.Ext(validation.Config.FileName) != ".js" {
 			continue
@@ -118,7 +117,6 @@ func checkValidation(validations []config.ValidateElement) ([]config.ValidateEle
 			}
 		}
 	}
-
 
 	//Check for one or more ValidateElements
 	if len(nodeValidate) > 0 {

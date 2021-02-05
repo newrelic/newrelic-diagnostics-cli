@@ -49,9 +49,9 @@ func (p PythonConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
-	
+
 		pythonValidation, checkValidationTrue := checkValidation(validations)
-	
+
 		if checkValidationTrue {
 			log.Debug("Identified Python from validated config file, setting Python to true")
 			result.Status = tasks.Success
@@ -66,7 +66,7 @@ func (p PythonConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 		configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -84,6 +84,7 @@ func (p PythonConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 				pythonItem := config.ValidateElement{Config: configItem, Status: tasks.None} //This defines the mocked validate element we'll put in the results that is empty expect the config element
 				validationResults = append(validationResults, pythonItem)
 			}
+			result.Payload = validationResults
 			return result
 		}
 	}

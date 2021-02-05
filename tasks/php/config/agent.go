@@ -85,6 +85,7 @@ func (p PHPConfigAgent) Execute(options tasks.Options, upstream map[string]tasks
 				phpItem := config.ValidateElement{Config: configItem, Status: tasks.None} //This defines the mocked validate element we'll put in the results that is empty expect the config element
 				validationResults = append(validationResults, phpItem)
 			}
+			result.Payload = validationResults
 			return result
 		}	
 	}
