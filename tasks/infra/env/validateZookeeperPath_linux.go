@@ -60,8 +60,8 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 	}
 	if upstream["Base/Env/CollectEnvVars"].Status != tasks.Info {
 		return tasks.Result{
-			Status: tasks.None,
-			Summary: tasks.ThisProgramFullName + " was unable to collect env vars from current shell. This task did not run"
+			Status:  tasks.None,
+			Summary: tasks.ThisProgramFullName + " was unable to collect env vars from current shell. This task did not run",
 		}
 	}
 
