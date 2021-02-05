@@ -71,7 +71,7 @@ var _ = Describe("Base/Config/AppName", func() {
 
 				expectedResult := tasks.Result{
 					Status:  tasks.Error,
-					Summary: "Diagnostics CLI was unable to complete this health check because we ran into an unexpected type assertion error.\nPlease notify this issue to us whenever possible through https://discuss.newrelic.com/ by creating a new topic or through https://github.com/newrelic/newrelic-diagnostics-cli/issues\n",
+					Summary: tasks.AssertionErrorSummary,
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))

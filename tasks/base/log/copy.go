@@ -167,14 +167,22 @@ func hasDotnetLogs(logElements []LogElement) bool {
 func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) ([]LogElement, error) {
 
 	//get payload from env vars
-	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
-	if !ok {
-		return []LogElement{}, errors.New("type assertion error")
+	foundEnvVars := make(map[string]string)
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info {
+		envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+		if !ok {
+			return []LogElement{}, errors.New("type assertion error")
+		}
+		foundEnvVars = envVars
 	}
 	//get payload from config files
-	configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
-	if !ok {
-		return []LogElement{}, errors.New("type assertion error")
+	foundConfigElements := []baseConfig.ValidateElement{}
+	if upstream["Base/Config/Validate"].Status == tasks.Success || upstream["Base/Config/Validate"].Status == tasks.Warning {
+		configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
+		if !ok {
+			return []LogElement{}, errors.New("type assertion error")
+		}
+		foundConfigElements = configElements
 	}
 	//attempt to find system properties related to logs in payload
 	foundSysProps := make(map[string]string)
@@ -205,7 +213,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 		dir, fileName := filepath.Split(options.Options["logpath"])
 		logFilesFound = append(logFilesFound, setLogElement(fileName, dir, logSourceData, false, true, ""))
 	} else {
-		logFilesFound = collectFilePaths(envVars, configElements, foundSysProps, options) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
+		logFilesFound = collectFilePaths(foundEnvVars, foundConfigElements, foundSysProps, options) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
 		for i, logFileFound := range logFilesFound {
 			if logFileFound.IsSecureLocation {
 				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", logFileFound.Source.FullPath) +
