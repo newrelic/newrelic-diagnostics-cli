@@ -72,6 +72,13 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 		}
 	}
 
+	if len(javaProcs) == 0 {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: tasks.ThisProgramFullName + " is unable to validate the presence of the New Relic -javaagent flag because you have no java processes running at this time. Please re-run " + tasks.ThisProgramFullName + " after starting your Java Agent application.",
+		}
+	}
+
 	/* range through java processes and add process IDs and a slice containing their corresponding
 	command line args to find the ones that include -javaagent argument */
 	javaAgentProcsIdArgs := []ProcIdAndArgs{}

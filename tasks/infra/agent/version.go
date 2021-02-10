@@ -1,9 +1,9 @@
 package agent
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
-	"errors"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -65,14 +65,14 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 			Summary: fmt.Sprintf("Unable to determine New Relic Infrastructure binary path: %s", err.Error()),
 		}
 	}
-	
+
 	log.Debug("Binary Path found was ", binaryPath)
 
 	rawVersionOutput, err := p.getInfraVersion(binaryPath)
 	if err != nil {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: fmt.Sprintf("New Relic Infrastructure Agent version could not be determined: %s", err.Error()),
+			Summary: fmt.Sprintf("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': %s", err.Error()),
 			URL:     "https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/update-infrastructure-agent",
 		}
 	}
@@ -117,7 +117,7 @@ func (p InfraAgentVersion) getInfraVersion(binaryPath string) (string, error) {
 
 func (p InfraAgentVersion) getBinaryPath(envVars map[string]string) (string, error) {
 	var binaryPath string
-
+	//binary path in Windows: C:\Program Files\New Relic\newrelic-infra\newrelic-infra.exe 
 	if p.runtimeOS == "windows" {
 		sysProgramFiles, ok := envVars["ProgramFiles"]
 		if !ok {

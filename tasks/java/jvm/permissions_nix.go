@@ -99,7 +99,7 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	if upstream["Java/Env/Process"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "The New Relic agent has not been added to a running JVM process yet. This task did not run.",
+			Summary: "Java/Env/Process check did not pass. This task did not run.",
 		}
 	}
 

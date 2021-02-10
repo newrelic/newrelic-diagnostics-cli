@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/shirou/gopsutil/process"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/shirou/gopsutil/process"
 )
 
 // JavaAppserverJBossAsCheck - This struct defines the JBoss AS version check
@@ -34,35 +34,44 @@ func (p JavaAppserverJBossAsCheck) Explain() string {
 
 // Dependencies - Returns the dependencies for this task.
 func (p JavaAppserverJBossAsCheck) Dependencies() []string {
-	return []string{"Base/Env/CollectEnvVars"}
+	return []string{"Base/Env/CollectEnvVars", "Java/Env/Process"}
 }
 
 // Execute - The core work within this task
 func (p JavaAppserverJBossAsCheck) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result
-	result.URL = "https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"
 
-	envVars, _ := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
-
-	jBossAsHome := envVars["JBOSS_HOME"]
-
-	if jBossAsHome != "" {
-		log.Debug("JBOSS_HOME env variable set")
-		versionString, err := p.getAndParseJBossAsReadMe(jBossAsHome)
-		if err != nil {
-			result.Summary = "Error reading jboss readme. Error: " + err.Error()
-			result.Status = tasks.Error
-			return result
+	if upstream["Java/Env/Process"].Status != tasks.Success {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Java/Env/Process did not pass our validation. This task did not run.",//This is a major java task that users should make it succeeds prior to worrying about any other issues.
 		}
-		result.Summary, result.Status = p.checkJBossAsVersion(versionString)
-		return result
 	}
 
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info {
+		envVars, _ := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+
+		jBossAsHome := envVars["JBOSS_HOME"]
+
+		if jBossAsHome != "" {
+			log.Debug("JBOSS_HOME env variable set")
+			versionString, err := p.getAndParseJBossAsReadMe(jBossAsHome)
+			if err != nil {
+				result.Summary = tasks.ThisProgramFullName + " was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading jboss readme: " + err.Error() + "\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"
+				result.Status = tasks.Error
+				return result
+			}
+			result.Summary, result.Status = p.checkJBossAsVersion(versionString)
+			return result
+		}
+	}
+
+	//JBOSS env var is not present, we'll attempt to find Jboss as a java process argument
 	processes, err := p.findProcessByName("java")
 
 	if err != nil {
 		log.Debug("Error reading processes. Error: ", err.Error())
-		result.Summary = "Error reading processes. Error: " + err.Error()
+		result.Summary = tasks.ThisProgramFullName + " was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading from your java process: " + err.Error() + "\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"
 		result.Status = tasks.Error
 		return result
 	}
@@ -76,7 +85,7 @@ func (p JavaAppserverJBossAsCheck) Execute(options tasks.Options, upstream map[s
 			versionString, err := p.getAndParseJBossAsReadMe(homeDir)
 
 			if err != nil {
-				result.Summary = "Error reading processes from homedir: " + homeDir + " Error: " + err.Error()
+				result.Summary = tasks.ThisProgramFullName + " was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading processes from homedir: " + err.Error() + "\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"
 				result.Status = tasks.Error
 				return result
 			}
