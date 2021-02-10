@@ -61,11 +61,17 @@ func (p DotnetRequirementsDatastores) Dependencies() []string {
 // Execute - The core work within this task
 func (p DotnetRequirementsDatastores) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
+	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
-
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: ".Net Agent not installed, this task didn't run",
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
 
