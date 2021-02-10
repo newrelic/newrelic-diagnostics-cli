@@ -12,5 +12,8 @@ const AssertionErrorSummary = ThisProgramFullName+ " was unable to complete this
 //NoAgentDetectedSummary is the standard tasks.None summary we want to display when nrdiag does not detect an agent after looking for its config file or other relevant ways of configuration
 const NoAgentDetectedSummary = "New Relic configuration not detected for this specific agent at the location where Diagnostics CLI was ran. This will stop other health checks (targetting this agent) from running. If you are attempting to troubleshoot for this specific agent, re-run Diagnostics CLI using the command-line option '-config-file' to point to the path to this agent configuration file."
 
-//TaskDidNotRunSummary it is not meant for all summaries where we say 'this task did not run'. Only to the ones that were unable to run because we did not detect an specific agent. Beware! this summary expects a string concatenation at the end
-const TaskDidNotRunSummary = "This task did not run because the following upstream task was unable to detect New Relic configuration for this agent: "
+//NoAgentUpstreamSummary is the standard tasks.None summary that we display when a task did not run because the upstream task for detecting an agent failed at detecting the agent. Beware! this summary expects a string concatenation at the end
+const NoAgentUpstreamSummary = "This task did not run because the following upstream task was unable to detect New Relic configuration for this agent: "
+
+//UpstreamFailedSummary is the tasks.None summary that we display when we cannot run the current task because the previous one had some sort of failure. Beware! this summary expects a string concatenation at the end
+const UpstreamFailedSummary = "This task did not run because the following upstream task will need to succeed before the current one can run: "

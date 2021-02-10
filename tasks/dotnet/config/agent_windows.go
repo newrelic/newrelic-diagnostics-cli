@@ -47,9 +47,15 @@ func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 
 	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: ".NET Agent not installed, not checking config",
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
 
