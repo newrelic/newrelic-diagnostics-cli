@@ -44,58 +44,72 @@ func (p JavaConfigAgent) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
-	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
 
-	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-	if ok {
-		log.Debug("Base/Config/Validate payload correct type")
-		//		log.Debug(configs) //This may be useful when debugging to log the entire results to the screen
+	if upstream["Base/Config/Validate"].HasPayload() {
+		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
+		if !ok {
+			return tasks.Result{
+				Status: tasks.Error,
+				Summary: tasks.AssertionErrorSummary,
+			}
+		}
+		javaValidation, checkValidationTrue := checkValidation(validations)
+
+		if checkValidationTrue {
+			log.Debug("Identified Java from validated config file, setting Java to true")
+			return tasks.Result{
+				Status: tasks.Success,
+				Summary: "Java agent identified as present on system",
+				Payload: javaValidation,
+			}
+		}
 	}
-
-	javaValidation, checkValidationTrue := checkValidation(validations)
-
-	if checkValidationTrue {
-		log.Debug("Identified Java from validated config file, setting Java to true")
-		result.Status = tasks.Success
-		result.Summary = "Java agent identified as present on system"
-		result.Payload = javaValidation
-		return result
-	}
+	
 	// If checking with the parsed Config failed, now check the file itself line by line to detect java agent for invalid config files
 
-	configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-	if ok {
-		log.Debug("Base/Config/Collect payload correct type")
-		//		log.Debug(configs) //This may be useful when debugging to log the entire results to the screen
-	}
+	if upstream["Base/Config/Collect"].Status == tasks.Success {
+		configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement)
 
-	javaConfig, checkConfigTrue := checkConfig(configs)
-
-	if checkConfigTrue {
-		log.Debug("Identified Java from config file parsing, setting Java to true")
-		result.Status = tasks.Success
-		result.Summary = "Java agent identified as present on system"
-		//Map config elements into ValidationElements so we always return a ValidationElement
-		var validationResults []config.ValidateElement
-
-		for _, configItem := range javaConfig {
-			javaItem := config.ValidateElement{Config: configItem, Status: tasks.None} //This defines the mocked validate element we'll put in the results that is empty expect the config element
-			validationResults = append(validationResults, javaItem)
+		if !ok {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: tasks.AssertionErrorSummary,
+			}
 		}
-		return result
-	}
+		javaConfig, checkConfigTrue := checkConfig(configs)
 
+		if checkConfigTrue {
+			log.Debug("Identified Java from config file parsing, setting Java to true")
+			
+			//Map config elements into ValidationElements so we always return a ValidationElement
+			var validationResults []config.ValidateElement
+
+			for _, configItem := range javaConfig {
+				javaItem := config.ValidateElement{Config: configItem, Status: tasks.None} //This defines the mocked validate element we'll put in the results that is empty expect the config element
+				validationResults = append(validationResults, javaItem)
+			}
+			return tasks.Result{
+				Status: tasks.Success,
+			 	Summary: "Java agent identified as present on system",
+				Payload: validationResults,
+			}
+		}
+	}
+	
 	//Last check for the existence of the newrelic.jar as a last ditch effort
 	if checkForJar() {
 		log.Debug("Identified Java from Jar, setting Java to true")
-		result.Status = tasks.Success
-		result.Summary = "Java agent identified as present on system"
-	} else {
-		log.Debug("No Java agent found on system")
-		result.Status = tasks.None
-		result.Summary = "No Java agent found on system"
+
+		return tasks.Result{
+			Status: tasks.Success,
+			Summary: "Java agent identified as present on system",
+			Payload: []config.ValidateElement{},
+		}
+	} 
+	return tasks.Result{
+		Status: tasks.None,
+		Summary: "No Java agent configuration found on system",
 	}
-	return result
 }
 
 // This uses the validation output since a valid yml should produce data that can be read by the FindString function to look for pertinent values
@@ -170,7 +184,6 @@ func checkConfig(configs []config.ConfigElement) ([]config.ConfigElement, bool) 
 
 // This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
 func checkForJar() bool {
-
 	jarNames := []string{
 		"newrelic.jar",
 	}
@@ -185,3 +198,4 @@ func checkForJar() bool {
 	log.Debug("Done search for jar files, setting false")
 	return false
 }
+
