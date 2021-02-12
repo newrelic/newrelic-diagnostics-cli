@@ -3,10 +3,10 @@
 package requirements
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
@@ -43,7 +43,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"DotNet/Agent/Installed": {
-						Status: None,
+						Status:  tasks.None,
 						Summary: tasks.NoAgentDetectedSummary,
 					},
 				}
