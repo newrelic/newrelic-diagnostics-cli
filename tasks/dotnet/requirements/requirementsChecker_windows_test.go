@@ -44,7 +44,12 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 		Context("With unsuccessful upstream", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {
+						Status: tasks.None,
+						Summary: tasks.NoAgentDetectedSummary,
+					},
+				}
 			})
 			It("Should return None status", func() {
 				Expect(result.Status).To(Equal(tasks.None))

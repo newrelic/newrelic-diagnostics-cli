@@ -37,13 +37,17 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 		Context("With unsuccessful upstream", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {
+						Status: tasks.Failure,
+					},
+				}
 			})
 			It("Should return None status", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Did not detect .Net Agent as being installed, this check did not run"))
+				Expect(result.Summary).To(Equal(tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed"))
 			})
 		})
 		Context("With Owin dll not present", func() {
