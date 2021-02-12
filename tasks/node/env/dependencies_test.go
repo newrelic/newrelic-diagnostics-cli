@@ -104,7 +104,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return a Failure result summary", func() {
-				Expect(result.Summary).To(Equal("an error message: npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors"))
+				Expect(result.Summary).To(Equal("an error message: npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
 			})
 		})
 		Context("When NodeModulesVersions length is zero", func() {
@@ -128,7 +128,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return a Error result summary", func() {
-				Expect(result.Summary).To(Equal("We failed to parse the output of npm ls, but have included it in nrdiag-output.zip"))
+				Expect(result.Summary).To(Equal("We failed to parse the output of npm ls, but have included it in nrdiag-output.zip. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
 			})
 		})
 		Context("When getModulesList returns a succesful output that we pass to tasks.FileCopyEnvelope", func() {
