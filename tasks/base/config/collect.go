@@ -26,6 +26,8 @@ var configEnvVarKeys = []string{
 	// PHP agent does not support config env vars
 }
 
+var noConfigEnvVar = "NEW_RELIC_NO_CONFIG_FILE"
+
 var patterns = []string{
 	"newrelic[.]yml",
 	"newrelic[.]xml",
@@ -160,7 +162,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 	//Find insecure paths
 	foundSecureConfigs := tasks.FindFiles(secureFilePatterns, paths)
 
-	var invalidConfigFiles []string
+	var invalidConfigFiles, cannotCollectConfigFiles []string//will represent the secure files that the user reject nrdiag to collect at the prompt
 	var warningSummaryOnInvalidFiles string
 
 	for _, secureConfig := range foundSecureConfigs {
@@ -187,10 +189,16 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 					log.Info("adding file ", secureConfig)
 				}
 				foundConfigs = append(foundConfigs, secureConfig)
+			} else {
+				cannotCollectConfigFiles = append(cannotCollectConfigFiles, secureConfig)
 			}
 		} else {
 			foundConfigs = append(foundConfigs, secureConfig)
 		}
+	}
+	warningSummaryCannotCollect := ""
+	if len(cannotCollectConfigFiles) > 0 {
+		warningSummaryCannotCollect += "\nThe following files were not collected because the user opted out from including them in the nrdiag-output.zip: "+ strings.Join(cannotCollectConfigFiles, ", ")
 	}
 
 	//search for config file in New Relic System Property
@@ -216,17 +224,24 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		invalidConfigFiles, foundConfigs = appendToInvalidOrFoundConfigs(configPath, &warningSummaryOnInvalidFiles, invalidConfigFiles, foundConfigs)
 	}
 
-	if len(foundConfigs) == 0 && len(invalidConfigFiles) > 0 {
-		return tasks.Result{
-			Status:  tasks.Warning,
-			Summary: warningSummaryOnInvalidFiles,
-		}
-	}
+	if len(foundConfigs) == 0 {
 
-	if len(foundConfigs) == 0 && len(invalidConfigFiles) == 0 {
+		if len(invalidConfigFiles) > 0 {
+			return tasks.Result{
+				Status:  tasks.Warning,
+				Summary: warningSummaryOnInvalidFiles + warningSummaryCannotCollect,
+			}
+		}
+		noConfigFileVal, envVarIsPresent := envVars[noConfigEnvVar]
+		if envVarIsPresent {
+			return tasks.Result{
+				Status: tasks.Warning,
+				Summary: tasks.ThisProgramFullName+ " was unable to collect a New Relic config file because the "+ noConfigEnvVar+ " env var was set to " + noConfigFileVal + "." + warningSummaryCannotCollect,
+			}
+		}
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "New Relic configuration files not found where the " + tasks.ThisProgramFullName + " was executed. Please ensure the " + tasks.ThisProgramFullName + " executable is within your application's directory alongside your New Relic agent configuration file(s). If you cannot set New Relic configuration files in your application's directory, move the " + tasks.ThisProgramFullName + " to that directory or use the -c <file_path> to specify the New Relic configuration file location.",
+			Summary: "New Relic configuration files not found where the " + tasks.ThisProgramFullName + " was executed. Please ensure the " + tasks.ThisProgramFullName + " executable is within your application's directory alongside your New Relic agent configuration file(s). If you cannot set New Relic configuration files in your application's directory, move the " + tasks.ThisProgramFullName + " to that directory or use the -c <file_path> to specify the New Relic configuration file location." + warningSummaryCannotCollect,
 		}
 	}
 
@@ -255,7 +270,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 	return tasks.Result{
 		Status:      tasks.Success,
 		Payload:     configFilesInfo,
-		Summary:     finalSummary,
+		Summary:     finalSummary + warningSummaryCannotCollect,
 		FilesToCopy: filesToCopy,
 	}
 }
