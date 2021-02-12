@@ -80,7 +80,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("New Relic configuration not detected for this specific agent at the location where Diagnostics CLI was ran. This will stop other health checks (targetting this agent) from running. If you are attempting to troubleshoot for this specific agent, re-run Diagnostics CLI using the command-line option '-config-file' to point to the path to this agent configuration file."))
+				Expect(result.Summary).To(Equal(tasks.NoAgentDetectedSummary))
 			})
 		})
 
@@ -108,7 +108,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("New Relic configuration not detected for this specific agent at the location where Diagnostics CLI was ran. This will stop other health checks (targetting this agent) from running. If you are attempting to troubleshoot for this specific agent, re-run Diagnostics CLI using the command-line option '-config-file' to point to the path to this agent configuration file."))
+				Expect(result.Summary).To(Equal(tasks.NoAgentDetectedSummary))
 			})
 		})
 
