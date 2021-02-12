@@ -50,7 +50,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal(".Net Agent not detected as installed, this check didn't run"))
+				Expect(result.Summary).To(Equal(tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed"))
 			})
 		})
 

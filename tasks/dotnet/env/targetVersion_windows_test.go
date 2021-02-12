@@ -55,7 +55,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal(tasks.UpstreamFailedSummary + p.Identifier()))
+				Expect(result.Summary).To(Equal(tasks.UpstreamFailedSummary + "DotNet/Agent/Installed"))
 			})
 		})
 		Context("when unable to get working directory", func() {

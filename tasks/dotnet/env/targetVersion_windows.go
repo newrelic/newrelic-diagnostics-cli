@@ -37,12 +37,12 @@ func (p DotNetEnvTargetVersion) Execute(options tasks.Options, upstream map[stri
 		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
 			return tasks.Result{
 				Status:  tasks.None,
-				Summary: tasks.NoAgentUpstreamSummary + p.Identifier(),
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
 			}
 		}
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: tasks.UpstreamFailedSummary + p.Identifier(),
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
 
