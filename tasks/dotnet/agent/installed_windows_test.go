@@ -3,10 +3,10 @@ package agent
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func mockDllSuccess(agentPath, profilerPath string) bool {
@@ -80,7 +80,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Not executing task: .NET agent config file not found."))
+				Expect(result.Summary).To(Equal("New Relic configuration not detected for this specific agent at the location where Diagnostics CLI was ran. This will stop other health checks (targetting this agent) from running. If you are attempting to troubleshoot for this specific agent, re-run Diagnostics CLI using the command-line option '-config-file' to point to the path to this agent configuration file."))
 			})
 		})
 
@@ -94,9 +94,9 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.yml", 
+									FileName: "newrelic.yml",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
@@ -108,35 +108,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal(".NET agent not detected"))
-			})
-		})
-
-		Context("When no .NET config files are found", func() {
-
-			BeforeEach(func() {
-				options = tasks.Options{}
-				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
-						Status: tasks.Success,
-						Payload: []config.ValidateElement{
-							config.ValidateElement{
-								Config: config.ConfigElement{
-									FileName: "newrelic.yml", 
-									FilePath: "",
-								}, 
-							},
-						},
-					},
-				}
-			})
-
-			It("should return an expected result status", func() {
-				Expect(result.Status).To(Equal(tasks.None))
-			})
-
-			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal(".NET agent not detected"))
+				Expect(result.Summary).To(Equal("New Relic configuration not detected for this specific agent at the location where Diagnostics CLI was ran. This will stop other health checks (targetting this agent) from running. If you are attempting to troubleshoot for this specific agent, re-run Diagnostics CLI using the command-line option '-config-file' to point to the path to this agent configuration file."))
 			})
 		})
 
@@ -150,16 +122,16 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.config", 
+									FileName: "newrelic.config",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
 					DotNetAgentInstall{
-						AgentPath: "fixtures/does_not_exist.dll",
+						AgentPath:    "fixtures/does_not_exist.dll",
 						ProfilerPath: "fixtures/does_not_exist.dll",
 					},
 				}
@@ -184,16 +156,16 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.config", 
+									FileName: "newrelic.config",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
 					DotNetAgentInstall{
-						AgentPath: "fixtures/file1.dll",
+						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/does_not_exist.dll",
 					},
 				}
@@ -218,16 +190,16 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.config", 
+									FileName: "newrelic.config",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
 					DotNetAgentInstall{
-						AgentPath: "fixtures/does_not_exist.dll",
+						AgentPath:    "fixtures/does_not_exist.dll",
 						ProfilerPath: "fixtures/file1.dll",
 					},
 				}
@@ -252,16 +224,16 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.config", 
+									FileName: "newrelic.config",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
 					DotNetAgentInstall{
-						AgentPath: "fixtures/file1.dll",
+						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/file2.dll",
 					},
 				}
@@ -286,16 +258,16 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.config", 
+									FileName: "newrelic.config",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
 					DotNetAgentInstall{
-						AgentPath: "fixtures/file1.dll",
+						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/file2.dll",
 					},
 				}
@@ -320,20 +292,20 @@ var _ = Describe("DotNetAgentInstalled", func() {
 						Payload: []config.ValidateElement{
 							config.ValidateElement{
 								Config: config.ConfigElement{
-									FileName: "newrelic.config", 
+									FileName: "newrelic.config",
 									FilePath: "",
-								}, 
+								},
 							},
 						},
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
 					DotNetAgentInstall{ //current agent
-						AgentPath: "fixtures/file1.dll",
+						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/file1.dll",
 					},
 					DotNetAgentInstall{ //legacy agent
-						AgentPath: "fixtures/file2.dll",
+						AgentPath:    "fixtures/file2.dll",
 						ProfilerPath: "fixtures/file2.dll",
 					},
 				}
