@@ -232,7 +232,7 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
 		}
 
-		if result.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && (result.Result.Status == tasks.Success || result.Result.Status == tasks.Warning) {
+		if result.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && result.Result.Status == tasks.Success {
 			licenseKeyToSources, ok := result.Result.Payload.(map[string][]string)
 			//We do not need the value of sources(if lk is env var or comes from config file, etc) for this operation
 			reducedLicenseKeys := []string{}

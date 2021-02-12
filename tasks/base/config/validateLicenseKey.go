@@ -98,11 +98,13 @@ func (p BaseConfigValidateLicenseKey) Execute(options tasks.Options, upstream ma
 			}
 			resultsPayload = validFormatLKToSources
 		}
+
 		if len(invalidAccountLKToSources) > 0 {
 			for lk, sources := range invalidAccountLKToSources {
-				failureSummary += fmt.Sprintf("The license key found in %s did not pass our validation check when verifying against your account:\n%s\nIf your agent is reporting an 'Invalid license key' log entry, please reach out to New Relic Support.\n\n", strings.Join(sources, ",\n "), lk)
+				warningSummary += fmt.Sprintf("The license key found in %s did not match the one assigned to your account:\n%s\nIf you are using an 'ingest key', ignore this warning. Ingest keys are secondary license keys manage by their own users that we do not validate for. Read more about ingest keys - https://docs.newrelic.com/docs/apis/nerdgraph/examples/use-nerdgraph-manage-license-keys-user-keys\n\n", strings.Join(sources, ",\n "), lk)
 			}
 		}
+
 		if len(validAccountLKToSources) > 0 {
 			for lk, sources := range validAccountLKToSources {
 				successSummary += fmt.Sprintf("The license key found in %s passed our validation check when verifying against your account:\n %s"+"\n", strings.Join(sources, ",\n "), lk)
