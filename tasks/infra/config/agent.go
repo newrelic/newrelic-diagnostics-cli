@@ -114,7 +114,7 @@ func (p InfraConfigAgent) Execute(options tasks.Options, upstream map[string]tas
 	log.Debug("No Infra agent found on system")
 	return tasks.Result{
 		Status: tasks.None,
-		Summary: "No Infra agent found on system",
+		Summary: tasks.NoAgentDetectedSummary,
 	}
 }
 

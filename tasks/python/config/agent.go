@@ -91,7 +91,7 @@ func (p PythonConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 
 	log.Debug("No Python agent found on system")
 	result.Status = tasks.None
-	result.Summary = "No Python agent found on system"
+	result.Summary = tasks.NoAgentDetectedSummary
 	return result
 
 }

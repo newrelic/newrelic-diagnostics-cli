@@ -47,7 +47,7 @@ func (p PHPConfigAgent) Execute(options tasks.Options, upstream map[string]tasks
 		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -67,32 +67,32 @@ func (p PHPConfigAgent) Execute(options tasks.Options, upstream map[string]tasks
 		configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
-	
+
 		phpConfig, checkConfigTrue := checkConfig(configs)
-	
+
 		if checkConfigTrue {
 			log.Debug("Identified PHP from config file parsing, setting PHP to true")
 			result.Status = tasks.Success
 			result.Summary = "PHP agent identified as present on system"
 			//Map config elements into ValidationElements so we always return a ValidationElement
 			var validationResults []config.ValidateElement
-	
+
 			for _, configItem := range phpConfig {
 				phpItem := config.ValidateElement{Config: configItem, Status: tasks.None} //This defines the mocked validate element we'll put in the results that is empty expect the config element
 				validationResults = append(validationResults, phpItem)
 			}
 			result.Payload = validationResults
 			return result
-		}	
+		}
 	}
 
 	log.Debug("No PHP agent found on system")
 	result.Status = tasks.None
-	result.Summary = "No PHP agent found on system"
+	result.Summary = tasks.NoAgentDetectedSummary
 	return result
 }
 

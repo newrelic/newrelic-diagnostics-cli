@@ -123,7 +123,7 @@ func (p NodeConfigAgent) Execute(options tasks.Options, upstream map[string]task
 
 	log.Debug("No Node agent found on system")
 	result.Status = tasks.None
-	result.Summary = "No Node agent found on system"
+	result.Summary = tasks.NoAgentDetectedSummary
 	return result
 
 }

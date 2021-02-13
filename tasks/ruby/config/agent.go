@@ -90,7 +90,7 @@ func (p RubyConfigAgent) Execute(options tasks.Options, upstream map[string]task
 	}
 	log.Debug("No Ruby agent found on system")
 	result.Status = tasks.None
-	result.Summary = "No Ruby agent found on system"
+	result.Summary = tasks.NoAgentDetectedSummary
 	return result
 }
 

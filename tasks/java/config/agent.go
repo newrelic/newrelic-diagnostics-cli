@@ -49,7 +49,7 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -58,13 +58,13 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 		if checkValidationTrue {
 			log.Debug("Identified Java from validated config file, setting Java to true")
 			return tasks.Result{
-				Status: tasks.Success,
+				Status:  tasks.Success,
 				Summary: "Java agent identified as present on system",
 				Payload: javaValidation,
 			}
 		}
 	}
-	
+
 	// If checking with the parsed Config failed, now check the file itself line by line to detect java agent for invalid config files
 
 	if upstream["Base/Config/Collect"].Status == tasks.Success {
@@ -80,7 +80,7 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 
 		if checkConfigTrue {
 			log.Debug("Identified Java from config file parsing, setting Java to true")
-			
+
 			//Map config elements into ValidationElements so we always return a ValidationElement
 			var validationResults []config.ValidateElement
 
@@ -89,27 +89,27 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 				validationResults = append(validationResults, javaItem)
 			}
 			return tasks.Result{
-				Status: tasks.Success,
-			 	Summary: "Java agent identified as present on system",
+				Status:  tasks.Success,
+				Summary: "Java agent identified as present on system",
 				Payload: validationResults,
 			}
 		}
 	}
-	
+
 	//Last check for the existence of the newrelic.jar as a last ditch effort
 	if checkForJar() {
 		log.Debug("Identified Java from Jar, setting Java to true")
 
 		return tasks.Result{
-			Status: tasks.Success,
+			Status:  tasks.Success,
 			Summary: "Java agent identified as present on system",
 			Payload: []config.ValidateElement{},
 		}
-	} 
-	
+	}
+
 	return tasks.Result{
-		Status: tasks.None,
-		Summary: "No Java agent configuration found on system",
+		Status:  tasks.None,
+		Summary: tasks.NoAgentDetectedSummary,
 	}
 }
 
@@ -199,4 +199,3 @@ func checkForJar() bool {
 	log.Debug("Done search for jar files, setting false")
 	return false
 }
-
