@@ -2,6 +2,7 @@ package config
 
 import (
 	"path/filepath"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -19,6 +20,12 @@ var nodeKeys = []string{
 	"license_key",
 }
 
+var nodeConfigEnvVars = []string{
+	"NEW_RELIC_APP_NAME",
+	"NEW_RELIC_LICENSE_KEY",
+	"NEW_RELIC_NO_CONFIG_FILE", //most agents have an order of precedence and don't force/care if you have anything
+}
+
 // Identifier - This returns the Category, Subcategory and Name of each task
 func (p NodeConfigAgent) Identifier() tasks.Identifier {
 	return tasks.IdentifierFromString("Node/Config/Agent") // This should be updated to match the struct name
@@ -32,6 +39,7 @@ func (p NodeConfigAgent) Explain() string {
 // Dependencies - Returns the dependencies for ech task. When executed by name each dependency will be executed as well and the results from that dependency passed in to the downstream task
 func (p NodeConfigAgent) Dependencies() []string {
 	return []string{
+		"Base/Env/CollectEnvVars",
 		"Base/Config/Collect",
 		"Base/Config/Validate", //This identifies this task as dependent on "Base/Config/Validate" and so the results from that task will be passed to this task. See the execute method to see how to interact with the results.
 	}
@@ -40,6 +48,29 @@ func (p NodeConfigAgent) Dependencies() []string {
 // Execute - The core work within each task
 func (p NodeConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
 	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info {
+		envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+		if !ok {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: tasks.ThisProgramFullName + " was unable to complete this health check because we ran into an unexpected type assertion error.\nPlease notify this issue to us whenever possible through https://discuss.newrelic.com/ by creating a new topic or through https://github.com/newrelic/newrelic-diagnostics-cli/issues\n",
+			}
+		}
+		foundAllNeededEnvVars := true
+		for _, nodeEnvVarKey := range nodeConfigEnvVars {
+			_, isPresent := envVars[nodeEnvVarKey]
+			if !isPresent {
+				foundAllNeededEnvVars = false
+			}
+		}
+		if foundAllNeededEnvVars {
+			return tasks.Result{
+				Status:  tasks.Success,
+				Summary: "Node agent identified as present on system by detecting the following New Relic Env vars: " + strings.Join(nodeConfigEnvVars, ", "),
+				Payload: []config.ValidateElement{},
+			}
+		}
+	}
 
 	if upstream["Base/Config/Validate"].HasPayload() {
 		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
@@ -92,7 +123,7 @@ func (p NodeConfigAgent) Execute(options tasks.Options, upstream map[string]task
 
 	log.Debug("No Node agent found on system")
 	result.Status = tasks.None
-	result.Summary = "No Node agent found on system"
+	result.Summary = tasks.NoAgentDetectedSummary
 	return result
 
 }

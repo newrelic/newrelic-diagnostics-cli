@@ -132,13 +132,17 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 		Context("With unsuccessful upstream", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": tasks.Result{
+						Status: tasks.Failure,
+					},
+				}
 			})
 			It("Should return None status", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal(".Net Agent not installed, this task didn't run"))
+				Expect(result.Summary).To(Equal(tasks.UpstreamFailedSummary + "DotNet/Agent/Installed"))
 			})
 		})
 

@@ -140,7 +140,7 @@ func checkLinux(osPlatform string, osVersion string) (result tasks.Result) {
 		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
 		return
 	}
-
+	//https://docs.microsoft.com/en-us/dotnet/core/install/linux
 	if checkPassed {
 		result.Status = tasks.Success
 		result.Summary = "OS detected as meeting requirements. See HostInfo task Payload for more info on OS."
@@ -149,7 +149,7 @@ func checkLinux(osPlatform string, osVersion string) (result tasks.Result) {
 	}
 
 	result.Status = tasks.Failure
-	result.Summary = "OS not detected as compatible with the .Net Core Agent. See HostInfo task Payload for more info on OS."
+	result.Summary = "OS not detected as compatible with the .Net Core Agent. See HostInfo task Payload for more info on OS: " + osPlatform + " " + osVersion
 	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
 	return
 }
@@ -169,14 +169,14 @@ func checkLinux(osPlatform string, osVersion string) (result tasks.Result) {
 */
 
 func checkUbuntu(osVerMaj int, osVerMin int) (retVal bool) {
-	// Ubuntu: 17.10, 16.04, 14.04
-	if osVerMaj == 14 || osVerMaj == 16 {
+	// Ubuntu: 17.10, 16.04, 20.10, 20.04, 18.04
+	if osVerMaj == 16 || osVerMaj == 18 || osVerMaj == 20 {
 		if osVerMin == 04 {
 			retVal = true
 			return
 		}
 	}
-	if osVerMaj == 17 {
+	if osVerMaj == 17 || osVerMaj == 20 {
 		if osVerMin == 10 {
 			retVal = true
 			return

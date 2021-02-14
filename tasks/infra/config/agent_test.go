@@ -18,6 +18,7 @@ func TestMain(m *testing.M) {
 }
 
 var validationFromDefaultYML []config.ValidateElement
+
 func Test_checkValidation(t *testing.T) {
 	type args struct {
 		validations []config.ValidateElement
@@ -151,7 +152,7 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 	successResultBinary := tasks.Result{Status: tasks.Success,
 		Summary: "Infra agent identified as present on system from existence of binary file: newrelic-infra.exe",
 	}
-	emptyResult := tasks.Result{Status: tasks.None, Summary: "No Infra agent found on system", URL: "", FilesToCopy: nil, Payload: nil}
+	emptyResult := tasks.Result{Status: tasks.None, Summary: tasks.NoAgentDetectedSummary, URL: "", FilesToCopy: nil, Payload: nil}
 	mockValidationTrue := func([]config.ValidateElement) ([]config.ValidateElement, bool) {
 		return []config.ValidateElement{}, true
 	}
@@ -192,11 +193,11 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationTrue, configChecker: mockConfigTrue, binaryChecker: mockBinaryTrue},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
-					Status: tasks.Success,
+					Status:  tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
 				},
 				"Base/Config/Validate": {
-					Status: tasks.Success,
+					Status:  tasks.Success,
 					Payload: validationFromDefaultYML,
 				},
 			}},
@@ -205,7 +206,7 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigTrue, binaryChecker: mockBinaryTrue},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
-					Status: tasks.Success,
+					Status:  tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
 				},
 				"Base/Config/Validate": {
@@ -217,7 +218,7 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigFalse, binaryChecker: mockBinaryTrue},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
-					Status: tasks.Success,
+					Status:  tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
 				},
 				"Base/Config/Validate": {
@@ -229,7 +230,7 @@ func TestInfraConfigAgent_Execute(t *testing.T) {
 			fields: fields{validationChecker: mockValidationFalse, configChecker: mockConfigFalse, binaryChecker: mockBinaryFalse},
 			args: args{upstream: map[string]tasks.Result{
 				"Base/Config/Collect": {
-					Status: tasks.Success,
+					Status:  tasks.Success,
 					Payload: []config.ConfigElement{{FileName: "newrelic-infra.yml", FilePath: "fixtures/default_infra_config/"}},
 				},
 				"Base/Config/Validate": {

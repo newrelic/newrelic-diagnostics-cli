@@ -45,7 +45,7 @@ func (t BrowserAgentDetect) Execute(options tasks.Options, upstream map[string]t
 	if upstream["Browser/Agent/GetSource"].Status == tasks.Failure || upstream["Browser/Agent/GetSource"].Status == tasks.Error || upstream["Browser/Agent/GetSource"].Status == tasks.None {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "This tasks did not run because the previous task 'Browser/Agent/GetSource' either did not run or was not successful.",
+			Summary: "This task did not run because the previous task 'Browser/Agent/GetSource' either did not run or was not successful.",
 		}
 	}
 
@@ -54,7 +54,7 @@ func (t BrowserAgentDetect) Execute(options tasks.Options, upstream map[string]t
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "This task was unable to run because we ran into a Type Assertion error from the upstream task Browser/Agent/GetSource",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

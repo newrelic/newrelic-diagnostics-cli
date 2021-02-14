@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
@@ -39,7 +39,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal(".Net Agent not installed this task didn't run"))
+				Expect(result.Summary).To(Equal(tasks.UpstreamFailedSummary + "DotNet/Agent/Installed"))
 			})
 		})
 		Context("when list of directories is empty", func() {

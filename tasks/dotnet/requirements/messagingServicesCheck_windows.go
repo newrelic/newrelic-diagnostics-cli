@@ -58,11 +58,17 @@ func (p DotnetRequirementsMessagingServicesCheck) Execute(options tasks.Options,
 	var result tasks.Result
 	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-framework-agent#messaging"
 
+	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
-
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: ".Net Agent not installed this task didn't run",
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
 

@@ -34,15 +34,23 @@ func (t DotNetLogLevelCollect) Dependencies() []string {
 func (t DotNetLogLevelCollect) Execute(options tasks.Options, upstream map[string]tasks.Result) (result tasks.Result) {
 	logger.Debug("DotNet/Log/LevelCollect Start")
 
+	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
-		result.Status = tasks.None
-		result.Summary = ".NET Framework Agent not installed, skipping this task."
-		return
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
+		}
 	}
 
 	if upstream["DotNet/Config/Agent"].Status != tasks.Success {
 		result.Status = tasks.None
-		result.Summary = ".NET Framework Agent newrelic.config files not present, skipping this task."
+		result.Summary = "DotNet/Config/Agent was unable to validate settings for newrelic.config. This task did not run."
 		return
 	}
 
