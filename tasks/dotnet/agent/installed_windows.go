@@ -50,10 +50,10 @@ func (p DotNetAgentInstalled) Dependencies() []string {
 }
 
 func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	if upstream["Base/Config/Validate"].Status != tasks.Success && upstream["Base/Config/Validate"].Status != tasks.Warning {
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Not executing task: .NET agent config file not found.",
+			Summary: tasks.NoAgentDetectedSummary,
 		}
 	}
 
@@ -61,7 +61,7 @@ func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string
 	if !ok {
 		return tasks.Result{
 			Status: tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -88,7 +88,7 @@ func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string
 
 	return tasks.Result{
 		Status: tasks.None,
-		Summary: ".NET agent not detected",
+		Summary: tasks.NoAgentDetectedSummary,
 	}
 }
 

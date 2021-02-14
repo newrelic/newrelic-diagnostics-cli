@@ -35,12 +35,20 @@ func (p DotNetProfilerW3svcRegKey) Dependencies() []string {
 
 func (p DotNetProfilerW3svcRegKey) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	if upstream["DotNet/Agent/Installed"].Status != tasks.Success{
+	// abort if it isn't installed
+	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
 		return tasks.Result{
-			Status: tasks.None,
-			Summary: "Did not detect .Net Agent as being installed, this check did not run",
+			Status:  tasks.None,
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
+
 
 	return validateW3svcInstrumentationRegKeys()
 

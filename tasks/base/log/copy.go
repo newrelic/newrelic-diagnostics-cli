@@ -1,6 +1,7 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -47,7 +48,14 @@ func (p BaseLogCopy) Dependencies() []string {
 // Execute - This task will search for config files based on the string array defined and walk the directory tree from the working directory searching for additional matches
 func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	logElementsFound := searchForLogPaths(options, upstream)
+	logElementsFound, errTypeAssertion := searchForLogPaths(options, upstream)
+
+	if errTypeAssertion != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
+	}
 
 	if len(logElementsFound) < 1 {
 		return tasks.Result{
@@ -102,7 +110,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 
 		if hasInvalidLogs {
-			warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support.", strings.Join(invalidLogPaths, ", "))
+			warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue and you are working with New Relic Support, you will need to manually provide those logs.", strings.Join(invalidLogPaths, ", "))
 			return tasks.Result{
 				Status:      tasks.Warning,
 				Summary:     successSummary + "\n" + warningSummary,
@@ -156,29 +164,38 @@ func hasDotnetLogs(logElements []LogElement) bool {
 	return false
 }
 
-func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) []LogElement {
+func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) ([]LogElement, error) {
 
 	//get payload from env vars
-	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
-	if !ok {
-		log.Debug("Could not get envVars from upstream")
+	foundEnvVars := make(map[string]string)
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info {
+		envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+		if !ok {
+			return []LogElement{}, errors.New("type assertion error")
+		}
+		foundEnvVars = envVars
 	}
 	//get payload from config files
-	configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
-	if !ok {
-		log.Debug("type assertion failure for Base/Config/Validate Payload")
+	foundConfigElements := []baseConfig.ValidateElement{}
+	if upstream["Base/Config/Validate"].HasPayload() {
+		configElements, ok := upstream["Base/Config/Validate"].Payload.([]baseConfig.ValidateElement)
+		if !ok {
+			return []LogElement{}, errors.New("type assertion error")
+		}
+		foundConfigElements = configElements
 	}
 	//attempt to find system properties related to logs in payload
 	foundSysProps := make(map[string]string)
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
 		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
-		if ok {
-			for _, process := range proccesses {
-				for _, sysPropKey := range logSysProps {
-					sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
-					if isPresent {
-						foundSysProps[sysPropKey] = sysPropVal
-					}
+		if !ok {
+			return []LogElement{}, errors.New("type assertion error")
+		}
+		for _, process := range proccesses {
+			for _, sysPropKey := range logSysProps {
+				sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
+				if isPresent {
+					foundSysProps[sysPropKey] = sysPropVal
 				}
 			}
 		}
@@ -196,7 +213,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 		dir, fileName := filepath.Split(options.Options["logpath"])
 		logFilesFound = append(logFilesFound, setLogElement(fileName, dir, logSourceData, false, true, ""))
 	} else {
-		logFilesFound = collectFilePaths(envVars, configElements, foundSysProps, options) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
+		logFilesFound = collectFilePaths(foundEnvVars, foundConfigElements, foundSysProps, options) //At this point foundSysPropPath may be not be have an assigned value but we'll check for length on the other end
 		for i, logFileFound := range logFilesFound {
 			if logFileFound.IsSecureLocation {
 				question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", logFileFound.Source.FullPath) +
@@ -210,7 +227,7 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 
 		}
 	}
-	return logFilesFound
+	return logFilesFound, nil
 }
 
 func determineFilesDate(logFilePaths []string, lastModifiedDate time.Time) ([]string, []string) {

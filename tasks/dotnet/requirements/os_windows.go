@@ -34,10 +34,17 @@ func (p DotnetRequirementsOS) Dependencies() []string {
 // Execute - The core work within each task
 func (p DotnetRequirementsOS) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
+	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Did not detect .Net Agent as being installed, this check did not run",
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
 	//add check for agent installed

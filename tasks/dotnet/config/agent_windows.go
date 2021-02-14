@@ -44,41 +44,45 @@ var webAppConfigKeys = []string{
 
 // Execute - The core work within each task
 func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
-	var result tasks.Result //This is what we will use to pass the output from this task back to the core and report to the UI
-
-	// check if the agent is installed
-	checkInstalled := upstream["DotNet/Agent/Installed"].Status
 
 	// abort if it isn't installed
-	if checkInstalled != tasks.Success {
-		result.Status = tasks.None
-		result.Summary = ".NET Agent not installed, not checking config"
-		return result
-	}
-
-	// get all the config files and elements to check them
-	configFiles, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-	if ok {
-		log.Debug("Successfully gathered config files from upstream.")
-
-		// validate the config files elements
-		filesToAdd, err := checkConfigs(configFiles)
-		if !err { // no error means at least one file validated
-			result.Status = tasks.Success
-			result.Summary = "Found" + strconv.FormatInt(int64(len(filesToAdd)), 10) + ".NET agent config files."
-			result.Payload = filesToAdd
-			return result
+	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
 		}
-
-		// log.Debug(configElements) //This may be useful when debugging to log the entire results to the screen
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
+		}
 	}
 
-	// if it gets this far, no files were able to validate.
-	log.Debug("Error validating .NET agent config files:", configFiles)
-	result.Status = tasks.Failure
-	result.Summary = "Unable to validate the .NET agent config files."
+	// get all the config files and elements to check them. No need to verify if this task succeeded because we already checked this on the upstream task DotNet/Agent/Installed
+	configFiles, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
+	}
+	log.Debug("Successfully gathered config files from upstream.")
 
-	return result
+	// validate the config files elements
+	filesToAdd, err := checkConfigs(configFiles) //err is a boolean
+	if err {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: "Unable to validate the .NET agent config files because the files do not contain typical .NET agent configuration settings.",
+		}
+	}
+	// no error means at least one file validated
+	return tasks.Result{
+		Status:  tasks.Success,
+		Summary: "Found" + strconv.FormatInt(int64(len(filesToAdd)), 10) + ".NET agent config files.",
+		Payload: filesToAdd,
+	}
 }
 
 func checkConfigs(configFiles []config.ValidateElement) ([]config.ValidateElement, bool) {

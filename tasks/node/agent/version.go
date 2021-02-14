@@ -43,7 +43,7 @@ func (t NodeAgentVersion) Execute(options tasks.Options, upstream map[string]tas
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: tasks.ThisProgramFullName + " was unable to complete this health check because we ran into an unexpected type assertion error." + tasks. NotifyIssueSummary,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

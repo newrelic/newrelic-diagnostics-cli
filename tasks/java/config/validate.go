@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/shirou/gopsutil/process"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
+	"github.com/shirou/gopsutil/process"
 )
 
 // JavaConfigValidate - This struct defined the sample plugin which can be used as a starting point
@@ -65,21 +65,35 @@ func (t JavaConfigValidate) Execute(options tasks.Options, upstream map[string]t
 	// Validate Java Config Agent Success
 	if upstream["Java/Config/Agent"].Status != tasks.Success && upstream["Java/Env/Process"].Status != tasks.Success {
 		result.Status = tasks.None
-		result.Summary = "Java agent not detected"
+		result.Summary = "Java agent not detected. This task did not run."
 		return result
 	}
 
 	// Get Validate and Process Payloads with type assertions
+	if !upstream["Base/Config/Validate"].HasPayload() {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Unable to validate a new relic config file. This task did not run.",
+		}
+	}
 	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
 	if !ok {
-		log.Debug("No validations found")
+		result.Status = tasks.Error
+		result.Summary = tasks.AssertionErrorSummary
+		return result
+	}
+
+	if upstream["Java/Env/Process"].Status != tasks.Success {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Java/Env/Process check did not pass. This task did not run.",
+		}
 	}
 
 	processes, ok := upstream["Java/Env/Process"].Payload.([]env.ProcIdAndArgs)
 	if !ok {
-		log.Debug("No running processes found")
-		result.Status = tasks.None
-		result.Summary = "Running Java agent not detected"
+		result.Status = tasks.Error
+		result.Summary = tasks.AssertionErrorSummary
 		return result
 	}
 
@@ -108,7 +122,6 @@ func (t JavaConfigValidate) Execute(options tasks.Options, upstream map[string]t
 	result.Status = tasks.Success
 	result.Payload = javaConfigs
 
-	
 	for _, javaConfig := range javaConfigs {
 		stream := make(chan string)
 		output := fmt.Sprintf("PID: %d\n", javaConfig.Proc.Pid)

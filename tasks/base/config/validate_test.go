@@ -65,7 +65,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			options := tasks.Options{}
 			result := p.Execute(options, upstream)
 			It("Should return error result", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 		})
@@ -96,7 +96,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			options := tasks.Options{}
 			result := p.Execute(options, upstream)
 			It("Should return error result", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 		})

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 
-	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
@@ -12,6 +11,7 @@ import (
 // InfraConfigIntegrationsMatch - attempt to match Infra OHAI config and definition files
 type InfraConfigIntegrationsMatch struct {
 	runtimeOS string
+	
 }
 
 // IntegrationFilePair - This struct defines a pair of integration files
@@ -90,8 +90,8 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 	// If type assertion failed, bail out
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -101,12 +101,12 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 
 	//In December 2019, Infrastructure agent version 1.8.0 began supporting a newer configuration format that makes use of a single configuration file. Most integrations may still install a definition file though their usage is optional and the file can be removed. The docker-config.yml does not install a definition file at all.
 
-	isNewerInfraVersion, err := checkInfraVersion(upstream)
+	isNewerInfraVersion, errMessage := checkInfraVersion(upstream)
 
-	if err != nil {
+	if errMessage != "" {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: tasks.ThisProgramFullName + " was unable to validate this health check because it ran into an unexpect error: " + err.Error(),
+			Summary: errMessage,
 		}
 	}
 
@@ -305,8 +305,8 @@ func isConfigFileV4(configElement config.ValidateElement) bool {
 	*/
 	integrationsKeys := configElement.ParsedResult.FindKey("integrations")
 	/* Expect to find at least one. Example:
-		/integrations/0/name: nri-docker
-		/integrations/0/when/feature: docker_enabled */
+	/integrations/0/name: nri-docker
+	/integrations/0/when/feature: docker_enabled */
 	instancesKeys := configElement.ParsedResult.FindKey("instances")
 	// Expect to find none
 	if len(integrationsKeys) > 0 && len(instancesKeys) == 0 {
@@ -314,17 +314,17 @@ func isConfigFileV4(configElement config.ValidateElement) bool {
 	}
 	return false
 }
-func checkInfraVersion(upstream map[string]tasks.Result) (bool, error) {
+func checkInfraVersion(upstream map[string]tasks.Result) (bool, string) {
 	installedInfraVersion, ok := upstream["Infra/Agent/Version"].Payload.(tasks.Ver)
 	if !ok {
-		log.Debug("failed for payload type assertion for Infra/Agent/Version task in Infra/Config/IntegrationsMatch")
+		return false, tasks.AssertionErrorSummary
 	}
 	infraVersionWithNewConfigFormat, err := tasks.ParseVersion("1.8.0")
 	if err != nil {
-		return false, err
+		return false, tasks.ThisProgramFullName + " was unable to complete this health check because it ran into an unexpect error: " + err.Error()
 	}
 	isRecentVersion := installedInfraVersion.IsGreaterThanEq(infraVersionWithNewConfigFormat)
-	return isRecentVersion, nil
+	return isRecentVersion, ""
 }
 
 //Validates that IntegrationPair ValidateElements have matching integration names parsed from their yamls

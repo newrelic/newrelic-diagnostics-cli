@@ -1013,7 +1013,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			})
 
 			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("The task Java/JVM/VendorsVersions encountered an error while detecting all running Java processes."))
+				Expect(result.Summary).To(Equal(tasks.ThisProgramFullName + " was unable to detect any running Java processes because we ran into an error: an error message"))
 			})
 		})
 		Context("when there are no Java processes running", func() {

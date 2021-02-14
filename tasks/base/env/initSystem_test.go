@@ -86,7 +86,7 @@ var _ = Describe("Base/Env/InitSystem", func() {
 			})
 
 			It("should return an expected error result status", func() {
-				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Status).To(Equal(tasks.None))
 			})
 
 			It("should return an expected error result summary", func() {

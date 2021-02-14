@@ -58,13 +58,19 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 			Summary: "No On-host Integration config and definitions files were collected. Task not executed.",
 		}
 	}
+	if upstream["Base/Env/CollectEnvVars"].Status != tasks.Info {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: tasks.ThisProgramFullName + " was unable to collect env vars from current shell. This task did not run",
+		}
+	}
 
 	integrationFiles, ok := upstream["Infra/Config/IntegrationsMatch"].Payload.(infraConfig.MatchedIntegrationFiles)
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -88,8 +94,8 @@ func (p InfraEnvValidateZookeeperPath) Execute(options tasks.Options, upstream m
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure for task Base/Env/CollectEnvVars",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

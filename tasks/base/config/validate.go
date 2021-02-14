@@ -87,7 +87,7 @@ func (p BaseConfigValidate) Execute(options tasks.Options, results map[string]ta
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

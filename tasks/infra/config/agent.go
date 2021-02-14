@@ -50,53 +50,72 @@ func (p InfraConfigAgent) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p InfraConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) (result tasks.Result) { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
-	p.upstream = upstream
 
-	validations, _ := p.upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-
-	configs, _ := p.upstream["Base/Config/Collect"].Payload.([]config.ConfigElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
-
-	infraValidation, checkValidationTrue := p.validationChecker(validations)
-
-	if checkValidationTrue {
-		log.Debug("Identified Infra from validated config file, setting Infra to true")
-		result.Status = tasks.Success
-		result.Summary = "Infra agent identified as present on system from validated config file"
-		result.Payload = infraValidation
-		return
-	}
-	infraConfig, checkConfigTrue := p.configChecker(configs)
-
-	if checkConfigTrue {
-		log.Debug("Identified Infra from config file parsing, setting Infra to true")
-		result.Status = tasks.Success
-		result.Summary = "Infra agent identified as present on system from parsed config file"
-
-		//Map config elements into ValidationElements so we always return a ValidationElement
-		var validationResults []config.ValidateElement
-
-		for _, configItem := range infraConfig {
-			//This defines the mocked validate element we'll put in the results that is empty except the config element
-			infraItem := config.ValidateElement{Config: configItem, Status: tasks.None}
-			validationResults = append(validationResults, infraItem)
+	if upstream["Base/Config/Validate"].HasPayload(){
+		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
+		if !ok {
+			return tasks.Result{
+				Status: tasks.Error,
+				Summary: tasks.AssertionErrorSummary,
+			}
 		}
-		result.Payload = validationResults
-		return
+		infraValidation, checkValidationTrue := p.validationChecker(validations)
+
+		if checkValidationTrue {
+			log.Debug("Identified Infra from validated config file, setting Infra to true")
+			return tasks.Result{
+				Status: tasks.Success,
+				Summary: "Infra agent identified as present on system from validated config file",
+				Payload: infraValidation,
+			}
+		}
+	}
+
+	if upstream["Base/Config/Collect"].Status == tasks.Success {
+		configs, ok := upstream["Base/Config/Collect"].Payload.([]config.ConfigElement)
+
+		if !ok {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: tasks.AssertionErrorSummary,
+			}
+		}
+
+		infraConfig, checkConfigTrue := p.configChecker(configs)
+
+		if checkConfigTrue {
+			log.Debug("Identified Infra from config file parsing, setting Infra to true")
+			//Map config elements into ValidationElements so we always return a ValidationElement
+			var validationResults []config.ValidateElement
+
+			for _, configItem := range infraConfig {
+				//This defines the mocked validate element we'll put in the results that is empty except the config element
+				infraItem := config.ValidateElement{Config: configItem, Status: tasks.None}
+				validationResults = append(validationResults, infraItem)
+			}
+			return tasks.Result{
+				Status: tasks.Success,
+				Summary: "Infra agent identified as present on system from parsed config file",
+				Payload: validationResults,
+			}
+		}
+
 	}
 
 	//Last check for the existence of the newrelic-infra binary as a last ditch effort
 	binaryFound, binaryFilename := p.binaryChecker()
 	if binaryFound {
 		log.Debug("Identified Infra from binary, setting Infra to true")
-		result.Status = tasks.Success
-		result.Summary = "Infra agent identified as present on system from existence of binary file: " + binaryFilename
-	} else {
-		log.Debug("No Infra agent found on system")
-		result.Status = tasks.None
-		result.Summary = "No Infra agent found on system"
+		return tasks.Result{
+			Status: tasks.Success,
+			Summary: "Infra agent identified as present on system from existence of binary file: " + binaryFilename,
+		}
 	}
-
-	return
+	log.Debug("No Infra agent found on system")
+	return tasks.Result{
+		Status: tasks.None,
+		Summary: tasks.NoAgentDetectedSummary,
+	}
 }
 
 // This uses the validation output since a valid yml should produce data that can be read by the FindString function to look for pertinent values

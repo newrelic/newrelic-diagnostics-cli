@@ -104,10 +104,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			})
 
 			It("Should return a none result", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return the correct summary", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure."))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 

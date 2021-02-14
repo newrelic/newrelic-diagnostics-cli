@@ -4,7 +4,7 @@
       - "COPY tasks/fixtures/java/newrelic/newrelic.yml /app/newrelic.yml"
     docker_cmd: ./nrdiag -s java -y
     log_entry_expected:  
-     - Failure.*Java/Env/Process
+     - Warning.*Java/Env/Process
     log_entry_not_expected:
      - Failure.*Infra/Agent/Version
  -  test_name: BadSuiteArgsWarnsWithExit

@@ -99,7 +99,7 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	if upstream["Java/Env/Process"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "The New Relic agent has not been added to a running JVM process yet. This task did not run.",
+			Summary: "Java/Env/Process check did not pass. This task did not run.",
 		}
 	}
 
@@ -108,8 +108,8 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	javaAgentProcs, ok := upstream["Java/Env/Process"].Payload.([]env.ProcIdAndArgs)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "We were unable to run this health check due to an internal type assertion error for the task Java/Env/Process",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

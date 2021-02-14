@@ -5,7 +5,7 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -195,7 +195,7 @@ func insertCustomEvents(account, apiKey, payload string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return errors.New("Received non 200 response code from insert API:" + string(resp.StatusCode))
+		return fmt.Errorf("Received non 200 response code from insert API: %d", resp.StatusCode)
 	}
 
 	return nil

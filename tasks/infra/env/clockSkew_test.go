@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
-	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func mockValidDateHeader(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
@@ -82,14 +82,15 @@ var _ = Describe("Infra/Env/ClockSkew", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Infra/Agent/Connect": tasks.Result{
+						Status:  tasks.Success,
 						Payload: "Incorrect payload",
 					},
 				}
 			})
 
 			It("It should a return task.None and a Summary", func() {
-				Expect(result.Status).To(Equal(tasks.None))
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 
@@ -99,6 +100,7 @@ var _ = Describe("Infra/Env/ClockSkew", func() {
 				upstream = map[string]tasks.Result{
 
 					"Infra/Agent/Connect": tasks.Result{
+						Status: tasks.Failure,
 						Payload: map[string]string{
 							"requestURLs": "",
 						},
@@ -120,6 +122,7 @@ var _ = Describe("Infra/Env/ClockSkew", func() {
 				upstream = map[string]tasks.Result{
 
 					"Infra/Agent/Connect": tasks.Result{
+						Status: tasks.Success,
 						Payload: map[string]string{
 							"requestURLs": "https://infra-api.newrelic.com",
 						},
@@ -166,6 +169,7 @@ var _ = Describe("Infra/Env/ClockSkew", func() {
 				upstream = map[string]tasks.Result{
 
 					"Infra/Agent/Connect": tasks.Result{
+						Status: tasks.Success,
 						Payload: map[string]string{
 							"requestURLs": "https://infra-api.newrelic.com",
 						},

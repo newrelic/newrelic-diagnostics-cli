@@ -53,6 +53,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -76,17 +77,18 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Warning,
 						Payload: "I should be a slice of validate elements, but I'm not",
 					},
 				}
 			})
 
 			It("should return a result with None Status", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 
 			It("should return a result the expected Summary", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 
@@ -98,6 +100,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{
@@ -127,6 +130,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{
@@ -156,6 +160,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{
@@ -185,6 +190,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
 								ParsedResult: tasks.ValidateBlob{

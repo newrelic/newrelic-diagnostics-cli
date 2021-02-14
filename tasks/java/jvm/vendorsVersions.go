@@ -62,7 +62,7 @@ func (p JavaJVMVendorsVersions) Execute(options tasks.Options, upstream map[stri
 		log.Debug(p.Identifier(), "- Error getting list of running Java processes. Error is: ", err.Error())
 
 		return tasks.Result{
-			Summary: fmt.Sprintf("The task %s encountered an error while detecting all running Java processes.", p.Identifier()),
+			Summary: fmt.Sprintf(tasks.ThisProgramFullName+" was unable to detect any running Java processes because we ran into an error: %s", err.Error()),
 			Status:  tasks.Error,
 		}
 	}

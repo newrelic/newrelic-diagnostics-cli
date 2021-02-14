@@ -4,6 +4,7 @@ package agent
 
 import (
 	"errors"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -91,11 +92,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			})
 
 			It("should return an expected result status", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 
@@ -137,7 +138,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 					},
 				}
 				p.runtimeOS = "darwin"
-				p.cmdExecutor = func (a string, b ...string) ([]byte, error) {
+				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
 					return []byte("New Relic Infrastructure Agent version: 1.5.40"), nil
 				}
 
@@ -166,7 +167,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 					},
 				}
 				p.runtimeOS = "windows"
-				p.cmdExecutor = func (a string, b ...string) ([]byte, error) {
+				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
 					return []byte("New Relic Infrastructure Agent version: 1.5.40"), nil
 				}
 
@@ -195,7 +196,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 					},
 				}
 				p.runtimeOS = "linux"
-				p.cmdExecutor = func (a string, b ...string) ([]byte, error) {
+				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
 					return []byte("newrelic-infra: Permission denied"), nil
 				}
 
@@ -223,18 +224,18 @@ var _ = Describe("Infra/Agent/Version", func() {
 						},
 					}
 					p.runtimeOS = "linux"
-					p.cmdExecutor = func (a string, b ...string) ([]byte, error) {
+					p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
 						return []byte(""), errors.New("Fromlet was defrobozticated")
 					}
-	
+
 				})
-	
+
 				It("should return an expected result status", func() {
 					Expect(result.Status).To(Equal(tasks.Failure))
 				})
-	
+
 				It("should return an expected result summary", func() {
-					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined: Fromlet was defrobozticated"))
+					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': Fromlet was defrobozticated"))
 				})
 			})
 			Context("Infrastructure agent is present but version check returns unparseable version string", func() {
@@ -251,29 +252,28 @@ var _ = Describe("Infra/Agent/Version", func() {
 						},
 					}
 					p.runtimeOS = "linux"
-					p.cmdExecutor = func (a string, b ...string) ([]byte, error) {
+					p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
 						return []byte("New Relic Infrastructure Agent version: .19.1."), nil
 					}
-	
+
 				})
-	
+
 				It("should return an expected result status", func() {
 					Expect(result.Status).To(Equal(tasks.Error))
 				})
-	
+
 				It("should return an expected result summary", func() {
 					Expect(result.Summary).To(Equal("Unable to parse New Relic Infrastructure Agent version from: New Relic Infrastructure Agent version: .19.1."))
 				})
 			})
 		})
 
-
 		Describe("getBinaryPath()", func() {
 
 			var (
 				envVars map[string]string
 				result  string
-				err error
+				err     error
 			)
 
 			JustBeforeEach(func() {

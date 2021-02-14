@@ -29,18 +29,25 @@ func (t DotNetAgentVersion) Dependencies() []string {
 
 // Execute - The core work within this task
 func (t DotNetAgentVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var result tasks.Result
-	if (upstream["DotNet/Agent/Installed"].Status == tasks.Failure) || (upstream["DotNet/Agent/Installed"].Status == tasks.None) {
-		result.Status = tasks.None
-		result.Summary = "Did not detect .Net Agent as being installed, this check did not run"
-		return result
+
+	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
+		}
 	}
 
 	agentInstall, ok := upstream["DotNet/Agent/Installed"].Payload.(DotNetAgentInstall)
 	if !ok {
 		return tasks.Result{
-			Status: tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -53,15 +60,15 @@ func getVersion(agentInstall DotNetAgentInstall) (result tasks.Result) {
 	agentVersion, err := tasks.GetFileVersion(agentInstall.AgentPath)
 
 	if err != nil {
-		result.Status = tasks.Error
-		result.Summary = "Error finding .Net Agent version"
 		log.Info("Error finding .Net Agent version. The error is ", err)
-		return result
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: "Error finding .Net Agent version",
+		}
 	}
-
-	result.Status = tasks.Info
-	result.Summary = agentVersion
-	result.Payload = agentVersion
-	return result
-
+	return tasks.Result{
+		Status:  tasks.Info,
+		Summary: agentVersion,
+		Payload: agentVersion,
+	}
 }

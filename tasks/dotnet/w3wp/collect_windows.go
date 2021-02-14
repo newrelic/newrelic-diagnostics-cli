@@ -34,10 +34,18 @@ func (p DotNetW3wpCollect) Execute(options tasks.Options, upstream map[string]ta
 	}
 
 	// get results from DotNet/Agent/IsInstalled and make sure status wasn't Failure
-	if (upstream["DotNet/Agent/Installed"].Status == tasks.Failure) || (upstream["DotNet/Agent/Installed"].Status == tasks.None) {
-		result.Status = tasks.None
-		result.Summary = ".NET Agent is not installed, skipping this check."
-		return result
+	// abort if it isn't installed
+	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
+		}
 	}
 
 	w3wpProcesses, err := tasks.FindProcessByName("w3wp.exe")

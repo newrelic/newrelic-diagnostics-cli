@@ -65,7 +65,7 @@ func TestRegisterWith(t *testing.T) {
 		InfraConfigIntegrationsValidate{fileReader: os.Open},
 		InfraConfigIntegrationsMatch{runtimeOS: runtime.GOOS},
 		InfraConfigIntegrationsValidateJson{},
-		InfraConfigValidateJMX{mCmdExecutor: tasks.MultiCmdExecutor},
+		InfraConfigValidateJMX{mCmdExecutor: tasks.MultiCmdExecutor, getJMXProcessCmdlineArgs: getJMXProcessCmdlineArgs},
 	}
 
 	tests := []struct {

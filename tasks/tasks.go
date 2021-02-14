@@ -20,12 +20,6 @@ type Result struct {
 // Status statusEnum listing of valid values for status
 type Status int
 
-//ThisProgramFullName is a constant for the name of the program to be used in task summaries
-const ThisProgramFullName = "Diagnostics CLI"
-
-//NotifyIssueSummary is the standarized message we can add to a tasks.Result summary to suggest users ways to reach out to us and notify about an nrdiag issue
-const NotifyIssueSummary = "\nPlease notify this issue to us whenever possible through https://discuss.newrelic.com/ by creating a new topic or through https://github.com/newrelic/newrelic-diagnostics-cli/issues\n"
-
 //Constants for use by the status property above
 const (
 	//None - this task does not apply to this system and has no meaninful data to report.
@@ -64,6 +58,11 @@ func (r Result) Equals(result Result) bool {
 
 func (r Result) IsFailure() bool {
 	return r.Status != None && r.Status != Success && r.Status != Info
+}
+
+// HasPayload will check if a upstream task.Result has a payload we can work with. Notice status 'Warning' is not included here and it's because a lot of the time it has payload. But HasPayload may not be applicable to some tasks.
+func (r Result) HasPayload() bool {
+	return r.Status != None && r.Status != Error && r.Status != Failure
 }
 
 //MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config

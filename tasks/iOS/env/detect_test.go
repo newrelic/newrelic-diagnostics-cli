@@ -86,6 +86,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 	//mock successful upstream
 	successfulUpstream := make(map[string]tasks.Result)
 	successfulUpstream["Base/Config/Collect"] = tasks.Result{
+		Status: tasks.Success,
 		Payload: []config.ConfigElement{
 			config.ConfigElement{
 				FileName: "AppDelegate.swift",
@@ -96,6 +97,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 	//mock failed upstream
 	failedUpstream := make(map[string]tasks.Result)
 	failedUpstream["Base/Config/Collect"] = tasks.Result{
+		Status: tasks.Success,
 		Payload: []config.ConfigElement{
 			config.ConfigElement{
 				FileName: "",
@@ -107,6 +109,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 
 	errorUpstream := make(map[string]tasks.Result)
 	errorUpstream["Base/Config/Collect"] = tasks.Result{
+		Status: tasks.Success,
 		Payload: []string{""},
 	}
 
@@ -145,8 +148,8 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 				upstream: errorUpstream,
 			},
 			want: tasks.Result{
-				Status:  tasks.None,
-				Summary: "Task did not meet requirements necessary to run: type assertion failure",
+				Status:  tasks.Error,
+				Summary: tasks.AssertionErrorSummary,
 			},
 		},
 	}

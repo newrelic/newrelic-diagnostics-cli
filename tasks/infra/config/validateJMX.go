@@ -17,7 +17,8 @@ const defaultJMXport = "9999"
 
 // InfraConfigValidateJMX - This struct defines the task
 type InfraConfigValidateJMX struct {
-	mCmdExecutor func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
+	mCmdExecutor             func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error)
+	getJMXProcessCmdlineArgs func() []string
 }
 
 type JmxConfig struct {
@@ -91,8 +92,8 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -157,7 +158,7 @@ func (p InfraConfigValidateJMX) Execute(options tasks.Options, upstream map[stri
 
 }
 
-func (p InfraConfigValidateJMX) getJMXProcessCmdlineArgs() []string {
+func getJMXProcessCmdlineArgs() []string {
 	collectedJmxArgs := []string{}
 
 	javaProcs := tasks.GetJavaProcArgs()

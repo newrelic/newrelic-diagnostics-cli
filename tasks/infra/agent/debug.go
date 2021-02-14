@@ -79,7 +79,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -114,7 +114,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 		if !ok {
 			return tasks.Result{
 				Status:  tasks.Error,
-				Summary: "Task did not meet requirements necessary to run: type assertion failure",
+				Summary: tasks.AssertionErrorSummary,
 			}
 		}
 

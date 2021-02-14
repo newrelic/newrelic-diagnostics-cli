@@ -47,8 +47,8 @@ func (p BaseLogCount) Execute(options tasks.Options, upstream map[string]tasks.R
 	// if type assertion failed
 	if !ok {
 		result = tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 		return result
 	}
