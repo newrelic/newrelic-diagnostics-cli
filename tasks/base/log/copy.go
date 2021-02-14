@@ -110,7 +110,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 		}
 
 		if hasInvalidLogs {
-			warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue, you will need to manually provide those logs if you are working with New Relic Support.", strings.Join(invalidLogPaths, ", "))
+			warningSummary := fmt.Sprintf("Warning, some log files were not collected:%s\nIf those logs are relevant to this issue and you are working with New Relic Support, you will need to manually provide those logs.", strings.Join(invalidLogPaths, ", "))
 			return tasks.Result{
 				Status:      tasks.Warning,
 				Summary:     successSummary + "\n" + warningSummary,

@@ -37,7 +37,7 @@ func getOnlineVersion(log logger.API) string {
 
 	resp, err := httpHelper.MakeHTTPRequest(wrapper)
 	if err != nil {
-		log.Info("Error checking latest version: ", err)
+		log.Info("We ran into a connection error when attempting to check Diagnostics CLI latest version: ", err)
 		return ""
 	}
 

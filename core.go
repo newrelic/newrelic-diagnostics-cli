@@ -118,7 +118,7 @@ func main() {
 				command = os.Args[0]
 				option = "-h suites"
 			}
-			log.Infof("\n\nTo diagnose a specific product or issue, see task suites options: '%s %s'\n\n", command, option)
+			log.Infof("\n\nFor better results, run Diagnostics CLI with the 'suites' option to target a New Relic product. To learn how to use this option, run: '%s %s'\n\n", command, option)
 		}
 	}
 }
