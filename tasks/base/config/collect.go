@@ -184,7 +184,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 				"Include this file in nrdiag-output.zip?"
 			if tasks.PromptUser(question, options) {
 				if !config.Flags.Quiet {
-					log.Info("adding file ", secureConfig)
+					log.Info("Adding file to Diagnostics CLI zip file: ", secureConfig)
 				}
 				foundConfigs = append(foundConfigs, secureConfig)
 			}
