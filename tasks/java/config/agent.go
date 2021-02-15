@@ -1,7 +1,9 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
+	"regexp"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -49,11 +51,7 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
 		if !ok {
 			return tasks.Result{
-<<<<<<< HEAD
-				Status: tasks.Error,
-=======
 				Status:  tasks.Error,
->>>>>>> main
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -62,21 +60,12 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 		if checkValidationTrue {
 			log.Debug("Identified Java from validated config file, setting Java to true")
 			return tasks.Result{
-<<<<<<< HEAD
-				Status: tasks.Success,
-=======
 				Status:  tasks.Success,
->>>>>>> main
 				Summary: "Java agent identified as present on system",
 				Payload: javaValidation,
 			}
 		}
 	}
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> main
 	// If checking with the parsed Config failed, now check the file itself line by line to detect java agent for invalid config files
 
 	if upstream["Base/Config/Collect"].Status == tasks.Success {
@@ -107,14 +96,14 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 			}
 		}
 	}
-	
+
 	//Last check for the existence of the newrelic.jar as a last ditch effort
 	if checkForJar() {
 		log.Debug("Identified Java from Jar, setting Java to true")
 
 		return tasks.Result{
 			Status:  tasks.Success,
-			Summary: "Java agent identified as present on system",
+			Summary: "Java agent identified as present on system because we found a New Relic JAR file",
 			Payload: []config.ValidateElement{},
 		}
 	}
@@ -197,18 +186,57 @@ func checkConfig(configs []config.ConfigElement) ([]config.ConfigElement, bool) 
 
 // This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
 func checkForJar() bool {
-	jarNames := []string{
-		"newrelic.jar",
+	//check for existence of this specific file name in the user's system. We do not look for a regex/pattern name because it would be a never ending search
+	if tasks.FileExists("newrelic.jar") {
+		log.Debug("Jar file found, setting true")
+		return true
+	}
+	//Now we can attempt to find a newrelic filename pattern, but only in the current directory
+	jarRgx := regexp.MustCompile(`(newrelic)?i([\S]+)?\.jar`)
+	dirRgx := regexp.MustCompile(`(newrelic)?i`) //in case they put the jar inside a newrelic directory
+	dir, errDir := os.Getwd()
+
+	if errDir != nil {
+		log.Debug(errDir)
+		return false
 	}
 
-	for _, jarName := range jarNames {
+	files := getFilesFromDir(dir)
 
-		if tasks.FileExists(jarName) {
-			log.Debug("Jar file found, setting true")
-			return true
+	for _, file := range files {
+		if file.IsDir() {
+			if dirRgx.MatchString(file.Name()) {
+				log.Debug("We found a newrelic directory. Looking for a jar file in here:", file.Name())
+				nrFiles := getFilesFromDir(file.Name())
+				for _, nrFile := range nrFiles {
+					if jarRgx.MatchString(nrFile.Name()) {
+						return true
+					}
+				}
+			}
+		} else {
+			if jarRgx.MatchString(file.Name()) {
+				return true
+			}
 		}
 	}
+
 	log.Debug("Done search for jar files, setting false")
 	return false
 }
 
+func getFilesFromDir(dir string) []os.FileInfo {
+	f, errOpen := os.Open(dir)
+	if errOpen != nil {
+		log.Debug(errOpen)
+		return []os.FileInfo{}
+	}
+
+	files, err := f.Readdir(-1)
+	f.Close()
+	if err != nil {
+		log.Debug(err)
+		return []os.FileInfo{}
+	}
+	return files
+}
