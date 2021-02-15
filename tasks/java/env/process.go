@@ -117,8 +117,8 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 	//Java’s built-in argument called “-javaagent”
 	return tasks.Result{
 		Status:  tasks.Failure,
-		Summary: "None of the current active Java processes includes the '-javaagent' argument. For proper installation of the New Relic Java agent, the -javaagent argument must be passed to the same process that is running your application. Examples on how to include this argument can be found in the documentation listed above.",
-		URL:     "https://docs.newrelic.com/docs/agents/java-agent/installation/include-java-agent-jvm-argument\nhttps://discuss.newrelic.com/t/relic-solution-what-you-need-to-know-about-new-relic-when-deploying-with-docker/52492",
+		Summary: "None of the current active Java processes includes the '-javaagent' argument. For proper installation of the New Relic Java agent, the -javaagent argument must be passed to the same process that is running your application. Examples on how to include this argument can be found in the documentation listed below.",
+		URL:     "https://docs.newrelic.com/docs/agents/java-agent/installation/include-java-agent-jvm-argument\nhttps://discuss.newrelic.com/t/relic-solution-what-you-need-to-know-about-new-relic-when-deploying-with-docker/52492\n",
 	}
 }
 
