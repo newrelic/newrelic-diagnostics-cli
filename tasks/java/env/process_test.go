@@ -241,9 +241,36 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "newrelic.jar"
 				commandLineArgsStr := command + path + javaAgent
 
-				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
-				Expect(result).To(Equal(path))
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal(path))
+				Expect(resultFilename).To(Equal(javaAgent))
 				Expect(err).To(BeNil())
+			})
+		})
+		
+		Context("When given a cmdLineArgsStr using a windows path", func() {
+			It("should return the path and no error", func() {
+				path := `\newrelic\`
+				javaAgent := "newrelic.jar"
+				commandLineArgsStr := command + path + javaAgent
+
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal(path))
+				Expect(resultFilename).To(Equal(javaAgent))
+				Expect(err).To(BeNil())
+			})
+		})
+
+		Context("When given a cmdLineArgsStr using a windows path where jar does not have new relic in the name", func() {
+			It("should return the path and an error", func() {
+				path := `C:\projects\myapp\newrelic\`
+				javaAgent := "bluerelic.jar"
+				commandLineArgsStr := command + path + javaAgent
+
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal(path))
+				Expect(resultFilename).To(Equal(javaAgent))
+				Expect(err.Error()).To(Equal(commandLineArgsStr))
 			})
 		})
 
@@ -253,8 +280,9 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "newrelic-1.8.3.jar"
 				commandLineArgsStr := command + path + javaAgent
 
-				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
-				Expect(result).To(Equal(path))
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal(path))
+				Expect(resultFilename).To(Equal(javaAgent))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -267,8 +295,9 @@ var _ = Describe("JavaEnvProcess", func() {
 				otherAfter := " build/libs/lucessqs-1.0-SNAPSHOT.jar"
 				commandLineArgsStr := otherBefore + command + path + javaAgent + otherAfter
 
-				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
-				Expect(result).To(Equal(path))
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal(path))
+				Expect(resultFilename).To(Equal(javaAgent))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -278,8 +307,9 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "newrelic-1.8.3.jar"
 				commandLineArgsStr := command + javaAgent
 
-				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
-				Expect(result).To(Equal("./"))
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal("./"))
+				Expect(resultFilename).To(Equal(javaAgent))
 				Expect(err).To(BeNil())
 			})
 		})
@@ -290,8 +320,9 @@ var _ = Describe("JavaEnvProcess", func() {
 				javaAgent := "bluerelic.jar"
 				commandLineArgsStr := command + path + javaAgent
 
-				result, _, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
-				Expect(result).To(Equal(path))
+				resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
+				Expect(resultPath).To(Equal(path))
+				Expect(resultFilename).To(Equal(javaAgent))
 				Expect(err.Error()).To(Equal(commandLineArgsStr))
 			})
 		})
