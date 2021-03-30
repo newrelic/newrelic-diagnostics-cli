@@ -40,6 +40,7 @@ type jsonResponse struct {
 const ticketAttachmentUploadTimeoutSeconds = 600
 const awsUploadTimeoutSeconds = 7200
 const defaultAttachmentEndpoint = "http://localhost:3000/attachments"
+const awsS3Domain = "s3.amazonaws.com"
 
 func getAttachmentsEndpoint() string {
 	if config.Flags.AttachmentEndpoint != "" { //If local development flag is supplied
@@ -152,7 +153,7 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 	var filesForTicketAttachment, filesForAWS []uploadFiles
 
 	for _, upload := range filelist {
-		if strings.Contains(upload.URL, os.Getenv("S3_UPLOAD_URL")) {
+		if strings.Contains(upload.URL, awsS3Domain) {
 			filesForAWS = append(filesForAWS, upload)
 		} else {
 			filesForTicketAttachment = append(filesForTicketAttachment, upload)
