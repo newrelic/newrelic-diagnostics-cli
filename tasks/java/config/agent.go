@@ -188,12 +188,15 @@ func checkConfig(configs []config.ConfigElement) ([]config.ConfigElement, bool) 
 
 }
 
+// This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
 func checkForJar() bool {
+	//check for existence of this specific file name in the user's system. We do not look for a regex/pattern name because it would be a never ending search
 	if tasks.FileExists("newrelic.jar") {
 		log.Debug("Jar file found, setting true")
 		return true
 	}
 
+	// Now we can attempt to find a newrelic filename pattern, but only in the current directory
 	jarRgx := regexp.MustCompile(`(?i)(newrelic)([\S]+)?\.jar`)
 	dir, errDir := os.Getwd()
 
@@ -203,8 +206,10 @@ func checkForJar() bool {
 	}
 
 	foundJar := false
-	maxDirDepth := 3
+	currentDirDepth := strings.Count(dir, string(filepath.Separator))
+	maxDirDepth := currentDirDepth + 3
 
+	// Walk current directory to max depth of 3 to look for jar file. Agent jar placement can be arbitrary
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 
 		if err != nil {
@@ -212,8 +217,8 @@ func checkForJar() bool {
 			return err
 		}
 
-		if strings.Count(path, string(filepath.Separator)) > maxDirDepth {
-			return errors.New("Reached max depth")
+		if info.IsDir() && strings.Count(path, string(filepath.Separator)) > maxDirDepth {
+			return filepath.SkipDir
 		}
 
 		if info.IsDir() {
@@ -230,61 +235,4 @@ func checkForJar() bool {
 
 	return foundJar
 
-}
-
-// This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
-func _checkForJar() bool {
-	//check for existence of this specific file name in the user's system. We do not look for a regex/pattern name because it would be a never ending search
-	if tasks.FileExists("newrelic.jar") {
-		log.Debug("Jar file found, setting true")
-		return true
-	}
-	//Now we can attempt to find a newrelic filename pattern, but only in the current directory
-	jarRgx := regexp.MustCompile(`(?i)(newrelic)([\S]+)?\.jar`)
-	dirRgx := regexp.MustCompile(`(?i)(newrelic)`) //in case they put the jar inside a newrelic directory
-	dir, errDir := os.Getwd()
-
-	if errDir != nil {
-		log.Debug(errDir)
-		return false
-	}
-
-	files := getFilesFromDir(dir)
-
-	for _, file := range files {
-		if file.IsDir() {
-			if dirRgx.MatchString(file.Name()) {
-				log.Debug("We found a newrelic directory. Looking for a jar file in here:", file.Name())
-				nrFiles := getFilesFromDir(file.Name())
-				for _, nrFile := range nrFiles {
-					if jarRgx.MatchString(nrFile.Name()) {
-						return true
-					}
-				}
-			}
-		} else {
-			if jarRgx.MatchString(file.Name()) {
-				return true
-			}
-		}
-	}
-
-	log.Debug("Done search for jar files, setting false")
-	return false
-}
-
-func getFilesFromDir(dir string) []os.FileInfo {
-	f, errOpen := os.Open(dir)
-	if errOpen != nil {
-		log.Debug(errOpen)
-		return []os.FileInfo{}
-	}
-
-	files, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		log.Debug(err)
-		return []os.FileInfo{}
-	}
-	return files
 }
