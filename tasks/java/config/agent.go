@@ -192,8 +192,8 @@ func checkForJar() bool {
 		return true
 	}
 	//Now we can attempt to find a newrelic filename pattern, but only in the current directory
-	jarRgx := regexp.MustCompile(`(newrelic)?i([\S]+)?\.jar`)
-	dirRgx := regexp.MustCompile(`(newrelic)?i`) //in case they put the jar inside a newrelic directory
+	jarRgx := regexp.MustCompile(`(?i)(newrelic)([\S]+)?\.jar`)
+	dirRgx := regexp.MustCompile(`(?i)(newrelic)`) //in case they put the jar inside a newrelic directory
 	dir, errDir := os.Getwd()
 
 	if errDir != nil {
