@@ -129,7 +129,7 @@ func checkValidation(validations []config.ValidateElement) ([]config.ValidateEle
 
 		var attributes []tasks.ValidateBlob
 		for _, key := range javaKeys {
-			attributes = append(validation.ParsedResult.FindKey(key))
+			attributes = append(attributes, validation.ParsedResult.FindKey(key)...)
 		}
 
 		if len(attributes) > 0 {
@@ -210,7 +210,7 @@ func checkForJar() bool {
 	maxDirDepth := currentDirDepth + 3
 
 	// Walk current directory to max depth of 3 to look for jar file. Agent jar placement can be arbitrary
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 
 		if err != nil {
 			log.Debug(err)
@@ -232,6 +232,8 @@ func checkForJar() bool {
 
 		return nil
 	})
+
+	log.Debug(walkErr)
 
 	return foundJar
 
