@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"errors"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -186,8 +188,52 @@ func checkConfig(configs []config.ConfigElement) ([]config.ConfigElement, bool) 
 
 }
 
-// This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
 func checkForJar() bool {
+	if tasks.FileExists("newrelic.jar") {
+		log.Debug("Jar file found, setting true")
+		return true
+	}
+
+	jarRgx := regexp.MustCompile(`(?i)(newrelic)([\S]+)?\.jar`)
+	dir, errDir := os.Getwd()
+
+	if errDir != nil {
+		log.Debug(errDir)
+		return false
+	}
+
+	foundJar := false
+	maxDirDepth := 3
+
+	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
+			log.Debug(err)
+			return err
+		}
+
+		if strings.Count(path, string(filepath.Separator)) > maxDirDepth {
+			return errors.New("Reached max depth")
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		if jarRgx.MatchString(info.Name()) {
+			foundJar = true
+			return errors.New("Found jar")
+		}
+
+		return nil
+	})
+
+	return foundJar
+
+}
+
+// This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
+func _checkForJar() bool {
 	//check for existence of this specific file name in the user's system. We do not look for a regex/pattern name because it would be a never ending search
 	if tasks.FileExists("newrelic.jar") {
 		log.Debug("Jar file found, setting true")

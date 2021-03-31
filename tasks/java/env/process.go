@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-	"runtime"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -132,13 +131,6 @@ func getJarInfoFromCmdLineArgs(cmdLineArgsString string) (string, string, error)
 	var err error
 
 	javaAgentCmd := "javaagent:"
-	var dirSeparator string
-
-	if runtime.GOOS == "windows" {
-		dirSeparator = `\`
-	} else {
-		dirSeparator = "/"
-	}
 
 	var javaAgentArg string
 	for _, arg := range strings.Split(cmdLineArgsString, " ") {
@@ -148,7 +140,7 @@ func getJarInfoFromCmdLineArgs(cmdLineArgsString string) (string, string, error)
 	}
 
 	firstIndexOfPath := strings.Index(javaAgentArg, javaAgentCmd) + len(javaAgentCmd)
-	lastIndexOfPath := strings.LastIndex(javaAgentArg, dirSeparator)
+	lastIndexOfPath := strings.LastIndex(javaAgentArg, string(filepath.Separator))
 
 	// if there is no path in the javaAgentArg
 	if lastIndexOfPath == -1 {
@@ -166,8 +158,8 @@ func getJarInfoFromCmdLineArgs(cmdLineArgsString string) (string, string, error)
 	}
 
 	path := javaAgentArg[firstIndexOfPath : lastIndexOfPath+1]
-	if !strings.Contains(path, dirSeparator) {
-		path = "." + dirSeparator
+	if !strings.Contains(path, string(filepath.Separator)) {
+		path = "." + string(filepath.Separator)
 	}
 	return path, fileName, err
 }
