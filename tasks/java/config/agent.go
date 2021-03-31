@@ -120,17 +120,19 @@ func checkValidation(validations []config.ValidateElement) ([]config.ValidateEle
 	var javaValidate []config.ValidateElement
 	//Check the validated yml for some java attributes that don't exist in Ruby
 
-	for _, key := range javaKeys {
-		for _, validation := range validations {
-			if filepath.Ext(validation.Config.FileName) != ".yml" {
-				continue
-			}
+	for _, validation := range validations {
+		if filepath.Ext(validation.Config.FileName) != ".yml" {
+			continue
+		}
 
-			attributes := validation.ParsedResult.FindKey(key)
-			if len(attributes) > 0 {
-				log.Debug("found ", attributes, "in validated yml. Java language detected")
-				javaValidate = append(javaValidate, validation)
-			}
+		var attributes []tasks.ValidateBlob
+		for _, key := range javaKeys {
+			attributes = append(validation.ParsedResult.FindKey(key))
+		}
+
+		if len(attributes) > 0 {
+			log.Debug("found ", attributes, "in validated yml. Java language detected")
+			javaValidate = append(javaValidate, validation)
 		}
 	}
 
