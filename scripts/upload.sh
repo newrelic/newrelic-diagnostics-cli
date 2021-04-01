@@ -11,7 +11,6 @@ then
   ./scripts/build.sh
 
   VERSION=`cat releaseVersion.txt| awk -F'majorMinor=' '{printf$2}'`
-
   ZIPFILENAME="nrdiag_${VERSION}.${BUILD_NUMBER}.zip"
 
   echo "Creating zipfile ${ZIPFILENAME}"
@@ -24,6 +23,8 @@ then
   zip -r $ZIPFILENAME nrdiag/
   echo "Uploading to Download.Newrelic.com"
   ln -s $ZIPFILENAME nrdiag_latest.zip
+
+  AWS_EC2_METADATA_DISABLED=true
 
   aws s3 cp ${ZIPFILENAME} s3://${S3_BUCKET}/nrdiag/
   aws s3 cp nrdiag_latest.zip s3://${S3_BUCKET}/nrdiag/
