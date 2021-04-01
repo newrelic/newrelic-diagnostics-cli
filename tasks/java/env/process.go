@@ -1,5 +1,3 @@
-// +build !windows
-
 package env
 
 import (
@@ -116,11 +114,11 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 			Payload: javaAgentProcsIdArgs,
 		}
 	}
-
+	//Java’s built-in argument called “-javaagent”
 	return tasks.Result{
 		Status:  tasks.Failure,
-		Summary: "None of the active Java processes included the -javaagent argument. For proper installation of New Relic Java agent, the -javaagent flag must be passed to the same Java process that is running your application",
-		URL:     "https://docs.newrelic.com/docs/agents/java-agent/installation/include-java-agent-jvm-argument",
+		Summary: "None of the current active Java processes includes the '-javaagent' argument. For proper installation of the New Relic Java agent, the -javaagent argument must be passed to the same process that is running your application. Examples on how to include this argument can be found in the documentation listed below.",
+		URL:     "https://docs.newrelic.com/docs/agents/java-agent/installation/include-java-agent-jvm-argument\nhttps://discuss.newrelic.com/t/relic-solution-what-you-need-to-know-about-new-relic-when-deploying-with-docker/52492\n",
 	}
 }
 
@@ -142,7 +140,7 @@ func getJarInfoFromCmdLineArgs(cmdLineArgsString string) (string, string, error)
 	}
 
 	firstIndexOfPath := strings.Index(javaAgentArg, javaAgentCmd) + len(javaAgentCmd)
-	lastIndexOfPath := strings.LastIndex(javaAgentArg, "/")
+	lastIndexOfPath := strings.LastIndex(javaAgentArg, string(filepath.Separator))
 
 	// if there is no path in the javaAgentArg
 	if lastIndexOfPath == -1 {
@@ -160,8 +158,8 @@ func getJarInfoFromCmdLineArgs(cmdLineArgsString string) (string, string, error)
 	}
 
 	path := javaAgentArg[firstIndexOfPath : lastIndexOfPath+1]
-	if !strings.Contains(path, "/") {
-		path = "./"
+	if !strings.Contains(path, string(filepath.Separator)) {
+		path = "." + string(filepath.Separator)
 	}
 	return path, fileName, err
 }

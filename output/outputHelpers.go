@@ -114,7 +114,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			// Get file info from file
 			stat, err := os.Stat(envelope.Path)
 			if err != nil {
-				log.Info("Error adding file to zip", err)
+				log.Info("Error adding file to Diagnostics CLI zip file: ", err)
 				return
 			}
 			// open file handle

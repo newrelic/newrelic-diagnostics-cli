@@ -1,7 +1,11 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
+	"regexp"
+	"errors"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -64,7 +68,6 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 			}
 		}
 	}
-
 	// If checking with the parsed Config failed, now check the file itself line by line to detect java agent for invalid config files
 
 	if upstream["Base/Config/Collect"].Status == tasks.Success {
@@ -102,7 +105,7 @@ func (p JavaConfigAgent) Execute(options tasks.Options, upstream map[string]task
 
 		return tasks.Result{
 			Status:  tasks.Success,
-			Summary: "Java agent identified as present on system",
+			Summary: "Java agent identified as present on system because we found a New Relic JAR file",
 			Payload: []config.ValidateElement{},
 		}
 	}
@@ -119,17 +122,19 @@ func checkValidation(validations []config.ValidateElement) ([]config.ValidateEle
 	var javaValidate []config.ValidateElement
 	//Check the validated yml for some java attributes that don't exist in Ruby
 
-	for _, key := range javaKeys {
-		for _, validation := range validations {
-			if filepath.Ext(validation.Config.FileName) != ".yml" {
-				continue
-			}
+	for _, validation := range validations {
+		if filepath.Ext(validation.Config.FileName) != ".yml" {
+			continue
+		}
 
-			attributes := validation.ParsedResult.FindKey(key)
-			if len(attributes) > 0 {
-				log.Debug("found ", attributes, "in validated yml. Java language detected")
-				javaValidate = append(javaValidate, validation)
-			}
+		var attributes []tasks.ValidateBlob
+		for _, key := range javaKeys {
+			attributes = append(attributes, validation.ParsedResult.FindKey(key)...)
+		}
+
+		if len(attributes) > 0 {
+			log.Debug("found ", attributes, "in validated yml. Java language detected")
+			javaValidate = append(javaValidate, validation)
 		}
 	}
 
@@ -185,17 +190,51 @@ func checkConfig(configs []config.ConfigElement) ([]config.ConfigElement, bool) 
 
 // This check looks for the existence of the newrelic.jar in the file system as a final attempt at identifying this as a java app present
 func checkForJar() bool {
-	jarNames := []string{
-		"newrelic.jar",
+	//check for existence of this specific file name in the user's system. We do not look for a regex/pattern name because it would be a never ending search
+	if tasks.FileExists("newrelic.jar") {
+		log.Debug("Jar file found, setting true")
+		return true
 	}
 
-	for _, jarName := range jarNames {
+	// Now we can attempt to find a newrelic filename pattern, but only in the current directory
+	jarRgx := regexp.MustCompile(`(?i)(newrelic)([\S]+)?\.jar`)
+	dir, errDir := os.Getwd()
 
-		if tasks.FileExists(jarName) {
-			log.Debug("Jar file found, setting true")
-			return true
+	if errDir != nil {
+		log.Debug(errDir)
+		return false
+	}
+
+	foundJar := false
+	currentDirDepth := strings.Count(dir, string(filepath.Separator))
+	maxDirDepth := currentDirDepth + 3
+
+	// Walk current directory to max depth of 3 to look for jar file. Agent jar placement can be arbitrary
+	walkErr := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
+			log.Debug(err)
+			return err
 		}
-	}
-	log.Debug("Done search for jar files, setting false")
-	return false
+
+		if info.IsDir() && strings.Count(path, string(filepath.Separator)) > maxDirDepth {
+			return filepath.SkipDir
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		if jarRgx.MatchString(info.Name()) {
+			foundJar = true
+			return errors.New("Found jar")
+		}
+
+		return nil
+	})
+
+	log.Debug(walkErr)
+
+	return foundJar
+
 }
