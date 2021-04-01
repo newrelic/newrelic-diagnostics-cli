@@ -24,7 +24,6 @@ then
   echo "Uploading to Download.Newrelic.com"
   ln -s $ZIPFILENAME nrdiag_latest.zip
 
-  AWS_EC2_METADATA_DISABLED=true
 
   aws s3 cp ${ZIPFILENAME} s3://${S3_BUCKET}/nrdiag/
   aws s3 cp nrdiag_latest.zip s3://${S3_BUCKET}/nrdiag/
