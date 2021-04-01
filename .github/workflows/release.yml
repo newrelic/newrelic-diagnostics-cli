@@ -7,7 +7,7 @@ on:
 jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/v.')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
@@ -30,13 +30,10 @@ jobs:
           STAGING_ATTACHMENT_ENDPOINT: ${{ secrets.STAGING_ATTACHMENT_ENDPOINT }}
           STAGING_HABERDASHER_URL: ${{ secrets.STAGING_HABERDASHER_URL }}
         run: |
-            echo "release with following build version:"
-            echo ${{ github.event.release.name }}
-            BUILD_NUMBER=${{ github.event.release.name }} ./scripts/upload.sh
+          echo "release with following build version:"
+          echo ${{ github.event.release.name }}
+          BUILD_NUMBER=${{ github.event.release.name }} ./scripts/upload.sh
       - name: Debug GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-
-
-
