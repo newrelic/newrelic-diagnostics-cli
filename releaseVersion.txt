@@ -1,4 +1,4 @@
 majorMinor=1.12
-buildNumber=34
-currentReleaseVersion=1.12.34
-prevReleaseVersion=1.12.33
+buildNumber=35
+currentReleaseVersion=1.12.35
+prevReleaseVersion=1.12.34
