@@ -34,6 +34,24 @@ func (p NodeEnvDependencies) Dependencies() []string {
 
 func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
+	// var packageManager string
+	// if upstream["Node/Env/NpmVersion"].Status == tasks.Info {
+	// 	packageManager = "npm"
+	// }
+
+	// if packageManager == "" {
+	// 	if upstream["Node/Env/YarnVersion"].Status == tasks.Info {
+	// 		packageManager = "yarn"
+	// 	}
+	// }
+
+	// if packageManager == "" {
+	// 	return tasks.Result{
+	// 		Status:  tasks.None, //tasks.Warning?
+	// 		Summary: "This task did not because we could not found npm or yarn installed",
+	// 	}
+	// }
+
 	if upstream["Node/Env/NpmVersion"].Status != tasks.Info {
 		return tasks.Result{
 			Status:  tasks.None,
