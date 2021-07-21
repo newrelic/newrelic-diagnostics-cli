@@ -119,6 +119,11 @@ func Upload(attachmentKey string) {
 	uploadFilelist(attachmentKey, filesToUpload)
 }
 
+func uploadByAccount(accountID string) {
+	log.Info("Uploading to account ID")
+	//do same thing as above possible change with uploadFileList
+}
+
 func uploadCustomerFile() {
 	attachmentKey := config.Flags.AttachmentKey
 	if attachmentKey == "" {

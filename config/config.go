@@ -31,6 +31,7 @@ type userFlags struct {
 	YesToAll           bool
 	ShowOverrideHelp   bool
 	UsageOptOut        bool
+	AutoAttach         bool
 	Proxy              string
 	ProxyUser          string
 	ProxyPassword      string
@@ -44,7 +45,7 @@ type userFlags struct {
 	BrowserURL         string
 	AttachmentEndpoint string
 	Suites             string
-	InNewRelicCLI	   bool
+	InNewRelicCLI      bool
 }
 
 type ConfigFlag struct {
@@ -67,6 +68,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		ShowOverrideHelp bool
 		ProxySpecified   bool
 		SkipVersionCheck bool
+		AutoAttach       bool
 		Tasks            string
 		AttachmentKey    string
 		ConfigFile       string
@@ -83,6 +85,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		ShowOverrideHelp: f.ShowOverrideHelp,
 		ProxySpecified:   proxySpecified,
 		SkipVersionCheck: f.SkipVersionCheck,
+		AutoAttach:       f.AutoAttach,
 		Tasks:            f.Tasks,
 		AttachmentKey:    f.AttachmentKey,
 		ConfigFile:       f.ConfigFile,
@@ -125,6 +128,8 @@ func ParseFlags() {
 
 	defaultString := ""
 
+	//fs := flag.NewFlagSet("all", flag.ContinueOnError)
+
 	flag.BoolVar(&Flags.Verbose, "v", false, "alias for -verbose")
 	flag.BoolVar(&Flags.Verbose, "verbose", false, "Display verbose logging during check execution. Off by default")
 
@@ -137,7 +142,10 @@ func ParseFlags() {
 	flag.StringVar(&Flags.Suites, "s", defaultString, "alias for -suites")
 	flag.StringVar(&Flags.Suites, "suites", defaultString, "Specific {name of task suite} - could be comma separated list. If you do '-h suites' it will list all diagnostic task suites that can be run.")
 
-	flag.StringVar(&Flags.AttachmentKey, "a", defaultString, "alias for -attachment-key")
+	flag.BoolVar(&Flags.AutoAttach, "a", false, "alias for -attach")
+	flag.BoolVar(&Flags.AutoAttach, "attach", false, "Attach for automatic upload to RPM account")
+
+	flag.StringVar(&Flags.AttachmentKey, "ak", defaultString, "alias for -attachment-key")
 	flag.StringVar(&Flags.AttachmentKey, "attachment-key", defaultString, "Attachment key for automatic upload to a support ticket (get key from an existing ticket).")
 
 	flag.BoolVar(&Flags.Help, "h", false, "alias for -help")
@@ -175,8 +183,20 @@ func ParseFlags() {
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
 		flag.StringVar(&Flags.AttachmentEndpoint, "attachment-endpoint", defaultString, "The endpoint to send attachments to. (NR ONLY)")
 	}
-
+	// if err := fs.Parse(os.Args[1:]); err != nil {
+	// 	fmt.Println("Error Handling done here")
+	// 	fmt.Printf("\nDefault Value: '%s'\n", Flags.AttachmentKey)
+	// 	fmt.Printf("\nDefault Value: '%v'\n", Flags.AutoAttach)
+	// 	os.Exit(100)
+	// }
 	flag.Parse()
+
+	// if Flags.AutoAttach || Flags.AttachmentKey != "" {
+	// 	fmt.Println("Exiting...")
+	// 	fmt.Printf("Attachment Key: '%s'\n", Flags.AttachmentKey)
+	// 	fmt.Printf("Optional Key: '%v'\n", Flags.AutoAttach)
+	// 	os.Exit(100)
+	// }
 
 	// Bail early if bad length attachment key provided.
 	if Flags.AttachmentKey != "" && len(Flags.AttachmentKey) < 32 {
@@ -220,6 +240,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		ConfigFlag{Name: "version", Value: f.Version},
 		ConfigFlag{Name: "yesToAll", Value: f.YesToAll},
 		ConfigFlag{Name: "showOverrideHelp", Value: f.ShowOverrideHelp},
+		ConfigFlag{Name: "autoAttach", Value: f.AutoAttach},
 		ConfigFlag{Name: "proxy", Value: boolifyFlag(f.Proxy)},
 		ConfigFlag{Name: "proxyUser", Value: boolifyFlag(f.ProxyUser)},
 		ConfigFlag{Name: "proxyPassword", Value: boolifyFlag(f.ProxyPassword)},

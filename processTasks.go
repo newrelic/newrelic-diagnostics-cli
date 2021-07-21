@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 
@@ -15,6 +16,11 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
+
+type LicenseKey struct {
+	Value  string
+	Source string
+}
 
 func processTasksToRun() {
 
@@ -128,6 +134,23 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 
 		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
 		registration.Work.ResultsChannel <- taskResult
+		if taskResult.Task.Explain() == "Determine New Relic license key(s)" && taskResult.Result.Payload != nil {
+
+			thisType := reflect.ValueOf(taskResult.Result.Payload)
+			if thisType.Kind() != reflect.Slice {
+				//error
+				fmt.Println("ERROR")
+			}
+			licenseKeySlice := make([]interface{}, thisType.Len())
+
+			for i := 0; i < thisType.Len(); i++ {
+				licenseKeySlice[i] = thisType.Index(i).Interface()
+			}
+
+			for _, slice := range licenseKeySlice {
+				fmt.Printf("LICENSE KEY: '%v'\n", slice)
+			}
+		}
 		if len(result.FilesToCopy) > 0 {
 			log.Debug(" - writing result to file channel")
 			registration.Work.FilesChannel <- taskResult
@@ -188,19 +211,30 @@ func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error)
 func processUploads() {
 	log.Debug("processing uploads")
 
-	if config.Flags.AttachmentKey == "" {
+	if config.Flags.AttachmentKey == "" && !config.Flags.AutoAttach {
+		log.Info("No attachment process specified")
 		return
 	}
 
 	if config.Flags.YesToAll {
-		Upload(config.Flags.AttachmentKey)
+		if config.Flags.AttachmentKey != "" {
+			Upload(config.Flags.AttachmentKey)
+		}
+		if config.Flags.AutoAttach {
+			uploadByAccount("<insert-nr-license-key>")
+		}
 		return
 	}
 
 	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
 		"Do you want to attach these files to the support ticket matching the attachment key?"
 	if promptUser(question) {
-		Upload(config.Flags.AttachmentKey)
+		if config.Flags.AttachmentKey != "" {
+			Upload(config.Flags.AttachmentKey)
+		}
+		if config.Flags.AutoAttach {
+			uploadByAccount("<insert-nr-license-key>")
+		}
 	}
 
 }
