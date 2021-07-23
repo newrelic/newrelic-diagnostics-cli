@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
 	"sync"
 
@@ -21,6 +20,8 @@ type LicenseKey struct {
 	Value  string
 	Source string
 }
+
+var ValidLicenseKeys []string
 
 func processTasksToRun() {
 
@@ -134,22 +135,18 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 
 		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
 		registration.Work.ResultsChannel <- taskResult
-		if taskResult.Task.Explain() == "Determine New Relic license key(s)" && taskResult.Result.Payload != nil {
 
-			thisType := reflect.ValueOf(taskResult.Result.Payload)
-			if thisType.Kind() != reflect.Slice {
-				//error
-				fmt.Println("ERROR")
+		if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
+			licenseKeyToSources, ok := taskResult.Result.Payload.(map[string][]string)
+			if !ok {
+				log.Debug("Error parsing for License Key(s)")
+			} else {
+				log.Info("Valid License Key(s) provided")
+				for lk := range licenseKeyToSources {
+					ValidLicenseKeys = append(ValidLicenseKeys, lk)
+				}
 			}
-			licenseKeySlice := make([]interface{}, thisType.Len())
 
-			for i := 0; i < thisType.Len(); i++ {
-				licenseKeySlice[i] = thisType.Index(i).Interface()
-			}
-
-			for _, slice := range licenseKeySlice {
-				fmt.Printf("LICENSE KEY: '%v'\n", slice)
-			}
 		}
 		if len(result.FilesToCopy) > 0 {
 			log.Debug(" - writing result to file channel")

@@ -184,19 +184,9 @@ func ParseFlags() {
 		flag.StringVar(&Flags.AttachmentEndpoint, "attachment-endpoint", defaultString, "The endpoint to send attachments to. (NR ONLY)")
 	}
 	// if err := fs.Parse(os.Args[1:]); err != nil {
-	// 	fmt.Println("Error Handling done here")
-	// 	fmt.Printf("\nDefault Value: '%s'\n", Flags.AttachmentKey)
-	// 	fmt.Printf("\nDefault Value: '%v'\n", Flags.AutoAttach)
 	// 	os.Exit(100)
 	// }
 	flag.Parse()
-
-	// if Flags.AutoAttach || Flags.AttachmentKey != "" {
-	// 	fmt.Println("Exiting...")
-	// 	fmt.Printf("Attachment Key: '%s'\n", Flags.AttachmentKey)
-	// 	fmt.Printf("Optional Key: '%v'\n", Flags.AutoAttach)
-	// 	os.Exit(100)
-	// }
 
 	// Bail early if bad length attachment key provided.
 	if Flags.AttachmentKey != "" && len(Flags.AttachmentKey) < 32 {
