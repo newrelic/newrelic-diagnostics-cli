@@ -119,8 +119,8 @@ func Upload(attachmentKey string) {
 	uploadFilelist(attachmentKey, filesToUpload)
 }
 
-func uploadByAccount(accountID string) {
-	log.Info("Uploading to account ID")
+func uploadByAccount(accountID []string) {
+	log.Infof("Uploading to account ID %s", accountID)
 	//do same thing as above possible change with uploadFileList
 }
 

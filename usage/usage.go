@@ -198,6 +198,10 @@ func getRPMdetails(r tasks.Result) []rpmApp {
 	result := []rpmApp{}
 
 	rpmAppslice := r.Payload.([]l.LogNameReportingTo)
+	for _, appSlice := range rpmAppslice {
+		log.Infof("RPM Logfile: %v\n", appSlice.Logfile)
+		log.Infof("RPM Reporting To: %v\n", appSlice.ReportingTo)
+	}
 
 	regex := `https://rpm.newrelic.com/accounts/(?P<account>\d+)/applications/(?P<application>\d+)$`
 	regexKey := regexp.MustCompile(regex)
@@ -229,6 +233,7 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 
 	for _, result := range results {
 		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
+
 			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
 		}
 

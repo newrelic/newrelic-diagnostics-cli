@@ -53,6 +53,7 @@ func processTasksToRun() {
 }
 
 func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGroup) {
+	//fmt.Printf("OPTIONS: '%v'\nOVERRIDES: '%v'\nWG: '%v'\n", options, overrides, *wg)
 	log.Debugf("work queue has %d items\n", len(registration.Work.WorkQueue))
 	taskCount := 0
 	for task := range registration.Work.WorkQueue {
@@ -133,21 +134,19 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 			WasOverride: overrideEnabled,
 		}
 
-		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
-		registration.Work.ResultsChannel <- taskResult
-
 		if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
-			licenseKeyToSources, ok := taskResult.Result.Payload.(map[string][]string)
-			if !ok {
-				log.Debug("Error parsing for License Key(s)")
+			LicenseKeys, err := getLicenseKey(taskResult.Result)
+			if err != nil {
+				log.Debug("Could not retrieve a license key, automatic attachment will not be possible")
 			} else {
-				log.Info("Valid License Key(s) provided")
-				for lk := range licenseKeyToSources {
-					ValidLicenseKeys = append(ValidLicenseKeys, lk)
-				}
+				ValidLicenseKeys = LicenseKeys
 			}
 
 		}
+
+		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
+		registration.Work.ResultsChannel <- taskResult
+
 		if len(result.FilesToCopy) > 0 {
 			log.Debug(" - writing result to file channel")
 			registration.Work.FilesChannel <- taskResult
@@ -172,6 +171,21 @@ func processFlagsTasks(flagValue string) []string {
 		}
 	}
 	return validatedIdentifiers
+}
+
+func getLicenseKey(thisResult tasks.Result) ([]string, error) {
+	fmt.Printf("\tStatus: %v\n\n\tSummary: %v\n\n\tURL: %v\n\n\tFilesToCopy: %v\n\n\tPayload: %v\n\n", thisResult.Status, thisResult.Summary, thisResult.URL, thisResult.FilesToCopy, thisResult.Payload)
+	licenseKeyToSources, ok := thisResult.Payload.(map[string][]string)
+	if !ok {
+		return nil, fmt.Errorf("Unable to retrieve license Key")
+	}
+	log.Debug("Valid License Key(s) provided")
+	validLicenseKeys := []string{}
+	for lk := range licenseKeyToSources {
+		validLicenseKeys = append(validLicenseKeys, lk)
+	}
+	return validLicenseKeys, nil
+
 }
 
 func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error) {
@@ -218,7 +232,7 @@ func processUploads() {
 			Upload(config.Flags.AttachmentKey)
 		}
 		if config.Flags.AutoAttach {
-			uploadByAccount("<insert-nr-license-key>")
+			uploadByAccount(ValidLicenseKeys)
 		}
 		return
 	}
@@ -230,7 +244,7 @@ func processUploads() {
 			Upload(config.Flags.AttachmentKey)
 		}
 		if config.Flags.AutoAttach {
-			uploadByAccount("<insert-nr-license-key>")
+			uploadByAccount(ValidLicenseKeys)
 		}
 	}
 
