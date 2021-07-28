@@ -14,7 +14,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 
@@ -73,59 +72,30 @@ func addFileToForm(originalFilename string, newFilename string, i int, w *multip
 }
 
 // Upload - takes the attachment key from a ticket and uploads the output to that ticket
-func Upload(attachmentKey string) {
+func UploadByAttachmentKey(attachmentKey string, timestamp string) {
 	log.Info("Uploading files to support ticket...")
 	log.Debugf("Attempting to attach file with key: %s\n", attachmentKey)
 
 	log.Debugf("argument zero: %s\n", os.Args[0])
 	// look at our command name, should be 'nrdiag' in production
 	var filesToUpload []uploadFiles
-	zipfile, jsonfile := getUploadFiles(attachmentKey)
-
+	s3zipfile := getS3UploadFiles(attachmentKey, timestamp, "zip")
+	s3jsonfile := getS3UploadFiles(attachmentKey, timestamp, "json")
+	ticketJsonFile := getTicketUploadFile(attachmentKey, timestamp)
 	// Calculate the filerename just once
 
-	filesToUpload = append(filesToUpload, zipfile)
-	filesToUpload = append(filesToUpload, jsonfile)
+	filesToUpload = append(filesToUpload, s3zipfile)
+	filesToUpload = append(filesToUpload, s3jsonfile)
+	filesToUpload = append(filesToUpload, ticketJsonFile)
 
 	uploadFilelist(attachmentKey, filesToUpload)
 }
 
-func getUploadFiles(attachmentKey string) (uploadFiles, uploadFiles) {
-	timestamp := time.Now().UTC().Format(time.RFC3339)
-	zipfile := uploadFiles{path: config.Flags.OutputPath, filename: "nrdiag-output.zip"}
-	zipfile.path = config.Flags.OutputPath
-	zipfile.filename = "nrdiag-output.zip"
-	stat, err := os.Stat(zipfile.path + "/" + zipfile.filename)
-	if err != nil {
-		log.Fatalf("Error getting filesize: %s", err.Error())
-		log.Infof("Error getting filesize: %s\n", err.Error())
+func UploadByLicenseKey(licenseKeys []string, timestamp string) {
+	if len(ValidLicenseKeys) == 0 {
+		log.Info("No Valid License Keys detected. Auto-upload cannot be completed")
+		return
 	}
-	zipfile.filesize = stat.Size()
-	zipfile.newFilename = datestampFile("nrdiag-output.zip", timestamp)
-	// Get upload URL for zip file
-
-	jsonResponse, err := getUploadURL(zipfile.newFilename, attachmentKey, zipfile.filesize)
-	if err != nil {
-		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n", err.Error())
-	}
-	zipfile.URL = jsonResponse.URL
-	if jsonResponse.Key != "" {
-		zipfile.key = jsonResponse.Key
-	}
-	log.Debug("Zipfile upload URL is ", zipfile.URL)
-
-	jsonfile := uploadFiles{path: config.Flags.OutputPath, filename: "nrdiag-output.json"}
-	jsonfile.path = config.Flags.OutputPath
-	jsonfile.filename = "nrdiag-output.json"
-	jsonfile.newFilename = datestampFile("nrdiag-output.json", timestamp)
-
-	jsonfile.URL = getAttachmentsEndpoint() + "/upload"
-
-	return zipfile, jsonfile
-
-}
-
-func uploadByLicenseKey(licenseKeys []string) {
 	for _, licenseKey := range licenseKeys {
 		// get files to upload for each account
 		log.Infof("Uploading to account ID %s", licenseKey)
@@ -134,44 +104,58 @@ func uploadByLicenseKey(licenseKeys []string) {
 		log.Debugf("argument zero: %s\n", os.Args[0])
 		// look at our command name, should be 'nrdiag' in production
 		var filesToUpload []uploadFiles
-		zipfile, jsonfile := getUploadFiles(licenseKey)
+		//zipfile, jsonfile := getUploadFiles(licenseKey, timestamp)
+		s3zipfile := getS3UploadFiles(licenseKey, timestamp, "zip")
+		s3jsonfile := getS3UploadFiles(licenseKey, timestamp, "json")
+		ticketJsonFile := getTicketUploadFile(licenseKey, timestamp)
 		// Calculate the filerename just once
 
-		filesToUpload = append(filesToUpload, zipfile)
-		filesToUpload = append(filesToUpload, jsonfile)
+		filesToUpload = append(filesToUpload, s3zipfile)
+		filesToUpload = append(filesToUpload, s3jsonfile)
+		filesToUpload = append(filesToUpload, ticketJsonFile)
+
+		fmt.Printf("FILES2U: %v\n", filesToUpload)
 		// upload files to haberdasher and s3 bucket
-		//uploadFilelist(licenseKey, filesToUpload)
+		uploadFilelist(licenseKey, filesToUpload)
 	}
 }
 
-func uploadCustomerFile() {
-	attachmentKey := config.Flags.AttachmentKey
-	if attachmentKey == "" {
-		log.Fatal("No AttachmentKey supplied, you must run '-file-upload' with '-a' option to upload a file")
-	}
-	file := uploadFiles{}
-
-	stat, err := os.Stat(config.Flags.FileUpload)
-
+func getS3UploadFiles(identifyingKey string, timestamp string, filetype string) uploadFiles {
+	thisFileName := "nrdiag-output." + filetype
+	thisFile := uploadFiles{path: config.Flags.OutputPath, filename: thisFileName}
+	thisFile.path = config.Flags.OutputPath
+	thisFile.filename = thisFileName
+	stat, err := os.Stat(thisFile.path + "/" + thisFile.filename)
 	if err != nil {
-		log.Fatalf("Error getting information for the file provided: %s", err.Error())
+		log.Fatalf("Error getting filesize: %s", err.Error())
+		log.Infof("Error getting filesize: %s\n", err.Error())
 	}
+	thisFile.filesize = stat.Size()
+	thisFile.newFilename = datestampFile(thisFileName, timestamp)
+	// Get upload URL for zip file
 
-	file.filesize = stat.Size()
-	file.filename = stat.Name()
-	file.path = filepath.Dir(config.Flags.FileUpload)
-
-	file.newFilename = datestampFile(file.filename, time.Now().UTC().Format(time.RFC3339))
-	jsonResponse, err := getUploadURL(stat.Name(), attachmentKey, stat.Size())
+	jsonResponse, err := getUploadURL(thisFile.newFilename, identifyingKey, thisFile.filesize)
 	if err != nil {
 		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n", err.Error())
 	}
-	file.URL = jsonResponse.URL
-	file.key = jsonResponse.Key
+	thisFile.URL = jsonResponse.URL
+	if jsonResponse.Key != "" {
+		thisFile.key = jsonResponse.Key
+	}
+	log.Debug("This file upload URL is ", thisFile.URL)
 
-	log.Debug("Uploading file", file)
-	files := []uploadFiles{file}
-	uploadFilelist(attachmentKey, files)
+	return thisFile
+}
+
+func getTicketUploadFile(attachmentKey string, timestamp string) uploadFiles {
+	jsonfile := uploadFiles{path: config.Flags.OutputPath, filename: "nrdiag-output.json"}
+	jsonfile.path = config.Flags.OutputPath
+	jsonfile.filename = "nrdiag-output.json"
+	jsonfile.newFilename = datestampFile("nrdiag-output.json", timestamp)
+
+	jsonfile.URL = getAttachmentsEndpoint() + "/upload"
+
+	return jsonfile
 }
 
 func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
@@ -198,7 +182,8 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 		filesForTicketAttachment = append(filesForTicketAttachment, filesForAWS...)
 	}
 
-	if len(filesForTicketAttachment) != 0 {
+	//length of an attachment key is 32 and if both attach and attachment key are provided, then this will check if what is begin passed through is an attahment key
+	if len(filesForTicketAttachment) != 0 && len(attachmentKey) == 32 {
 		log.Debug("Uploading to Haberdasher for ticket attachment")
 		attachErr := uploadTicketAttachments(filesForTicketAttachment, attachmentKey)
 		if attachErr != nil {

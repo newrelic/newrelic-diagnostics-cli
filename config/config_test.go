@@ -16,6 +16,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Version            bool
 		YesToAll           bool
 		ShowOverrideHelp   bool
+		AutoAttach         bool
 		UsageOptOut        bool
 		Proxy              string
 		ProxyUser          string
@@ -26,7 +27,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Override           string
 		OutputPath         string
 		Filter             string
-		FileUpload         string
 		BrowserURL         string
 		AttachmentEndpoint string
 		Suites             string
@@ -41,6 +41,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Version:            true,
 		YesToAll:           false,
 		ShowOverrideHelp:   true,
+		AutoAttach:         true,
 		Proxy:              "string",
 		ProxyUser:          "string",
 		ProxyPassword:      "",
@@ -50,7 +51,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Override:           "",
 		OutputPath:         "",
 		Filter:             "string",
-		FileUpload:         "string",
 		BrowserURL:         "string",
 		AttachmentEndpoint: "string",
 		Suites:             "string",
@@ -65,6 +65,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ConfigFlag{Name: "version", Value: true},
 		ConfigFlag{Name: "yesToAll", Value: false},
 		ConfigFlag{Name: "showOverrideHelp", Value: true},
+		ConfigFlag{Name: "autoAttach", Value: true},
 		ConfigFlag{Name: "proxy", Value: true},
 		ConfigFlag{Name: "proxyUser", Value: true},
 		ConfigFlag{Name: "proxyPassword", Value: false},
@@ -74,7 +75,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ConfigFlag{Name: "override", Value: false},
 		ConfigFlag{Name: "outputPath", Value: false},
 		ConfigFlag{Name: "filter", Value: "string"},
-		ConfigFlag{Name: "fileUpload", Value: true},
 		ConfigFlag{Name: "browserURL", Value: true},
 		ConfigFlag{Name: "attachmentEndpoint", Value: true},
 		ConfigFlag{Name: "suites", Value: "string"},
@@ -102,6 +102,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				Version:            tt.fields.Version,
 				YesToAll:           tt.fields.YesToAll,
 				ShowOverrideHelp:   tt.fields.ShowOverrideHelp,
+				AutoAttach:         tt.fields.AutoAttach,
 				UsageOptOut:        tt.fields.UsageOptOut,
 				Proxy:              tt.fields.Proxy,
 				ProxyUser:          tt.fields.ProxyUser,
@@ -112,7 +113,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				Override:           tt.fields.Override,
 				OutputPath:         tt.fields.OutputPath,
 				Filter:             tt.fields.Filter,
-				FileUpload:         tt.fields.FileUpload,
 				BrowserURL:         tt.fields.BrowserURL,
 				AttachmentEndpoint: tt.fields.AttachmentEndpoint,
 				Suites:             tt.fields.Suites,

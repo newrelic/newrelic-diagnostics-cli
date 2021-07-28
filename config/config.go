@@ -30,8 +30,8 @@ type userFlags struct {
 	SkipVersionCheck   bool
 	YesToAll           bool
 	ShowOverrideHelp   bool
-	UsageOptOut        bool
 	AutoAttach         bool
+	UsageOptOut        bool
 	Proxy              string
 	ProxyUser          string
 	ProxyPassword      string
@@ -41,7 +41,6 @@ type userFlags struct {
 	Override           string
 	OutputPath         string
 	Filter             string
-	FileUpload         string
 	BrowserURL         string
 	AttachmentEndpoint string
 	Suites             string
@@ -66,9 +65,9 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		VeryQuiet        bool
 		YesToAll         bool
 		ShowOverrideHelp bool
+		AutoAttach       bool
 		ProxySpecified   bool
 		SkipVersionCheck bool
-		AutoAttach       bool
 		Tasks            string
 		AttachmentKey    string
 		ConfigFile       string
@@ -83,9 +82,9 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		VeryQuiet:        f.VeryQuiet,
 		YesToAll:         f.YesToAll,
 		ShowOverrideHelp: f.ShowOverrideHelp,
+		AutoAttach:       f.AutoAttach,
 		ProxySpecified:   proxySpecified,
 		SkipVersionCheck: f.SkipVersionCheck,
-		AutoAttach:       f.AutoAttach,
 		Tasks:            f.Tasks,
 		AttachmentKey:    f.AttachmentKey,
 		ConfigFile:       f.ConfigFile,
@@ -173,7 +172,7 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.Quiet, "q", false, "Quiet ouput; only prints the high level results and not the explainatory output. Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'")
 	flag.BoolVar(&Flags.VeryQuiet, "qq", false, "Very quiet ouput; only prints a single summary line for output (implies '-q'). Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'. Inclusion filters are ignored.")
 
-	flag.StringVar(&Flags.FileUpload, "file-upload", defaultString, "File to upload to support ticket, requires running with '-a' option")
+	//flag.StringVar(&Flags.FileUpload, "file-upload", defaultString, "File to upload to support ticket, requires running with '-a' option")
 
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
@@ -240,7 +239,6 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		ConfigFlag{Name: "override", Value: boolifyFlag(f.Override)},
 		ConfigFlag{Name: "outputPath", Value: boolifyFlag(f.OutputPath)},
 		ConfigFlag{Name: "filter", Value: f.Filter},
-		ConfigFlag{Name: "fileUpload", Value: boolifyFlag(f.FileUpload)},
 		ConfigFlag{Name: "browserURL", Value: boolifyFlag(f.BrowserURL)},
 		ConfigFlag{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		ConfigFlag{Name: "suites", Value: f.Suites},

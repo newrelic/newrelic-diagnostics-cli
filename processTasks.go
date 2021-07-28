@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
@@ -224,13 +225,14 @@ func processUploads() {
 		log.Info("No attachment process specified")
 		return
 	}
+	timestamp := time.Now().UTC().Format(time.RFC3339)
 
 	if config.Flags.YesToAll {
 		if config.Flags.AttachmentKey != "" {
-			Upload(config.Flags.AttachmentKey)
+			UploadByAttachmentKey(config.Flags.AttachmentKey, timestamp)
 		}
 		if config.Flags.AutoAttach {
-			uploadByLicenseKey(ValidLicenseKeys)
+			UploadByLicenseKey(ValidLicenseKeys, timestamp)
 		}
 		return
 	}
@@ -239,10 +241,10 @@ func processUploads() {
 		"Do you want to attach these files to the support ticket matching the attachment key?"
 	if promptUser(question) {
 		if config.Flags.AttachmentKey != "" {
-			Upload(config.Flags.AttachmentKey)
+			UploadByAttachmentKey(config.Flags.AttachmentKey, timestamp)
 		}
 		if config.Flags.AutoAttach {
-			uploadByLicenseKey(ValidLicenseKeys)
+			UploadByLicenseKey(ValidLicenseKeys, timestamp)
 		}
 	}
 
