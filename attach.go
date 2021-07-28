@@ -80,17 +80,25 @@ func Upload(attachmentKey string) {
 	log.Debugf("argument zero: %s\n", os.Args[0])
 	// look at our command name, should be 'nrdiag' in production
 	var filesToUpload []uploadFiles
+	zipfile, jsonfile := getUploadFiles(attachmentKey)
 
 	// Calculate the filerename just once
 
-	timestamp := time.Now().UTC().Format(time.RFC3339)
+	filesToUpload = append(filesToUpload, zipfile)
+	filesToUpload = append(filesToUpload, jsonfile)
 
+	uploadFilelist(attachmentKey, filesToUpload)
+}
+
+func getUploadFiles(attachmentKey string) (uploadFiles, uploadFiles) {
+	timestamp := time.Now().UTC().Format(time.RFC3339)
 	zipfile := uploadFiles{path: config.Flags.OutputPath, filename: "nrdiag-output.zip"}
 	zipfile.path = config.Flags.OutputPath
 	zipfile.filename = "nrdiag-output.zip"
 	stat, err := os.Stat(zipfile.path + "/" + zipfile.filename)
 	if err != nil {
 		log.Fatalf("Error getting filesize: %s", err.Error())
+		log.Infof("Error getting filesize: %s\n", err.Error())
 	}
 	zipfile.filesize = stat.Size()
 	zipfile.newFilename = datestampFile("nrdiag-output.zip", timestamp)
@@ -113,15 +121,27 @@ func Upload(attachmentKey string) {
 
 	jsonfile.URL = getAttachmentsEndpoint() + "/upload"
 
-	filesToUpload = append(filesToUpload, zipfile)
-	filesToUpload = append(filesToUpload, jsonfile)
+	return zipfile, jsonfile
 
-	uploadFilelist(attachmentKey, filesToUpload)
 }
 
-func uploadByAccount(accountID []string) {
-	log.Infof("Uploading to account ID %s", accountID)
-	//do same thing as above possible change with uploadFileList
+func uploadByLicenseKey(licenseKeys []string) {
+	for _, licenseKey := range licenseKeys {
+		// get files to upload for each account
+		log.Infof("Uploading to account ID %s", licenseKey)
+		log.Debugf("Attempting to attach file with key: %s\n", licenseKey)
+
+		log.Debugf("argument zero: %s\n", os.Args[0])
+		// look at our command name, should be 'nrdiag' in production
+		var filesToUpload []uploadFiles
+		zipfile, jsonfile := getUploadFiles(licenseKey)
+		// Calculate the filerename just once
+
+		filesToUpload = append(filesToUpload, zipfile)
+		filesToUpload = append(filesToUpload, jsonfile)
+		// upload files to haberdasher and s3 bucket
+		//uploadFilelist(licenseKey, filesToUpload)
+	}
 }
 
 func uploadCustomerFile() {

@@ -53,7 +53,6 @@ func processTasksToRun() {
 }
 
 func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGroup) {
-	//fmt.Printf("OPTIONS: '%v'\nOVERRIDES: '%v'\nWG: '%v'\n", options, overrides, *wg)
 	log.Debugf("work queue has %d items\n", len(registration.Work.WorkQueue))
 	taskCount := 0
 	for task := range registration.Work.WorkQueue {
@@ -174,7 +173,6 @@ func processFlagsTasks(flagValue string) []string {
 }
 
 func getLicenseKey(thisResult tasks.Result) ([]string, error) {
-	fmt.Printf("\tStatus: %v\n\n\tSummary: %v\n\n\tURL: %v\n\n\tFilesToCopy: %v\n\n\tPayload: %v\n\n", thisResult.Status, thisResult.Summary, thisResult.URL, thisResult.FilesToCopy, thisResult.Payload)
 	licenseKeyToSources, ok := thisResult.Payload.(map[string][]string)
 	if !ok {
 		return nil, fmt.Errorf("Unable to retrieve license Key")
@@ -232,7 +230,7 @@ func processUploads() {
 			Upload(config.Flags.AttachmentKey)
 		}
 		if config.Flags.AutoAttach {
-			uploadByAccount(ValidLicenseKeys)
+			uploadByLicenseKey(ValidLicenseKeys)
 		}
 		return
 	}
@@ -244,7 +242,7 @@ func processUploads() {
 			Upload(config.Flags.AttachmentKey)
 		}
 		if config.Flags.AutoAttach {
-			uploadByAccount(ValidLicenseKeys)
+			uploadByLicenseKey(ValidLicenseKeys)
 		}
 	}
 
