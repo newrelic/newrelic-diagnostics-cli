@@ -17,11 +17,6 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-type LicenseKey struct {
-	Value  string
-	Source string
-}
-
 var ValidLicenseKeys []string
 
 func processTasksToRun() {
