@@ -79,42 +79,39 @@ func UploadByAttachmentKey(attachmentKey string, timestamp string) {
 	log.Debugf("argument zero: %s\n", os.Args[0])
 	// look at our command name, should be 'nrdiag' in production
 	var filesToUpload []uploadFiles
+
 	s3zipfile := getS3UploadFiles(attachmentKey, timestamp, "zip")
 	s3jsonfile := getS3UploadFiles(attachmentKey, timestamp, "json")
-	ticketJsonFile := getTicketUploadFile(attachmentKey, timestamp)
-	// Calculate the filerename just once
+	// Calculate the filename just once
 
 	filesToUpload = append(filesToUpload, s3zipfile)
 	filesToUpload = append(filesToUpload, s3jsonfile)
-	filesToUpload = append(filesToUpload, ticketJsonFile)
 
 	uploadFilelist(attachmentKey, filesToUpload)
 }
 
 func UploadByLicenseKey(licenseKeys []string, timestamp string) {
 	if len(ValidLicenseKeys) == 0 {
-		log.Info("No Valid License Keys detected. Auto-upload cannot be completed")
+		log.Info("No Valid License Keys detected. Auto-upload cannot be completed\n")
 		return
 	}
 	for _, licenseKey := range licenseKeys {
 		// get files to upload for each account
-		log.Infof("Uploading to account ID %s", licenseKey)
+		log.Infof("Uploading to account ID %s\n", licenseKey)
 		log.Debugf("Attempting to attach file with key: %s\n", licenseKey)
 
 		log.Debugf("argument zero: %s\n", os.Args[0])
 		// look at our command name, should be 'nrdiag' in production
 		var filesToUpload []uploadFiles
-		//zipfile, jsonfile := getUploadFiles(licenseKey, timestamp)
+
 		s3zipfile := getS3UploadFiles(licenseKey, timestamp, "zip")
 		s3jsonfile := getS3UploadFiles(licenseKey, timestamp, "json")
-		ticketJsonFile := getTicketUploadFile(licenseKey, timestamp)
-		// Calculate the filerename just once
+		// Calculate the filename just once
 
 		filesToUpload = append(filesToUpload, s3zipfile)
 		filesToUpload = append(filesToUpload, s3jsonfile)
-		filesToUpload = append(filesToUpload, ticketJsonFile)
+		//filesToUpload = append(filesToUpload, ticketJsonFile)
 
-		fmt.Printf("FILES2U: %v\n", filesToUpload)
 		// upload files to haberdasher and s3 bucket
 		uploadFilelist(licenseKey, filesToUpload)
 	}
@@ -179,10 +176,10 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 			log.Fatalf("Error uploading large file: %s", AWSErr.Error())
 		}
 		log.Debug("Successfully uploaded to AWS, adding completed files for ticket attachment upload")
-		filesForTicketAttachment = append(filesForTicketAttachment, filesForAWS...)
+		//filesForTicketAttachment = append(filesForTicketAttachment, filesForAWS...)
 	}
 
-	//length of an attachment key is 32 and if both attach and attachment key are provided, then this will check if what is begin passed through is an attahment key
+	//length of an attachment key is 32 and if both attach and attachment key are provided, then this will check if what is begin passed through is an attachment key
 	if len(filesForTicketAttachment) != 0 && len(attachmentKey) == 32 {
 		log.Debug("Uploading to Haberdasher for ticket attachment")
 		attachErr := uploadTicketAttachments(filesForTicketAttachment, attachmentKey)
