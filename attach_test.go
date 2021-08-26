@@ -1,11 +1,16 @@
 package main
 
 import (
-	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/assert"
 )
 
 var _ = Describe("GetTicketFile", func() {
@@ -18,6 +23,8 @@ var _ = Describe("GetTicketFile", func() {
 		BeforeEach(func() {
 			attachmentKey = "12345678912345678912345678912345"
 			timestamp = "2021-07-28T22:49:34Z"
+			config.Flags.AttachmentEndpoint = ""
+			config.AttachmentEndpoint = ""
 			expectedResult = uploadFiles{
 				path:        "./",
 				filename:    "nrdiag-output.json",
@@ -79,53 +86,56 @@ var _ = Describe("GetAttachmentEndpoints", func() {
 
 })
 
-var _ = Describe("TestS3Upload", func() {
+var _ = Describe("buildGetRequestURL", func() {
 	var (
-		filesToUpload  []uploadFiles
-		attachmentKey  string
 		expectedResult string
 	)
-	Context("With non s3 URL given", func() {
+	Context("with filename, attachmentKey, and filesize set", func() {
 		BeforeEach(func() {
 			config.Flags.AttachmentEndpoint = ""
 			config.AttachmentEndpoint = ""
-			filesToUpload = []uploadFiles{
-				uploadFiles{
-					path:        "./",
-					filename:    "nrdiag-output.json",
-					newFilename: "nrdiag-output-2021-07-28T22:49:34Z.json",
-					filesize:    0,
-					URL:         "http://localhost:3000/attachments/upload",
-					key:         "",
-				},
-			}
-		})
-		It("Should return a 500 internal server error", func() {
-			result := uploadAWS(filesToUpload, attachmentKey)
-			Expect(result).To(Equal(errors.New("Error uploading, status code was 500 Internal Server Error")))
-		})
-	})
-
-	Context("With non s3 URL given", func() {
-		BeforeEach(func() {
-			config.Flags.AttachmentEndpoint = ""
-			config.AttachmentEndpoint = ""
-			filesToUpload = []uploadFiles{
-				uploadFiles{
-					path:        "./",
-					filename:    "",
-					newFilename: "",
-					filesize:    0,
-					URL:         "http://localhost:3000/attachments/upload",
-					key:         "",
-				},
-			}
-			expectedResult = "read " + filesToUpload[0].path + "/: is a directory"
+			expectedResult = "http://localhost:3000/attachments/upload_url?attachment_key=1Q3OS5O1ffsd2345678901t56789014&filename=nrdiag-output.json&filesize=23647"
 		})
 		It("Should return default attachment endpoint (localhost)", func() {
-			result := uploadAWS(filesToUpload, attachmentKey)
-			Expect(result.Error()).To(Equal(expectedResult))
+			result := buildGetRequestURL("nrdiag-output.json", "1Q3OS5O1ffsd2345678901t56789014", 23647)
+			Expect(result).To(Equal(expectedResult))
 		})
 	})
 
 })
+
+func TestGetUploadURLPath(t *testing.T) {
+	t.Parallel()
+	// setup()
+	// defer teardown()
+	testAPIEndpoint := "/attachments/upload_url?attachment_key=1Q3OS5O1ffsd2345678901t56789014&filename=nrdiag-output.zip&filesize=234567"
+
+	req, _ := http.NewRequest("GET", testAPIEndpoint, nil)
+	writer := httptest.NewRecorder()
+
+	thisRouter().ServeHTTP(writer, req)
+	fmt.Println(req.URL)
+	assert.Equal(t, http.StatusOK, writer.Code)
+}
+
+func thisRouter() *mux.Router {
+	r := mux.NewRouter().StrictSlash(true)
+	r.Path("/attachments/upload_url").
+		Queries("attachment_key", "{[a-zA-Z0-9]+}").
+		Queries("filename", "{nrdiag-output.zip|nrdiag-output.json}").
+		Queries("filesize", "{[0-9]+}").
+		HandlerFunc(GetRequest).
+		Name("/attachments/upload_url")
+	r.HandleFunc("/attachments/upload_url/{attachment_key:{[a-zA-Z0-9]+}}{filename:{nrdiag-output.zip|nrdiag-output.json}}{filesize:{[0-9]+}}", GetRequest).Name("/attachments/upload_url").Methods("GET")
+	http.Handle("/", r)
+	return r
+}
+
+func GetRequest(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	myString := vars["mystring"]
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(myString))
+}

@@ -47,7 +47,7 @@ func getAttachmentsEndpoint() string {
 	} else if config.AttachmentEndpoint != "" { //Else if its a binary build
 		return config.AttachmentEndpoint
 	}
-	log.Info("No attachments endpoint supplied! Defaulting to localhost.") //This case should only be local dev without attachment flag
+	log.Debug("No attachments endpoint supplied! Defaulting to localhost.") //This case should only be local dev without attachment flag
 	return defaultAttachmentEndpoint
 }
 
@@ -71,50 +71,27 @@ func addFileToForm(originalFilename string, newFilename string, i int, w *multip
 	}
 }
 
-// Upload - takes the attachment key from a ticket and uploads the output to that ticket
-func UploadByAttachmentKey(attachmentKey string, timestamp string) {
-	log.Info("Uploading files to support ticket...")
-	log.Debugf("Attempting to attach file with key: %s\n", attachmentKey)
-
+// Upload - takes the attachment key from a ticket OR license key from ValidateLicenseKey
+// and uploads the output to that ticket/s3
+func Upload(identifyingKey string, timestamp string) {
+	log.Debugf("Attempting to attach file with key: %s\n", identifyingKey)
 	log.Debugf("argument zero: %s\n", os.Args[0])
 	// look at our command name, should be 'nrdiag' in production
 	var filesToUpload []uploadFiles
 
-	s3zipfile := getS3UploadFiles(attachmentKey, timestamp, "zip")
-	s3jsonfile := getS3UploadFiles(attachmentKey, timestamp, "json")
+	s3zipfile := getS3UploadFiles(identifyingKey, timestamp, "zip")
+	s3jsonfile := getS3UploadFiles(identifyingKey, timestamp, "json")
+	//ticketUploadFile will upload the JSON file to the support ticket
+	//currently it uploads all 3 of these files because Haberdasher returns the default URL
+	//as a https://diagnostics... as opposed to https://s3.amazonaws...
+	ticketUploadFile := getTicketUploadFile(identifyingKey, timestamp)
 	// Calculate the filename just once
 
 	filesToUpload = append(filesToUpload, s3zipfile)
 	filesToUpload = append(filesToUpload, s3jsonfile)
+	filesToUpload = append(filesToUpload, ticketUploadFile)
 
-	uploadFilelist(attachmentKey, filesToUpload)
-}
-
-func UploadByLicenseKey(licenseKeys []string, timestamp string) {
-	if len(ValidLicenseKeys) == 0 {
-		log.Info("No Valid License Keys detected. Auto-upload cannot be completed\n")
-		return
-	}
-	for _, licenseKey := range licenseKeys {
-		// get files to upload for each account
-		log.Infof("Uploading to account ID %s\n", licenseKey)
-		log.Debugf("Attempting to attach file with key: %s\n", licenseKey)
-
-		log.Debugf("argument zero: %s\n", os.Args[0])
-		// look at our command name, should be 'nrdiag' in production
-		var filesToUpload []uploadFiles
-
-		s3zipfile := getS3UploadFiles(licenseKey, timestamp, "zip")
-		s3jsonfile := getS3UploadFiles(licenseKey, timestamp, "json")
-		// Calculate the filename just once
-
-		filesToUpload = append(filesToUpload, s3zipfile)
-		filesToUpload = append(filesToUpload, s3jsonfile)
-		//filesToUpload = append(filesToUpload, ticketJsonFile)
-
-		// upload files to haberdasher and s3 bucket
-		uploadFilelist(licenseKey, filesToUpload)
-	}
+	uploadFilelist(identifyingKey, filesToUpload)
 }
 
 func getS3UploadFiles(identifyingKey string, timestamp string, filetype string) uploadFiles {
@@ -125,13 +102,13 @@ func getS3UploadFiles(identifyingKey string, timestamp string, filetype string) 
 	stat, err := os.Stat(thisFile.path + "/" + thisFile.filename)
 	if err != nil {
 		log.Fatalf("Error getting filesize: %s", err.Error())
-		log.Infof("Error getting filesize: %s\n", err.Error())
 	}
 	thisFile.filesize = stat.Size()
 	thisFile.newFilename = datestampFile(thisFileName, timestamp)
-	// Get upload URL for zip file
 
-	jsonResponse, err := getUploadURL(thisFile.newFilename, identifyingKey, thisFile.filesize)
+	// Get upload URL for file
+	requestURL := buildGetRequestURL(thisFile.newFilename, identifyingKey, thisFile.filesize)
+	jsonResponse, err := getUploadURL(requestURL)
 	if err != nil {
 		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n", err.Error())
 	}
@@ -171,17 +148,18 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 
 	if len(filesForAWS) != 0 {
 		log.Debug("Uploading to AWS")
+		log.Info("Uploading to AWS")
 		AWSErr := uploadAWS(filesForAWS, attachmentKey)
 		if AWSErr != nil {
 			log.Fatalf("Error uploading large file: %s", AWSErr.Error())
 		}
 		log.Debug("Successfully uploaded to AWS, adding completed files for ticket attachment upload")
-		//filesForTicketAttachment = append(filesForTicketAttachment, filesForAWS...)
 	}
 
 	//length of an attachment key is 32 and if both attach and attachment key are provided, then this will check if what is begin passed through is an attachment key
 	if len(filesForTicketAttachment) != 0 && len(attachmentKey) == 32 {
 		log.Debug("Uploading to Haberdasher for ticket attachment")
+		log.Info("Uploading to Haberdasher for ticket attachment")
 		attachErr := uploadTicketAttachments(filesForTicketAttachment, attachmentKey)
 		if attachErr != nil {
 			log.Fatalf("Error uploading file to New Relic Support: %s", attachErr.Error())
@@ -328,15 +306,7 @@ func datestampFile(originalFile, timestamp string) string {
 	return newName
 }
 
-func getUploadURL(filename, attachmentKey string, filesize int64) (jsonResponse, error) {
-
-	requestURL := getAttachmentsEndpoint() + "/upload_url"
-	log.Debug("Making call to get zip file endpoint")
-
-	// Now add the parameters to the URL
-	requestURL += "?attachment_key=" + attachmentKey
-	requestURL += "&filename=" + filename
-	requestURL += "&filesize=" + strconv.FormatInt(filesize, 10)
+func getUploadURL(requestURL string) (jsonResponse, error) {
 	log.Debug("Making http request to ", requestURL)
 
 	wrapper := httpHelper.RequestWrapper{
@@ -384,4 +354,16 @@ func getUploadURL(filename, attachmentKey string, filesize int64) (jsonResponse,
 	}
 
 	return data, nil
+}
+
+func buildGetRequestURL(filename, attachmentKey string, filesize int64) string {
+	requestURL := getAttachmentsEndpoint() + "/upload_url"
+	log.Debug("Making call to get zip file endpoint")
+
+	// Now add the parameters to the URL
+	requestURL += "?attachment_key=" + attachmentKey
+	requestURL += "&filename=" + filename
+	requestURL += "&filesize=" + strconv.FormatInt(filesize, 10)
+
+	return requestURL
 }

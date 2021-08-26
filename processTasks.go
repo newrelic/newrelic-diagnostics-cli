@@ -223,26 +223,29 @@ func processUploads() {
 	timestamp := time.Now().UTC().Format(time.RFC3339)
 
 	if config.Flags.YesToAll {
-		if config.Flags.AttachmentKey != "" {
-			UploadByAttachmentKey(config.Flags.AttachmentKey, timestamp)
-		}
-		if config.Flags.AutoAttach {
-			UploadByLicenseKey(ValidLicenseKeys, timestamp)
-		}
+		checkAttachmentFlags(timestamp)
 		return
 	}
 
 	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
 		"Do you want to attach these files to the support ticket matching the attachment key?"
 	if promptUser(question) {
-		if config.Flags.AttachmentKey != "" {
-			UploadByAttachmentKey(config.Flags.AttachmentKey, timestamp)
-		}
-		if config.Flags.AutoAttach {
-			UploadByLicenseKey(ValidLicenseKeys, timestamp)
-		}
+		checkAttachmentFlags(timestamp)
 	}
 
+}
+
+func checkAttachmentFlags(timestamp string) {
+	if config.Flags.AttachmentKey != "" {
+		log.Info("Uploading files by Support Ticket Attachment Key...")
+		Upload(config.Flags.AttachmentKey, timestamp)
+	}
+	if config.Flags.AutoAttach {
+		for _, licenseKey := range ValidLicenseKeys {
+			log.Info("Uploading files by RPM Account ID...")
+			Upload(licenseKey, timestamp)
+		}
+	}
 }
 
 func sanitizeOSArgs(osArgs []string) []string {
