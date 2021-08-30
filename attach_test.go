@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +15,11 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 )
+
+type Client struct {
+	cli *http.Client
+	URL string
+}
 
 var _ = Describe("GetTicketFile", func() {
 	var (
@@ -104,38 +112,138 @@ var _ = Describe("buildGetRequestURL", func() {
 
 })
 
-func TestGetUploadURLPath(t *testing.T) {
-	t.Parallel()
-	// setup()
-	// defer teardown()
-	testAPIEndpoint := "/attachments/upload_url?attachment_key=1Q3OS5O1ffsd2345678901t56789014&filename=nrdiag-output.zip&filesize=234567"
+func TestGoodAttachmentUploadURL(t *testing.T) {
+	r := thisRouter(SuccessGetRequestAttachmentKey)
 
-	req, _ := http.NewRequest("GET", testAPIEndpoint, nil)
-	writer := httptest.NewRecorder()
+	s := httptest.NewServer(r)
+	defer s.Close()
 
-	thisRouter().ServeHTTP(writer, req)
-	fmt.Println(req.URL)
-	assert.Equal(t, http.StatusOK, writer.Code)
+	thisClient := &Client{
+		cli: s.Client(),
+		URL: s.URL,
+	}
+	testAPIEndpoint := thisClient.URL + "/attachments/upload_url?attachment_key=1Q3OS5O1ffsd2345678901t5F789014R&filename=nrdiag-output.zip&filesize=23456"
+	expectedResponse := jsonResponse{
+		URL: "https://mock-bucket.s3.amazonaws.com/staging/tickets/543210/attachments/12345678-abcd-9876-fedc-abcdefabcdef/nrdiag-output-2021-04-29T05:15:00Z.json",
+		Key: "tickets/543210/12345678-abcd-9876-fedc-abcdefabcdef/nrdiag-output-2021-04-29T05:15:00Z.json",
+	}
+
+	req, err := http.NewRequest("GET", testAPIEndpoint, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := thisClient.cli.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(res.Body)
+	var MyResult jsonResponse
+	json.Unmarshal(buf.Bytes(), &MyResult)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, expectedResponse, MyResult)
 }
 
-func thisRouter() *mux.Router {
+func TestBadAttachmentUploadURL(t *testing.T) {
+	r := thisRouter(FailureGetRequest)
+
+	s := httptest.NewServer(r)
+	defer s.Close()
+
+	thisClient := &Client{
+		cli: s.Client(),
+		URL: s.URL,
+	}
+	testAPIEndpoint := thisClient.URL + "/attachments/upload_url?attachment_key=badattachmentkey&filename=nrdiag-output.json&filesize=34256"
+
+	req, err := http.NewRequest("GET", testAPIEndpoint, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := thisClient.cli.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(res.Body)
+	var MyResult jsonResponse
+	json.Unmarshal(buf.Bytes(), &MyResult)
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+}
+
+func TestGoodLicenseUploadURL(t *testing.T) {
+	r := thisRouter(SuccessGetRequestLicenseKey)
+
+	s := httptest.NewServer(r)
+	defer s.Close()
+
+	thisClient := &Client{
+		cli: s.Client(),
+		URL: s.URL,
+	}
+	testAPIEndpoint := thisClient.URL + "/attachments/upload_url?attachment_key=1Q3OS5O1ffsd2345678901t5F789014RFf87AsS0&filename=nrdiag-output.json&filesize=23456"
+	expectedResponse := jsonResponse{
+		URL: "https://mock-bucket.s3.amazonaws.com/staging/accounts/123456789/attachments/12345678-abcd-9876-fedc-abcdefabcdef/nrdiag-output-2021-04-29T05:15:00Z.json",
+		Key: "accounts/123456789/12345678-abcd-9876-fedc-abcdefabcdef/nrdiag-output-2021-04-29T05:15:00Z.json",
+	}
+
+	req, err := http.NewRequest("GET", testAPIEndpoint, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := thisClient.cli.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(res.Body)
+	var MyResult jsonResponse
+	json.Unmarshal(buf.Bytes(), &MyResult)
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, expectedResponse, MyResult)
+}
+
+func thisRouter(thisRequest func(w http.ResponseWriter, r *http.Request)) *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 	r.Path("/attachments/upload_url").
-		Queries("attachment_key", "{[a-zA-Z0-9]+}").
-		Queries("filename", "{nrdiag-output.zip|nrdiag-output.json}").
-		Queries("filesize", "{[0-9]+}").
-		HandlerFunc(GetRequest).
+		Queries("attachment_key", "{attachment_key:[a-zA-Z0-9]{32}|[a-zA-Z0-9]{40}}", "filename", "{filename:nrdiag-output.json|nrdiag-output.zip}", "filesize", "{filesize:[0-9]+}").
+		HandlerFunc(thisRequest).
 		Name("/attachments/upload_url")
-	r.HandleFunc("/attachments/upload_url/{attachment_key:{[a-zA-Z0-9]+}}{filename:{nrdiag-output.zip|nrdiag-output.json}}{filesize:{[0-9]+}}", GetRequest).Name("/attachments/upload_url").Methods("GET")
-	http.Handle("/", r)
+
 	return r
 }
 
-func GetRequest(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	myString := vars["mystring"]
+func SuccessGetRequestAttachmentKey(w http.ResponseWriter, r *http.Request) {
+	rawResponse, err := ioutil.ReadFile("./mocks/hdash-response-good-attachment.json")
+	if err != nil {
+		panic(err)
+	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte(myString))
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(rawResponse))
+}
+func SuccessGetRequestLicenseKey(w http.ResponseWriter, r *http.Request) {
+	rawResponse, err := ioutil.ReadFile("./mocks/hdash-response-good-license.json")
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(rawResponse))
+}
+
+func FailureGetRequest(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Header().Set("Content-Type", "application/json")
 }

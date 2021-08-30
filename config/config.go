@@ -182,9 +182,7 @@ func ParseFlags() {
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
 		flag.StringVar(&Flags.AttachmentEndpoint, "attachment-endpoint", defaultString, "The endpoint to send attachments to. (NR ONLY)")
 	}
-	// if err := fs.Parse(os.Args[1:]); err != nil {
-	// 	os.Exit(100)
-	// }
+
 	flag.Parse()
 
 	// Bail early if bad length attachment key provided.
