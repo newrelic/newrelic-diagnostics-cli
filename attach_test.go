@@ -139,9 +139,15 @@ func TestGoodAttachmentUploadURL(t *testing.T) {
 	}
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(res.Body)
+	_, err = buf.ReadFrom(res.Body)
+	if err != nil {
+		panic(err)
+	}
 	var MyResult jsonResponse
-	json.Unmarshal(buf.Bytes(), &MyResult)
+	err = json.Unmarshal(buf.Bytes(), &MyResult)
+	if err != nil {
+		panic(err)
+	}
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, expectedResponse, MyResult)
@@ -168,11 +174,6 @@ func TestBadAttachmentUploadURL(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(res.Body)
-	var MyResult jsonResponse
-	json.Unmarshal(buf.Bytes(), &MyResult)
 
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
@@ -204,9 +205,15 @@ func TestGoodLicenseUploadURL(t *testing.T) {
 	}
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(res.Body)
+	_, err = buf.ReadFrom(res.Body)
+	if err != nil {
+		panic(err)
+	}
 	var MyResult jsonResponse
-	json.Unmarshal(buf.Bytes(), &MyResult)
+	err = json.Unmarshal(buf.Bytes(), &MyResult)
+	if err != nil {
+		panic(err)
+	}
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, expectedResponse, MyResult)
