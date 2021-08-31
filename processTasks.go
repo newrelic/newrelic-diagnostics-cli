@@ -17,8 +17,6 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-var ValidLicenseKeys []string
-
 func processTasksToRun() {
 
 	log.Debugf("There are %d tasks in this queue\n", len(registration.Work.WorkQueue))
@@ -129,16 +127,6 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 			WasOverride: overrideEnabled,
 		}
 
-		if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
-			LicenseKeys, err := getLicenseKey(taskResult.Result)
-			if err != nil {
-				log.Debug("Could not retrieve a license key, automatic attachment will not be possible")
-			} else {
-				ValidLicenseKeys = LicenseKeys
-			}
-
-		}
-
 		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
 		registration.Work.ResultsChannel <- taskResult
 
@@ -236,6 +224,21 @@ func processUploads() {
 }
 
 func checkAttachmentFlags(timestamp string) {
+
+	var ValidLicenseKeys []string
+
+	for _, taskResult := range registration.Work.Results {
+		if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
+			LicenseKeys, err := getLicenseKey(taskResult.Result)
+			if err != nil {
+				log.Debug("Could not retrieve a license key, automatic attachment will not be possible")
+			} else {
+				ValidLicenseKeys = LicenseKeys
+			}
+
+		}
+	}
+
 	if config.Flags.AttachmentKey != "" {
 		log.Info("Uploading files by Support Ticket Attachment Key...")
 		Upload(config.Flags.AttachmentKey, timestamp)
