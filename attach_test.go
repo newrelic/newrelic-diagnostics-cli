@@ -47,7 +47,7 @@ var _ = Describe("GetTicketFile", func() {
 		})
 		Context("With proper JSON format", func() {
 			It("Should return a JSON", func() {
-				result := getTicketUploadFile(attachmentKey, timestamp)
+				result := getTicketUploadFile(attachmentKey, timestamp, "json")
 				Expect(result).To(Equal(expectedResult))
 			})
 		})

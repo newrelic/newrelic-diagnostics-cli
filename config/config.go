@@ -172,8 +172,6 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.Quiet, "q", false, "Quiet ouput; only prints the high level results and not the explainatory output. Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'")
 	flag.BoolVar(&Flags.VeryQuiet, "qq", false, "Very quiet ouput; only prints a single summary line for output (implies '-q'). Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'. Inclusion filters are ignored.")
 
-	//flag.StringVar(&Flags.FileUpload, "file-upload", defaultString, "File to upload to support ticket, requires running with '-a' option")
-
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")

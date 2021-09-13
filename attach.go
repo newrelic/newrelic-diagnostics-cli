@@ -79,17 +79,20 @@ func Upload(identifyingKey string, timestamp string) {
 	// look at our command name, should be 'nrdiag' in production
 	var filesToUpload []uploadFiles
 
+	//files to be uploaded to s3
 	s3zipfile := getS3UploadFiles(identifyingKey, timestamp, "zip")
 	s3jsonfile := getS3UploadFiles(identifyingKey, timestamp, "json")
-	//ticketUploadFile will upload the JSON file to the support ticket
-	//currently it uploads all 3 of these files because Haberdasher returns the default URL
-	//as a https://diagnostics... as opposed to https://s3.amazonaws...
-	ticketUploadFile := getTicketUploadFile(identifyingKey, timestamp)
-	// Calculate the filename just once
+
+	//files to be uploaded to support ticket
+	ticketJSONUploadFile := getTicketUploadFile(identifyingKey, timestamp, "json")
+	tickeZIPUploadFile := getTicketUploadFile(identifyingKey, timestamp, "zip")
 
 	filesToUpload = append(filesToUpload, s3zipfile)
 	filesToUpload = append(filesToUpload, s3jsonfile)
-	filesToUpload = append(filesToUpload, ticketUploadFile)
+	if len(identifyingKey) == 32 {
+		filesToUpload = append(filesToUpload, ticketJSONUploadFile)
+		filesToUpload = append(filesToUpload, tickeZIPUploadFile)
+	}
 
 	uploadFilelist(identifyingKey, filesToUpload)
 }
@@ -110,7 +113,7 @@ func getS3UploadFiles(identifyingKey string, timestamp string, filetype string) 
 	requestURL := buildGetRequestURL(thisFile.newFilename, identifyingKey, thisFile.filesize)
 	jsonResponse, err := getUploadURL(requestURL)
 	if err != nil {
-		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\n", err.Error())
+		log.Fatalf("Unable to retrieve upload URL: %s\nIf you can see the nrdiag output in your directory, consider manually uploading it to your support ticket\nIf you want to upload it to your account, use the -a option", err.Error())
 	}
 	thisFile.URL = jsonResponse.URL
 	if jsonResponse.Key != "" {
@@ -121,15 +124,16 @@ func getS3UploadFiles(identifyingKey string, timestamp string, filetype string) 
 	return thisFile
 }
 
-func getTicketUploadFile(attachmentKey string, timestamp string) uploadFiles {
-	jsonfile := uploadFiles{path: config.Flags.OutputPath, filename: "nrdiag-output.json"}
-	jsonfile.path = config.Flags.OutputPath
-	jsonfile.filename = "nrdiag-output.json"
-	jsonfile.newFilename = datestampFile("nrdiag-output.json", timestamp)
+func getTicketUploadFile(attachmentKey string, timestamp string, filetype string) uploadFiles {
+	thisFileName := "nrdiag-output." + filetype
+	thisFile := uploadFiles{path: config.Flags.OutputPath, filename: thisFileName}
+	thisFile.path = config.Flags.OutputPath
+	thisFile.filename = thisFileName
+	thisFile.newFilename = datestampFile(thisFileName, timestamp)
 
-	jsonfile.URL = getAttachmentsEndpoint() + "/upload"
+	thisFile.URL = getAttachmentsEndpoint() + "/upload"
 
-	return jsonfile
+	return thisFile
 }
 
 func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
@@ -148,7 +152,6 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 
 	if len(filesForAWS) != 0 {
 		log.Debug("Uploading to AWS")
-		log.Info("Uploading to AWS")
 		AWSErr := uploadAWS(filesForAWS, attachmentKey)
 		if AWSErr != nil {
 			log.Fatalf("Error uploading large file: %s", AWSErr.Error())
@@ -159,7 +162,6 @@ func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
 	//length of an attachment key is 32 and if both attach and attachment key are provided, then this will check if what is begin passed through is an attachment key
 	if len(filesForTicketAttachment) != 0 && len(attachmentKey) == 32 {
 		log.Debug("Uploading to Haberdasher for ticket attachment")
-		log.Info("Uploading to Haberdasher for ticket attachment")
 		attachErr := uploadTicketAttachments(filesForTicketAttachment, attachmentKey)
 		if attachErr != nil {
 			log.Fatalf("Error uploading file to New Relic Support: %s", attachErr.Error())
