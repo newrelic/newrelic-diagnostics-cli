@@ -247,6 +247,9 @@ func checkAttachmentFlags(timestamp string) {
 					ValidLicenseKeys = LicenseKeys
 				}
 
+			} else {
+				log.Info("No valid license keys specified, upload to RPM Account cannot be completed")
+				return
 			}
 		}
 		for _, licenseKey := range ValidLicenseKeys {
