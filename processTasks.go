@@ -247,7 +247,7 @@ func checkAttachmentFlags(timestamp string) {
 					ValidLicenseKeys = LicenseKeys
 				}
 
-			} else {
+			} else if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status != tasks.Success {
 				log.Info("No valid license keys specified, upload to RPM Account cannot be completed")
 				return
 			}
