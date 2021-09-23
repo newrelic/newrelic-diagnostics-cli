@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
@@ -128,6 +129,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 
 		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
 		registration.Work.ResultsChannel <- taskResult
+
 		if len(result.FilesToCopy) > 0 {
 			log.Debug(" - writing result to file channel")
 			registration.Work.FilesChannel <- taskResult
@@ -152,6 +154,20 @@ func processFlagsTasks(flagValue string) []string {
 		}
 	}
 	return validatedIdentifiers
+}
+
+func getLicenseKey(thisResult tasks.Result) ([]string, error) {
+	licenseKeyToSources, ok := thisResult.Payload.(map[string][]string)
+	if !ok {
+		return nil, fmt.Errorf("Unable to retrieve license Key")
+	}
+	log.Debug("Valid License Key(s) provided")
+	validLicenseKeys := []string{}
+	for lk := range licenseKeyToSources {
+		validLicenseKeys = append(validLicenseKeys, lk)
+	}
+	return validLicenseKeys, nil
+
 }
 
 func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error) {
@@ -188,21 +204,59 @@ func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error)
 func processUploads() {
 	log.Debug("processing uploads")
 
-	if config.Flags.AttachmentKey == "" {
+	//if neither attachment flags are provided
+	if config.Flags.AttachmentKey == "" && !config.Flags.AutoAttach {
+		log.Info("No attachment process specified")
 		return
 	}
 
+	//get timestamp to use for both types of attachments
+	timestamp := time.Now().UTC().Format(time.RFC3339)
+
 	if config.Flags.YesToAll {
-		Upload(config.Flags.AttachmentKey)
+		checkAttachmentFlags(timestamp)
 		return
 	}
 
 	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
-		"Do you want to attach these files to the support ticket matching the attachment key?"
+		"Do you want to upload these to your RPM Account/Support Ticket?"
 	if promptUser(question) {
-		Upload(config.Flags.AttachmentKey)
+		checkAttachmentFlags(timestamp)
 	}
 
+}
+
+func checkAttachmentFlags(timestamp string) {
+
+	var ValidLicenseKeys []string
+
+	//check for ticket attachment key and upload with that key
+	if config.Flags.AttachmentKey != "" {
+		log.Info("Uploading files by Support Ticket Attachment Key...")
+		Upload(config.Flags.AttachmentKey, timestamp)
+	}
+	//check for validated license keys and upload with those keys
+	if config.Flags.AutoAttach {
+		for _, taskResult := range registration.Work.Results {
+			if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
+				LicenseKeys, err := getLicenseKey(taskResult.Result)
+				if err != nil {
+					log.Debug("Could not retrieve a license key, automatic attachment will not be possible")
+					return
+				} else {
+					ValidLicenseKeys = LicenseKeys
+				}
+
+			} else if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status != tasks.Success {
+				log.Info("No valid license keys specified, upload to RPM Account cannot be completed")
+				return
+			}
+		}
+		for _, licenseKey := range ValidLicenseKeys {
+			log.Info("Uploading files by RPM Account ID...")
+			Upload(licenseKey, timestamp)
+		}
+	}
 }
 
 func sanitizeOSArgs(osArgs []string) []string {

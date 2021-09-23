@@ -30,6 +30,7 @@ type userFlags struct {
 	SkipVersionCheck   bool
 	YesToAll           bool
 	ShowOverrideHelp   bool
+	AutoAttach         bool
 	UsageOptOut        bool
 	Proxy              string
 	ProxyUser          string
@@ -40,11 +41,10 @@ type userFlags struct {
 	Override           string
 	OutputPath         string
 	Filter             string
-	FileUpload         string
 	BrowserURL         string
 	AttachmentEndpoint string
 	Suites             string
-	InNewRelicCLI	   bool
+	InNewRelicCLI      bool
 }
 
 type ConfigFlag struct {
@@ -65,6 +65,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		VeryQuiet        bool
 		YesToAll         bool
 		ShowOverrideHelp bool
+		AutoAttach       bool
 		ProxySpecified   bool
 		SkipVersionCheck bool
 		Tasks            string
@@ -81,6 +82,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		VeryQuiet:        f.VeryQuiet,
 		YesToAll:         f.YesToAll,
 		ShowOverrideHelp: f.ShowOverrideHelp,
+		AutoAttach:       f.AutoAttach,
 		ProxySpecified:   proxySpecified,
 		SkipVersionCheck: f.SkipVersionCheck,
 		Tasks:            f.Tasks,
@@ -137,7 +139,10 @@ func ParseFlags() {
 	flag.StringVar(&Flags.Suites, "s", defaultString, "alias for -suites")
 	flag.StringVar(&Flags.Suites, "suites", defaultString, "Specific {name of task suite} - could be comma separated list. If you do '-h suites' it will list all diagnostic task suites that can be run.")
 
-	flag.StringVar(&Flags.AttachmentKey, "a", defaultString, "alias for -attachment-key")
+	flag.BoolVar(&Flags.AutoAttach, "a", false, "alias for -attach")
+	flag.BoolVar(&Flags.AutoAttach, "attach", false, "Attach for automatic upload to RPM account")
+
+	flag.StringVar(&Flags.AttachmentKey, "ak", defaultString, "alias for -attachment-key")
 	flag.StringVar(&Flags.AttachmentKey, "attachment-key", defaultString, "Attachment key for automatic upload to a support ticket (get key from an existing ticket).")
 
 	flag.BoolVar(&Flags.Help, "h", false, "alias for -help")
@@ -165,8 +170,6 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.Quiet, "q", false, "Quiet ouput; only prints the high level results and not the explainatory output. Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'")
 	flag.BoolVar(&Flags.VeryQuiet, "qq", false, "Very quiet ouput; only prints a single summary line for output (implies '-q'). Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'. Inclusion filters are ignored.")
 
-	flag.StringVar(&Flags.FileUpload, "file-upload", defaultString, "File to upload to support ticket, requires running with '-a' option")
-
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
@@ -179,7 +182,7 @@ func ParseFlags() {
 	flag.Parse()
 
 	// Bail early if bad length attachment key provided.
-	if Flags.AttachmentKey != "" && len(Flags.AttachmentKey) < 32 {
+	if Flags.AttachmentKey != "" && len(Flags.AttachmentKey) != 32 {
 		fmt.Printf("Invalid attachment key '%s' length: %d\n", Flags.AttachmentKey, len(Flags.AttachmentKey))
 		fmt.Println("The 32 character Diagnostics CLI Attachment Key can be found upper-right of your ticket on support.newrelic.com")
 		os.Exit(1)
@@ -220,6 +223,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		ConfigFlag{Name: "version", Value: f.Version},
 		ConfigFlag{Name: "yesToAll", Value: f.YesToAll},
 		ConfigFlag{Name: "showOverrideHelp", Value: f.ShowOverrideHelp},
+		ConfigFlag{Name: "autoAttach", Value: f.AutoAttach},
 		ConfigFlag{Name: "proxy", Value: boolifyFlag(f.Proxy)},
 		ConfigFlag{Name: "proxyUser", Value: boolifyFlag(f.ProxyUser)},
 		ConfigFlag{Name: "proxyPassword", Value: boolifyFlag(f.ProxyPassword)},
@@ -229,7 +233,6 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		ConfigFlag{Name: "override", Value: boolifyFlag(f.Override)},
 		ConfigFlag{Name: "outputPath", Value: boolifyFlag(f.OutputPath)},
 		ConfigFlag{Name: "filter", Value: f.Filter},
-		ConfigFlag{Name: "fileUpload", Value: boolifyFlag(f.FileUpload)},
 		ConfigFlag{Name: "browserURL", Value: boolifyFlag(f.BrowserURL)},
 		ConfigFlag{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		ConfigFlag{Name: "suites", Value: f.Suites},
