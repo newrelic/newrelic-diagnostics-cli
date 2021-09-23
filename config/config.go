@@ -127,8 +127,6 @@ func ParseFlags() {
 
 	defaultString := ""
 
-	//fs := flag.NewFlagSet("all", flag.ContinueOnError)
-
 	flag.BoolVar(&Flags.Verbose, "v", false, "alias for -verbose")
 	flag.BoolVar(&Flags.Verbose, "verbose", false, "Display verbose logging during check execution. Off by default")
 
