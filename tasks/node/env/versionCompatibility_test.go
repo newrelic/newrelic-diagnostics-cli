@@ -78,11 +78,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 10, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 10,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -131,20 +131,20 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 10, 
-							Minor: 6, 
-							Patch: 7, 
+							Major: 10,
+							Minor: 6,
+							Patch: 7,
 							Build: 456,
 						},
 					},
 					"Node/Agent/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 6, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 6,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -165,11 +165,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 11, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 11,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -195,11 +195,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 8, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 8,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -225,11 +225,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 10, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 10,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -255,11 +255,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 12, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 12,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -285,11 +285,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Node/Env/Version": tasks.Result{
-						Status:  tasks.Info,
+						Status: tasks.Info,
 						Payload: tasks.Ver{
-							Major: 12, 
-							Minor: 0, 
-							Patch: 0, 
+							Major: 12,
+							Minor: 0,
+							Patch: 0,
 							Build: 0,
 						},
 					},
@@ -300,8 +300,68 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 				}
 			})
 
-			It("should return an expected Warning for an odd version", func() {
+			It("should return an expected success for an odd version", func() {
 				Expect(result.Summary).To(Equal("Your current Node.js version, 12.0.0.0, is compatible with New Relic's Node.js agent"))
+			})
+		})
+
+		Context("When version 10 of Node.js is used with a valid Agent version", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Node/Env/Version": tasks.Result{
+						Status: tasks.Info,
+						Payload: tasks.Ver{
+							Major: 10,
+							Minor: 0,
+							Patch: 0,
+							Build: 0,
+						},
+					},
+					"Node/Agent/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "7.0.0.0",
+					},
+				}
+			})
+
+			It("should return an expected success for a compatible version", func() {
+				Expect(result.Status).To(Equal(tasks.Success))
+			})
+
+			It("should return an expected successful message", func() {
+				Expect(result.Summary).To(Equal("Your current Node.js version, 10.0.0.0, is compatible with New Relic's Node.js agent"))
+			})
+		})
+
+		Context("When version 10 of Node.js is used with an incompatible Agent version", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Node/Env/Version": tasks.Result{
+						Status: tasks.Info,
+						Payload: tasks.Ver{
+							Major: 10,
+							Minor: 0,
+							Patch: 0,
+							Build: 0,
+						},
+					},
+					"Node/Agent/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "8.0.0.0",
+					},
+				}
+			})
+
+			It("should return an expected failure for a compatible version", func() {
+				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+
+			It("should return an expected failure message", func() {
+				Expect(result.Summary).To(Equal("Your current Node.js version, 10.0.0.0, is not compatible with New Relic's Node.js agent"))
 			})
 		})
 	})
