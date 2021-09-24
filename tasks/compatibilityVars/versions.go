@@ -65,7 +65,7 @@ var SupportedForJavaAgent4 = map[string][]string{
 
 var NodeSupportedVersions = map[string][]string{
 	"12": []string{"6.0.0+"},
-	"10": []string{"4.6.0+"},
+	"10": []string{"4.6.0-7.*"},
 }
 
 //https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
