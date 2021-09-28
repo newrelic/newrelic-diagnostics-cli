@@ -58,9 +58,6 @@ func main() {
 		processHelp()
 	} else if config.Flags.Version {
 		version.ProcessVersion(promptUser)
-	} else if config.Flags.FileUpload != "" {
-		// Do arbitrary file upload here
-		uploadCustomerFile()
 	} else if config.Flags.Interactive {
 		// do interactive stuff
 	} else {
