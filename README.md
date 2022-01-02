@@ -11,7 +11,7 @@ It is a diagnostic and troubleshooting tool used to find common issues with New 
 
 To install in a Docker container see [here](https://docs.newrelic.com/docs/using-new-relic/cross-product-functions/diagnostics-cli-nrdiag/run-diagnostics-cli-nrdiag/#docker)
 
-1. Download a zip of the [latest version here](http://download.newrelic.com/nrdiag/nrdiag_latest.zip), see changes in our [releases notes](https://docs.newrelic.com/docs/release-notes/diagnostics-release-notes/diagnostics-cli-release-notes/)
+1. Download a zip of the [latest version here](https://download.newrelic.com/nrdiag/nrdiag_latest.zip), see changes in our [releases notes](https://docs.newrelic.com/docs/release-notes/diagnostics-release-notes/diagnostics-cli-release-notes/)
 2. Extract the zip, and select the executable file for your OS.
 3. Place the executable in your application's root directory. *(May not find all issues if located outside the apps root directory)*
 
