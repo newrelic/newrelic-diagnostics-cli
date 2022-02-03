@@ -39,11 +39,16 @@ import (
 	javaEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
 	javaJvm "github.com/newrelic/newrelic-diagnostics-cli/tasks/java/jvm"
 	javaLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/java/log"
+	k8sConfigs "github.com/newrelic/newrelic-diagnostics-cli/tasks/k8s/configs"
+	k8sDeploy "github.com/newrelic/newrelic-diagnostics-cli/tasks/k8s/deploy"
+	k8sLogs "github.com/newrelic/newrelic-diagnostics-cli/tasks/k8s/logs"
+	k8sVersion "github.com/newrelic/newrelic-diagnostics-cli/tasks/k8s/version"
+
 	nodeAgent "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/agent"
-	nodeRequirements "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/requirements"
 	nodeConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/config"
 	nodeEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
 	nodeLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/log"
+	nodeRequirements "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/requirements"
 	phpAgent "github.com/newrelic/newrelic-diagnostics-cli/tasks/php/agent"
 	phpConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/php/config"
 	phpDaemon "github.com/newrelic/newrelic-diagnostics-cli/tasks/php/daemon"
@@ -120,6 +125,10 @@ func init() {
 	baseAgent.RegisterWith(Register)
 	nodeRequirements.RegisterWith(Register)
 	rubyRequirements.RegisterWith(Register)
+	k8sLogs.RegisterWith(Register)
+	k8sVersion.RegisterWith(Register)
+	k8sConfigs.RegisterWith(Register)
+	k8sDeploy.RegisterWith(Register)
 
 	//example stuff, doesn't need to "ship" because binary gets name after directory with `go build` cmd
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
