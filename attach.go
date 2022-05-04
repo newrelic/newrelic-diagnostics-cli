@@ -5,15 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 
@@ -36,10 +33,8 @@ type jsonResponse struct {
 	Error string `json:"error"`
 }
 
-const ticketAttachmentUploadTimeoutSeconds = 600
 const awsUploadTimeoutSeconds = 7200
 const defaultAttachmentEndpoint = "http://localhost:3000/attachments"
-const awsS3Domain = "s3.amazonaws.com"
 
 func getAttachmentsEndpoint() string {
 	if config.Flags.AttachmentEndpoint != "" { //If local development flag is supplied
@@ -51,28 +46,8 @@ func getAttachmentsEndpoint() string {
 	return defaultAttachmentEndpoint
 }
 
-func addFileToForm(originalFilename string, newFilename string, i int, w *multipart.Writer) {
-	f, err := os.Open(originalFilename)
-	if err != nil {
-		log.Debug("error", err)
-		return
-	}
-	defer f.Close()
-
-	log.Debugf("uploading %s as %s...\n", originalFilename, newFilename)
-	fw, err := w.CreateFormFile("file"+fmt.Sprint(i), newFilename)
-	if err != nil {
-		log.Debug("error", err)
-		return
-	}
-	if _, err = io.Copy(fw, f); err != nil {
-		log.Debug("error", err)
-		return
-	}
-}
-
-// Upload - takes the attachment key from a ticket OR license key from ValidateLicenseKey
-// and uploads the output to that ticket/s3
+// Upload - takes the license key from ValidateLicenseKey
+// and uploads the output to s3
 func Upload(identifyingKey string, timestamp string) {
 	log.Debugf("Attempting to attach file with key: %s\n", identifyingKey)
 	log.Debugf("argument zero: %s\n", os.Args[0])
@@ -83,16 +58,8 @@ func Upload(identifyingKey string, timestamp string) {
 	s3zipfile := getS3UploadFiles(identifyingKey, timestamp, "zip")
 	s3jsonfile := getS3UploadFiles(identifyingKey, timestamp, "json")
 
-	//files to be uploaded to support ticket
-	ticketJSONUploadFile := getTicketUploadFile(identifyingKey, timestamp, "json")
-	tickeZIPUploadFile := getTicketUploadFile(identifyingKey, timestamp, "zip")
-
 	filesToUpload = append(filesToUpload, s3zipfile)
 	filesToUpload = append(filesToUpload, s3jsonfile)
-	if len(identifyingKey) == 32 {
-		filesToUpload = append(filesToUpload, ticketJSONUploadFile)
-		filesToUpload = append(filesToUpload, tickeZIPUploadFile)
-	}
 
 	uploadFilelist(identifyingKey, filesToUpload)
 }
@@ -124,143 +91,18 @@ func getS3UploadFiles(identifyingKey string, timestamp string, filetype string) 
 	return thisFile
 }
 
-func getTicketUploadFile(attachmentKey string, timestamp string, filetype string) uploadFiles {
-	thisFileName := "nrdiag-output." + filetype
-	thisFile := uploadFiles{path: config.Flags.OutputPath, filename: thisFileName}
-	thisFile.path = config.Flags.OutputPath
-	thisFile.filename = thisFileName
-	thisFile.newFilename = datestampFile(thisFileName, timestamp)
-
-	thisFile.URL = getAttachmentsEndpoint() + "/upload"
-
-	return thisFile
-}
-
-func uploadFilelist(attachmentKey string, filelist []uploadFiles) {
-	var filesForTicketAttachment, filesForAWS []uploadFiles
-
-	for _, upload := range filelist {
-		if strings.Contains(upload.URL, awsS3Domain) {
-			filesForAWS = append(filesForAWS, upload)
-		} else {
-			filesForTicketAttachment = append(filesForTicketAttachment, upload)
-		}
-	}
-
-	log.Debug("AWS files found", len(filesForAWS))
-	log.Debug("Ticket attachment files found", len(filesForTicketAttachment))
-
+func uploadFilelist(attachmentKey string, filesForAWS []uploadFiles) {
 	if len(filesForAWS) != 0 {
 		log.Debug("Uploading to AWS")
 		AWSErr := uploadAWS(filesForAWS, attachmentKey)
 		if AWSErr != nil {
 			log.Fatalf("Error uploading large file: %s", AWSErr.Error())
 		}
-		log.Debug("Successfully uploaded to AWS, adding completed files for ticket attachment upload")
+		log.Debug("Successfully uploaded to AWS")
 	}
-
-	//length of an attachment key is 32 and if both attach and attachment key are provided, then this will check if what is begin passed through is an attachment key
-	if len(filesForTicketAttachment) != 0 && len(attachmentKey) == 32 {
-		log.Debug("Uploading to Haberdasher for ticket attachment")
-		attachErr := uploadTicketAttachments(filesForTicketAttachment, attachmentKey)
-		if attachErr != nil {
-			log.Fatalf("Error uploading file to New Relic Support: %s", attachErr.Error())
-		}
-	}
-}
-
-func uploadTicketAttachments(filesToUpload []uploadFiles, attachmentKey string) error {
-
-	// Prepare a form that you will submit to that URL.
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-	// Add the other fields
-	fw, err := w.CreateFormField("attachment_key")
-	if err != nil {
-		log.Debug("Error creating form field")
-		return err
-	}
-	if _, err = fw.Write([]byte(attachmentKey)); err != nil {
-		log.Debug("Error creating form field")
-		return err
-	}
-	var filelist string
-	for i, upload := range filesToUpload {
-		// First check to see if key exists
-		if upload.key != "" {
-			s3key, err := w.CreateFormField("S3key")
-			if err != nil {
-				log.Debug("Error creating form field")
-				return err
-			}
-			if _, err = s3key.Write([]byte(upload.key)); err != nil {
-				log.Debug("Error creating form field")
-				return err
-			}
-		} else {
-			addFileToForm(upload.path+"/"+upload.filename, upload.newFilename, i, w)
-			filelist += upload.newFilename + ","
-		}
-	}
-
-	fl, err := w.CreateFormField("filelist")
-	if err != nil {
-		log.Debug("Error creating form field")
-		return err
-	}
-
-	if _, err = fl.Write([]byte(filelist)); err != nil {
-		log.Debug("Error creating form field for filelist")
-		return err
-	}
-
-	// Don't forget to set the content type, this will contain the boundary.
-	headers := make(map[string]string)
-	headers["Content-Type"] = w.FormDataContentType()
-	// Don't forget to close the multipart writer.
-	// If you don't close it, your request will be missing the terminating boundary.
-	w.Close()
-	url := getAttachmentsEndpoint() + "/upload"
-	log.Debug("URL is", url)
-	// Submit the request
-
-	wrapper := httpHelper.RequestWrapper{
-		Method:         "POST",
-		URL:            url,
-		Payload:        &b,
-		Headers:        headers,
-		TimeoutSeconds: ticketAttachmentUploadTimeoutSeconds,
-	}
-
-	res, err := httpHelper.MakeHTTPRequest(wrapper)
-
-	if err != nil {
-		log.Info("Failed upload: " + err.Error())
-		return err
-	}
-
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
-	bodyString := string(bodyBytes)
-	log.Debugf("Reponse: %s\n", bodyString)
-
-	var data jsonResponse
-	if err := json.Unmarshal(bodyBytes, &data); err != nil {
-		//Not returning here as this doesn't necessarily mean the upload failed.
-		log.Debugf("Error parsing json response when attempting to upload ticket attachments: %s\n", err.Error())
-	}
-
-	if res.StatusCode != http.StatusOK {
-		if data.Error != "" {
-			return fmt.Errorf("(%v status) %s", res.StatusCode, data.Error)
-		}
-		return fmt.Errorf("received %v response code", res.StatusCode)
-	}
-	return nil
-
 }
 
 func uploadAWS(filesToUpload []uploadFiles, attachmentKey string) error {
-
 	for _, files := range filesToUpload {
 		log.Debug("opening", files.path+"/"+files.filename, "to upload to S3")
 
@@ -322,7 +164,7 @@ func getUploadURL(requestURL string) (jsonResponse, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return jsonResponse{}, fmt.Errorf("Got %v status code from %s", res.StatusCode, requestURL)
+		return jsonResponse{}, fmt.Errorf("got %v status code from %s", res.StatusCode, requestURL)
 	}
 
 	bodyBytes, readErr := ioutil.ReadAll(res.Body)
@@ -352,7 +194,7 @@ func getUploadURL(requestURL string) (jsonResponse, error) {
 
 	_, err = url.ParseRequestURI(data.URL)
 	if err != nil {
-		return jsonResponse{}, fmt.Errorf("Invalid URL: '%s'", data.URL)
+		return jsonResponse{}, fmt.Errorf("invalid URL: '%s'", data.URL)
 	}
 
 	return data, nil

@@ -18,7 +18,6 @@ import (
 )
 
 func processTasksToRun() {
-
 	log.Debugf("There are %d tasks in this queue\n", len(registration.Work.WorkQueue))
 
 	if config.Flags.Tasks != "" {
@@ -171,7 +170,6 @@ func getLicenseKey(thisResult tasks.Result) ([]string, error) {
 }
 
 func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error) {
-
 	suiteIdentifiers := sanitizeAndParseFlagValue(flagValue)
 	sanitizedArgs := sanitizeOSArgs(args)
 
@@ -204,13 +202,7 @@ func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error)
 func processUploads() {
 	log.Debug("processing uploads")
 
-	//if neither attachment flags are provided
-	if config.Flags.AttachmentKey == "" && !config.Flags.AutoAttach {
-		log.Info("No attachment process specified")
-		return
-	}
-
-	//get timestamp to use for both types of attachments
+	//get timestamp to use attachment
 	timestamp := time.Now().UTC().Format(time.RFC3339)
 
 	if config.Flags.YesToAll {
@@ -219,7 +211,7 @@ func processUploads() {
 	}
 
 	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
-		"Do you want to upload these to your RPM Account/Support Ticket?"
+		"Do you want to upload these to your New Relic account?"
 	if promptUser(question) {
 		checkAttachmentFlags(timestamp)
 	}
@@ -227,14 +219,8 @@ func processUploads() {
 }
 
 func checkAttachmentFlags(timestamp string) {
-
 	var ValidLicenseKeys []string
 
-	//check for ticket attachment key and upload with that key
-	if config.Flags.AttachmentKey != "" {
-		log.Info("Uploading files by Support Ticket Attachment Key...")
-		Upload(config.Flags.AttachmentKey, timestamp)
-	}
 	//check for validated license keys and upload with those keys
 	if config.Flags.AutoAttach {
 		for _, taskResult := range registration.Work.Results {
@@ -248,12 +234,12 @@ func checkAttachmentFlags(timestamp string) {
 				}
 
 			} else if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status != tasks.Success {
-				log.Info("No valid license keys specified, upload to RPM Account cannot be completed")
+				log.Info("No valid license keys specified, upload to New Relic Account cannot be completed")
 				return
 			}
 		}
 		for _, licenseKey := range ValidLicenseKeys {
-			log.Info("Uploading files by RPM Account ID...")
+			log.Info("Uploading files by Account ID...")
 			Upload(licenseKey, timestamp)
 		}
 	}
