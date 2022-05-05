@@ -71,7 +71,6 @@ var NodeSupportedVersions = map[string][]string{
 //https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
 // .NET framework as keys and .NET agent as values
 var DotnetFrameworkSupportedVersions = map[string][]string{
-	"5.0": []string{"7.0.0+"},
 	"4.8": []string{"7.0.0+"},
 	"4.7": []string{"7.0.0+"},
 	"4.6": []string{"7.0.0+"}, //should be inclusive of version such as 4.6.1
@@ -88,6 +87,7 @@ var DotnetFrameworkOldVersions = map[string][]string{
 //.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
 
 var DotnetCoreSupportedVersions = map[string][]string{
+	"6.0": []string{"9.2.0+"},
 	"5.0": []string{"8.35.0+"},
 	"3.1": []string{"8.21.34.0+"},
 	"3.0": []string{"8.21.34.0+"},
