@@ -2,7 +2,6 @@ package appserver
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -37,8 +36,6 @@ func (m mockFileInfo) IsDir() bool {
 func (m mockFileInfo) Sys() interface{} {
 	return nil
 }
-
-
 
 func TestVersionCheckJboss(t *testing.T) {
 
@@ -122,7 +119,6 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 
 			})
 			It("Should return Result from getAndParseJBossAsReadMeChecker", func() {
-				fmt.Println(result.Summary)
 				Expect(result.Summary).To(Equal("JBossEAP detected but unable to detect version: Version file not found"))
 			})
 			It("Should return Warning status", func() {

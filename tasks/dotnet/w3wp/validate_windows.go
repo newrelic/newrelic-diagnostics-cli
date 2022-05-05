@@ -6,10 +6,10 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/shirou/gopsutil/process"
-	"github.com/shirou/w32"
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/w32"
 )
 
 type inspectResults struct {

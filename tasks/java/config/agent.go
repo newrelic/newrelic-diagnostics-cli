@@ -1,10 +1,10 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"regexp"
-	"errors"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"

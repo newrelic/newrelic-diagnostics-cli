@@ -153,4 +153,3 @@ func pruneLog(file *os.File, logChannel chan string) {
 
 	close(logChannel)
 }
-

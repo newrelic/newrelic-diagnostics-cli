@@ -39,7 +39,7 @@ func FindFiles(patterns []string, paths []string) []string {
 		if err == nil {
 			path = symPath
 		}
-		filepath.Walk(path, func(pathInfo string, fileInfo os.FileInfo, walkErr error) error {
+		_ = filepath.Walk(path, func(pathInfo string, fileInfo os.FileInfo, walkErr error) error {
 			if walkErr != nil {
 				// log the error and move on to next item to be walked
 				log.Debug("Error when walking filesystem:", walkErr)

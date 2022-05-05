@@ -1,11 +1,11 @@
 package profiler
 
 import (
-	"strings"
 	"fmt"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"golang.org/x/sys/windows/registry"
+	"strings"
 )
 
 var wasRegKeyPath = `SYSTEM\CurrentControlSet\Services\WAS`
@@ -56,7 +56,7 @@ func validateWasInstrumentationRegKeys() (result tasks.Result) {
 	if err != nil {
 		log.Debug("WAS RegKey Check. Error opening WAS Reg Key. Error = ", string(err.Error()))
 		return tasks.Result{
-			Status: tasks.Error,
+			Status:  tasks.Error,
 			Summary: "Could not open WAS Reg Key" + string(err.Error()),
 		}
 	}
@@ -68,17 +68,17 @@ func validateWasInstrumentationRegKeys() (result tasks.Result) {
 	if regErr != nil {
 		log.Debug("WAS RegKey Check. Error opening Environment Sub Key. Error = ", string(regErr.Error()))
 		return tasks.Result{
-			Status: tasks.Warning,
+			Status:  tasks.Warning,
 			Summary: fmt.Sprintf("Unable to find WAS Registry keys needed for IIS hosted .NET app profiling set at: HKLM:\\%s\\Environment", wasRegKeyPath),
-			URL: "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts",
+			URL:     "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts",
 		}
 	}
 
 	foundRegKeys := make(map[string]string)
-	
-	for _, regVal  := range regValues{
+
+	for _, regVal := range regValues {
 		kvPair := strings.Split(regVal, "=")
-		if len(kvPair) != 2{
+		if len(kvPair) != 2 {
 			continue
 		}
 		foundRegKeys[kvPair[0]] = kvPair[1]
@@ -90,38 +90,38 @@ func validateWasInstrumentationRegKeys() (result tasks.Result) {
 		if !ok {
 			err := fmt.Sprintf("%s was not set", k)
 			regKeyErrors = append(regKeyErrors, err)
-		} else if v != foundValue{
+		} else if v != foundValue {
 			err := fmt.Sprintf("%s was unexpectedly set to: '%s'. Expected: '%s'", k, foundValue, v)
 			regKeyErrors = append(regKeyErrors, err)
 		}
 	}
 
-	for _, k := range expectedRegKeyExists{
+	for _, k := range expectedRegKeyExists {
 		foundValue, _ := foundRegKeys[k]
 		if foundValue == "" {
 			err := fmt.Sprintf("%s was not set", k)
 			regKeyErrors = append(regKeyErrors, err)
 		}
 	}
-	
+
 	if len(regKeyErrors) > 0 {
 		warningSummary := fmt.Sprintf("WAS registry keys needed for IIS hosted .NET app profiling are not correctly set. These should be located at: HKLM:\\%s\\Environment. Errors found:", wasRegKeyPath)
 		for _, e := range regKeyErrors {
 			warningSummary += "\n\t" + e
 		}
-		
+
 		return tasks.Result{
-			Status: tasks.Warning,
+			Status:  tasks.Warning,
 			Summary: warningSummary,
-			URL: "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts#registry-keys",
+			URL:     "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts#registry-keys",
 			Payload: regValues,
 		}
 	}
 
 	return tasks.Result{
-		Status: tasks.Success,
+		Status:  tasks.Success,
 		Summary: "WAS RegKeys needed for IIS hosted .Net App profiling are correctly set.",
 		Payload: regValues,
 	}
-	
+
 }

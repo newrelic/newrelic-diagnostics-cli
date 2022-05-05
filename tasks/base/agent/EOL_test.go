@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/suites"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
-	"github.com/newrelic/newrelic-diagnostics-cli/suites"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestBaseAgentEOL(t *testing.T) {
@@ -116,22 +116,22 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status: tasks.None,
 					},
-					"Java/Agent/Version": tasks.Result{
+					"Java/Agent/Version": {
 						Status: tasks.Failure,
 					},
-					"Python/Agent/Version": tasks.Result{
+					"Python/Agent/Version": {
 						Status: tasks.None,
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.None,
 					},
-					"PHP/Agent/Version": tasks.Result{
+					"PHP/Agent/Version": {
 						Status: tasks.Error,
 					},
-					"Dotnet/Agent/Version": tasks.Result{
+					"Dotnet/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -152,23 +152,23 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "2.13.2",
 					},
-					"Java/Agent/Version": tasks.Result{
+					"Java/Agent/Version": {
 						Status:  tasks.Success,
 						Payload: "3.6.2",
 					},
-					"Python/Agent/Version": tasks.Result{
+					"Python/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "3.0.0",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "4.0",
 					},
-					"PHP/Agent/Version": tasks.Result{
+					"PHP/Agent/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 5,
@@ -177,7 +177,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 							Patch: 212,
 						},
 					},
-					"Dotnet/Agent/Version": tasks.Result{
+					"Dotnet/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "3.0",
 					},
@@ -203,11 +203,11 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: []string{"I should not be in a slice"},
 					},
-					"Java/Agent/Version": tasks.Result{
+					"Java/Agent/Version": {
 						Status:  tasks.Success,
 						Payload: "3.6.2",
 					},
@@ -235,22 +235,22 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status: tasks.None,
 					},
-					"Java/Agent/Version": tasks.Result{
+					"Java/Agent/Version": {
 						Status: tasks.Failure,
 					},
-					"Python/Agent/Version": tasks.Result{
+					"Python/Agent/Version": {
 						Status: tasks.None,
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.None,
 					},
-					"PHP/Agent/Version": tasks.Result{
+					"PHP/Agent/Version": {
 						Status: tasks.Error,
 					},
-					"Dotnet/Agent/Version": tasks.Result{
+					"Dotnet/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -271,11 +271,11 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "___#_3_#3",
 					},
-					"Java/Agent/Version": tasks.Result{
+					"Java/Agent/Version": {
 						Status:  tasks.Success,
 						Payload: "3.6.2",
 					},
@@ -303,23 +303,23 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "1.0",
 					},
-					"Java/Agent/Version": tasks.Result{
+					"Java/Agent/Version": {
 						Status:  tasks.Success,
 						Payload: "3.6.2",
 					},
-					"Python/Agent/Version": tasks.Result{
+					"Python/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "1.0.5",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "4.0",
 					},
-					"PHP/Agent/Version": tasks.Result{
+					"PHP/Agent/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 5,
@@ -328,7 +328,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 							Patch: 212,
 						},
 					},
-					"Dotnet/Agent/Version": tasks.Result{
+					"Dotnet/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "3.0",
 					},
@@ -362,11 +362,11 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.Info,
 						Payload: []tasks.Ver{
-							tasks.Ver{3, 2, 3, 2},
-							tasks.Ver{9, 8, 7, 4},
+							{Major: 3, Minor: 2, Patch: 3, Build: 2},
+							{Major: 9, Minor: 8, Patch: 7, Build: 4},
 						},
 					},
 				}
@@ -397,7 +397,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: []tasks.Ver{},
 					},
@@ -501,11 +501,11 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 
 				successes = []agentVersion{
-					agentVersion{
+					{
 						name:    "Node",
 						version: "5.10.0",
 					},
-					agentVersion{
+					{
 						name:    "Java",
 						version: "4.11.0",
 					},
@@ -530,11 +530,11 @@ var _ = Describe("Base/Agent/EOL", func() {
 				successes = []agentVersion{}
 				errors = []agentVersion{}
 				failures = []agentVersion{
-					agentVersion{
+					{
 						name:    "Python",
 						version: "2.40.0.34",
 					},
-					agentVersion{
+					{
 						name:    "Java",
 						version: "2.21.4",
 					},
@@ -561,7 +561,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 			BeforeEach(func() {
 				successes = []agentVersion{}
 				errors = []agentVersion{
-					agentVersion{
+					{
 						name:    "Python",
 						version: "",
 					},

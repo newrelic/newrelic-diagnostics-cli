@@ -76,7 +76,7 @@ var samplePreparedConfig = []config.ConfigFlag{
 var apiStubReflectBody = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	body, _ := ioutil.ReadAll(r.Body)
-	w.Write(body)
+	_, _ = w.Write(body)
 }))
 
 func getJSONfixture(filename string, t *testing.T) (string, error) {
@@ -274,12 +274,12 @@ func Test_getRPMdetails(t *testing.T) {
 				URL:     "",
 				Payload: []l.LogNameReportingTo{{
 					Logfile:     "new_relic.log",
-          ReportingTo: []string{"https://rpm.newrelic.com/accounts/111/applications/21487336"},
+					ReportingTo: []string{"https://rpm.newrelic.com/accounts/111/applications/21487336"},
 				}},
 			}},
 			want: []rpmApp{{
 				AppID:     "21487336",
-        AccountID: "111",
+				AccountID: "111",
 			}},
 		},
 		{name: "it should not parse account and app ID from garbage reporting to log line",
@@ -289,7 +289,7 @@ func Test_getRPMdetails(t *testing.T) {
 				URL:     "",
 				Payload: []l.LogNameReportingTo{{
 					Logfile:     "new_relic.log",
-          ReportingTo: []string{"https://rpm.newrelic.com/accounts/111applications21487336"},
+					ReportingTo: []string{"https://rpm.newrelic.com/accounts/111applications21487336"},
 				}},
 			}},
 			want: []rpmApp{},

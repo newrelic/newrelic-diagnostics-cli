@@ -13,7 +13,7 @@ const (
 	NotInstalled SEMode = "Not Installed"
 	NotEnforced         = "Not Enforced"
 	Enforced            = "Enforced"
-	SEUnknown			= "Could not be determined"
+	SEUnknown           = "Could not be determined"
 )
 
 // BaseEnvCheckSELinux - This struct defined the sample plugin which can be used as a starting point

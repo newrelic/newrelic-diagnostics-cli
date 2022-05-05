@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package env
@@ -7,11 +8,9 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-
-
 // Gets information on a host
 type BaseEnvHostInfo struct {
-	HostInfoProvider HostInfoProviderFunc
+	HostInfoProvider            HostInfoProviderFunc
 	HostInfoProviderWithContext HostInfoProviderWithContextFunc
 }
 
@@ -32,24 +31,21 @@ func (t BaseEnvHostInfo) Dependencies() []string {
 
 // Execute - The core work within each task
 func (t BaseEnvHostInfo) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	
+
 	hostInfo, err := t.HostInfoProvider()
 
 	if err != nil {
-		return tasks.Result {
-			Status: tasks.Warning,
+		return tasks.Result{
+			Status:  tasks.Warning,
 			Summary: fmt.Sprintf("Error collecting complete host information:\n%s", err.Error()),
 			Payload: hostInfo,
 		}
 	}
-	
-	return tasks.Result {
-		Status: tasks.Info,
+
+	return tasks.Result{
+		Status:  tasks.Info,
 		Summary: "Collected host information",
 		Payload: hostInfo,
 	}
 
 }
-
-
-

@@ -55,9 +55,9 @@ func (t BaseConfigLicenseKey) Dependencies() []string {
 // Execute - The core work within each task
 func (t BaseConfigLicenseKey) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var (
-		licenseKeys []LicenseKey
+		licenseKeys           []LicenseKey
 		licenseKeysFromConfig []LicenseKey
-		licenseKeysFromEnv []LicenseKey
+		licenseKeysFromEnv    []LicenseKey
 		licenseKeyFromSysProp LicenseKey //there can only be one system property for a license key
 	)
 

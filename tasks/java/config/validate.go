@@ -165,7 +165,7 @@ func matchConfigFile(processWorkingDir string, validations []config.ValidateElem
 		for _, validation := range validations {
 			if validation.Config.FilePath+validation.Config.FileName == configPath {
 				parsedResult = validation.ParsedResult
-			} 
+			}
 		}
 	}
 	// last ditch effort to find the config file

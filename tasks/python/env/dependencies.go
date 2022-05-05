@@ -8,7 +8,7 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-) 
+)
 
 // PythonEnvDependencies - This struct defines the project dependencies.
 type PythonEnvDependencies struct {

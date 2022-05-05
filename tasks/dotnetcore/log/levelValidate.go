@@ -42,18 +42,18 @@ func (t DotNetCoreLogLevelValidate) Execute(options tasks.Options, upstream map[
 	if upstream["DotNetCore/Log/LevelCollect"].Status != tasks.Info {
 		result.Status = tasks.None
 		result.Summary = "Log levels were not collected successfully, skipping this task."
-		return 
+		return
 	}
 
 	logLevels, ok := upstream["DotNetCore/Log/LevelCollect"].Payload.(map[string]string)
 	if !ok || len(logLevels) == 0 {
 		result.Status = tasks.None
 		result.Summary = "Log levels were not collected, skipping this task."
-		return 
+		return
 	}
 
 	result = logLevelValidate(logLevels)
-	return 
+	return
 }
 
 func logLevelValidate(logLevels map[string]string) (result tasks.Result) {
@@ -108,7 +108,7 @@ func logLevelValidate(logLevels map[string]string) (result tasks.Result) {
 		if numConfigs > numErrors {
 			// some log levels were invalid, some were valid
 			result.Status = tasks.Warning
-			result.Payload = validLevelsFound   // put the valid level in the payload 
+			result.Payload = validLevelsFound // put the valid level in the payload
 		}
 
 		return
@@ -116,7 +116,7 @@ func logLevelValidate(logLevels map[string]string) (result tasks.Result) {
 
 	// if it gets here, numErrors was 0
 	result.Status = tasks.Success
-	result.Summary = "All log levels valid in all "  + strconv.Itoa(numConfigs) + " newrelic.config files:"
+	result.Summary = "All log levels valid in all " + strconv.Itoa(numConfigs) + " newrelic.config files:"
 	for config, level := range validLevelsFound {
 		result.Summary += " - " + config + `: "` + level + `"` + "\n"
 	}

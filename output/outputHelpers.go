@@ -54,7 +54,7 @@ func outputJSON(json string) {
 		log.Info("Error creating directory", err)
 		log.Info(permissionsError)
 	}
-	ioutil.WriteFile(jsonFile, []byte(json), 0644)
+	_ = ioutil.WriteFile(jsonFile, []byte(json), 0644)
 }
 
 func CreateZip() *zip.Writer {
@@ -101,7 +101,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 			writer, _ := dst.CreateHeader(&header)
 			for s := range envelope.Stream {
-				io.WriteString(writer, s)
+				_, _ = io.WriteString(writer, s)
 			}
 		} else {
 			log.Debug("adding " + envelope.Path + " to zip")
@@ -118,7 +118,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 				return
 			}
 			defer fileHandle.Close()
-			
+
 			header, err := zip.FileInfoHeader(stat)
 			if err != nil {
 				log.Info("Error copying file", err)

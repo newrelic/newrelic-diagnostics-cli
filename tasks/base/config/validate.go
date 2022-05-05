@@ -334,7 +334,7 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 	arrayLocation := ""
 	var buildarray []string
 
-	loop:
+loop:
 	for lineNum, keyValue := range jsonString {
 		log.Debug("keyvalue", keyValue)
 		switch keyValue {
@@ -360,13 +360,13 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 			if arrayLocation != "" {
 				log.Debug("creating multi-line array", strings.Replace(keyValue, ",", "", 1))
 				buildarray = append(buildarray, strings.Replace(keyValue, ",", "", 1))
-				continue  // we are in an array, go to next line
+				continue // we are in an array, go to next line
 			}
 
 			keyMap := strings.SplitN(keyValue, ":", 2)
 			if len(keyMap) != 2 {
 				log.Debug("Couldn't parse line", lineNum)
-				break 
+				break
 			}
 
 			log.Debug("adding: ", location+keyMap[0], " : ", strings.Replace(keyMap[1], ",", "", 1))

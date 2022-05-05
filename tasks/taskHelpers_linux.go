@@ -12,7 +12,7 @@ func GetProcessorArch() (procType string, retErr error) {
 	// that is why we are using exec.Command and running uname -m manually
 	procTypeBytes, retErr := exec.Command("uname", "-m").Output()
 	procTypeBytes = bytes.Trim(procTypeBytes[:], "\x00") // remove null characters
-	procTypeBytes = bytes.Trim(procTypeBytes[:], "\n")   // remove new lines 
+	procTypeBytes = bytes.Trim(procTypeBytes[:], "\n")   // remove new lines
 	procType = string(procTypeBytes[:])
 	return
 }

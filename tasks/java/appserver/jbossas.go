@@ -41,7 +41,7 @@ func (p JavaAppserverJBossAsCheck) Execute(options tasks.Options, upstream map[s
 	if upstream["Java/Env/Process"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Java/Env/Process did not pass our validation. This task did not run.",//This is a major java task that users should make it succeeds prior to worrying about any other issues.
+			Summary: "Java/Env/Process did not pass our validation. This task did not run.", //This is a major java task that users should make it succeeds prior to worrying about any other issues.
 		}
 	}
 

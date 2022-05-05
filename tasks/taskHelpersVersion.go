@@ -18,12 +18,13 @@ type Ver struct {
 
 // VersionIsCompatibleFunc - allows VersionIsCompatible to be dependency injected
 type VersionIsCompatibleFunc func(string, []string) (bool, error)
+
 // VersionIsCompatible checks a version against a slice of compatibility requirements.
 // It accepts as input a string version (one or more numbers separated by periods) and a slice of compatibility requirements.
 // Individual compatibility requirements can be expressed as a range ("4.0-7.4"), as a single ("8.0"), or a minimum ("4.9+")
 // It returns a boolean indicating compatibility and an error in cases of invalid input.
 func VersionIsCompatible(version string, requirements []string) (bool, error) {
-	
+
 	versionToCheck, err := ParseVersion(version)
 	if err != nil {
 		return false, errors.New("unable to parse version: " + version)
@@ -42,7 +43,7 @@ func VersionIsCompatible(version string, requirements []string) (bool, error) {
 // Single version only ("7") - Match this version only:  matches "7", "7.0", "7.0.0" but not "7.1" or "7.0.2"
 
 func (v Ver) CheckCompatibility(requirements []string) (bool, error) {
-	
+
 	for _, requirement := range requirements {
 		// Convert plus sign to lower boundary + infinity for upper boundary
 		if strings.Contains(requirement, "+") {

@@ -3,9 +3,9 @@ package httpHelper
 import (
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"time"
-	"net"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -20,7 +20,7 @@ type RequestWrapper struct {
 	Payload        io.Reader
 	Length         int64
 	TimeoutSeconds int16
-	BypassProxy bool
+	BypassProxy    bool
 }
 
 //NewHTTPRequestWrapper - returns a new request wrapper for creating an http request
@@ -68,8 +68,8 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 	}
 
 	var transport http.RoundTripper
-	
-	//All HTTP requests use the same http transport. 
+
+	//All HTTP requests use the same http transport.
 	//However, when bypassing the detected system proxy, the request will be using its own unique http transport.
 	if wrapper.BypassProxy {
 		//These are the http.DefaultTransport values minus the Proxy
@@ -86,7 +86,7 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 		}
 	} else {
 		transport = http.DefaultTransport
-	}	
+	}
 
 	client := &http.Client{
 		Transport: transport,

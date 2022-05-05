@@ -1,13 +1,14 @@
+//go:build windows
 // +build windows
 
 package profiler
 
 import (
-	"strings"
 	"fmt"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"golang.org/x/sys/windows/registry"
+	"strings"
 )
 
 var w3svcRegPath = `SYSTEM\CurrentControlSet\Services\W3SVC\`
@@ -49,7 +50,6 @@ func (p DotNetProfilerW3svcRegKey) Execute(op tasks.Options, upstream map[string
 		}
 	}
 
-
 	return validateW3svcInstrumentationRegKeys()
 
 }
@@ -60,45 +60,45 @@ func validateW3svcInstrumentationRegKeys() (result tasks.Result) {
 	if err != nil {
 		log.Debug("W3svc RegKey Check. Error opening W3SVC Reg Key. Error = ", err.Error())
 		return tasks.Result{
-			Status: tasks.Error,
+			Status:  tasks.Error,
 			Summary: "Could not open W3SVC Reg Key" + err.Error(),
 		}
 	}
 
 	defer regKey.Close()
 	regValues, _, regErr := regKey.GetStringsValue("Environment")
-	
+
 	if regErr != nil {
 		return tasks.Result{
-			Status: tasks.Warning,
+			Status:  tasks.Warning,
 			Summary: fmt.Sprintf("Unable to find W3SVC Registry keys needed for IIS hosted .NET app profiling set at: HKLM:\\%s\\Environment", w3svcRegPath),
-			URL: "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts",
+			URL:     "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts",
 		}
 	}
 
 	foundRegKeys := make(map[string]string)
 
-	for _, regVal  := range regValues{
+	for _, regVal := range regValues {
 		kvPair := strings.Split(regVal, "=")
-		if len(kvPair) != 2{
+		if len(kvPair) != 2 {
 			continue
 		}
 		foundRegKeys[kvPair[0]] = kvPair[1]
 	}
-	
+
 	regKeyErrors := []string{}
 	for k, v := range expectedRegKeyWithVals {
 		foundValue, ok := foundRegKeys[k]
 		if !ok {
 			err := fmt.Sprintf("%s was not set", k)
 			regKeyErrors = append(regKeyErrors, err)
-		} else if v != foundValue{
+		} else if v != foundValue {
 			err := fmt.Sprintf("%s was unexpectedly set to: '%s'. Expected: '%s'", k, foundRegKeys[k], v)
 			regKeyErrors = append(regKeyErrors, err)
 		}
 	}
 
-	for _, k := range expectedRegKeyExists{
+	for _, k := range expectedRegKeyExists {
 		val, _ := foundRegKeys[k]
 		if val == "" {
 			err := fmt.Sprintf("%s was not set", k)
@@ -108,22 +108,21 @@ func validateW3svcInstrumentationRegKeys() (result tasks.Result) {
 
 	if len(regKeyErrors) > 0 {
 		warningSummary := fmt.Sprintf("W3SVC registry keys needed for IIS hosted .NET app profiling are not correctly set. These should be located at: HKLM:\\%s\\Environment. Errors found:", w3svcRegPath)
-		for _, e := range regKeyErrors{
+		for _, e := range regKeyErrors {
 			warningSummary += "\n\t" + e
 		}
 		return tasks.Result{
-			Status: tasks.Warning,
+			Status:  tasks.Warning,
 			Summary: warningSummary,
-			URL: "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts#registry-keys",
+			URL:     "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/profiler-conflicts#registry-keys",
 			Payload: regValues,
 		}
 	}
 
 	return tasks.Result{
-		Status: tasks.Success,
+		Status:  tasks.Success,
 		Summary: "W3SVC RegKeys needed for IIS hosted .Net App profiling are correctly set.",
 		Payload: regValues,
 	}
-
 
 }

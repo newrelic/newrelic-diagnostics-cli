@@ -11,7 +11,6 @@ import (
 // InfraConfigIntegrationsMatch - attempt to match Infra OHAI config and definition files
 type InfraConfigIntegrationsMatch struct {
 	runtimeOS string
-	
 }
 
 // IntegrationFilePair - This struct defines a pair of integration files

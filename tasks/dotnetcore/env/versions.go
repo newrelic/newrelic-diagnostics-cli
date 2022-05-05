@@ -120,11 +120,11 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 }
 
 func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr error) {
-	
+
 	var (
-		searchString string
-		pathVarSplit []string
-		netCoreLocWin = []string{`C:\Program Files\dotnet\sdk`}
+		searchString    string
+		pathVarSplit    []string
+		netCoreLocWin   = []string{`C:\Program Files\dotnet\sdk`}
 		netCoreLocLinux = []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
 	)
 

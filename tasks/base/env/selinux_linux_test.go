@@ -3,9 +3,9 @@ package env
 import (
 	"errors"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Base/Env/SELinux", func() {
@@ -67,7 +67,7 @@ var _ = Describe("Base/Env/SELinux", func() {
 			It("should return in the summary the execution error", func() {
 				Expect(result.Summary).To(Equal("Unable to execute command: sestatus Error: " + "execution error"))
 			})
-			
+
 			It("should return a payload with the SEUnknown SEMode", func() {
 				Expect(result.Payload).To(Equal(SEUnknown))
 			})

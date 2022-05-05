@@ -9,6 +9,6 @@ import (
 func RegisterWinWith(registrationFunc func(tasks.Task, bool)) {
 	log.Debug("Registering DotNet/Agent/*")
 
-	registrationFunc(DotNetAgentInstalled{ agentInstallPaths: agentInstallPaths }, true)
+	registrationFunc(DotNetAgentInstalled{agentInstallPaths: agentInstallPaths}, true)
 	registrationFunc(DotNetAgentVersion{}, true)
 }

@@ -242,27 +242,27 @@ var _ = Describe("JavaEnvProcess", func() {
 					path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
 					javaAgent := "newrelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-			
+
 			Context("When given a cmdLineArgsStr that contains a path and an agent name of newrelic-1.8.3.jar", func() {
 				It("should return the path and no error", func() {
 					path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
 					javaAgent := "newrelic-1.8.3.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-	
+
 			Context("When cmdLineArgsStr content contains things other than the javaagent argument", func() {
 				It("should return the path and no error", func() {
 					otherBefore := "/usr/bin/java -Dnewrelic.logfile=/Users/shuayhuaca/Desktop/newrelic_agent.log -jar "
@@ -270,32 +270,32 @@ var _ = Describe("JavaEnvProcess", func() {
 					javaAgent := "newrelic-1.8.3.jar"
 					otherAfter := " build/libs/lucessqs-1.0-SNAPSHOT.jar"
 					commandLineArgsStr := otherBefore + command + path + javaAgent + otherAfter
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-	
+
 			Context("When given a cmdLineArgsStr that does not contain a path, but has a valid agent name", func() {
 				It("should return ./ as the path and no error", func() {
 					javaAgent := "newrelic-1.8.3.jar"
 					commandLineArgsStr := command + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal("./"))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-	
+
 			Context("When given a cmdLineArgsStr with an invalid agent name", func() {
 				It("should return the path and an error", func() {
 					path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
 					javaAgent := "bluerelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
@@ -310,7 +310,7 @@ var _ = Describe("JavaEnvProcess", func() {
 					path := `\newrelic\`
 					javaAgent := "newrelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
@@ -323,7 +323,7 @@ var _ = Describe("JavaEnvProcess", func() {
 					path := `C:\projects\myapp\newrelic\`
 					javaAgent := "bluerelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
@@ -331,6 +331,6 @@ var _ = Describe("JavaEnvProcess", func() {
 				})
 			})
 		}
-		
+
 	})
 })

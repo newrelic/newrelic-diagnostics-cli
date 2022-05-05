@@ -48,7 +48,7 @@ func (p BaseEnvDetectAWS) checkAWSMetaData() bool {
 		Method:         "GET",
 		URL:            "http://169.254.169.254/latest/meta-data",
 		TimeoutSeconds: 2,
-		BypassProxy: true,
+		BypassProxy:    true,
 	}
 	resp, err := p.httpGetter(wrapper)
 

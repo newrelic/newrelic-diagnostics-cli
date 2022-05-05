@@ -75,7 +75,7 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 	if err != nil {
 		log.Debug("Error creating filelist", err)
 	} else {
-		ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
+		_ = ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
 	}
 
 	// This is how we track the file names going into to zip file to prevent duplicates

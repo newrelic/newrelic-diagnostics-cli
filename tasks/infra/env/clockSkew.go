@@ -51,7 +51,7 @@ func (p InfraEnvClockSkew) Execute(options tasks.Options, upstream map[string]ta
 
 	if upstream["Infra/Agent/Connect"].Status == tasks.None {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: "Unable to urls from Infra/Agent/Connect. This task did not run",
 		}
 	}

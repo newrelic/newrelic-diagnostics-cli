@@ -98,7 +98,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 			URL:     "https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes",
 		}
 	}
-	
+
 	infraCtlCmd := "newrelic-infra-ctl"
 
 	//For windows we have determine exact location of binary, using environment variables
@@ -159,7 +159,6 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 		Summary: "Successfully enabled New Relic Infrastructure debug logging with newrelic-infra-ctl",
 	}
 }
-
 
 func blockWithProgressbar(minutes int) {
 	seconds := minutes * 60

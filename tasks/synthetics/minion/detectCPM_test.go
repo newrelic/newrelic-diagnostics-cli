@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Synthetics/Minion/DetectCPM", func() {
@@ -50,7 +50,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 		successfulDetectDockerResult := tasks.Result{
 			Status: tasks.Info,
 			Payload: tasks.DockerInfo{
-				ServerVersion:   "18.09.0",
+				ServerVersion: "18.09.0",
 			},
 		}
 
@@ -78,7 +78,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					"Base/Containers/DetectDocker": tasks.Result{
 						Status: tasks.None,
 						Payload: tasks.DockerInfo{
-							ServerVersion:   "",
+							ServerVersion: "",
 						},
 					},
 				}

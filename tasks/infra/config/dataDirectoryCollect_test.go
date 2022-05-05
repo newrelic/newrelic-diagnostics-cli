@@ -158,7 +158,6 @@ func Test_getDataDir(t *testing.T) {
 					Identifier: "Infra/Config/DataDirectoryCollect"},
 			},
 		},
-		
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
