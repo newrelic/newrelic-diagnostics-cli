@@ -88,9 +88,7 @@ func (s SuiteManager) CaptureOutOfPlaceArgs(osArgs []string, suiteFlagArgs []str
 func (s SuiteManager) FindTasksBySuites(suites []Suite) []string {
 	var tasks []string
 	for _, suite := range suites {
-		for _, task := range suite.Tasks {
-			tasks = append(tasks, task)
-		}
+		tasks = append(tasks, suite.Tasks...)
 	}
 	return tasks
 }
@@ -103,13 +101,4 @@ func NewSuiteManager(suites []Suite) *SuiteManager {
 	return &SuiteManager{
 		Suites: suites,
 	}
-}
-
-func isArgInSuiteSlice(arg string, suites []string) bool {
-	for _, suite := range suites {
-		if arg == suite {
-			return true
-		}
-	}
-	return false
 }

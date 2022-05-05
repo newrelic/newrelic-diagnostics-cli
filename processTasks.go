@@ -75,7 +75,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 		for _, value := range overrides {
 			// Initialize the taskOptions object
 			log.Debugf("override %s: %s", value.Identifier, value.value)
-			if strings.ToLower(value.Identifier.String()) == strings.ToLower(task.Identifier().String()) {
+			if strings.EqualFold(value.Identifier.String(), task.Identifier().String()) {
 				log.Debug("Adding override to task namedTaskOptions", value.key, ":", value.value)
 				namedTaskOptions.Options[value.key] = value.value
 			}
@@ -158,7 +158,7 @@ func processFlagsTasks(flagValue string) []string {
 func getLicenseKey(thisResult tasks.Result) ([]string, error) {
 	licenseKeyToSources, ok := thisResult.Payload.(map[string][]string)
 	if !ok {
-		return nil, fmt.Errorf("Unable to retrieve license Key")
+		return nil, fmt.Errorf("unable to retrieve license Key")
 	}
 	log.Debug("Valid License Key(s) provided")
 	validLicenseKeys := []string{}

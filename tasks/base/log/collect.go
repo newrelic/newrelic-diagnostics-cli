@@ -152,14 +152,5 @@ func pruneLog(file *os.File, logChannel chan string) {
 	}
 
 	close(logChannel)
-
-	return
 }
 
-func limitLength(s string, length int) string {
-	if len(s) < length {
-		return s
-	}
-
-	return s[:length]
-}

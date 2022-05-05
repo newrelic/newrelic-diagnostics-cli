@@ -90,10 +90,10 @@ func createFile(create bool) {
 	if create {
 		log.Debug("create File")
 		file, err := os.Create("newrelic.jar") // For read access.
-		defer file.Close()
 		if err != nil {
 			log.Info("Error creating file", err)
 		}
+		defer file.Close()
 	} else {
 		log.Debug("delete file")
 		err := os.Remove("newrelic.jar")

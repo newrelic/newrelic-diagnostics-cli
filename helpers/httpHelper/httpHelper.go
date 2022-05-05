@@ -38,7 +38,7 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 
 	if wrapper.URL == "" || wrapper.Method == "" {
 		log.Info("Error: URL or method are not set")
-		return nil, errors.New("Error: URL or method are not set")
+		return nil, errors.New("error: URL or method are not set")
 	}
 	reader := wrapper.Payload
 	// set up a progress bar if length is set
@@ -50,7 +50,7 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 	}
 
 	//Now create our request object
-	req, err := http.NewRequest(wrapper.Method, wrapper.URL, reader)
+	req, _ := http.NewRequest(wrapper.Method, wrapper.URL, reader)
 
 	// Setting the content length header if supplied
 	if wrapper.Length != 0 {

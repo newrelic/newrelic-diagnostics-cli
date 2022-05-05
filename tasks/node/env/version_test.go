@@ -119,7 +119,7 @@ var _ = Describe("Node/Env/Version", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("An issue occur while parsing node version: Unable to convert  to an integer"))
+				Expect(result.Summary).To(Equal("An issue occur while parsing node version: unable to convert  to an integer"))
 			})
 		})
 		Context("When node -v returns the expected string", func() {

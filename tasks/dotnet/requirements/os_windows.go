@@ -85,7 +85,7 @@ func (p DotnetRequirementsOS) Execute(options tasks.Options, upstream map[string
 		osVersion := osVersionSplit[0] + "." + osVersionSplit[1]
 		supported, supportedErr = tasks.VersionIsCompatible(osVersion, compatibleOs)
 	} else {
-		supportedErr = errors.New("Error parsing version: " + hostInfo.PlatformVersion)
+		supportedErr = errors.New("error parsing version: " + hostInfo.PlatformVersion)
 	}
 
 	if supportedErr != nil {

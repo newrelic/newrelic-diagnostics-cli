@@ -100,7 +100,7 @@ func parseGemVersions(gemListLine string) ([]tasks.Ver, error) {
 
 	//Was a "(val)" substring not found?
 	if len(versionString) < 2 {
-		return nil, errors.New("Unable to parse version from string")
+		return nil, errors.New("unable to parse version from string")
 	}
 
 	rawVersions := strings.Split(versionString[1], ",")

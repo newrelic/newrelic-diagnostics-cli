@@ -10,7 +10,6 @@ import (
 
 // PythonConfigAgent - This struct defines the Python agent config is present.
 type PythonConfigAgent struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
-	name string
 }
 
 var pythonKeys = []string{

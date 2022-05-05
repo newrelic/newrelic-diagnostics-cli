@@ -109,8 +109,7 @@ func streamBlob(input string, ch chan string) {
 // this function will remove any warnings from pipFreezeOutput so only actionable data is left in the data structure.
 func filterPipFreeze(pipFreezeOutput string) []string {
 	var filteredOutput []string
-	var keys map[string]bool
-	keys = make(map[string]bool)
+	keys := make(map[string]bool)
 
 	pipFreezeOutput = strings.ToLower(pipFreezeOutput)
 

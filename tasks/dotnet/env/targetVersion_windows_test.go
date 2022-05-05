@@ -67,7 +67,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 					},
 				}
 				p.osGetwd = func() (string, error) {
-					return "", errors.New("This is an error")
+					return "", errors.New("this is an error")
 				}
 			})
 			It("should return an expected result status", func() {
@@ -139,7 +139,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 					return []string{"/foo/app.config"}
 				}
 				p.returnStringInFile = func(string, string) ([]string, error) {
-					return nil, errors.New("This is a special news announcement")
+					return nil, errors.New("this is a special news announcement")
 				}
 			})
 			It("should return an expected result status", func() {

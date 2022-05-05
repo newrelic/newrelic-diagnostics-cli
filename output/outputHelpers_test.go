@@ -19,7 +19,7 @@ func Test_copyFilesToZip(t *testing.T) {
 		name string
 		args args
 	}{
-		{"addFiles", args{zipFile, []tasks.FileCopyEnvelope{tasks.FileCopyEnvelope{Path: "tasks/fixtures/java/newrelic/newrelic.yml"}}}},
+		{"addFiles", args{zipFile, []tasks.FileCopyEnvelope{{Path: "tasks/fixtures/java/newrelic/newrelic.yml"}}}},
 	}
 
 	for _, tt := range tests {

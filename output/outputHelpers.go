@@ -46,12 +46,6 @@ func getResultsJSON(data []registration.TaskResult) string {
 	return string(output)
 }
 
-//getEpoch returns epoch time (at time of fn call) as an int64
-func getEpoch() int64 {
-	now := time.Now().UTC().UnixNano()
-	return (now / 1000000)
-}
-
 func outputJSON(json string) {
 	jsonFile := filepath.Clean(config.Flags.OutputPath + "/nrdiag-output.json")
 	log.Debug("Creating json file:", jsonFile)
@@ -119,13 +113,12 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			}
 			// open file handle
 			fileHandle, err := os.Open(envelope.Path)
-			defer fileHandle.Close()
-
 			if err != nil {
 				log.Info("Error opening file handle", err)
 				return
 			}
-
+			defer fileHandle.Close()
+			
 			header, err := zip.FileInfoHeader(stat)
 			if err != nil {
 				log.Info("Error copying file", err)

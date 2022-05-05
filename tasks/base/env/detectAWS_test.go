@@ -33,7 +33,7 @@ func mockUnsuccessfulRequest400(wrapper httpHelper.RequestWrapper) (*http.Respon
 }
 
 func mockUnSuccessfulRequestErr(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-	return &http.Response{}, errors.New("Error! This is an error")
+	return &http.Response{}, errors.New("error! This is an error")
 }
 
 var _ = Describe("Base/Env/DetectAWS", func() {

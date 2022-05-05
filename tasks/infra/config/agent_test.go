@@ -123,10 +123,10 @@ func createFile(t *testing.T, create bool) {
 	if create {
 		log.Debug("create File")
 		file, err := os.Create("newrelic-infra") // For read access.
-		defer file.Close()
 		if err != nil {
 			log.Debug("Error creating file", err)
 		}
+		defer file.Close()
 	} else {
 		log.Debug("delete file")
 		err := os.Remove("newrelic-infra")
@@ -136,10 +136,6 @@ func createFile(t *testing.T, create bool) {
 
 	}
 
-}
-
-func checkPayload(payload interface{}, expected interface{}) bool {
-	return true
 }
 
 func TestInfraConfigAgent_Execute(t *testing.T) {

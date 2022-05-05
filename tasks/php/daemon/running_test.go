@@ -47,7 +47,7 @@ func mockProcessFinderThreeDaemon(name string) ([]process.Process, error) {
 }
 
 func mockProcessFinderError(name string) ([]process.Process, error) {
-	return []process.Process{}, errors.New("Couldn't find daemon")
+	return []process.Process{}, errors.New("couldn't find daemon")
 }
 
 func mockFileExistsCheckerTrue(filename string) bool {
@@ -92,7 +92,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 				})
 
 				It("should return an expected Error result summary including error", func() {
-					Expect(result.Summary).To(Equal("Error detecting newrelic-daemon process: Couldn't find daemon"))
+					Expect(result.Summary).To(Equal("Error detecting newrelic-daemon process: couldn't find daemon"))
 				})
 			})
 

@@ -105,9 +105,10 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 			continue // go to the next directory
 		}
 
+		r, _ := regexp.Compile(`^\d+[.]\d+[.]\d+$`)
 		for _, dir := range subDirs {
 			dirName := dir.Name()
-			versionMatch, _ := regexp.MatchString(`^\d+[.]\d+[.]\d+$`, dirName) // ensure we just have the version dirs and not nuget's
+			versionMatch := r.MatchString(dirName) // ensure we just have the version dirs and not nuget's
 			//logger.Debug(dirName)
 			if versionMatch { // filter out NuGet's dirs
 				versions = append(versions, dirName)
@@ -119,10 +120,13 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 }
 
 func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr error) {
-	pathVarSplit := []string{}
-	var searchString string
-	netCoreLocWin := []string{`C:\Program Files\dotnet\sdk`}
-	netCoreLocLinux := []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
+	
+	var (
+		searchString string
+		pathVarSplit []string
+		netCoreLocWin = []string{`C:\Program Files\dotnet\sdk`}
+		netCoreLocLinux = []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
+	)
 
 	switch os := runtime.GOOS; os {
 	case "windows":
@@ -139,7 +143,7 @@ func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr err
 		searchString = `/dotnet`
 	default:
 		logger.Debug("DotNetCoreVersions error, Unknown OS: ", os)
-		return nil, errors.New("DotNetCoreVersions task encountered unknown OS: " + os)
+		return nil, errors.New("task DotNetCoreVersions encountered unknown OS: " + os)
 	}
 	if envVars["DOTNET_INSTALL_PATH"] != "" {
 		dirsToRead = appendIfUnique(dirsToRead, filepath.Join(envVars["DOTNET_INSTALL_PATH"], "sdk"))
@@ -154,7 +158,7 @@ func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr err
 }
 
 func checkPathVarForDotnet(paths []string, searchString string) string {
-	if paths != nil {
+	if len(paths) > 0 {
 		for _, path := range paths {
 			if strings.Contains(path, searchString) {
 				logger.Debug("DotNetCoreVersions - Found dotnet core dir in path var: ", path)

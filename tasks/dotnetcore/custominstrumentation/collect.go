@@ -11,7 +11,6 @@ import (
 )
 
 type DotNetCoreCustomInstrumentationCollect struct { 
-	name string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task

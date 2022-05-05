@@ -243,7 +243,7 @@ func (p InfraConfigIntegrationsMatch) isValidIntegrationFilePath(integrationFile
 
 		for _, path := range definitionFilepaths {
 			isValidPath = (filePath == path)
-			if isValidPath == true {
+			if isValidPath {
 				break
 			}
 		}

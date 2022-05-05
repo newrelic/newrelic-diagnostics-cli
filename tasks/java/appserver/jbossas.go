@@ -18,9 +18,6 @@ type JavaAppserverJBossAsCheck struct {
 	returnSubstringInFile tasks.ReturnStringInFileFunc
 }
 type getCmdlineFromProcessFunc func(process.Process) string
-type getAndParseJBossAsReadMeFunc func(string, func([]string, []string) []string, tasks.ReturnStringInFileFunc) ([]string, error)
-type checkJBossAsVersionFunc func([]string) (string, tasks.Status)
-type getHomeDirFromCmdlineFunc func(string) string
 
 // Identifier - This returns the Category, Subcategory and Name of this task
 func (p JavaAppserverJBossAsCheck) Identifier() tasks.Identifier {
@@ -134,7 +131,7 @@ func (p JavaAppserverJBossAsCheck) getAndParseJBossAsReadMe(homePath string) (st
 	readmes := p.findFiles(filePatterns, paths)
 	if len(readmes) < 1 {
 		log.Debug("Error finding JBoss readme at ", homePath)
-		return "", errors.New("Error finding JBoss version")
+		return "", errors.New("error finding JBoss version")
 	}
 
 	versionSearchString := "JBoss[ Application Server ]+[0-9]+[.][0-9]+[.][0-9]+"
@@ -142,7 +139,7 @@ func (p JavaAppserverJBossAsCheck) getAndParseJBossAsReadMe(homePath string) (st
 	versionStringRaw, err := p.returnSubstringInFile(versionSearchString, readmes[0])
 	if len(versionStringRaw) < 1 || err != nil {
 		log.Debug("Could not find version string in readme.txt file")
-		return "", errors.New("Error finding version string")
+		return "", errors.New("error finding version string")
 	}
 
 	versionString := ""
@@ -155,7 +152,7 @@ func (p JavaAppserverJBossAsCheck) getAndParseJBossAsReadMe(homePath string) (st
 	}
 
 	if strings.Count(versionString, ".") < 2 {
-		return "", errors.New("Error finding version string")
+		return "", errors.New("error finding version string")
 	}
 
 	return versionString, nil
@@ -172,7 +169,7 @@ func (p JavaAppserverJBossAsCheck) checkJBossAsVersion(versionString string) (st
 	if err != nil {
 		return "Error parsing detected version string: " + versionString, tasks.Error
 	}
-	if jBossCompatible == true {
+	if jBossCompatible {
 		return "JBoss version supported. Version is " + versionString, tasks.Success
 	}
 

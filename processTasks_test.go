@@ -247,7 +247,7 @@ var _ = Describe("getLicenseKey()", func() {
 				Summary:     "This does not matter",
 				URL:         "",
 				FilesToCopy: []tasks.FileCopyEnvelope{},
-				Payload:     map[string][]string{"NEW_RELIC_LICENSE_KEY": []string{"correctformatprovided"}},
+				Payload:     map[string][]string{"NEW_RELIC_LICENSE_KEY": {"correctformatprovided"}},
 			}
 		})
 		It("Should return with the above error", func() {
@@ -258,9 +258,9 @@ var _ = Describe("getLicenseKey()", func() {
 		})
 	})
 
-	Context("when the task validatdLicenseKey is not in the proper format", func() {
+	Context("when the task validateLicenseKey is not in the proper format", func() {
 		BeforeEach(func() {
-			expectedError = fmt.Errorf("Unable to retrieve license Key")
+			expectedError = fmt.Errorf("unable to retrieve license Key")
 			taskResult = tasks.Result{
 				Status:      1,
 				Summary:     "This does not matter",

@@ -2,8 +2,6 @@ package tasks
 
 import (
 	"errors"
-	"io/ioutil"
-	"log"
 	"path/filepath"
 	"reflect"
 	"runtime"
@@ -20,12 +18,6 @@ func TestTaskHelpers(t *testing.T) {
 }
 
 func TestValidateBlob_FindKeyByPath(t *testing.T) {
-	type fields struct {
-		Key      string
-		Path     string
-		RawValue interface{}
-		Children []ValidateBlob
-	}
 	tests := []struct {
 		name       string
 		fields     ValidateBlob
@@ -104,12 +96,6 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 }
 
 func TestValidateBlob_FindKey(t *testing.T) {
-	type fields struct {
-		Key      string
-		Path     string
-		RawValue interface{}
-		Children []ValidateBlob
-	}
 	tests := []struct {
 		name        string
 		fields      ValidateBlob
@@ -209,12 +195,6 @@ func TestValidateBlob_FindKey(t *testing.T) {
 }
 
 func TestValidateBlob_UpdateKey(t *testing.T) {
-	type fields struct {
-		Key      string
-		Path     string
-		RawValue interface{}
-		Children []ValidateBlob
-	}
 	type args struct {
 		searchKey        string
 		replacementValue interface{}
@@ -655,7 +635,7 @@ var _ = Describe("Task Helpers", func() {
 		Context("when os.Getwd returns an error and os.Executable return expected result", func() {
 			BeforeEach(func() {
 				osGetwd = func() (string, error) {
-					return "", errors.New("I am a robot error")
+					return "", errors.New("i am a robot error")
 				}
 				osExecutable = func() (string, error) {
 					return "/bar", nil
@@ -683,10 +663,10 @@ var _ = Describe("Task Helpers", func() {
 		Context("when os.Getwd and os.Executable both return an error", func() {
 			BeforeEach(func() {
 				osGetwd = func() (string, error) {
-					return "", errors.New("I like pandas")
+					return "", errors.New("i like pandas")
 				}
 				osExecutable = func() (string, error) {
-					return "", errors.New("I also like frogs")
+					return "", errors.New("i also like frogs")
 				}
 			})
 			It("should return expected slice", func() {
@@ -822,17 +802,3 @@ var _ = Describe("Task Helpers", func() {
 	})
 
 })
-
-func tempFileFromString(input string) string {
-
-	tempFile, err := ioutil.TempFile("", "golang-test")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if _, err := tempFile.Write([]byte(input)); err != nil {
-		log.Fatal(err)
-	}
-	_ = tempFile.Close()
-	return tempFile.Name()
-}

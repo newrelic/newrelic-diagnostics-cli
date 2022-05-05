@@ -153,7 +153,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("Should return task result summary of err.Erro()", func() {
-				Expect(result.Summary).To(Equal("Unable to convert %^&^&% to an integer"))
+				Expect(result.Summary).To(Equal("unable to convert %^&^&% to an integer"))
 			})
 		})
 		Context("When len(agentVersion) > 1 ", func() {

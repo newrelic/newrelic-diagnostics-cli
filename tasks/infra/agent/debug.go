@@ -178,10 +178,8 @@ func blockWithProgressbar(minutes int) {
 	ticker := time.NewTicker(time.Second)
 
 	for i := 0; i < seconds; i++ {
-		select {
-		case <-ticker.C:
-			bar.Increment()
-		}
+		<-ticker.C
+		bar.Increment()
 	}
 	ticker.Stop()
 }

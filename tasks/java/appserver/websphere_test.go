@@ -41,10 +41,10 @@ var _ = Describe("JavaAppServerWebSphere", func() {
 		Context("When directoryGetter returns error", func() {
 			BeforeEach(func() {
 				p.osGetwd = func() (string, error) {
-					return "", errors.New("Error getting menu")
+					return "", errors.New("error getting menu")
 				}
 				p.osGetExecutable = func() (string, error) {
-					return "", errors.New("Error getting list of burritos")
+					return "", errors.New("error getting list of burritos")
 				}
 			})
 			It("Should return error Status", func() {
@@ -152,17 +152,17 @@ var _ = Describe("JavaAppServerWebSphere", func() {
 		Context("When getwd returns error and osexecutable returns error", func() {
 			BeforeEach(func() {
 				p.osGetwd = func() (string, error) {
-					return "", errors.New("One burrito error")
+					return "", errors.New("one burrito error")
 				}
 				p.osGetExecutable = func() (string, error) {
-					return "", errors.New("Two burrito error")
+					return "", errors.New("two burrito error")
 				}
 			})
 			It("Should return empty directory list", func() {
 				Expect(dirs).To(BeEmpty())
 			})
 			It("Should return expected error", func() {
-				Expect(getDirErr.Error()).To(Equal("Obtained neither the current working directory nor the executable directory location"))
+				Expect(getDirErr.Error()).To(Equal("obtained neither the current working directory nor the executable directory location"))
 			})
 		})
 

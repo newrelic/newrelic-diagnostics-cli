@@ -2,7 +2,6 @@ package env
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -31,9 +30,6 @@ func mockInvalidDateHeader(wrapper httpHelper.RequestWrapper) (*http.Response, e
 	}, nil
 }
 
-func mockUnSuccessfulRequestErr(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-	return &http.Response{}, errors.New("Error! This is an error")
-}
 func TestInfraCheckClockSkew(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Infra/Env/ClockSkew test suite")

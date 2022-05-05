@@ -108,7 +108,7 @@ func GetContainerIdsByLabel(label string, value string, numberOf int, includeExi
 	cmdOutBytes, err := cmdExec("docker", queryArgsArray...)
 
 	if err != nil {
-		return nil, errors.New("Error querying for container: " + err.Error() + ": " + string(cmdOutBytes))
+		return nil, errors.New("error querying for container: " + err.Error() + ": " + string(cmdOutBytes))
 	}
 
 	cmdOutString := string(cmdOutBytes)
@@ -171,7 +171,7 @@ func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 		}
 
 		if env == nil {
-			return []byte{}, errors.New("Could not find Env variables in container inspect blob")
+			return []byte{}, errors.New("could not find Env variables in container inspect blob")
 		}
 
 		//for every env variable of a container
@@ -236,6 +236,4 @@ func StreamContainerLogsById(containerId string, bufferedCmdExec BufferedCommand
 	for cmdOutScanner.Scan() {
 		sw.Stream <- cmdOutScanner.Text() + "\n"
 	}
-
-	return
 }

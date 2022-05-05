@@ -136,12 +136,12 @@ func (c *Client) Do(req *http.Request, respStruct interface{}) (*Response, error
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading response: %v", err)
+		return nil, fmt.Errorf("error reading response: %v", err)
 	}
 
 	if resp.StatusCode >= 300 {
 		bodyString := string(bodyBytes)
-		return nil, fmt.Errorf("Expected StatusCode < 300 got %d: %v", resp.StatusCode, bodyString)
+		return nil, fmt.Errorf("expected StatusCode < 300 got %d: %v", resp.StatusCode, bodyString)
 	}
 
 	response := newResponse(resp)
@@ -156,7 +156,7 @@ func (c *Client) Do(req *http.Request, respStruct interface{}) (*Response, error
 		}
 
 		if decErr != nil {
-			err = fmt.Errorf("Error unmarshalling to %T: %v", respStruct, decErr)
+			err = fmt.Errorf("error unmarshalling to %T: %v", respStruct, decErr)
 		}
 
 	}

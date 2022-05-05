@@ -112,7 +112,7 @@ var _ = Describe("Synthetics/Minion/CollectLogs", func() {
 					containerIdToError := "b3e2f06abf13fddb3ee805d7cdd4d3b5160e014627b460f50c181267f586ba74"
 
 					if argContainerId == containerIdToError {
-						return nil, errors.New("Error reading output")
+						return nil, errors.New("error reading output")
 					}
 					logBytes := fmt.Sprintf("Logs from %s", argContainerId)
 					return bufio.NewScanner(strings.NewReader(logBytes)), nil
@@ -123,7 +123,7 @@ var _ = Describe("Synthetics/Minion/CollectLogs", func() {
 			It("Should return a task status of error with error message in summary", func() {
 				expectedResult := tasks.Result{
 					Status:  tasks.Error,
-					Summary: "Error collecting logs from containers: Error reading output\n",
+					Summary: "Error collecting logs from containers: error reading output\n",
 					Payload: nil,
 				}
 				Expect(result).To(Equal(expectedResult))

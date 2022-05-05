@@ -205,7 +205,7 @@ func (t BaseConfigValidateHSM) matchSourceToConfigElement(source string) (Valida
 		}
 	}
 
-	return ValidateElement{}, errors.New("No ConfigElement matches source filepath")
+	return ValidateElement{}, errors.New("no ConfigElement matches source filepath")
 }
 
 func (t BaseConfigValidateHSM) getHSMConfigurations(configElements []ValidateElement) map[string]bool {
@@ -256,7 +256,7 @@ func (t BaseConfigValidateHSM) getHSMConfiguration(configElement ValidateElement
 func validLKtoSourcesMapToSlice(validLKtoSourcesMap map[string][]string) []string{
 	licenseKeys := []string {}
 
-	for k, _ := range validLKtoSourcesMap {
+	for k := range validLKtoSourcesMap {
 		licenseKeys = append(licenseKeys, k)
 	}
 

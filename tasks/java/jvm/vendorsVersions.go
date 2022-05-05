@@ -229,11 +229,12 @@ func parseJavaExecutable(cmdLineArgs string) string {
 
 	//first pass, splitting on ' -'
 	argsSplitByDash := strings.Split(cmdLineArgs, " -")
+	r, _ := regexp.Compile(".*java.exe$|.*java$")
 	for _, cmdLineArg := range argsSplitByDash {
 		sanitizedCmdLineArg := sanitizeCmdLineArg(cmdLineArg)
 
 		/* does the arg string end in java or java.exe(windows) */
-		match, _ := regexp.MatchString(".*java.exe$|.*java$", sanitizedCmdLineArg)
+		match := r.MatchString(sanitizedCmdLineArg)
 		if match {
 			return sanitizedCmdLineArg
 		}
@@ -241,8 +242,9 @@ func parseJavaExecutable(cmdLineArgs string) string {
 
 	//second pass, splitting on ' '
 	argsSplitBySpace := strings.Split(cmdLineArgs, " ")
+	r2, _ := regexp.Compile(".*java$")
 	for _, cmdLineArg := range argsSplitBySpace {
-		match, _ := regexp.MatchString(".*java$", cmdLineArg)
+		match := r2.MatchString(cmdLineArg)
 		if match {
 			return cmdLineArg
 		}

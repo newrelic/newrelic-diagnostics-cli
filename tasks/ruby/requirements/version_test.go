@@ -148,7 +148,7 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			})
 
 			It("should return an expected none error summary", func() {
-				Expect(result.Summary).To(Equal("While parsing the Ruby Version, we encountered an error: No found result for Ruby Version when parsing for payload ruby "))
+				Expect(result.Summary).To(Equal("While parsing the Ruby Version, we encountered an error: no found result for Ruby Version when parsing for payload ruby "))
 			})
 		})
 

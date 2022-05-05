@@ -26,7 +26,7 @@ func VersionIsCompatible(version string, requirements []string) (bool, error) {
 	
 	versionToCheck, err := ParseVersion(version)
 	if err != nil {
-		return false, errors.New("Unable to parse version: " + version)
+		return false, errors.New("unable to parse version: " + version)
 	}
 	return versionToCheck.CheckCompatibility(requirements)
 }
@@ -59,17 +59,17 @@ func (v Ver) CheckCompatibility(requirements []string) (bool, error) {
 		reqsToCheck := strings.Split(requirement, "-")
 		// Handle cases like 5-7.5+ or the ever-possible 3-6-9.4
 		if len(reqsToCheck) > 2 {
-			return false, errors.New("Received a range with too many values: " + requirement)
+			return false, errors.New("received a range with too many values: " + requirement)
 		}
 
 		minReq, err := ParseVersion(reqsToCheck[0])
 		if err != nil {
-			return false, errors.New("Unable to parse version: " + reqsToCheck[0])
+			return false, errors.New("unable to parse version: " + reqsToCheck[0])
 		}
 
 		maxReq, err := ParseVersion(reqsToCheck[1])
 		if err != nil {
-			return false, errors.New("Unable to parse version: " + reqsToCheck[1])
+			return false, errors.New("unable to parse version: " + reqsToCheck[1])
 		}
 		if v.IsGreaterThanEq(minReq) && v.IsLessThanEq(maxReq) {
 			return true, nil
@@ -157,7 +157,7 @@ func ParseVersion(version string) (Ver, error) {
 		} else {
 			intNum, ierr = strconv.Atoi(num)
 			if ierr != nil {
-				return emptyVersion, errors.New("Unable to convert " + num + " to an integer")
+				return emptyVersion, errors.New("unable to convert " + num + " to an integer")
 			}
 		}
 

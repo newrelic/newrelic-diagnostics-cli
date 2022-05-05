@@ -68,7 +68,7 @@ func TestBaseCollectorConnectEU_prepareEarlyResult(t *testing.T) {
 }
 
 func TestBaseCollectorConnectEU_prepareCollectorErrorResult(t *testing.T) {
-	sampleError := errors.New("HTTP Error: this is an error")
+	sampleError := errors.New("received HTTP Error: this is an error")
 	type fields struct {
 		upstream map[string]tasks.Result
 	}

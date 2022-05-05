@@ -76,7 +76,7 @@ func (p JavaAppserverJbossEapCheck) Execute(options tasks.Options, upstream map[
 		log.Debug("Error returned fileGetterErr:", fileGetterErr)
 
 		if fileGetterErr != nil {
-			if fileGetterErr.Error() == "Unable to detect JBoss directory" {
+			if fileGetterErr.Error() == "unable to detect JBoss directory" {
 				result.Status = tasks.None
 				result.Summary = "Can't find version file, didn't exist"
 				return result
@@ -91,7 +91,7 @@ func (p JavaAppserverJbossEapCheck) Execute(options tasks.Options, upstream map[
 	versionString, err := p.readJbossVersionFile(jbossConfFile)
 	log.Debug("error getting versionString: ", err)
 	if err != nil {
-		if err.Error() == "Version file didn't exist" {
+		if err.Error() == "version file didn't exist" {
 			result.Status = tasks.Warning
 			result.Summary = "JBossEAP detected but unable to detect version: Version file not found"
 			return result
@@ -131,7 +131,7 @@ func (p JavaAppserverJbossEapCheck) getJbossFileWindows(programFiles string) (st
 		}
 
 	}
-	return "", errors.New("Unable to detect JBoss directory")
+	return "", errors.New("unable to detect JBoss directory")
 }
 
 type listDirType func(string, readDirFunc) []string
@@ -162,7 +162,7 @@ func (p JavaAppserverJbossEapCheck) readJbossVersionFile(versionFilePath string)
 		}
 
 	}
-	return "", errors.New("Version file didn't exist")
+	return "", errors.New("version file didn't exist")
 }
 
 func (p JavaAppserverJbossEapCheck) getJbossFileLinux() (string, error) {
@@ -182,7 +182,7 @@ func (p JavaAppserverJbossEapCheck) getJbossFileLinux() (string, error) {
 		if len(jbossHomeFull) > 0 {
 			jbossHomePathSplit := strings.Split(jbossHomeFull[0], "\"")
 			if len(jbossHomePathSplit) < 2 {
-				return "", errors.New("Error parsing JBOSS_HOME path in jboss-eap.conf")
+				return "", errors.New("error parsing JBOSS_HOME path in jboss-eap.conf")
 			}
 			jbossHomePath := jbossHomePathSplit[1]
 			return filepath.Join(jbossHomePath, "version.txt"), nil
@@ -204,7 +204,7 @@ func (p JavaAppserverJbossEapCheck) getJbossFileLinux() (string, error) {
 	fileResults := p.findFiles(files, path)
 
 	if len(fileResults) < 1 {
-		return "", errors.New("Unable to detect JBoss directory")
+		return "", errors.New("unable to detect JBoss directory")
 	}
 
 	for _, v := range fileResults {
@@ -219,7 +219,7 @@ func (p JavaAppserverJbossEapCheck) getJbossFileLinux() (string, error) {
 		}
 	}
 
-	return "", errors.New("Unable to detect JBoss directory")
+	return "", errors.New("unable to detect JBoss directory")
 
 }
 

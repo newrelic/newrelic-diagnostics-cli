@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	errResponseMissingDateHeader = errors.New("Date header not found in collector response")
+	errResponseMissingDateHeader = errors.New("date header not found in collector response")
 )
 
 const (

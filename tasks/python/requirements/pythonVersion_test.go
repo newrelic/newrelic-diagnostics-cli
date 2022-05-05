@@ -92,7 +92,7 @@ var _ = Describe("Python/Requirements/PythonVersion", func() {
 			It("should return an expected summary", func() {
 				fmt.Println("MY SUMMARY: ", result.Summary)
 				Expect(result.Status).To(Equal(tasks.Error))
-				Expect(result.Summary).To(Equal("We ran into an error while parsing your current agent version Peruvian potatoes. Unable to parse version: Peruvian potatoes"))
+				Expect(result.Summary).To(Equal("We ran into an error while parsing your current agent version Peruvian potatoes. unable to parse version: Peruvian potatoes"))
 			})
 		})
 

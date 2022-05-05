@@ -83,7 +83,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 					return []string{"/foo/bar"}
 				}
 				p.getFileVersion = func(string) (string, error) {
-					return "", errors.New("I'm a little teapot")
+					return "", errors.New("i'm a little teapot")
 				}
 			})
 			It("Should return Warning status", func() {

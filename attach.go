@@ -133,7 +133,7 @@ func uploadAWS(filesToUpload []uploadFiles, attachmentKey string) error {
 			body, _ := ioutil.ReadAll(res.Body)
 			log.Debug("Body was", string(body))
 			log.Debug("headers were", res.Header)
-			return errors.New("Error uploading, status code was " + res.Status)
+			return errors.New("error uploading, status code was " + res.Status)
 		}
 		log.Debug(res.Status, "was status code to AWS upload")
 

@@ -78,7 +78,7 @@ var _ = Describe("Base/Env/SELinux", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{}
 				p.cmdExec = func(name string, arg ...string) ([]byte, error) {
-					return []byte{}, errors.New("Command 'sestatus' not found")
+					return []byte{}, errors.New("command 'sestatus' not found")
 				}
 			})
 

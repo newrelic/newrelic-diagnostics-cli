@@ -250,7 +250,7 @@ func runDockerTest(test integrationTest) (IntegrationTestRun, error) {
 	currentTest.DockerRun.StopTimer()
 	currentTest.StatusDockerRun = "DONE"
 
-	//Look for expected log exntries
+	//Look for expected log entries
 	found, regex := searchOutput([]byte(logs), test.LogEntryExpected, true)
 	//Look to ensure the Log entries not expected are not present
 	notFound, regex := searchOutput([]byte(logs), test.LogEntryNotExpected, false)

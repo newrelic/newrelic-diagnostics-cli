@@ -464,7 +464,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 			})
 			It("Should return supported", func() {
 				Expect(isItUnsupported).To(BeFalse())
-				Expect(err).To(Equal(errors.New("Unable to parse version: " + version)))
+				Expect(err).To(Equal(errors.New("unable to parse version: " + version)))
 			})
 		})
 	})
