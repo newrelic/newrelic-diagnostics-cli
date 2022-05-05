@@ -87,7 +87,7 @@ var _ = Describe("Base/Env/SELinux", func() {
 			})
 
 			It("should return a summary that reports SELinux is not installed", func() {
-				Expect(result.Summary).To(Equal("SELinux does seem to be installed in this environment: Command 'sestatus' not found"))
+				Expect(result.Summary).To(Equal("SELinux does seem to be installed in this environment: command 'sestatus' not found"))
 			})
 			It("should return an payload of SEMode NotInstalled", func() {
 				Expect(result.Payload).To(Equal(NotInstalled))

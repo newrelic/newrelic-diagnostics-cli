@@ -90,7 +90,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("OWIN dlls detected but unable to confirm OWIN version. See debug logs for more information on error. Version returned I'm a little teapot"))
+				Expect(result.Summary).To(Equal("OWIN dlls detected but unable to confirm OWIN version. See debug logs for more information on error. Version returned i'm a little teapot"))
 			})
 		})
 		Context("With Owin dll present but error validating supported version", func() {
