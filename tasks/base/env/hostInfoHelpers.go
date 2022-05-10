@@ -1,45 +1,45 @@
 package env
 
 import (
-	"runtime"
 	"context"
-	"github.com/shirou/gopsutil/host"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/mem"
 	"errors"
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/mem"
+	"runtime"
 	"strings"
 )
 
 //Defines the struct for holding host name and OS information
 type HostInfo struct {
-	Hostname        string
-	OS              string
-	Platform        string
-	PlatformFamily  string
-	PlatformVersion string
-	KernelVersion 	string
-	KernelArch		string
-	CPUs			[]CPU
+	Hostname             string
+	OS                   string
+	Platform             string
+	PlatformFamily       string
+	PlatformVersion      string
+	KernelVersion        string
+	KernelArch           string
+	CPUs                 []CPU
 	TotalVirtualMemoryMB int
 }
 
 type CPU struct {
 	Cores int32
-	Mhz float64
+	Mhz   float64
 }
 
-type HostInfoProviderFunc func()(HostInfo, error)
-type HostInfoProviderWithContextFunc func(context.Context)(HostInfo, error)
+type HostInfoProviderFunc func() (HostInfo, error)
+type HostInfoProviderWithContextFunc func(context.Context) (HostInfo, error)
 
-func NewHostInfo()(HostInfo, error){
+func NewHostInfo() (HostInfo, error) {
 	ctx := context.Background()
 	return NewHostInfoWithContext(ctx)
 }
 
-func NewHostInfoWithContext(ctx context.Context)(HostInfo, error) {
+func NewHostInfoWithContext(ctx context.Context) (HostInfo, error) {
 	hostInfo := HostInfo{}
 	errorMessages := []string{}
-	
+
 	hostInfoErr := populateHostInfo(&hostInfo, ctx)
 
 	if hostInfoErr != nil {
@@ -58,24 +58,20 @@ func NewHostInfoWithContext(ctx context.Context)(HostInfo, error) {
 		errorMessages = append(errorMessages, memInfoErr.Error())
 	}
 
-	if len(errorMessages ) > 0 {
+	if len(errorMessages) > 0 {
 		return hostInfo, errors.New(strings.Join(errorMessages, "\n"))
 	}
 
 	return hostInfo, nil
 }
 
-
-
-
-
 func populateHostInfo(hostInfo *HostInfo, ctx context.Context) error {
 
 	info, err := host.InfoWithContext(ctx)
 	if err != nil {
 		hostInfo.OS = runtime.GOOS
-		return err;
-	} 
+		return err
+	}
 
 	hostInfo.OS = info.OS
 	hostInfo.Hostname = info.Hostname
@@ -91,13 +87,13 @@ func populateHostInfo(hostInfo *HostInfo, ctx context.Context) error {
 func populateHostCPUInfo(hostInfo *HostInfo, ctx context.Context) error {
 	info, err := cpu.InfoWithContext(ctx)
 	if err != nil {
-		return err;
-	} 
+		return err
+	}
 
 	for _, cpuInfo := range info {
 		cpu := CPU{
 			Cores: cpuInfo.Cores,
-			Mhz: cpuInfo.Mhz,
+			Mhz:   cpuInfo.Mhz,
 		}
 
 		hostInfo.CPUs = append(hostInfo.CPUs, cpu)
@@ -109,10 +105,10 @@ func populateHostCPUInfo(hostInfo *HostInfo, ctx context.Context) error {
 func populateHostMemoryInfo(hostInfo *HostInfo, ctx context.Context) error {
 	info, err := mem.VirtualMemoryWithContext(ctx)
 	if err != nil {
-		return err;
-	} 
+		return err
+	}
 
-	hostInfo.TotalVirtualMemoryMB =  int((info.Total) / uint64(1048576))
+	hostInfo.TotalVirtualMemoryMB = int((info.Total) / uint64(1048576))
 
 	return nil
 }

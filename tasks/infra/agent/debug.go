@@ -98,7 +98,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 			URL:     "https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes",
 		}
 	}
-	
+
 	infraCtlCmd := "newrelic-infra-ctl"
 
 	//For windows we have determine exact location of binary, using environment variables
@@ -160,7 +160,6 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 	}
 }
 
-
 func blockWithProgressbar(minutes int) {
 	seconds := minutes * 60
 	bar := pb.New(seconds)
@@ -178,10 +177,8 @@ func blockWithProgressbar(minutes int) {
 	ticker := time.NewTicker(time.Second)
 
 	for i := 0; i < seconds; i++ {
-		select {
-		case <-ticker.C:
-			bar.Increment()
-		}
+		<-ticker.C
+		bar.Increment()
 	}
 	ticker.Stop()
 }

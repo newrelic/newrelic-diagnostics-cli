@@ -14,8 +14,7 @@ func Test_checkValidation(t *testing.T) {
 		name string
 		args args
 		want bool
-	}{
-	}
+	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if _, got := checkValidation(tt.args.validations); got != tt.want {
@@ -33,8 +32,7 @@ func Test_checkConfig(t *testing.T) {
 		name string
 		args args
 		want bool
-	}{
-	}
+	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if _, got := checkConfig(tt.args.configs); got != tt.want {

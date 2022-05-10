@@ -5,11 +5,11 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/agent"
 	dotnetConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/config"
 	dotnetCustomInstrumentation "github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/custominstrumentation"
+	dotnetEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/env"
 	dotnetLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/log"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/profiler"
 	netframeworkrequirements "github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/requirements"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/w3wp"
-	dotnetEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/env"
 )
 
 func init() {

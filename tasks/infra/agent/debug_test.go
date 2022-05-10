@@ -12,7 +12,7 @@ import (
 )
 
 var _ = Describe("Infra/Agent/Debug", func() {
-	
+
 	var p InfraAgentDebug
 
 	Describe("Identifier()", func() {
@@ -210,7 +210,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 		})
 
 		Context("When Running on Windows", func() {
-			Describe("and the infra version is not supported", func() { 
+			Describe("and the infra version is not supported", func() {
 				BeforeEach(func() {
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
@@ -240,7 +240,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 					Expect(result.Summary).To(Equal("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(1.5.0.0). Minimum required Infrastructure Agent version is: 1.7.0.0"))
 				})
 			})
-			Describe("and the infra version is supported", func() { 
+			Describe("and the infra version is supported", func() {
 				BeforeEach(func() {
 
 					options = tasks.Options{}

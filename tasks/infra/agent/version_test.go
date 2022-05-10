@@ -178,7 +178,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Unable to determine New Relic Infrastructure binary path: ProgramFiles environment variable not set"))
+				Expect(result.Summary).To(Equal("Unable to determine New Relic Infrastructure binary path: environment variable not set: ProgramFiles"))
 			})
 		})
 
@@ -225,7 +225,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 					}
 					p.runtimeOS = "linux"
 					p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
-						return []byte(""), errors.New("Fromlet was defrobozticated")
+						return []byte(""), errors.New("fromlet was defrobozticated")
 					}
 
 				})
@@ -235,7 +235,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 				})
 
 				It("should return an expected result summary", func() {
-					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': Fromlet was defrobozticated"))
+					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': fromlet was defrobozticated"))
 				})
 			})
 			Context("Infrastructure agent is present but version check returns unparseable version string", func() {

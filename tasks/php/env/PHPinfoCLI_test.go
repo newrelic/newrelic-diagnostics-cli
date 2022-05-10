@@ -158,7 +158,7 @@ func mockPHPInfo(name string, arg ...string) ([]byte, error) {
 }
 
 func mockPHPError(name string, arg ...string) ([]byte, error) {
-	return []byte(""), errors.New("PHP info error")
+	return []byte(""), errors.New("php info error")
 }
 
 func TestPHPEnvPHPinfoCLI_gatherPHPInfoCLI(t *testing.T) {

@@ -24,7 +24,7 @@ func validateHTTPProxy(proxy string) (bool, error) {
 	}
 	splitURL := strings.Split(proxy, "//")
 	if len(splitURL) != 2 {
-		return false, errors.New("Proxy url expecting exactly one instance of '//'")
+		return false, errors.New("proxy url expecting exactly one instance of '//'")
 	}
 
 	//Also check if go's built in proxy testing throws any errors.
@@ -48,7 +48,7 @@ func processHTTPProxy() (bool, error) {
 		_, err := validateHTTPProxy(config.Flags.Proxy)
 		if err != nil {
 			log.Debug("Error parsing proxy url: " + err.Error())
-			return false, errors.New("Proxy format should be: -proxy http://poxy_host:proxy_port")
+			return false, errors.New("proxy format should be: -proxy http://poxy_host:proxy_port")
 		}
 
 		//Check if there is a proxy user && password, then construct URL. Can you have a user with no pass?
@@ -74,11 +74,11 @@ func processHTTPProxy() (bool, error) {
 		if err != nil {
 			log.Debug("Proxy url is malformed: " + err.Error())
 			log.Debug(envProxy)
-			return false, errors.New("Proxy format should be: -proxy http://poxy_host:proxy_port")
+			return false, errors.New("proxy format should be: -proxy http://poxy_host:proxy_port")
 		}
 
 		if !ProxyParseNSet() {
-			return false, errors.New("Error setting proxy: " + envProxy)
+			return false, errors.New("error setting proxy: " + envProxy)
 		}
 
 		log.Debug("Using proxy address from HTTP_PROXY environment variable:", envProxy)
@@ -148,9 +148,7 @@ func printTasks() {
 		config.Flags.ShowOverrideHelp = true
 		identifiers := strings.Split(os.Args[2], ",")
 		for _, ident := range identifiers {
-			for _, task := range registration.TasksForIdentifierString(ident) {
-				allTasks = append(allTasks, task)
-			}
+			allTasks = append(allTasks, registration.TasksForIdentifierString(ident)...)
 		}
 	}
 
@@ -234,12 +232,6 @@ func processOverrides() (tasks.Options, []override) {
 		options.Options["configFile"] = config.Flags.ConfigFile
 	}
 
-	// Pass in AttachmentKey file override value
-	if config.Flags.AttachmentKey != "" {
-		log.Debug("Manually setting attachment to ", config.Flags.AttachmentKey)
-		options.Options["attachmentKey"] = config.Flags.AttachmentKey
-	}
-
 	// Pass in Filter file override value
 	if config.Flags.Filter != "" {
 		log.Debug("Manually setting Filter to ", config.Flags.Filter)
@@ -247,7 +239,7 @@ func processOverrides() (tasks.Options, []override) {
 	}
 
 	// Pass in YesToAll file override value
-	if config.Flags.YesToAll == true {
+	if config.Flags.YesToAll {
 		log.Debug("Manually setting YesToAll to ", config.Flags.YesToAll)
 		options.Options["YesToAll"] = "true"
 	}

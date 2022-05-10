@@ -245,7 +245,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			})
 
 			It("should return an expected Error for the string being passed in", func() {
-				Expect(result.Summary).To(Equal("There was an issue when checking for Node.js Version compatibility: Unable to parse version: potato"))
+				Expect(result.Summary).To(Equal("There was an issue when checking for Node.js Version compatibility: unable to parse version: potato"))
 			})
 		})
 

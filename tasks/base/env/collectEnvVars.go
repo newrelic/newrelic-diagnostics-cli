@@ -32,7 +32,7 @@ func (t BaseEnvCollectEnvVars) Execute(options tasks.Options, upstream map[strin
 	if err != nil {
 		log.Debug(err.Error())
 		result.Status = tasks.Error
-		result.Summary = "Unable to gather any Environment Variables from the current shell. Error found: " + err.Error()+ tasks.NotifyIssueSummary
+		result.Summary = "Unable to gather any Environment Variables from the current shell. Error found: " + err.Error() + tasks.NotifyIssueSummary
 		return result
 	}
 

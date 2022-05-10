@@ -104,5 +104,5 @@ func (p JavaAgentVersion) getAgentVersion(jarLocation string) (string, error) {
 		return match[1], nil
 	}
 
-	return "", errors.New("Unable to determine Java Agent version from output: '" + string(version) + "'")
+	return "", errors.New("unable to determine Java Agent version from output: '" + string(version) + "'")
 }

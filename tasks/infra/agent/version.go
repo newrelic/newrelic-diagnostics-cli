@@ -117,11 +117,11 @@ func (p InfraAgentVersion) getInfraVersion(binaryPath string) (string, error) {
 
 func (p InfraAgentVersion) getBinaryPath(envVars map[string]string) (string, error) {
 	var binaryPath string
-	//binary path in Windows: C:\Program Files\New Relic\newrelic-infra\newrelic-infra.exe 
+	//binary path in Windows: C:\Program Files\New Relic\newrelic-infra\newrelic-infra.exe
 	if p.runtimeOS == "windows" {
 		sysProgramFiles, ok := envVars["ProgramFiles"]
 		if !ok {
-			return "", errors.New("ProgramFiles environment variable not set")
+			return "", errors.New("environment variable not set: ProgramFiles")
 		}
 		binaryPath = sysProgramFiles + `\New Relic\newrelic-infra\newrelic-infra.exe`
 	} else {

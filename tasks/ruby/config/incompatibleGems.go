@@ -83,7 +83,7 @@ func checkGems(gemfiles []string) (incompatibleGem []BadGemAndPath) {
 }
 
 func displayResults(incompatibleGems []BadGemAndPath) (summary string) {
-	
+
 	if len(incompatibleGems) == 0 {
 		return "There were no incompatible gems found."
 	}

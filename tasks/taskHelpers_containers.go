@@ -1,22 +1,22 @@
 package tasks
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os/exec"
 	"sort"
 	"strings"
-	"os/exec"
-	"bytes"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 type DockerInfo struct {
-	Driver string
+	Driver        string
 	ServerVersion string
-	MemTotal int64
-	NCPU int
+	MemTotal      int64
+	NCPU          int
 }
 
 //DockerContainer is a truncated struct of the docker inspect blob
@@ -56,7 +56,7 @@ type ContainerConfig struct {
 	Env  []string
 }
 
-func GetDockerInfoCLIBytes(cmdExec CmdExecFunc)([]byte, error){
+func GetDockerInfoCLIBytes(cmdExec CmdExecFunc) ([]byte, error) {
 
 	cmdOutBytes, err := cmdExec("docker", "info", "--format", "'{{json .}}'")
 
@@ -67,21 +67,20 @@ func GetDockerInfoCLIBytes(cmdExec CmdExecFunc)([]byte, error){
 		}
 		return nil, err
 	}
-	
+
 	trimmedBytes := bytes.TrimSpace(cmdOutBytes)
 	trimmedBytes = bytes.Trim(trimmedBytes, "'")
 
 	return trimmedBytes, nil
 }
 
-func NewDockerInfoFromBytes(dockerInfoBytes []byte)(DockerInfo, error){
+func NewDockerInfoFromBytes(dockerInfoBytes []byte) (DockerInfo, error) {
 	dockerInfo := DockerInfo{}
 
 	parseErr := json.Unmarshal(dockerInfoBytes, &dockerInfo)
-	
+
 	return dockerInfo, parseErr
 }
-
 
 //Example of the command we want to construct:
 //docker ps -q --last 4 --filter label=name=synthetics-minion --filter status=running
@@ -108,7 +107,7 @@ func GetContainerIdsByLabel(label string, value string, numberOf int, includeExi
 	cmdOutBytes, err := cmdExec("docker", queryArgsArray...)
 
 	if err != nil {
-		return nil, errors.New("Error querying for container: " + err.Error() + ": " + string(cmdOutBytes))
+		return nil, errors.New("error querying for container: " + err.Error() + ": " + string(cmdOutBytes))
 	}
 
 	cmdOutString := string(cmdOutBytes)
@@ -171,7 +170,7 @@ func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 		}
 
 		if env == nil {
-			return []byte{}, errors.New("Could not find Env variables in container inspect blob")
+			return []byte{}, errors.New("could not find Env variables in container inspect blob")
 		}
 
 		//for every env variable of a container
@@ -236,6 +235,4 @@ func StreamContainerLogsById(containerId string, bufferedCmdExec BufferedCommand
 	for cmdOutScanner.Scan() {
 		sw.Stream <- cmdOutScanner.Text() + "\n"
 	}
-
-	return
 }

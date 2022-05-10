@@ -1,9 +1,9 @@
+//go:build integration
 // +build integration
 
 package main
 
 import (
-	"archive/zip"
 	"errors"
 	"flag"
 	"fmt"
@@ -203,8 +203,7 @@ func runDockerTest(test integrationTest) (IntegrationTestRun, error) {
 	}
 
 	if os.Getenv("ghprbSourceBranch") != "" && os.Getenv("BUILD_ID") != "" {
-		var buildString string
-		buildString = os.Getenv("ghprbSourceBranch") + " - #" + os.Getenv("BUILD_ID")
+		buildString := os.Getenv("ghprbSourceBranch") + " - #" + os.Getenv("BUILD_ID")
 		currentTest.Build = buildString
 	}
 
@@ -250,22 +249,22 @@ func runDockerTest(test integrationTest) (IntegrationTestRun, error) {
 	currentTest.DockerRun.StopTimer()
 	currentTest.StatusDockerRun = "DONE"
 
-	//Look for expected log exntries
-	found, regex := searchOutput([]byte(logs), test.LogEntryExpected, true)
+	//Look for expected log entries
+	found, fregex := searchOutput([]byte(logs), test.LogEntryExpected, true)
 	//Look to ensure the Log entries not expected are not present
-	notFound, regex := searchOutput([]byte(logs), test.LogEntryNotExpected, false)
+	notFound, nfregex := searchOutput([]byte(logs), test.LogEntryNotExpected, false)
 
 	if found {
 		currentTest.Status = "FAILED"
-		currentTest.Error = "Log entry not found in output - " + regex
+		currentTest.Error = "Log entry not found in output - " + fregex
 
-		log.Info("Test", test.Name, "failed - Log entry not found in output -", regex)
+		log.Info("Test", test.Name, "failed - Log entry not found in output -", fregex)
 		outputTestHelp(test, dockerCMD)
 		writeLogFile(logs, test.Name)
 		return currentTest.WrapUp(), errors.New(currentTest.Error)
 	} else if notFound {
 		currentTest.Status = "FAILED"
-		currentTest.Error = "Log entry found in output - " + regex
+		currentTest.Error = "Log entry found in output - " + nfregex
 
 		outputTestHelp(test, dockerCMD)
 		writeLogFile(logs, test.Name)
@@ -279,7 +278,7 @@ func runDockerTest(test integrationTest) (IntegrationTestRun, error) {
 func writeLogFile(logs, testName string) {
 	logfile := "logs/test_results_" + testName
 	testFile := filepath.Clean(logfile)
-	ioutil.WriteFile(testFile, []byte(logs), 0644)
+	_ = ioutil.WriteFile(testFile, []byte(logs), 0644)
 }
 
 func outputTestHelp(test integrationTest, dockerCMD string) {
@@ -319,17 +318,4 @@ func searchOutput(input []byte, regexes []string, expected bool) (bool, string) 
 	}
 	// regex found (or not found), returning true
 	return false, ""
-}
-
-func openZip() *zip.ReadCloser {
-	// Open a zip archive for reading.
-	r, err := zip.OpenReader("nrdiag-output.zip")
-	if err != nil {
-		log.Info(err)
-	}
-	defer r.Close()
-
-	log.Info(r.File)
-
-	return r
 }

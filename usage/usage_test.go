@@ -52,40 +52,31 @@ var samplePreparedPayload = payload{
 }
 
 var samplePreparedConfig = []config.ConfigFlag{
-	config.ConfigFlag{Name: "verbose", Value: true},
-	config.ConfigFlag{Name: "interactive", Value: true},
-	config.ConfigFlag{Name: "quiet", Value: true},
-	config.ConfigFlag{Name: "veryQuiet", Value: false},
-	config.ConfigFlag{Name: "help", Value: false},
-	config.ConfigFlag{Name: "version", Value: true},
-	config.ConfigFlag{Name: "yesToAll", Value: false},
-	config.ConfigFlag{Name: "showOverrideHelp", Value: true},
-	config.ConfigFlag{Name: "proxy", Value: true},
-	config.ConfigFlag{Name: "proxyUser", Value: true},
-	config.ConfigFlag{Name: "proxyPassword", Value: false},
-	config.ConfigFlag{Name: "tasks", Value: "string"},
-	config.ConfigFlag{Name: "attachmentKey", Value: "string"},
-	config.ConfigFlag{Name: "configFile", Value: true},
-	config.ConfigFlag{Name: "override", Value: false},
-	config.ConfigFlag{Name: "outputPath", Value: false},
-	config.ConfigFlag{Name: "filter", Value: "string"},
-	config.ConfigFlag{Name: "fileUpload", Value: true},
-	config.ConfigFlag{Name: "browserURL", Value: true},
-	config.ConfigFlag{Name: "attachmentEndpoint", Value: true},
+	{Name: "verbose", Value: true},
+	{Name: "interactive", Value: true},
+	{Name: "quiet", Value: true},
+	{Name: "veryQuiet", Value: false},
+	{Name: "help", Value: false},
+	{Name: "version", Value: true},
+	{Name: "yesToAll", Value: false},
+	{Name: "showOverrideHelp", Value: true},
+	{Name: "proxy", Value: true},
+	{Name: "proxyUser", Value: true},
+	{Name: "proxyPassword", Value: false},
+	{Name: "tasks", Value: "string"},
+	{Name: "configFile", Value: true},
+	{Name: "override", Value: false},
+	{Name: "outputPath", Value: false},
+	{Name: "filter", Value: "string"},
+	{Name: "fileUpload", Value: true},
+	{Name: "browserURL", Value: true},
+	{Name: "attachmentEndpoint", Value: true},
 }
-
-var expectedSingleTaskJSON = "{\"protocol\":\"1.0\",\"data\":{\"metadata\":{\"timestamp\":1538417022,\"nrdiagversion\":\"\",\"licensekey\":\"\",\"runid\":\"552c0ed1-c5a4-11e8-a800-f45c8992bc33\"},\"configuration\":[{\"name\":\"verbose\",\"value\":false},{\"name\":\"interactive\",\"value\":false},{\"name\":\"quiet\",\"value\":false},{\"name\":\"veryQuiet\",\"value\":false},{\"name\":\"help\",\"value\":false},{\"name\":\"version\",\"value\":false},{\"name\":\"yesToAll\",\"value\":true},{\"name\":\"showOverrideHelp\",\"value\":false},{\"name\":\"proxy\",\"value\":false},{\"name\":\"proxyUser\",\"value\":false},{\"name\":\"proxyPassword\",\"value\":false},{\"name\":\"tasks\",\"value\":\"Example/Template/MinimalTask\"},{\"name\":\"attachmentKey\",\"value\":\"\"},{\"name\":\"configFile\",\"value\":false},{\"name\":\"override\",\"value\":false},{\"name\":\"outputPath\",\"value\":true},{\"name\":\"filter\",\"value\":\"success,warning,failure,error,info\"},{\"name\":\"fileUpload\",\"value\":false},{\"name\":\"browserURL\",\"value\":false},{\"name\":\"attachmentEndpoint\",\"value\":false}],\"results\":[{\"identifier\":\"Example/Template/MinimalTask\",\"status\":\"None\",\"URL\":\"\"}]}}"
 
 var apiStubReflectBody = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	body, _ := ioutil.ReadAll(r.Body)
-	w.Write(body)
-}))
-
-var apiStubReflectContentType = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	contentType := r.Header.Get("Content-Type")
-	w.Write([]byte(contentType))
+	_, _ = w.Write(body)
 }))
 
 func getJSONfixture(filename string, t *testing.T) (string, error) {
@@ -200,10 +191,6 @@ var sampleMetaData = metaData{
 	NRDiagVersion: "1.0",
 }
 
-func getTimeStub() int64 {
-	return 1538089691
-}
-
 func Test_preparePayload(t *testing.T) {
 	type args struct {
 		protocolVersion string
@@ -287,12 +274,12 @@ func Test_getRPMdetails(t *testing.T) {
 				URL:     "",
 				Payload: []l.LogNameReportingTo{{
 					Logfile:     "new_relic.log",
-          ReportingTo: []string{"https://rpm.newrelic.com/accounts/111/applications/21487336"},
+					ReportingTo: []string{"https://rpm.newrelic.com/accounts/111/applications/21487336"},
 				}},
 			}},
 			want: []rpmApp{{
 				AppID:     "21487336",
-        AccountID: "111",
+				AccountID: "111",
 			}},
 		},
 		{name: "it should not parse account and app ID from garbage reporting to log line",
@@ -302,7 +289,7 @@ func Test_getRPMdetails(t *testing.T) {
 				URL:     "",
 				Payload: []l.LogNameReportingTo{{
 					Logfile:     "new_relic.log",
-          ReportingTo: []string{"https://rpm.newrelic.com/accounts/111applications21487336"},
+					ReportingTo: []string{"https://rpm.newrelic.com/accounts/111applications21487336"},
 				}},
 			}},
 			want: []rpmApp{},

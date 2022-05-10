@@ -7,7 +7,7 @@ const ThisProgramFullName = "Diagnostics CLI"
 const NotifyIssueSummary = "\nPlease notify this issue to us whenever possible through https://discuss.newrelic.com/ by creating a new topic or through https://github.com/newrelic/newrelic-diagnostics-cli/issues\n"
 
 //AssertionErrorSummary is the standarized message we display to the user whenever Diagnostics CLI was unable to finish a task due a type assertion error
-const AssertionErrorSummary = ThisProgramFullName+ " was unable to complete this health check because we ran into an unexpected type assertion error." + NotifyIssueSummary
+const AssertionErrorSummary = ThisProgramFullName + " was unable to complete this health check because we ran into an unexpected type assertion error." + NotifyIssueSummary
 
 //NoAgentDetectedSummary is the standard tasks.None summary we want to display when nrdiag does not detect an agent after looking for its config file or other relevant ways of configuration
 const NoAgentDetectedSummary = "New Relic configuration not detected for this specific agent at the location where Diagnostics CLI was ran. This will stop other health checks (targetting this agent) from running. If you are attempting to troubleshoot for this specific agent, re-run Diagnostics CLI using the command-line option '-config-file' to point to the path to this agent configuration file."

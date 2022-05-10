@@ -109,7 +109,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 
 	errorUpstream := make(map[string]tasks.Result)
 	errorUpstream["Base/Config/Collect"] = tasks.Result{
-		Status: tasks.Success,
+		Status:  tasks.Success,
 		Payload: []string{""},
 	}
 

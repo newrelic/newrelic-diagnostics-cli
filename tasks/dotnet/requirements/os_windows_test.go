@@ -1,4 +1,5 @@
-// +build  !darwin !linux
+//go:build !darwin || !linux
+// +build !darwin !linux
 
 package requirements
 

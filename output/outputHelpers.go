@@ -46,12 +46,6 @@ func getResultsJSON(data []registration.TaskResult) string {
 	return string(output)
 }
 
-//getEpoch returns epoch time (at time of fn call) as an int64
-func getEpoch() int64 {
-	now := time.Now().UTC().UnixNano()
-	return (now / 1000000)
-}
-
 func outputJSON(json string) {
 	jsonFile := filepath.Clean(config.Flags.OutputPath + "/nrdiag-output.json")
 	log.Debug("Creating json file:", jsonFile)
@@ -60,7 +54,7 @@ func outputJSON(json string) {
 		log.Info("Error creating directory", err)
 		log.Info(permissionsError)
 	}
-	ioutil.WriteFile(jsonFile, []byte(json), 0644)
+	_ = ioutil.WriteFile(jsonFile, []byte(json), 0644)
 }
 
 func CreateZip() *zip.Writer {
@@ -107,7 +101,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 			writer, _ := dst.CreateHeader(&header)
 			for s := range envelope.Stream {
-				io.WriteString(writer, s)
+				_, _ = io.WriteString(writer, s)
 			}
 		} else {
 			log.Debug("adding " + envelope.Path + " to zip")
@@ -119,12 +113,11 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			}
 			// open file handle
 			fileHandle, err := os.Open(envelope.Path)
-			defer fileHandle.Close()
-
 			if err != nil {
 				log.Info("Error opening file handle", err)
 				return
 			}
+			defer fileHandle.Close()
 
 			header, err := zip.FileInfoHeader(stat)
 			if err != nil {

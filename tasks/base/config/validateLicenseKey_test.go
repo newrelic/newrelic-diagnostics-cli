@@ -147,7 +147,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
-				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in C:\ProgramData\New Relic\.NET Agent\newrelic.config,` + "\n " + `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml` + " did not match the one assigned to your account:\neu01xx66c637a29c3982469a3fe8d1982d00NRAL\nIf you are using an 'ingest key', ignore this warning. Ingest keys are secondary license keys manage by their own users that we do not validate for. Read more about ingest keys - https://docs.newrelic.com/docs/apis/nerdgraph/examples/use-nerdgraph-manage-license-keys-user-keys\n\n"))
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in C:\ProgramData\New Relic\.NET Agent\newrelic.config,` + "\n " + `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml` + " did not match the one assigned to your account:\neu01xx66c637a29c3982469a3fe8d1982d00NRAL\nIf you are not using the account's original license key, you can ignore this warning. The Diagnostics CLI only validates the account's original license key. Read more about license keys - https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key\n\n"))
 
 			})
 		})

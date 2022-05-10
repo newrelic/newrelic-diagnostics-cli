@@ -177,8 +177,7 @@ func insertCustomEvents(account, apiKey, payload string) error {
 	headers["content-type"] = "application/json"
 	headers["cache-control"] = "no-cache"
 
-	var insertURL string
-	insertURL = os.Getenv("STAGING_INSIGHTS_URL") + account + "/events"
+	insertURL := os.Getenv("STAGING_INSIGHTS_URL") + account + "/events"
 
 	wrapper := httpHelper.RequestWrapper{
 		Method:  "POST",
@@ -195,7 +194,7 @@ func insertCustomEvents(account, apiKey, payload string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Received non 200 response code from insert API: %d", resp.StatusCode)
+		return fmt.Errorf("received non 200 response code from insert API: %d", resp.StatusCode)
 	}
 
 	return nil

@@ -21,29 +21,6 @@ import (
 const defaultProtocolVersion = "1.0"
 const defaultUsageEndpoint = "http://localhost:3000/usage"
 
-/*
-dotnet: licenseKey
-dotnetcore: -licenseKey
-go: config not parsed
-infra: license_key
-java: license_key
-node: licenseKey
-php: newrelic.license
-python: license_key
-Ruby: license_key
-*/
-
-var licenseKeyConfigNames = []string{
-	"license_key",
-	"licenseKey",
-	"-licenseKey",
-	"newrelic.license",
-}
-
-// type Survey struct {
-// 	URI string `json:"uri"`
-// }
-
 type usageResponse struct {
 	Survey struct {
 		Prompt string
@@ -293,7 +270,7 @@ func (u *usageAPI) postData(data string, headers map[string]string) (usageRespon
 	// Check the response
 	if response.statusCode != 200 {
 		log.Debug("Unexpected status code from usage endpoint:", response.statusCode)
-		return usageResponse{}, errors.New("Unexpected status code")
+		return usageResponse{}, errors.New("unexpected status code")
 	}
 
 	var responseData usageResponse

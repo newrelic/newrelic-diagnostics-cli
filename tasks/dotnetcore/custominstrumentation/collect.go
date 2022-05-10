@@ -1,22 +1,21 @@
 package custominstrumentation
 
 import (
-	"runtime"
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"runtime"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-type DotNetCoreCustomInstrumentationCollect struct { 
-	name string
+type DotNetCoreCustomInstrumentationCollect struct {
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
 func (p DotNetCoreCustomInstrumentationCollect) Identifier() tasks.Identifier {
-	return tasks.IdentifierFromString("DotNetCore/CustomInstrumentation/Collect") 
+	return tasks.IdentifierFromString("DotNetCore/CustomInstrumentation/Collect")
 }
 
 // Explain - Returns the help text
@@ -24,10 +23,10 @@ func (p DotNetCoreCustomInstrumentationCollect) Explain() string {
 	return "Collect New Relic .NET Core agent custom instrumentation file(s)" //This is the customer visible help text that describes what this particular task does
 }
 
-// Dependencies - Returns the dependencies for ech task. 
+// Dependencies - Returns the dependencies for ech task.
 func (p DotNetCoreCustomInstrumentationCollect) Dependencies() []string {
 	return []string{
-		"DotNetCore/Agent/Installed", 
+		"DotNetCore/Agent/Installed",
 	}
 }
 
@@ -56,7 +55,7 @@ func (p DotNetCoreCustomInstrumentationCollect) Execute(options tasks.Options, u
 	}
 
 	// get path of agent
-	installPath, ok := upstream["DotNetCore/Agent/Installed"].Payload.(string) 
+	installPath, ok := upstream["DotNetCore/Agent/Installed"].Payload.(string)
 	if !ok {
 		result.Status = tasks.None
 		result.Summary = ".NET Core Agent not installed, not checking for custom instrumentation files"

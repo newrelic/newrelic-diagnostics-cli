@@ -22,7 +22,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ProxyUser          string
 		ProxyPassword      string
 		Tasks              string
-		AttachmentKey      string
 		ConfigFile         string
 		Override           string
 		OutputPath         string
@@ -46,7 +45,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ProxyUser:          "string",
 		ProxyPassword:      "",
 		Tasks:              "string",
-		AttachmentKey:      "string",
 		ConfigFile:         "string",
 		Override:           "",
 		OutputPath:         "",
@@ -70,7 +68,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ConfigFlag{Name: "proxyUser", Value: true},
 		ConfigFlag{Name: "proxyPassword", Value: false},
 		ConfigFlag{Name: "tasks", Value: "string"},
-		ConfigFlag{Name: "attachmentKey", Value: "string"},
 		ConfigFlag{Name: "configFile", Value: true},
 		ConfigFlag{Name: "override", Value: false},
 		ConfigFlag{Name: "outputPath", Value: false},
@@ -108,7 +105,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				ProxyUser:          tt.fields.ProxyUser,
 				ProxyPassword:      tt.fields.ProxyPassword,
 				Tasks:              tt.fields.Tasks,
-				AttachmentKey:      tt.fields.AttachmentKey,
 				ConfigFile:         tt.fields.ConfigFile,
 				Override:           tt.fields.Override,
 				OutputPath:         tt.fields.OutputPath,

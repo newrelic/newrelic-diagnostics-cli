@@ -1,10 +1,7 @@
 package output
 
 import (
-	"bytes"
-	"io"
 	"io/ioutil"
-	"os"
 	"reflect"
 	"runtime"
 	"strings"
@@ -41,19 +38,19 @@ func Test_GetResultsJSON(t *testing.T) {
 		t.Error("Expected:", expected, "Observed:", observed)
 	}
 }
-func Test_StreamDataOutut(t *testing.T) {
+func Test_StreamDataOutput(t *testing.T) {
 
 	dataChannel := make(chan string)
 
 	fakeResults := []registration.TaskResult{
-		registration.TaskResult{
+		{
 			Task: registration.TasksForIdentifierString("Base/Log/Collect")[0],
 			Result: tasks.Result{
 				Status:  tasks.Success,
 				Summary: "Streamed data",
 				URL:     "",
 				FilesToCopy: []tasks.FileCopyEnvelope{
-					tasks.FileCopyEnvelope{Path: "data.txt", Stream: dataChannel, Identifier: "Base/Log/Collect"},
+					{Path: "data.txt", Stream: dataChannel, Identifier: "Base/Log/Collect"},
 				},
 			},
 		},
@@ -111,8 +108,8 @@ func generateResultArray() []registration.TaskResult {
 			Summary: "4 config files(s) found",
 			URL:     "",
 			FilesToCopy: []tasks.FileCopyEnvelope{
-				tasks.FileCopyEnvelope{Path: "./fixtures/java/newrelic/newrelic.yml", Identifier: "Base/Config/Collect"},
-				tasks.FileCopyEnvelope{Path: "./fixtures/ruby/config/newrelic.yml", Identifier: "Base/Config/Collect"},
+				{Path: "./fixtures/java/newrelic/newrelic.yml", Identifier: "Base/Config/Collect"},
+				{Path: "./fixtures/ruby/config/newrelic.yml", Identifier: "Base/Config/Collect"},
 			},
 			Payload: "[{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/newrelic-diagnostics-cli/fixtures/java/newrelic/\"},{\"FileName\":\"newrelic.yml\",\"FilePath\":\"/Users/btribbia/dev/go/src/github.com/newrelic/newrelic-diagnostics-cli/fixtures/ruby/config/\"}]",
 		},
@@ -142,21 +139,6 @@ func generateResultArray() []registration.TaskResult {
 	results := []registration.TaskResult{resA, resB, resC}
 
 	return results
-}
-
-func captureStdout(f func([]tasks.Result), results []tasks.Result) string {
-	old := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	f(results)
-
-	w.Close()
-	os.Stdout = old
-
-	var buf bytes.Buffer
-	io.Copy(&buf, r)
-	return buf.String()
 }
 
 func readFile(file string) string {

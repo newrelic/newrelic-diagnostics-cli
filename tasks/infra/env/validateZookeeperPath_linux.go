@@ -229,7 +229,7 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 	zookeeperPathBlobs := kafkaConfigPair.Configuration.ParsedResult.FindKey("zookeeper_path")
 
 	if len(zookeeperPathBlobs) > 1 {
-		return ZookeeperConfig{}, fmt.Errorf("Multiple keys found for zookeeper_path")
+		return ZookeeperConfig{}, fmt.Errorf("multiple keys found for zookeeper_path")
 	} else if len(zookeeperPathBlobs) == 1 {
 		zookeeperExtractedConfig.Path = zookeeperPathBlobs[0].Value()
 	}

@@ -1,10 +1,10 @@
 package template
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Example/Template/FullTask", func() {
@@ -53,7 +53,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
-						Status: tasks.Success,
+						Status:  tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -77,7 +77,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"Base/Config/Validate": tasks.Result{
-						Status: tasks.Warning,
+						Status:  tasks.Warning,
 						Payload: "I should be a slice of validate elements, but I'm not",
 					},
 				}

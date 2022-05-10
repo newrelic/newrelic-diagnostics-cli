@@ -198,7 +198,7 @@ func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
 	for _, key := range jmxKeys {
 		foundkey := jmxConfigPair.Configuration.ParsedResult.FindKey(key)
 		if len(foundkey) > 1 {
-			return JmxConfig{}, fmt.Errorf("Multiple key %s found", key)
+			return JmxConfig{}, fmt.Errorf("multiple key %s found", key)
 		}
 
 		for _, fieldValue := range foundkey {
@@ -219,7 +219,7 @@ func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
 
 	//collection_files is minimum required key for jmx-config.yml
 	if jmxExtractedConfig.CollectionFiles == "" {
-		return JmxConfig{}, errors.New("Invalid configuration found: collection_files not set")
+		return JmxConfig{}, errors.New("invalid configuration found: collection_files not set")
 	}
 
 	return jmxExtractedConfig, nil

@@ -2,16 +2,16 @@ package env
 
 import (
 	"context"
-	"strconv"
-	"time"
 	"fmt"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"strconv"
+	"time"
 )
 
 // BaseEnvHostInfo - Gets information on a host
 type BaseEnvHostInfo struct {
-	HostInfoProvider HostInfoProviderFunc
+	HostInfoProvider            HostInfoProviderFunc
 	HostInfoProviderWithContext HostInfoProviderWithContextFunc
 }
 
@@ -62,7 +62,6 @@ func (t BaseEnvHostInfo) Execute(options tasks.Options, upstream map[string]task
 	return
 }
 
-
 func (t BaseEnvHostInfo) getInfo(timeout time.Duration) (result tasks.Result) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -70,15 +69,15 @@ func (t BaseEnvHostInfo) getInfo(timeout time.Duration) (result tasks.Result) {
 	hostInfo, err := t.HostInfoProviderWithContext(ctx)
 
 	if err != nil {
-		return tasks.Result {
-			Status: tasks.Warning,
+		return tasks.Result{
+			Status:  tasks.Warning,
 			Summary: fmt.Sprintf("Error collecting complete host information:\n%s", err.Error()),
 			Payload: hostInfo,
 		}
 	}
-	
-	return tasks.Result {
-		Status: tasks.Info,
+
+	return tasks.Result{
+		Status:  tasks.Info,
 		Summary: "Collected host information",
 		Payload: hostInfo,
 	}

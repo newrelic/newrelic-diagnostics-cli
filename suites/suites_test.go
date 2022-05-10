@@ -1,9 +1,9 @@
 package suites
 
 import (
-	"testing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"testing"
 )
 
 func TestSuites(t *testing.T) {
@@ -15,7 +15,7 @@ var _ = Describe("FindTasksBySuites()", func() {
 	var (
 		//inputs
 		suites []Suite
-		sm	*SuiteManager
+		sm     *SuiteManager
 		//output
 		expectedTasks []string
 	)
@@ -40,7 +40,7 @@ var _ = Describe("FindTasksBySuites()", func() {
 				},
 			}
 			sm = NewSuiteManager(suiteDefinitions)
-			expectedTasks = []string {
+			expectedTasks = []string{
 				"Java/*",
 				"Infra/*",
 			}

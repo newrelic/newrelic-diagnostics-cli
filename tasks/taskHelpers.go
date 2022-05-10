@@ -39,7 +39,7 @@ func FindFiles(patterns []string, paths []string) []string {
 		if err == nil {
 			path = symPath
 		}
-		filepath.Walk(path, func(pathInfo string, fileInfo os.FileInfo, walkErr error) error {
+		_ = filepath.Walk(path, func(pathInfo string, fileInfo os.FileInfo, walkErr error) error {
 			if walkErr != nil {
 				// log the error and move on to next item to be walked
 				log.Debug("Error when walking filesystem:", walkErr)
@@ -227,10 +227,7 @@ func (t ByChild) Less(i, j int) bool {
 	c2 := t[j].PathAndKey()
 	pathandkeys := []string{c1, c2}
 	sort.Strings(pathandkeys)
-	if pathandkeys[0] == c1 {
-		return true
-	}
-	return false
+	return pathandkeys[0] == c1
 }
 
 //Sort sorts an inplace object, organizing the children alphabetically
@@ -249,10 +246,7 @@ func (v ValidateBlob) Sort() {
 
 // IsLeaf - returns true if a ValidateBlob is a leaf, i.e. has a value, or false if it has children
 func (v ValidateBlob) IsLeaf() bool {
-	if v.Children == nil {
-		return true
-	}
-	return false
+	return v.Children == nil
 }
 
 // Value - returns the value as a string, if is a node
@@ -313,10 +307,7 @@ func (v ValidateBlob) PathAndKey() string {
 
 //PathAndKeyContains - Just a quick wrapper around strings.Contains to make it easier to call
 func (v ValidateBlob) PathAndKeyContains(searchKey string) bool {
-	if strings.Contains(v.PathAndKey(), searchKey) {
-		return true
-	}
-	return false
+	return strings.Contains(v.PathAndKey(), searchKey)
 }
 
 // FindKey - returns one or more ValidateBlobs within a given ValidateBlob that has the desired key
@@ -732,7 +723,7 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 
 	if len(envVars.All) == 0 {
 		log.Debug("Env vars slice is 0, assuming there was an error collecting them")
-		retErr = errors.New("Unable to gather any Environment Variables from the current shell")
+		retErr = errors.New("unable to gather any Environment Variables from the current shell")
 		return
 	}
 
@@ -928,7 +919,7 @@ func BytesToPrettyJSONBytes(bytes []byte) ([]byte, error) {
 	} else if firstByte == "{" {
 		unmarshaled = make(map[string]interface{})
 	} else {
-		return bytes, errors.New("Invalid JSON: First character is " + string(firstByte))
+		return bytes, errors.New("invalid JSON: First character is " + string(firstByte))
 	}
 
 	unMarshalError := json.Unmarshal(bytes, &unmarshaled)
@@ -1001,8 +992,6 @@ func HTTPRequester(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 //GetWorkingDirectoriesFunc function type declaration for GetWorkingDirectories
 type GetWorkingDirectoriesFunc func() []string
 
-type osFunc func() (string, error)
-
 var osGetwd = os.Getwd
 var osExecutable = os.Executable
 
@@ -1048,7 +1037,7 @@ func ValidatePath(path string) CollectFileStatus {
 	}
 
 	if fileInfo.IsDir() {
-		return CollectFileStatus{path, false, errors.New("Is directory and not a path to a file")}
+		return CollectFileStatus{path, false, errors.New("is directory and not a path to a file")}
 	}
 
 	file, err := os.Open(path)

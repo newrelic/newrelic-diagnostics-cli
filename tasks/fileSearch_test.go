@@ -146,11 +146,11 @@ var _ = Describe("file search Task helpers", func() {
 				search = ""
 				filepath = "brokenfile"
 				osOpen = func(string) (*os.File, error) {
-					return nil, errors.New("Error opening file")
+					return nil, errors.New("error opening file")
 				}
 			})
 			It("should err that is not nil", func() {
-				Expect(err.Error()).To(Equal("Error opening file"))
+				Expect(err.Error()).To(Equal("error opening file"))
 			})
 		})
 	})

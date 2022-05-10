@@ -21,7 +21,6 @@ type ProcIdAndArgs struct {
 }
 
 type JavaEnvProcess struct {
-	name           string
 	findProcByName tasks.FindProcessByNameFunc
 	getCmdLineArgs func(process.Process) (string, error)
 	getCwd         func(process.Process) (string, error)

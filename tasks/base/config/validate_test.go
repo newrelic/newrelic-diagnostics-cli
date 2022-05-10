@@ -233,7 +233,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			})
 		})
 		Context("When parsing invalid XML", func() {
-			file, err := os.Open("fixtures/validate_badxml.config")
+			file, _ := os.Open("fixtures/validate_badxml.config")
 			defer file.Close()
 			result, err := parseXML(file)
 			It("Should return error parsing xml", func() {

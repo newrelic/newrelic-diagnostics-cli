@@ -117,10 +117,10 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 			paths = append(paths, sysAppData+`\New Relic\newrelic-infra`)
 		} else if strings.HasSuffix(sysAppData, "Local") {
 
-			paths = append(paths, strings.TrimRight(sysAppData, "Local")+`Roaming\New Relic\newrelic-infra`)
+			paths = append(paths, strings.TrimSuffix(sysAppData, "Local")+`Roaming\New Relic\newrelic-infra`)
 
 		} else if strings.HasSuffix(sysAppData, "LocalLow") {
-			paths = append(paths, strings.TrimRight(sysAppData, "LocalLow")+`Roaming\New Relic\newrelic-infra`)
+			paths = append(paths, strings.TrimSuffix(sysAppData, "LocalLow")+`Roaming\New Relic\newrelic-infra`)
 
 		} else {
 			paths = append(paths, sysAppData+`\Roaming\New Relic\newrelic-infra`)
@@ -214,8 +214,8 @@ func getLogPathFromUnmatchedKeys(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal
 		logElements := getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
 		if len(logElements) > 0 {
 			return logElements
-		}	
-	} 
+		}
+	}
 	logElements := getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath, options)
 	if len(logElements) > 0 {
 		return logElements
@@ -256,8 +256,8 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 				for _, fullPath := range logPaths {
 					dir, fileName := filepath.Split(fullPath)
 					logSourceData := LogSourceData{
-						FoundBy: foundBy,
-						KeyVals: keyVals,
+						FoundBy:  foundBy,
+						KeyVals:  keyVals,
 						FullPath: fullPath,
 					}
 					logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))

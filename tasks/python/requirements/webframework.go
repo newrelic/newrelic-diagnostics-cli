@@ -90,7 +90,7 @@ func checkWebframework(pipFreezeOutput []string) (result tasks.Result) {
 			if err != nil {
 				log.Debugf("Encountered %s while attempting to parse the framework version.", err)
 			}
-			if v == true {
+			if v {
 				compatibleCustomerFrameworks = append(compatibleCustomerFrameworks, pipFreezeOutputItem)
 
 			}

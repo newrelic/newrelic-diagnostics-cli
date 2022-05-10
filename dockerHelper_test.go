@@ -35,10 +35,10 @@ func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, d
 //CreateDockerfile - This builds the raw Dockerfile from the slice of tests
 func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, dockerfileLines []string) (string, error) {
 
-	f, err := ioutil.TempFile("temp", imageName)
+	f, _ := ioutil.TempFile("temp", imageName)
 	//Build base Dockerfile
 
-	if _, err = f.WriteString("\r\n"); err != nil {
+	if _, err := f.WriteString("\r\n"); err != nil {
 		log.Info("Error writing output file", err)
 		return "", err
 	}
@@ -103,7 +103,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 
 	for _, line := range dockerfile {
 		log.Debug(line)
-		if _, err = f.WriteString(line + "\r\n"); err != nil {
+		if _, err := f.WriteString(line + "\r\n"); err != nil {
 			log.Info("Error writing output file", err)
 			return "", err
 		}

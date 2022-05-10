@@ -1,9 +1,9 @@
 package requirements
 
 import (
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"DotNet/Agent/Installed": {
-						Status: tasks.None,
+						Status:  tasks.None,
 						Summary: tasks.NoAgentDetectedSummary,
 					},
 				}

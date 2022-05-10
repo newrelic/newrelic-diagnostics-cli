@@ -56,18 +56,18 @@ var _ = Describe("Base/Env/HostInfo", func() {
 
 				p.HostInfoProvider = func() (HostInfo, error) {
 					hostInfo := HostInfo{}
-					return hostInfo, errors.New("Host is haunted")
+					return hostInfo, errors.New("host is haunted")
 				}
 				p.HostInfoProviderWithContext = func(context.Context) (HostInfo, error) {
 					hostInfo := HostInfo{}
-					return hostInfo, errors.New("Host is haunted")
+					return hostInfo, errors.New("host is haunted")
 				}
 			})
 			It("Should return", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("Should return", func() {
-				Expect(result.Summary).To(Equal("Error collecting complete host information:\nHost is haunted"))
+				Expect(result.Summary).To(Equal("Error collecting complete host information:\nhost is haunted"))
 			})
 
 		})

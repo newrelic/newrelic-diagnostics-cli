@@ -165,7 +165,6 @@ func matchConfigFile(processWorkingDir string, validations []config.ValidateElem
 		for _, validation := range validations {
 			if validation.Config.FilePath+validation.Config.FileName == configPath {
 				parsedResult = validation.ParsedResult
-			} else {
 			}
 		}
 	}
@@ -190,7 +189,7 @@ func matchConfigFile(processWorkingDir string, validations []config.ValidateElem
 	}
 
 	// now check for a parsed result and parse the file if we don't have one
-	if configPath != "" && parsedResult.IsLeaf() == true {
+	if configPath != "" && parsedResult.IsLeaf() {
 		//Now we need to create a new validated blob
 		log.Debug("Configpath is", configPath)
 		file, err := os.Open(configPath)

@@ -21,39 +21,6 @@ type Client struct {
 	URL string
 }
 
-var _ = Describe("GetTicketFile", func() {
-	var (
-		attachmentKey  string
-		timestamp      string
-		expectedResult uploadFiles
-	)
-	Describe("Testing proper ticket upload file", func() {
-		BeforeEach(func() {
-			attachmentKey = "12345678912345678912345678912345"
-			timestamp = "2021-07-28T22:49:34Z"
-			config.Flags.AttachmentEndpoint = ""
-			config.AttachmentEndpoint = ""
-			expectedResult = uploadFiles{
-				path:        "./",
-				filename:    "nrdiag-output.json",
-				newFilename: "nrdiag-output-2021-07-28T22:49:34Z.json",
-				filesize:    0,
-				URL:         "http://localhost:3000/attachments/upload",
-				key:         "",
-			}
-			config.Flags.OutputPath = "./"
-			config.Flags.AttachmentEndpoint = ""
-			config.AttachmentEndpoint = ""
-		})
-		Context("With proper JSON format", func() {
-			It("Should return a JSON", func() {
-				result := getTicketUploadFile(attachmentKey, timestamp, "json")
-				Expect(result).To(Equal(expectedResult))
-			})
-		})
-	})
-})
-
 var _ = Describe("GetAttachmentEndpoints", func() {
 	var (
 		expectedResult string

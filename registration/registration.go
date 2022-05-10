@@ -66,7 +66,7 @@ func TasksForIdentifierString(ident string) []tasks.Task {
 	var tasks []tasks.Task
 
 	if strings.Contains(ident, "*") {
-		converter, _ := regexp.Compile("\\*")
+		converter, _ := regexp.Compile(`\*`)
 		matchString := converter.ReplaceAllString(strings.ToLower(ident), ".*")
 		matcher, err := regexp.Compile(matchString)
 		if err != nil {

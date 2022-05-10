@@ -101,7 +101,7 @@ func (p BaseConfigValidateLicenseKey) Execute(options tasks.Options, upstream ma
 
 		if len(invalidAccountLKToSources) > 0 {
 			for lk, sources := range invalidAccountLKToSources {
-				warningSummary += fmt.Sprintf("The license key found in %s did not match the one assigned to your account:\n%s\nIf you are using an 'ingest key', ignore this warning. Ingest keys are secondary license keys manage by their own users that we do not validate for. Read more about ingest keys - https://docs.newrelic.com/docs/apis/nerdgraph/examples/use-nerdgraph-manage-license-keys-user-keys\n\n", strings.Join(sources, ",\n "), lk)
+				warningSummary += fmt.Sprintf("The license key found in %s did not match the one assigned to your account:\n%s\nIf you are not using the account's original license key, you can ignore this warning. The Diagnostics CLI only validates the account's original license key. Read more about license keys - https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key\n\n", strings.Join(sources, ",\n "), lk)
 			}
 		}
 

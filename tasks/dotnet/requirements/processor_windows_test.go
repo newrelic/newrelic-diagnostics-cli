@@ -58,7 +58,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
 				}
 				p.getProcessorArch = func() (string, error) {
-					return "", errors.New("I am a banana")
+					return "", errors.New("i am a banana")
 				}
 			})
 			It("Should return Error status", func() {

@@ -13,11 +13,11 @@ func TestTasksService_ValidateLicenseKeys(t *testing.T) {
 	defer teardown()
 	testAPIEndpoint := "/tasks/license-key"
 
-testLicenseKeys := []string{"08a2ad66c637a29c3982469a3fe8d1982d002c4a", "bad_key"}
+	testLicenseKeys := []string{"08a2ad66c637a29c3982469a3fe8d1982d002c4a", "bad_key"}
 	expectedParsedResults := []LicenseKeyResult{
 		{
-			LicenseKey: "08a2ad66c637a29c3982469a3fe8d1982d002c4a",			
-      IsValid:    true,
+			LicenseKey: "08a2ad66c637a29c3982469a3fe8d1982d002c4a",
+			IsValid:    true,
 		},
 		{
 			LicenseKey: "bad_key",

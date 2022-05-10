@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Synthetics/Minion/DetectCPM", func() {
@@ -50,7 +50,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 		successfulDetectDockerResult := tasks.Result{
 			Status: tasks.Info,
 			Payload: tasks.DockerInfo{
-				ServerVersion:   "18.09.0",
+				ServerVersion: "18.09.0",
 			},
 		}
 
@@ -78,7 +78,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					"Base/Containers/DetectDocker": tasks.Result{
 						Status: tasks.None,
 						Payload: tasks.DockerInfo{
-							ServerVersion:   "",
+							ServerVersion: "",
 						},
 					},
 				}
@@ -107,7 +107,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					} else if argAction == "inspect" {
 						return dockerMultiContainerInspectBytes, nil
 					}
-					return []byte{}, errors.New("Unknown command")
+					return []byte{}, errors.New("unknown command")
 				}
 			})
 
@@ -161,7 +161,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					} else if argAction == "inspect" {
 						return []byte{}, nil
 					}
-					return []byte{}, errors.New("Unknown command")
+					return []byte{}, errors.New("unknown command")
 				}
 			})
 
@@ -187,9 +187,9 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					if argAction == "ps" {
 						return []byte("b3e2f06abf13\ndb9438b731b2\nc4da14453597\n7f19f8818654"), nil
 					} else if argAction == "inspect" {
-						return []byte("Foo!"), errors.New("Inspect error")
+						return []byte("Foo!"), errors.New("inspect error")
 					}
-					return []byte{}, errors.New("Unknown command")
+					return []byte{}, errors.New("unknown command")
 				}
 			})
 
@@ -197,7 +197,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 				expectedResult := tasks.Result{}
 				expectedResult.Payload = nil
 				expectedResult.Status = tasks.Error
-				expectedResult.Summary = "Inspect error Foo!"
+				expectedResult.Summary = "inspect error Foo!"
 
 				Expect(result).To(Equal(expectedResult))
 
@@ -217,7 +217,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					} else if argAction == "inspect" {
 						return []byte(`[{"foo":"bar"}]`), nil
 					}
-					return []byte{}, errors.New("Unknown command")
+					return []byte{}, errors.New("unknown command")
 				}
 			})
 
@@ -225,7 +225,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 				expectedResult := tasks.Result{}
 				expectedResult.Payload = nil
 				expectedResult.Status = tasks.Error
-				expectedResult.Summary = "Could not find Env variables in container inspect blob"
+				expectedResult.Summary = "could not find Env variables in container inspect blob"
 
 				Expect(result).To(Equal(expectedResult))
 
@@ -241,9 +241,9 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 					argAction := args[0]
 
 					if argAction == "ps" {
-						return []byte("Bad query format"), errors.New("Invalid query")
+						return []byte("Bad query format"), errors.New("invalid query")
 					}
-					return []byte{}, errors.New("Unknown command")
+					return []byte{}, errors.New("unknown command")
 				}
 			})
 
@@ -251,7 +251,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 				expectedResult := tasks.Result{}
 				expectedResult.Payload = nil
 				expectedResult.Status = tasks.Error
-				expectedResult.Summary = "Error querying for container: Invalid query: Bad query format"
+				expectedResult.Summary = "error querying for container: invalid query: Bad query format"
 
 				Expect(result).To(Equal(expectedResult))
 

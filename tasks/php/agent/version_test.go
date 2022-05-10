@@ -3,10 +3,10 @@ package agent
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestPHPAgentVersion(t *testing.T) {
@@ -32,7 +32,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
-						Status: tasks.Success,
+						Status:  tasks.Success,
 						Payload: []string{},
 					},
 				}
@@ -48,7 +48,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
-						Status: tasks.Success,
+						Status:  tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -153,7 +153,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("Should return task result summary of err.Erro()", func() {
-				Expect(result.Summary).To(Equal("Unable to convert %^&^&% to an integer"))
+				Expect(result.Summary).To(Equal("unable to convert %^&^&% to an integer"))
 			})
 		})
 		Context("When len(agentVersion) > 1 ", func() {

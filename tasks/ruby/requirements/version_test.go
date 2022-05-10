@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -59,10 +60,10 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status: tasks.Error,
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status:  tasks.Success,
 						Payload: "6.11.0.365",
 					},
@@ -82,11 +83,11 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-linux]", //changed to just 2.4 and still worked with the test --> ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-linux]
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -105,14 +106,14 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "ruby 1.8.6p0 (2016-12-24 revision 57164) [x86_64-linux]",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.Info,
 						Payload: []tasks.Ver{
-							tasks.Ver{3, 9, 9, 275},
+							{Major: 3, Minor: 9, Patch: 9, Build: 275},
 						},
 					},
 				}
@@ -131,14 +132,14 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "ruby ",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.Info,
 						Payload: []tasks.Ver{
-							tasks.Ver{3, 9, 9, 275},
+							{Major: 3, Minor: 9, Patch: 9, Build: 275},
 						},
 					},
 				}
@@ -148,7 +149,7 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			})
 
 			It("should return an expected none error summary", func() {
-				Expect(result.Summary).To(Equal("While parsing the Ruby Version, we encountered an error: No found result for Ruby Version when parsing for payload ruby "))
+				Expect(result.Summary).To(Equal("While parsing the Ruby Version, we encountered an error: no found result for Ruby Version when parsing for payload ruby "))
 			})
 		})
 
@@ -157,15 +158,15 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-linux]",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.Info,
 						Payload: []tasks.Ver{
-							tasks.Ver{4, 8, 0, 2},
-							tasks.Ver{4, 8, 0, 3},
+							{Major: 4, Minor: 8, Patch: 0, Build: 2},
+							{Major: 4, Minor: 8, Patch: 0, Build: 3},
 						},
 					},
 				}
@@ -184,15 +185,15 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "ruby 2.4.0p0 (2016-12-24 revision 57164) [x86_64-linux]",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.Info,
 						Payload: []tasks.Ver{
-							tasks.Ver{3, 9, 9, 275},
-							tasks.Ver{3, 9, 6, 257},
+							{Major: 3, Minor: 9, Patch: 9, Build: 275},
+							{Major: 3, Minor: 9, Patch: 6, Build: 257},
 						},
 					},
 				}
@@ -211,15 +212,15 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Ruby/Env/Version": tasks.Result{
+					"Ruby/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "ruby 1.9.2p0 (2016-12-24 revision 57164) [x86_64-linux]",
 					},
-					"Ruby/Agent/Version": tasks.Result{
+					"Ruby/Agent/Version": {
 						Status: tasks.Info,
 						Payload: []tasks.Ver{
-							tasks.Ver{3, 9, 5, 275},
-							tasks.Ver{3, 9, 6, 257},
+							{Major: 3, Minor: 9, Patch: 5, Build: 275},
+							{Major: 3, Minor: 9, Patch: 6, Build: 257},
 						},
 					},
 				}
@@ -229,6 +230,7 @@ var _ = Describe("Ruby/Requirements/Version", func() {
 			})
 
 			It("should return an expected none warning summary", func() {
+				fmt.Println(result.Summary)
 				Expect(result.Summary).To(Equal("Incompatible Version detected: 3.9.5.275\nCompatible Version detected: 3.9.6.257\n"))
 			})
 		})

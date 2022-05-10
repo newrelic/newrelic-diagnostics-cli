@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	errResponseMissingDateHeader = errors.New("Date header not found in collector response")
+	errResponseMissingDateHeader = errors.New("date header not found in collector response")
 )
 
 const (
@@ -51,7 +51,7 @@ func (p InfraEnvClockSkew) Execute(options tasks.Options, upstream map[string]ta
 
 	if upstream["Infra/Agent/Connect"].Status == tasks.None {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: "Unable to urls from Infra/Agent/Connect. This task did not run",
 		}
 	}
