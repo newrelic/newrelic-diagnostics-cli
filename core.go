@@ -33,6 +33,8 @@ func main() {
 			log.Infof("%s exceeds maximum file size of 4 GB. Unable to include it in the zip.\n\nExiting program.\n", fileInfo.Name())
 			os.Exit(3)
 		}
+
+		// check dir file size?
 	}
 
 	_, err := processHTTPProxy()

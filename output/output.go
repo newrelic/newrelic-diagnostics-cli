@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
@@ -143,8 +144,14 @@ func CopyIncludeToZip(zipfile *zip.Writer, file string) {
 
 	// check for any errors accessing file
 	if err != nil {
-		log.Infof("Could not add %s to zip.\n", file)
-		log.Info(err.Error())
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), file)
+		log.Info(color.ColorString(color.Yellow, err.Error()))
+		return
+	}
+
+	if strings.HasSuffix(fileInfo.Name(), ".exe") {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), file)
+		log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
 		return
 	}
 
