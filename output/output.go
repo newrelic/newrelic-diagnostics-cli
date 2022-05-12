@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
@@ -138,6 +139,38 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 		{Path: filePath},
 	}
 	copyFilesToZip(zipfile, filelist)
+}
+
+func CopyIncludeToZip(zipfile *zip.Writer, file string) {
+	fileInfo, err := os.Stat(file)
+
+	// check for any errors accessing file
+	if err != nil {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), file)
+		log.Info(color.ColorString(color.Yellow, err.Error()))
+		return
+	}
+
+	if strings.HasSuffix(fileInfo.Name(), ".exe") {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), file)
+		log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
+		return
+	}
+
+	// Check if a file or dir was provided
+	if fileInfo.IsDir() {
+		// TODO: make this automatically pass this on to -upload-dir logic
+		return
+	}
+
+	// add the file to the zip in the Upload/
+	f := []tasks.FileCopyEnvelope{
+		{
+			Path:       file,
+			Identifier: "Upload/Upload",
+		},
+	}
+	copyFilesToZip(zipfile, f)
 }
 
 // CopyOutputToZip - takes the nrdiag-output.json and adds it to the zip file

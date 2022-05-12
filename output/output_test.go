@@ -8,9 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/newrelic/newrelic-diagnostics-cli/registration"
-
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
