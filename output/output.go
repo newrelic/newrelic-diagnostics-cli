@@ -3,8 +3,10 @@ package output
 import (
 	"archive/zip"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"sync"
@@ -145,6 +147,45 @@ func CopyOutputToZip(zipfile *zip.Writer) {
 
 func copyFileListToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
+}
+
+func CopyIncludeDirToZip(zipfile *zip.Writer, pathToDir string) {
+	dir, err := os.Stat(pathToDir)
+	if err != nil {
+		log.Infof("%q is not a directory\n\n", dir.Name())
+	} else {
+		log.Debugf("Valid directory supplied\n\n", dir.Name())
+		err := filepath.Walk(pathToDir,
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if info.IsDir() {
+					return nil
+				}
+				file, err := os.Open(path)
+				if err != nil {
+					return err
+				}
+				defer file.Close()
+
+				f, err := zipfile.Create(("Include/" + path))
+				if err != nil {
+					return err
+				}
+				_, err = io.Copy(f, file)
+				if err != nil {
+					return err
+				}
+
+				fmt.Println(filepath.Dir(path), info.Size())
+				return nil
+			})
+		if err != nil {
+			log.Info(err)
+		}
+	}
+
 }
 
 // WriteLineResults - outputs results to the screen as they complete (from the channel) and then returns the entire set
