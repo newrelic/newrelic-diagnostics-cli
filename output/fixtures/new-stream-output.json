@@ -15,7 +15,9 @@
 		"OutputPath": "",
 		"Filter": "",
 		"BrowserURL": "",
-		"Suites": ""
+		"Suites": "",
+		"Include": "",
+		"UploadDir": ""
 	},
 	"Results": [
 		{

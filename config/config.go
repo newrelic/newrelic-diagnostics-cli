@@ -43,7 +43,7 @@ type userFlags struct {
 	BrowserURL         string
 	AttachmentEndpoint string
 	Suites             string
-	UploadFile         string
+	Include            string
 	UploadDir          string
 	InNewRelicCLI      bool
 }
@@ -76,7 +76,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Filter           string
 		BrowserURL       string
 		Suites           string
-		UploadFile       string
+		Include          string
 		UploadDir        string
 	}{
 		Verbose:          f.Verbose,
@@ -94,7 +94,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Filter:           f.Filter,
 		BrowserURL:       f.BrowserURL,
 		Suites:           f.Suites,
-		UploadFile:       f.UploadFile,
+		Include:          f.Include,
 		UploadDir:        f.UploadDir,
 	})
 }
@@ -174,7 +174,7 @@ func ParseFlags() {
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
-	flag.StringVar(&Flags.UploadFile, "upload-file", defaultString, "Specify a file path to upload in the diagnostics-output.zip.  Cannot be used with '-upload-dir'")
+	flag.StringVar(&Flags.Include, "include", defaultString, " Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
 	flag.StringVar(&Flags.UploadDir, "upload-dir", defaultString, "Specify a directory path to upload in the diagnostics-output.zip.  Cannot be used with '-upload-file'")
 
 	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
@@ -183,7 +183,7 @@ func ParseFlags() {
 	}
 
 	flag.Parse()
-	if Flags.UploadFile != "" && Flags.UploadDir != "" {
+	if Flags.Include != "" && Flags.UploadDir != "" {
 		log.Fatal("Cannot use both 'upload-file' and 'upload-dir'.  Use '-h' for more information")
 	}
 
@@ -234,7 +234,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "browserURL", Value: boolifyFlag(f.BrowserURL)},
 		{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		{Name: "suites", Value: f.Suites},
-		{Name: "uploadFile", Value: f.UploadFile},
+		{Name: "include", Value: f.Include},
 		{Name: "uploadDir", Value: f.UploadDir},
 	}
 }

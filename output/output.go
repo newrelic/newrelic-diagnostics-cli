@@ -138,6 +138,32 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 	copyFilesToZip(zipfile, filelist)
 }
 
+func CopyIncludeToZip(zipfile *zip.Writer, file string) {
+	fileInfo, err := os.Stat(file)
+
+	// check for any errors accessing file
+	if err != nil {
+		log.Infof("Could not add %s to zip.\n", file)
+		log.Info(err.Error())
+		return
+	}
+
+	// Check if a file or dir was provided
+	if fileInfo.IsDir() {
+		// TODO: make this automatically pass this on to -upload-dir logic
+		return
+	}
+
+	// add the file to the zip in the Upload/
+	f := []tasks.FileCopyEnvelope{
+		{
+			Path:       file,
+			Identifier: "Upload/Upload",
+		},
+	}
+	copyFilesToZip(zipfile, f)
+}
+
 // CopyOutputToZip - takes the nrdiag-output.json and adds it to the zip file
 func CopyOutputToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-output.json")

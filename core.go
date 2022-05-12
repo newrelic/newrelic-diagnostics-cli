@@ -20,6 +20,21 @@ func main() {
 	log.Debugf("Run ID: %s\n", runID)
 	log.Debug("nrdiag was run with options", os.Args)
 
+	// if using -include, ensure file/dir exists
+	if config.Flags.Include != "" {
+		fileInfo, err := os.Stat(config.Flags.Include)
+		if err != nil {
+			log.Infof("Error including file or directory in zip: %v\n\nExiting program.\n" , err.Error())
+			os.Exit(3)
+		}
+
+		// limit file size to 4 GB
+		if fileInfo.Size() > 4000000000 {
+			log.Infof("%s exceeds maximum file size of 4 GB. Unable to include it in the zip.\n\nExiting program.\n", fileInfo.Name())
+			os.Exit(3)
+		}
+	}
+
 	_, err := processHTTPProxy()
 
 	//Error setting proxy and they specifically included one so let's break out of the program before we attempt any non-proxied calls.
@@ -93,6 +108,11 @@ func main() {
 		// copy our output file(s) to the zip file
 		output.CopyOutputToZip(zipfile)
 		// ...and close it out
+
+		if config.Flags.Include != "" {
+			output.CopyIncludeToZip(zipfile, config.Flags.Include)
+		}
+
 		output.CloseZip(zipfile)
 
 		// upload any files (zip and json)
