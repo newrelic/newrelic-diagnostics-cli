@@ -24,7 +24,7 @@ func main() {
 	if config.Flags.Include != "" {
 		fileInfo, err := os.Stat(config.Flags.Include)
 		if err != nil {
-			log.Infof("Error including file or directory in zip: %v\n\nExiting program.\n" , err.Error())
+			log.Infof("Error including file or directory in zip: %v\n\nExiting program.\n", err.Error())
 			os.Exit(3)
 		}
 

@@ -160,6 +160,8 @@ func CopyIncludeToZip(zipfile *zip.Writer, file string) {
 	// Check if a file or dir was provided
 	if fileInfo.IsDir() {
 		// TODO: make this automatically pass this on to -upload-dir logic
+		log.Debug("Passed in value is a directory\n")
+		CopyIncludeDirToZip(zipfile, file)
 		return
 	}
 
@@ -167,9 +169,10 @@ func CopyIncludeToZip(zipfile *zip.Writer, file string) {
 	f := []tasks.FileCopyEnvelope{
 		{
 			Path:       file,
-			Identifier: "Upload/Upload",
+			Identifier: "Include/Include",
 		},
 	}
+	log.Infof("Adding file to Diagnostics CLI zip file: %s\n", file)
 	copyFilesToZip(zipfile, f)
 }
 
@@ -183,39 +186,38 @@ func copyFileListToZip(zipfile *zip.Writer) {
 }
 
 func CopyIncludeDirToZip(zipfile *zip.Writer, pathToDir string) {
-	dir, err := os.Stat(pathToDir)
-	if err != nil {
-		log.Infof("%q is not a directory\n\n", dir.Name())
-	} else {
-		log.Debugf("Valid directory supplied\n\n", dir.Name())
-		err := filepath.Walk(pathToDir,
-			func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				if info.IsDir() {
-					return nil
-				}
-				file, err := os.Open(path)
-				if err != nil {
-					return err
-				}
-				defer file.Close()
 
-				f, err := zipfile.Create(("Include/" + path))
-				if err != nil {
-					return err
-				}
-				_, err = io.Copy(f, file)
-				if err != nil {
-					return err
-				}
-
+	err := filepath.Walk(pathToDir,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
 				return nil
+			}
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			f, err := zipfile.Create(("Include/" + path))
+			if err != nil {
+				return err
+			}
+			_, err = io.Copy(f, file)
+			if err != nil {
+				return err
+			}
+			log.Infof("Adding file to Diagnostics CLI zip file: %s\n", path)
+			addFileToFileList(tasks.FileCopyEnvelope{
+				Path: path,
 			})
-		if err != nil {
-			log.Info(err)
-		}
+
+			return nil
+		})
+	if err != nil {
+		log.Info(err)
 	}
 
 }
