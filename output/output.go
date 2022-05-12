@@ -178,7 +178,6 @@ func CopyIncludeDirToZip(zipfile *zip.Writer, pathToDir string) {
 					return err
 				}
 
-				fmt.Println(filepath.Dir(path), info.Size())
 				return nil
 			})
 		if err != nil {
