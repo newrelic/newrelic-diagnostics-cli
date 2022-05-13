@@ -2,6 +2,7 @@ package output
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -131,39 +132,20 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 	copyFilesToZip(zipfile, filelist)
 }
 
-func CopyIncludeToZip(zipfile *zip.Writer, file string) {
-	fileInfo, err := os.Stat(file)
+func CopyIncludeToZip(zipfile *zip.Writer, includePath string) {
 
-	// check for any errors accessing file
+	fileSize, err := GetTotalSize(zipfile, includePath)
 	if err != nil {
-		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), file)
-		log.Info(color.ColorString(color.Yellow, err.Error()))
-		return
+		log.Debugf("Error getting size: %s", err.Error())
+	}
+	if fileSize > 3999999999 {
+		log.Fatalf("The file(s) that you included were 4GB or larger.  Please specify a smaller file")
 	}
 
-	if strings.HasSuffix(fileInfo.Name(), ".exe") {
-		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), file)
-		log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
-		return
+	_err := CopyIncludePathToZip(zipfile, includePath)
+	if _err != nil {
+		log.Debugf("Error adding to zip: %s", _err.Error())
 	}
-
-	// Check if a file or dir was provided
-	if fileInfo.IsDir() {
-		// TODO: make this automatically pass this on to -upload-dir logic
-		log.Debug("Passed in value is a directory\n")
-		CopyIncludeDirToZip(zipfile, file)
-		return
-	}
-
-	// add the file to the zip in the Upload/
-	f := []tasks.FileCopyEnvelope{
-		{
-			Path:       file,
-			Identifier: "Include/Include",
-		},
-	}
-	log.Infof("Adding file to Diagnostics CLI zip file: %s\n", file)
-	copyFilesToZip(zipfile, f)
 }
 
 // CopyOutputToZip - takes the nrdiag-output.json and adds it to the zip file
@@ -174,9 +156,8 @@ func CopyOutputToZip(zipfile *zip.Writer) {
 func CopyFileListToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
 }
-
-func CopyIncludeDirToZip(zipfile *zip.Writer, pathToDir string) {
-
+func GetTotalSize(zipfile *zip.Writer, pathToDir string) (int64, error) {
+	var totalFileSize int64 = 0
 	err := filepath.Walk(pathToDir,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -185,20 +166,56 @@ func CopyIncludeDirToZip(zipfile *zip.Writer, pathToDir string) {
 			if info.IsDir() {
 				return nil
 			}
-			file, err := os.Open(path)
+			totalFileSize += info.Size()
+			return nil
+		})
+	return totalFileSize, err
+}
+func CopyIncludePathToZip(zipfile *zip.Writer, pathToDir string) error {
+	err := filepath.Walk(pathToDir,
+		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
+			}
+			if info.IsDir() {
+				return nil
+			}
+			fileInfo, ok := os.Stat(path)
+			if ok != nil {
+				log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
+				log.Info(color.ColorString(color.Yellow, err.Error()))
+				return err
+			}
+			if strings.HasSuffix(fileInfo.Name(), ".exe") {
+				log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
+				log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
+				return errors.New("cannot add executable files")
+			}
+
+			file, ok := os.Open(path)
+			if ok != nil {
+				return ok
 			}
 			defer file.Close()
 
-			f, err := zipfile.Create(("Include/" + path))
-			if err != nil {
-				return err
+			header, ok := zip.FileInfoHeader(fileInfo)
+			if ok != nil {
+				log.Info("Error copying file", ok)
+				return ok
 			}
-			_, err = io.Copy(f, file)
-			if err != nil {
-				return err
+
+			header.Name = filepath.ToSlash("nrdiag-output/Include" + path)
+			header.Method = zip.Deflate
+			writer, ok := zipfile.CreateHeader(header)
+			if ok != nil {
+				log.Info("Error writing results to zip file: ", ok)
+				return ok
 			}
+			_, ok = io.Copy(writer, file)
+			if ok != nil {
+				return ok
+			}
+
 			log.Infof("Adding file to Diagnostics CLI zip file: %s\n", path)
 			addFileToFileList(tasks.FileCopyEnvelope{
 				Path: path,
@@ -206,9 +223,7 @@ func CopyIncludeDirToZip(zipfile *zip.Writer, pathToDir string) {
 
 			return nil
 		})
-	if err != nil {
-		log.Info(err)
-	}
+	return err
 
 }
 
