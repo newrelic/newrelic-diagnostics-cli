@@ -133,7 +133,7 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.Verbose, "v", false, "alias for -verbose")
 	flag.BoolVar(&Flags.Verbose, "verbose", false, "Display verbose logging during check execution. Off by default")
 
-	flag.BoolVar(&Flags.Version, "version", false, "Display current program version. Take precedence over -no-version-check")
+	flag.BoolVar(&Flags.Version, "version", false, "Display current program version. Take precedence over -skip-version-check")
 	flag.BoolVar(&Flags.SkipVersionCheck, "skip-version-check", false, "Skips the automatic check for a newer version of the application.")
 
 	flag.StringVar(&Flags.Tasks, "t", defaultString, "alias for -tasks")
