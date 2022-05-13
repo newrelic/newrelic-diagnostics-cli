@@ -5,7 +5,6 @@ import (
 	"flag"
 	"net/url"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -263,44 +262,4 @@ func processOverrides() (tasks.Options, []override) {
 	}
 
 	return options, overrides
-}
-
-// processIncludes will check the file/dir provided with -include to ensure it exists and is under 4 GB
-func processIncludes() error {
-	if config.Flags.Include == "" {
-		return nil
-	}
-	path := config.Flags.Include
-	// if using -include, ensure file/dir exists
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		return err
-	}
-
-	// limit file size to 4 GB
-	if fileInfo.Size() > 4000000000 {
-		return errors.New("file exceeds maximum size of 4 GB")
-	}
-
-	// limit total dir size to 4 GB
-	if fileInfo.IsDir() {
-		var size int64
-		err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() {
-				size += info.Size()
-			}
-			return nil
-		})
-		if err != nil {
-			return err
-		}
-		if size > 4000000000 {
-			return errors.New("directory exceeds maximum size of 4 GB")
-		}
-	}
-
-	return nil
 }

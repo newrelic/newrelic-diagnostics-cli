@@ -20,13 +20,6 @@ func main() {
 	log.Debugf("Run ID: %s\n", runID)
 	log.Debug("nrdiag was run with options", os.Args)
 
-	// check file/dir provided with -include
-	includeErr := processIncludes()
-	if includeErr != nil {
-		log.Infof("Error including file or directory in zip: %v\n\nExiting program.\n", includeErr.Error())
-		os.Exit(3)
-	}
-
 	//Error setting proxy and they specifically included one so let's break out of the program before we attempt any non-proxied calls.
 	_, err := processHTTPProxy()
 	if err != nil {
@@ -84,7 +77,7 @@ func main() {
 
 		// check if any files/directories should be included in the zip
 		if config.Flags.Include != "" {
-			output.CopyIncludeToZip(zipfile, config.Flags.Include)
+			output.HandleIncludeFlag(zipfile, config.Flags.Include)
 		}
 
 		wg.Add(1) // run the tasks in goroutine

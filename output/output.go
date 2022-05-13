@@ -132,9 +132,9 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 	copyFilesToZip(zipfile, filelist)
 }
 
-func CopyIncludeToZip(zipfile *zip.Writer, includePath string) {
+func HandleIncludeFlag(zipfile *zip.Writer, includePath string) {
 
-	fileSize, err := GetTotalSize(zipfile, includePath)
+	fileSize, err := GetTotalSize(includePath)
 	if err != nil {
 		log.Debugf("Error getting size: %s", err.Error())
 	}
@@ -156,7 +156,7 @@ func CopyOutputToZip(zipfile *zip.Writer) {
 func CopyFileListToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
 }
-func GetTotalSize(zipfile *zip.Writer, pathToDir string) (int64, error) {
+func GetTotalSize(pathToDir string) (int64, error) {
 	var totalFileSize int64 = 0
 	err := filepath.Walk(pathToDir,
 		func(path string, info os.FileInfo, err error) error {
