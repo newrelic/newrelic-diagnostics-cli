@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -73,14 +72,6 @@ func WriteOutputFile(data []registration.TaskResult) {
 
 // ProcessFilesChannel - reads from the channels for files to copy and deals with them
 func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
-	//Create output file and wipe out if it already exists
-	err := ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
-	if err != nil {
-		log.Debug("Error creating filelist", err)
-	} else {
-		_ = ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
-	}
-
 	// This is how we track the file names going into to zip file to prevent duplicates
 	// map of [string]struct is used because empty struct takes no memory
 	fileList := make(map[string]struct{})
@@ -119,7 +110,6 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 	copyFilesToZip(zipfile, taskFiles)
 
 	log.Debug("Files channel closed")
-	copyFileListToZip(zipfile)
 	log.Debug("Decrementing wait group in processFilesChannel.")
 	wg.Done()
 }
@@ -181,7 +171,7 @@ func CopyOutputToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-output.json")
 }
 
-func copyFileListToZip(zipfile *zip.Writer) {
+func CopyFileListToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
 }
 

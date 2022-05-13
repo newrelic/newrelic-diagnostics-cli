@@ -92,7 +92,9 @@ func mapContains(set map[string]struct{}, item string) bool {
 func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 	for _, envelope := range filesToZip {
-
+		//Add filepath and name to text file
+		addFileToFileList(envelope)
+		
 		if envelope.Stream != nil {
 			header := zip.FileHeader{
 				Name:   filepath.ToSlash("nrdiag-output/" + envelope.StoreName()),
@@ -146,9 +148,6 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 				log.Info("Error writing file into zip: ", err)
 			}
 		}
-
-		//Add filepath and name to text file
-		addFileToFileList(envelope)
 	}
 }
 
@@ -196,4 +195,16 @@ func filteredToString(filtered [6]int) string {
 		}
 	}
 	return strings.Join(outputStrings, ", ")
+}
+
+
+//CreateFileList - Create output file and wipe out if it already exists
+func CreateFileList() error {
+	err := ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
+	if err != nil {
+		return err
+	} else {
+		_ = ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
+	}
+	return nil
 }
