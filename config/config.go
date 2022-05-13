@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"flag"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,7 +43,6 @@ type userFlags struct {
 	AttachmentEndpoint string
 	Suites             string
 	Include            string
-	UploadDir          string
 	InNewRelicCLI      bool
 }
 
@@ -77,7 +75,6 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		BrowserURL       string
 		Suites           string
 		Include          string
-		UploadDir        string
 	}{
 		Verbose:          f.Verbose,
 		Quiet:            f.Quiet,
@@ -95,7 +92,6 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		BrowserURL:       f.BrowserURL,
 		Suites:           f.Suites,
 		Include:          f.Include,
-		UploadDir:        f.UploadDir,
 	})
 }
 
@@ -175,7 +171,6 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
 	flag.StringVar(&Flags.Include, "include", defaultString, " Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
-	flag.StringVar(&Flags.UploadDir, "upload-dir", defaultString, "Specify a directory path to upload in the diagnostics-output.zip.  Cannot be used with '-upload-file'")
 
 	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
@@ -183,9 +178,6 @@ func ParseFlags() {
 	}
 
 	flag.Parse()
-	if Flags.Include != "" && Flags.UploadDir != "" {
-		log.Fatal("Cannot use both 'upload-file' and 'upload-dir'.  Use '-h' for more information")
-	}
 
 	if Flags.VeryQuiet {
 		Flags.Quiet = true
@@ -235,7 +227,6 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		{Name: "suites", Value: f.Suites},
 		{Name: "include", Value: f.Include},
-		{Name: "uploadDir", Value: f.UploadDir},
 	}
 }
 
