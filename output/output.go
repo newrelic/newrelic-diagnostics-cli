@@ -133,18 +133,25 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 }
 
 func HandleIncludeFlag(zipfile *zip.Writer, includePath string) {
+	if _, err := os.Stat(includePath); err == nil {
+		fileSize, err := GetTotalSize(includePath)
+		if err != nil {
+			log.Debugf("Error getting size: %s", err.Error())
+		}
+		if fileSize > 3999999999 {
+			log.Fatalf("The file(s) that you included were 4GB or larger.  Please specify a smaller file")
+		}
 
-	fileSize, err := GetTotalSize(includePath)
-	if err != nil {
-		log.Debugf("Error getting size: %s", err.Error())
-	}
-	if fileSize > 3999999999 {
-		log.Fatalf("The file(s) that you included were 4GB or larger.  Please specify a smaller file")
-	}
+		_err := CopyIncludePathToZip(zipfile, includePath)
+		if _err != nil {
+			log.Debugf("Error adding to zip: %s", _err.Error())
+		}
 
-	_err := CopyIncludePathToZip(zipfile, includePath)
-	if _err != nil {
-		log.Debugf("Error adding to zip: %s", _err.Error())
+	} else if errors.Is(err, os.ErrNotExist) {
+		log.Infof(color.ColorString(color.Yellow, "Error: no files found at: %s\n"), includePath)
+	} else {
+		log.Info(err)
+
 	}
 }
 
