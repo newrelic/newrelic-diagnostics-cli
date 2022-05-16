@@ -256,8 +256,8 @@ func WriteFileToZip(path string, info os.FileInfo, zipfile *zip.Writer) error {
 		log.Info("Error copying file", ok)
 		return ok
 	}
-
-	header.Name = filepath.ToSlash("nrdiag-output/Include" + path)
+	
+	header.Name = filepath.ToSlash("nrdiag-output/Include/" + path)
 	header.Method = zip.Deflate
 	writer, ok := zipfile.CreateHeader(header)
 	if ok != nil {
