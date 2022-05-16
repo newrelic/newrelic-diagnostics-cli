@@ -4,12 +4,10 @@ import (
 	"archive/zip"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
@@ -132,6 +130,15 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 	copyFilesToZip(zipfile, filelist)
 }
 
+// CopyOutputToZip - takes the nrdiag-output.json and adds it to the zip file
+func CopyOutputToZip(zipfile *zip.Writer) {
+	CopySingleFileToZip(zipfile, "nrdiag-output.json")
+}
+
+func CopyFileListToZip(zipfile *zip.Writer) {
+	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
+}
+
 func HandleIncludeFlag(zipfile *zip.Writer, includePath string) {
 	if _, err := os.Stat(includePath); err == nil {
 		fileSize, err := GetTotalSize(includePath)
@@ -155,14 +162,6 @@ func HandleIncludeFlag(zipfile *zip.Writer, includePath string) {
 	}
 }
 
-// CopyOutputToZip - takes the nrdiag-output.json and adds it to the zip file
-func CopyOutputToZip(zipfile *zip.Writer) {
-	CopySingleFileToZip(zipfile, "nrdiag-output.json")
-}
-
-func CopyFileListToZip(zipfile *zip.Writer) {
-	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
-}
 func GetTotalSize(pathToDir string) (int64, error) {
 	var totalFileSize int64 = 0
 	err := filepath.Walk(pathToDir,
@@ -173,7 +172,7 @@ func GetTotalSize(pathToDir string) (int64, error) {
 			if info.IsDir() {
 				return nil
 			}
-			totalFileSize += info.Size()
+			totalFileSize += WalkSizeFunction(info)
 			return nil
 		})
 	return totalFileSize, err
@@ -181,54 +180,8 @@ func GetTotalSize(pathToDir string) (int64, error) {
 func CopyIncludePathToZip(zipfile *zip.Writer, pathToDir string) error {
 	err := filepath.Walk(pathToDir,
 		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-			fileInfo, ok := os.Stat(path)
-			if ok != nil {
-				log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
-				log.Info(color.ColorString(color.Yellow, err.Error()))
-				return err
-			}
-			if strings.HasSuffix(fileInfo.Name(), ".exe") {
-				log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
-				log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
-				return errors.New("cannot add executable files")
-			}
-
-			file, ok := os.Open(path)
-			if ok != nil {
-				return ok
-			}
-			defer file.Close()
-
-			header, ok := zip.FileInfoHeader(fileInfo)
-			if ok != nil {
-				log.Info("Error copying file", ok)
-				return ok
-			}
-
-			header.Name = filepath.ToSlash("nrdiag-output/Include" + path)
-			header.Method = zip.Deflate
-			writer, ok := zipfile.CreateHeader(header)
-			if ok != nil {
-				log.Info("Error writing results to zip file: ", ok)
-				return ok
-			}
-			_, ok = io.Copy(writer, file)
-			if ok != nil {
-				return ok
-			}
-
-			log.Infof("Adding file to Diagnostics CLI zip file: %s\n", path)
-			addFileToFileList(tasks.FileCopyEnvelope{
-				Path: path,
-			})
-
-			return nil
+			ok := WalkCopyFunction(path, info, err, zipfile, WriteFileToZip)
+			return ok
 		})
 	return err
 
