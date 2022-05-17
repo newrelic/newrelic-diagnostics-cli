@@ -42,6 +42,7 @@ type userFlags struct {
 	BrowserURL         string
 	AttachmentEndpoint string
 	Suites             string
+	Include            string
 	InNewRelicCLI      bool
 }
 
@@ -73,6 +74,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Filter           string
 		BrowserURL       string
 		Suites           string
+		Include          string
 	}{
 		Verbose:          f.Verbose,
 		Quiet:            f.Quiet,
@@ -89,6 +91,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Filter:           f.Filter,
 		BrowserURL:       f.BrowserURL,
 		Suites:           f.Suites,
+		Include:          f.Include,
 	})
 }
 
@@ -126,7 +129,7 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.Verbose, "v", false, "alias for -verbose")
 	flag.BoolVar(&Flags.Verbose, "verbose", false, "Display verbose logging during check execution. Off by default")
 
-	flag.BoolVar(&Flags.Version, "version", false, "Display current program version. Take precedence over -no-version-check")
+	flag.BoolVar(&Flags.Version, "version", false, "Display current program version. Take precedence over -skip-version-check")
 	flag.BoolVar(&Flags.SkipVersionCheck, "skip-version-check", false, "Skips the automatic check for a newer version of the application.")
 
 	flag.StringVar(&Flags.Tasks, "t", defaultString, "alias for -tasks")
@@ -166,6 +169,8 @@ func ParseFlags() {
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
+
+	flag.StringVar(&Flags.Include, "include", defaultString, " Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
 
 	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
@@ -221,6 +226,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "browserURL", Value: boolifyFlag(f.BrowserURL)},
 		{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		{Name: "suites", Value: f.Suites},
+		{Name: "include", Value: f.Include},
 	}
 }
 

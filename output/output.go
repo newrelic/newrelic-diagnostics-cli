@@ -2,9 +2,10 @@ package output
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"sync"
@@ -70,14 +71,6 @@ func WriteOutputFile(data []registration.TaskResult) {
 
 // ProcessFilesChannel - reads from the channels for files to copy and deals with them
 func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
-	//Create output file and wipe out if it already exists
-	err := ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
-	if err != nil {
-		log.Debug("Error creating filelist", err)
-	} else {
-		_ = ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
-	}
-
 	// This is how we track the file names going into to zip file to prevent duplicates
 	// map of [string]struct is used because empty struct takes no memory
 	fileList := make(map[string]struct{})
@@ -116,7 +109,6 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 	copyFilesToZip(zipfile, taskFiles)
 
 	log.Debug("Files channel closed")
-	copyFileListToZip(zipfile)
 	log.Debug("Decrementing wait group in processFilesChannel.")
 	wg.Done()
 }
@@ -143,8 +135,56 @@ func CopyOutputToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-output.json")
 }
 
-func copyFileListToZip(zipfile *zip.Writer) {
+func CopyFileListToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
+}
+
+func HandleIncludeFlag(zipfile *zip.Writer, includePath string) {
+	if _, err := os.Stat(includePath); err == nil {
+		fileSize, err := GetTotalSize(includePath)
+		if err != nil {
+			log.Debugf("Error getting size: %s", err.Error())
+		}
+		if fileSize > 3999999999 {
+			log.Fatalf("The file(s) that you included were 4GB or larger.  Please specify a smaller file")
+		}
+
+		_err := CopyIncludePathToZip(zipfile, includePath)
+		if _err != nil {
+			log.Debugf("Error adding to zip: %s", _err.Error())
+		}
+
+	} else if errors.Is(err, os.ErrNotExist) {
+		log.Infof(color.ColorString(color.Yellow, "Error: no files found at: %s\n"), includePath)
+	} else {
+		log.Info(err)
+
+	}
+}
+
+func GetTotalSize(pathToDir string) (int64, error) {
+	var totalFileSize int64 = 0
+	err := filepath.Walk(pathToDir,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				return nil
+			}
+			totalFileSize += WalkSizeFunction(info)
+			return nil
+		})
+	return totalFileSize, err
+}
+func CopyIncludePathToZip(zipfile *zip.Writer, pathToDir string) error {
+	err := filepath.Walk(pathToDir,
+		func(path string, info os.FileInfo, err error) error {
+			ok := WalkCopyFunction(path, info, err, zipfile, WriteFileToZip)
+			return ok
+		})
+	return err
+
 }
 
 // WriteLineResults - outputs results to the screen as they complete (from the channel) and then returns the entire set

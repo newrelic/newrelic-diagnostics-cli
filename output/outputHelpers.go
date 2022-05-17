@@ -3,6 +3,7 @@ package output
 import (
 	"archive/zip"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
@@ -25,6 +27,10 @@ type resultsOutput struct {
 	Configuration interface{}
 	Results       []registration.TaskResult
 }
+
+type (
+	writeFunction func(path string, info os.FileInfo, zipfile *zip.Writer) error
+)
 
 // wee bit of a hack for testing
 var OutputNow = time.Now
@@ -92,6 +98,8 @@ func mapContains(set map[string]struct{}, item string) bool {
 func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 	for _, envelope := range filesToZip {
+		//Add filepath and name to text file
+		addFileToFileList(envelope)
 
 		if envelope.Stream != nil {
 			header := zip.FileHeader{
@@ -146,9 +154,6 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 				log.Info("Error writing file into zip: ", err)
 			}
 		}
-
-		//Add filepath and name to text file
-		addFileToFileList(envelope)
 	}
 }
 
@@ -196,4 +201,72 @@ func filteredToString(filtered [6]int) string {
 		}
 	}
 	return strings.Join(outputStrings, ", ")
+}
+
+//CreateFileList - Create output file and wipe out if it already exists
+func CreateFileList() error {
+	err := ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
+	if err != nil {
+		return err
+	} else {
+		_ = ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
+	}
+	return nil
+}
+
+func WalkSizeFunction(info os.FileInfo) int64 {
+	return info.Size()
+}
+func WalkCopyFunction(path string, info os.FileInfo, err error, zipfile *zip.Writer, writeToZip writeFunction) error {
+	if err != nil {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
+		return err
+	}
+	if info.IsDir() {
+		return nil
+	}
+	if strings.HasSuffix(info.Name(), ".exe") {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
+		log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
+		return errors.New("cannot add executable files")
+	}
+
+	ok := writeToZip(path, info, zipfile)
+	if ok != nil {
+		return ok
+	}
+
+	log.Infof("Adding file to Diagnostics CLI zip file: %s\n", path)
+	addFileToFileList(tasks.FileCopyEnvelope{
+		Path: path,
+	})
+
+	return nil
+}
+
+func WriteFileToZip(path string, info os.FileInfo, zipfile *zip.Writer) error {
+	file, ok := os.Open(path)
+	if ok != nil {
+		return ok
+	}
+	defer file.Close()
+
+	header, ok := zip.FileInfoHeader(info)
+	if ok != nil {
+		log.Info("Error copying file", ok)
+		return ok
+	}
+
+	header.Name = filepath.ToSlash("nrdiag-output/Include/" + path)
+	header.Method = zip.Deflate
+	writer, ok := zipfile.CreateHeader(header)
+	if ok != nil {
+		log.Info("Error writing results to zip file: ", ok)
+		return ok
+	}
+	_, ok = io.Copy(writer, file)
+	if ok != nil {
+		return ok
+	}
+	return nil
 }

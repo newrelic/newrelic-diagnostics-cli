@@ -18,7 +18,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	baseLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 var (

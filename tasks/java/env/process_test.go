@@ -11,7 +11,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func TestJavaEnvProcess(t *testing.T) {
