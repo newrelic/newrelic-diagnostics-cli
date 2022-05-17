@@ -96,11 +96,11 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected none result status", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 
 			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 
@@ -184,7 +184,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected failure result summary", func() {
-				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: Invalid configuration found: collection_files not set"))
+				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: invalid configuration found: collection_files not set"))
 			})
 			It("should return help URL", func() {
 				Expect(result.URL).To(Equal("https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/jmx-monitoring-integration#host-connection"))
@@ -203,6 +203,9 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 				}
 				p.mCmdExecutor = func(tasks.CmdWrapper, tasks.CmdWrapper) ([]byte, error) {
 					return []byte("success"), nil
+				}
+				p.getJMXProcessCmdlineArgs = func() []string {
+					return []string{}
 				}
 
 			})
@@ -267,7 +270,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected Failure result summary", func() {
-				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: Multiple key jmx_host found"))
+				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: multiple key jmx_host found"))
 			})
 		})
 		Context("Valid partial JXM configuration present in upstream payload but JMX server connection failed", func() {
@@ -353,7 +356,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected Failure result summary", func() {
-				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: Invalid configuration found: collection_files not set"))
+				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: invalid configuration found: collection_files not set"))
 			})
 		})
 

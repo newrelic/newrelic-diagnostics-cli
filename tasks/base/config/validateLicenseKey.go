@@ -94,15 +94,17 @@ func (p BaseConfigValidateLicenseKey) Execute(options tasks.Options, upstream ma
 
 		if err != nil {
 			for lk, sources := range validFormatLKToSources {
-				warningSummary += fmt.Sprintf("The license key found in %s has a valid New Relic format: %s. \nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n\n", strings.Join(sources, ",\n "), lk, err.Error())
+				warningSummary += fmt.Sprintf("The license key found in\n%s\nhas a valid New Relic format: %s\nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n", strings.Join(sources, "\n"), lk, err.Error())
 			}
 			resultsPayload = validFormatLKToSources
 		}
+
 		if len(invalidAccountLKToSources) > 0 {
 			for lk, sources := range invalidAccountLKToSources {
-				failureSummary += fmt.Sprintf("The license key found in %s did not pass our validation check when verifying against your account:\n%s\nIf your agent is reporting an 'Invalid license key' log entry, please reach out to New Relic Support.\n\n", strings.Join(sources, ",\n "), lk)
+				warningSummary += fmt.Sprintf("The license key found in %s did not match the one assigned to your account:\n%s\nIf you are not using the account's original license key, you can ignore this warning. The Diagnostics CLI only validates the account's original license key. Read more about license keys - https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key\n\n", strings.Join(sources, ",\n "), lk)
 			}
 		}
+
 		if len(validAccountLKToSources) > 0 {
 			for lk, sources := range validAccountLKToSources {
 				successSummary += fmt.Sprintf("The license key found in %s passed our validation check when verifying against your account:\n %s"+"\n", strings.Join(sources, ",\n "), lk)
@@ -139,7 +141,7 @@ func findLKFromEnvVarSources(licenseKeys []LicenseKey) []LicenseKey {
 
 func checkEnvVarFormat(licenseKey LicenseKey) (bool, string) {
 	if licenseKeyUsingQuotes(licenseKey.Value) {
-		errMsg := fmt.Sprintf(`Using quotes around %s may cause inconsistent behavior. We highly recommend removing those quotes, and running the ` + tasks.ThisProgramFullName + ` again.`+"\n\n", licenseKey.Source)
+		errMsg := fmt.Sprintf(`Using quotes around %s may cause inconsistent behavior. We highly recommend removing those quotes, and running the `+tasks.ThisProgramFullName+` again.`+"\n\n", licenseKey.Source)
 		return false, errMsg
 	}
 	if isFormatValid(strings.TrimSpace(licenseKey.Value)) {

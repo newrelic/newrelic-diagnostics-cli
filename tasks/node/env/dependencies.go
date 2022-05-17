@@ -62,7 +62,7 @@ func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]t
 	if upstream["Node/Config/Agent"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Node agent not detected. This task did not run",
+			Summary: "Node agent config file not detected. This task did not run",
 		}
 	}
 
@@ -78,7 +78,7 @@ func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]t
 	if npmErr != nil && (npmErr.Error() != "exit status 1") {
 		return tasks.Result{
 			Status:      tasks.Error,
-			Summary:     npmErr.Error() + ": npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors",
+			Summary:     npmErr.Error() + ": npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies.",
 			FilesToCopy: filesToCopy,
 		}
 	}
@@ -89,7 +89,7 @@ func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]t
 	if len(NodeModulesVersions) < 1 {
 		return tasks.Result{
 			Status:      tasks.Error,
-			Summary:     "We failed to parse the output of npm ls, but have included it in nrdiag-output.zip",
+			Summary:     "We failed to parse the output of npm ls, but have included it in nrdiag-output.zip. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies.",
 			FilesToCopy: filesToCopy,
 		}
 	}

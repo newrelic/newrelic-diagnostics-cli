@@ -57,7 +57,7 @@ func (p InfraConfigDataDirectoryCollect) Execute(options tasks.Options, upstream
 
 func getDataDir(paths []string) ([]tasks.FileCopyEnvelope, error) {
 	if len(paths) == 0 {
-		return []tasks.FileCopyEnvelope{}, errors.New("No data directory detected")
+		return []tasks.FileCopyEnvelope{}, errors.New("no data directory detected")
 	}
 
 	files := tasks.FindFiles([]string{".*"}, paths)

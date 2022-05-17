@@ -59,22 +59,6 @@ func ProxyParseNSet() (set bool) {
 
 }
 
-// posString returns the first index of element in slice.
-// If slice does not contain element, returns -1.
-func posString(slice []string, element string) int {
-	for index, elem := range slice {
-		if elem == element {
-			return index
-		}
-	}
-	return -1
-}
-
-// containsString returns true iff slice contains element
-func containsString(slice []string, element string) bool {
-	return !(posString(slice, element) == -1)
-}
-
 //similar to tasks - This takes the input string as the query to the end users and waits for a response
 func promptUser(msg string) bool {
 	if config.Flags.YesToAll {

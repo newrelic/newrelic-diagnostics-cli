@@ -1,9 +1,9 @@
 package env
 
 import (
-	"github.com/shirou/gopsutil/process"
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func gatherProcessInfo() (result tasks.Result) {

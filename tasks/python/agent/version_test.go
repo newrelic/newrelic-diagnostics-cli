@@ -3,9 +3,9 @@ package agent
 import (
 	"testing"
 
+	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
 func TestPythonAgentVersion(t *testing.T) {

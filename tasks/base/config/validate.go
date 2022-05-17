@@ -35,10 +35,10 @@ type ValidateElement struct {
 }
 
 var (
-	errConfigFileNotParse = errors.New("We cannot parse this file extension for this New Relic config file")
-	errConfigFileNotRead  = errors.New("We ran into an error when trying to read your New Relic config file")
-	errReaderMock         = errors.New("A reader error")
-	errParsingYML         = errors.New("This can mean that you either have incorrect spacing/indentation around this line or that you have a syntax error, such as a missing/invalid character")
+	errConfigFileNotParse = errors.New("we cannot parse this file extension for this New Relic config file")
+	errConfigFileNotRead  = "We ran into an error when trying to read your New Relic config file"
+	errReaderMock         = errors.New("a reader error")
+	errParsingYML         = "This can mean that you either have incorrect spacing/indentation around this line or that you have a syntax error, such as a missing/invalid character"
 )
 
 //MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
@@ -87,7 +87,7 @@ func (p BaseConfigValidate) Execute(options tasks.Options, results map[string]ta
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -155,7 +155,6 @@ func processConfig(config ConfigElement) (ValidateElement, error) {
 
 	//Read file
 	content, err := os.Open(file)
-	defer content.Close()
 	if err != nil {
 		log.Debug("error reading file", err)
 		return ValidateElement{
@@ -164,6 +163,7 @@ func processConfig(config ConfigElement) (ValidateElement, error) {
 			Error:  err.Error(),
 		}, nil
 	}
+	defer content.Close()
 	// initialize variables for data
 	var parsedConfig tasks.ValidateBlob
 
@@ -334,6 +334,7 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 	arrayLocation := ""
 	var buildarray []string
 
+loop:
 	for lineNum, keyValue := range jsonString {
 		log.Debug("keyvalue", keyValue)
 		switch keyValue {
@@ -351,7 +352,7 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 			buildarray = nil
 
 		case "};":
-			break // end of config, just break the switch
+			break loop // end of config, just break the switch
 
 		case "":
 
@@ -442,13 +443,6 @@ func parseIni(reader io.Reader) (result tasks.ValidateBlob, err error) {
 			t[string(value[1])] = trimQuotes(string(value[3]))
 		}
 	}
-	result = convertToValidateBlob(t)
-	return
-}
-
-func parseGradle(reader io.Reader) (result tasks.ValidateBlob, err error) {
-	t := make(map[string]interface{})
-	log.Debug("Can't parse gradle files yet")
 	result = convertToValidateBlob(t)
 	return
 }

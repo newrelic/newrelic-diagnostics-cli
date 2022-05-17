@@ -3,10 +3,10 @@ package agent
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestPHPAgentVersion(t *testing.T) {
@@ -32,21 +32,23 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status:  tasks.Success,
 						Payload: []string{},
 					},
 				}
 			})
-			It("Should return task result status of none ", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+			It("Should return task result status of error ", func() {
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return this task result summary  ", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 		Context("When upstream['PHP/Config/Agent'].Payload.([]config.ValidateElement) returns  len(validations) ==  0", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status:  tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -68,6 +70,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElmentNoAgent,
 						},
@@ -91,6 +94,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElmentOneAgentFile,
 						},
@@ -132,6 +136,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElementVersionErrors,
 						},
@@ -148,7 +153,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("Should return task result summary of err.Erro()", func() {
-				Expect(result.Summary).To(Equal("Unable to convert %^&^&% to an integer"))
+				Expect(result.Summary).To(Equal("unable to convert %^&^&% to an integer"))
 			})
 		})
 		Context("When len(agentVersion) > 1 ", func() {
@@ -167,6 +172,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
 					"PHP/Config/Agent": tasks.Result{
+						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElmentOneAgentFile,
 							mockValidateElementNoChildren,

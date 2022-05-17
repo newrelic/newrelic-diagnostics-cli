@@ -3,9 +3,9 @@ package env
 import (
 	"errors"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 var _ = Describe("Node/Env/Version", func() {
@@ -57,7 +57,7 @@ var _ = Describe("Node/Env/Version", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Node agent not detected. This task did not run"))
+				Expect(result.Summary).To(Equal("Node agent config file not detected. This task did not run"))
 			})
 		})
 
@@ -119,7 +119,7 @@ var _ = Describe("Node/Env/Version", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("An issue occur while parsing node version: Unable to convert  to an integer"))
+				Expect(result.Summary).To(Equal("An issue occur while parsing node version: unable to convert  to an integer"))
 			})
 		})
 		Context("When node -v returns the expected string", func() {

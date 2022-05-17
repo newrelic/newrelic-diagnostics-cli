@@ -1,3 +1,4 @@
+//go:build linux || darwin
 // +build linux darwin
 
 package jvm
@@ -17,7 +18,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	baseLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 var (
@@ -36,9 +37,9 @@ var (
 	dirOwnerPermissionsRgx           = "[drwx-]{2}wx.+"
 	dirGroupPermissionsRgx           = "[drwx-]{5}wx.+"
 	dirPublicPermissionsRgx          = "[drwx-]{8}wx"
-	errPermissionsCannotBeDetermined = errors.New("Permissions cannot be determined")
-	errTempDirDoesNotExist           = errors.New("Diagnostics CLi was unable to find the temp directory location for this host")
-	errTempDirHasNoJars              = errors.New("Diagnostics CLi was unable to find the New Relic tmp jar files or the directory where they are located")
+	errPermissionsCannotBeDetermined = errors.New("permissions cannot be determined")
+	errTempDirDoesNotExist           = errors.New("diagnostics CLi was unable to find the temp directory location for this host")
+	errTempDirHasNoJars              = errors.New("diagnostics CLi was unable to find the New Relic tmp jar files or the directory where they are located")
 	tempDirRecommendation            = "ONLY if you are seeing a java.io.IOException in the New Relic logs, manually create the tmp directory passing -Djava.io.tmpdir or -Dnewrelic.tempdir as a JVM argument at runtime (the Java Agent uses this temp directory to create temporary JAR files)."
 )
 
@@ -99,7 +100,7 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	if upstream["Java/Env/Process"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "The New Relic agent has not been added to a running JVM process yet. This task did not run.",
+			Summary: "Java/Env/Process check did not pass. This task did not run.",
 		}
 	}
 
@@ -108,8 +109,8 @@ func (p JavaJVMPermissions) Execute(options tasks.Options, upstream map[string]t
 	javaAgentProcs, ok := upstream["Java/Env/Process"].Payload.([]env.ProcIdAndArgs)
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "We were unable to run this health check due to an internal type assertion error for the task Java/Env/Process",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -286,7 +287,7 @@ func canCreateFilesInTempDir(proc process.Process, tempDir string) (err error) {
 	}
 	if !matchedPermissions {
 		/* the process/file owner has no write/execute permissions */
-		return fmt.Errorf("The owner of the process for PID %d does not have permissions to create the necessary temporary files in %s: %s", proc.Pid, tempDir, filePerm.String())
+		return fmt.Errorf("the owner of the process for PID %d does not have permissions to create the necessary temporary files in %s: %s", proc.Pid, tempDir, filePerm.String())
 	}
 	/* the process/dir owner has write/execute permissions */
 	return nil
@@ -378,7 +379,7 @@ func canCreateAgentLog(proc process.Process, logFilePath, jarPath string) (err e
 		return fmt.Errorf("%s: %w for %s", errRegexMatch.Error(), errPermissionsCannotBeDetermined, logDir)
 	}
 	if !matchedPermissions {
-		return fmt.Errorf("The owner of the process for PID %d does not have permissions to create the Agent log file in the directory %s: %s", proc.Pid, logDir, fmt.Sprint(filePerm))
+		return fmt.Errorf("the owner of the process for PID %d does not have permissions to create the Agent log file in the directory %s: %s", proc.Pid, logDir, fmt.Sprint(filePerm))
 	}
 	return nil
 }
@@ -387,7 +388,7 @@ func canCreateAgentLog(proc process.Process, logFilePath, jarPath string) (err e
 func canReadAgentJar(proc process.Process, jarLoc string) (err error) {
 	/* check if the Java Agent JAR exists */
 	if _, errJarNotExist := os.Stat(jarLoc); os.IsNotExist(errJarNotExist) {
-		return fmt.Errorf(`Agent JAR does not exist for PID %d. This location is at %s: %w`, proc.Pid, jarLoc, errJarNotExist)
+		return fmt.Errorf(`agent JAR does not exist for PID %d. This location is at %s: %w`, proc.Pid, jarLoc, errJarNotExist)
 	}
 	procOwnerUID, procOwnerGID, fileOwnerUID, fileOwnerGID, err := getUIDsGIDs(proc, jarLoc)
 	if err != nil {
@@ -418,7 +419,7 @@ func canReadAgentJar(proc process.Process, jarLoc string) (err error) {
 	}
 	if !matchedPermissions {
 		/* the process/file owner has no read permissions */
-		return fmt.Errorf("The owner of the process for PID %d does not have permissions to execute the New Relic Agent Jar located at %s: %s", proc.Pid, jarLoc, filePerm.String())
+		return fmt.Errorf("the owner of the process for PID %d does not have permissions to execute the New Relic Agent Jar located at %s: %s", proc.Pid, jarLoc, filePerm.String())
 	}
 	return nil
 }
@@ -448,13 +449,13 @@ func getUIDsGIDs(proc process.Process, fileOrDirPath string) (string, string, st
 	procOwner, _ := proc.Username()
 	procOwnerUser, err := user.Lookup(procOwner)
 	if err != nil {
-		return "", "", "", "", fmt.Errorf("Permissions could not be determined because we ran into a lookup error. Error is: %w", err)
+		return "", "", "", "", fmt.Errorf("permissions could not be determined because we ran into a lookup error. Error is: %w", err)
 	}
 	procOwnerUID := procOwnerUser.Uid
 	procOwnerGID := procOwnerUser.Gid
 	info, err := os.Stat(fileOrDirPath)
 	if err != nil {
-		return "", "", "", "", fmt.Errorf("Permissions could not be determined because we ran into a os.Stat error. Error is: %w", err)
+		return "", "", "", "", fmt.Errorf("permissions could not be determined because we ran into a os.Stat error. Error is: %w", err)
 	}
 	modeInfo := info.Sys()
 	fileDirOwner := modeInfo.(*syscall.Stat_t)

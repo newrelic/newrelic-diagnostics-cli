@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func mockPathFinder() (string, error) {
@@ -15,7 +15,7 @@ func mockPathFinder() (string, error) {
 }
 
 func mockPathFinderError() (string, error) {
-	return "", errors.New("Error getting current working directory")
+	return "", errors.New("error getting current working directory")
 }
 
 func mockCmdExec(name string, arg ...string) ([]byte, error) {
@@ -37,7 +37,7 @@ func mockCmdExecJavaUnsupported(name string, arg ...string) ([]byte, error) {
 }
 
 func mockCmdExecFailed(name string, arg ...string) ([]byte, error) {
-	return []byte(""), errors.New("Failed to execute command! :(")
+	return []byte(""), errors.New("failed to execute command! :(")
 }
 
 func mockFindFiles(patterns []string, paths []string) []string {
@@ -220,7 +220,7 @@ var _ = Describe("Java/Agent/Version", func() {
 				jarLocationPath := jarLocation
 				version, err := p.getAgentVersion(jarLocationPath)
 				Expect(version).To(Equal(expectedResults))
-				Expect(err.Error()).To(Equal("Failed to execute command! :("))
+				Expect(err.Error()).To(Equal("failed to execute command! :("))
 			})
 		})
 	})

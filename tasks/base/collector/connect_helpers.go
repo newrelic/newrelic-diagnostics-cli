@@ -26,5 +26,5 @@ func mockUnsuccessfulRequest400(wrapper httpHelper.RequestWrapper) (*http.Respon
 }
 
 func mockUnsuccessfulRequestError(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-	return &http.Response{}, errors.New("Failed request (timeout)")
+	return &http.Response{}, errors.New("failed request (timeout)")
 }

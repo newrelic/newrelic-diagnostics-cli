@@ -2,23 +2,24 @@ package output
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
-	. "github.com/newrelic/newrelic-diagnostics-cli/output/color"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 //WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>
 func WriteOutputHeader() {
-	log.Info(ColorString(White, "\nCheck Results\n-------------------------------------------------\n"))
+	log.Info(color.ColorString(color.White, "\nCheck Results\n-------------------------------------------------\n"))
 }
 
 // WriteSummary reports on any non-successful items and tells the user why they weren't successful
@@ -32,9 +33,9 @@ func WriteSummary(data []registration.TaskResult) {
 	}
 
 	if len(failures) == 0 {
-		log.Info(ColorString(White, "\nNo Issues Found\n"))
+		log.Info(color.ColorString(color.White, "\nNo Issues Found\n"))
 	} else {
-		log.Info(ColorString(White, "\nIssues Found\n-------------------------------------------------"))
+		log.Info(color.ColorString(color.White, "\nIssues Found\n-------------------------------------------------"))
 
 	}
 
@@ -44,7 +45,7 @@ func WriteSummary(data []registration.TaskResult) {
 	for _, result := range failures {
 
 		if filteredResult(result.Result.StatusToString()) {
-			log.Info(ColorString(result.Result.Status, result.Result.StatusToString()), "-", result.Task.Identifier().String())
+			log.Info(color.ColorString(result.Result.Status, result.Result.StatusToString()), "-", result.Task.Identifier().String())
 			log.Info(result.Result.Summary)
 			if result.Result.URL != "" {
 				log.Info("See " + result.Result.URL + " for more information.")
@@ -58,7 +59,7 @@ func WriteSummary(data []registration.TaskResult) {
 
 	//If -filter caused some results to be filtered, provide a summary of filtered results
 	if filteredCounter > 0 {
-		filteredOutput := ColorString(Gray, "\n"+strconv.Itoa(filteredCounter)+" issues not shown: "+filteredToString(filtered)+"\n(Use \"-filter all\" to see all issues)")
+		filteredOutput := color.ColorString(color.Gray, "\n"+strconv.Itoa(filteredCounter)+" issues not shown: "+filteredToString(filtered)+"\n(Use \"-filter all\" to see all issues)")
 		log.Info(filteredOutput)
 	}
 }
@@ -70,14 +71,6 @@ func WriteOutputFile(data []registration.TaskResult) {
 
 // ProcessFilesChannel - reads from the channels for files to copy and deals with them
 func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
-	//Create output file and wipe out if it already exists
-	err := ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
-	if err != nil {
-		log.Debug("Error creating filelist", err)
-	} else {
-		ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
-	}
-
 	// This is how we track the file names going into to zip file to prevent duplicates
 	// map of [string]struct is used because empty struct takes no memory
 	fileList := make(map[string]struct{})
@@ -116,7 +109,6 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 	copyFilesToZip(zipfile, taskFiles)
 
 	log.Debug("Files channel closed")
-	copyFileListToZip(zipfile)
 	log.Debug("Decrementing wait group in processFilesChannel.")
 	wg.Done()
 }
@@ -133,7 +125,7 @@ func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
 
 	// Now add the filelist to the zip
 	filelist := []tasks.FileCopyEnvelope{
-		tasks.FileCopyEnvelope{Path: filePath},
+		{Path: filePath},
 	}
 	copyFilesToZip(zipfile, filelist)
 }
@@ -143,8 +135,56 @@ func CopyOutputToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-output.json")
 }
 
-func copyFileListToZip(zipfile *zip.Writer) {
+func CopyFileListToZip(zipfile *zip.Writer) {
 	CopySingleFileToZip(zipfile, "nrdiag-filelist.txt")
+}
+
+func HandleIncludeFlag(zipfile *zip.Writer, includePath string) {
+	if _, err := os.Stat(includePath); err == nil {
+		fileSize, err := GetTotalSize(includePath)
+		if err != nil {
+			log.Debugf("Error getting size: %s", err.Error())
+		}
+		if fileSize > 3999999999 {
+			log.Fatalf("The file(s) that you included were 4GB or larger.  Please specify a smaller file")
+		}
+
+		_err := CopyIncludePathToZip(zipfile, includePath)
+		if _err != nil {
+			log.Debugf("Error adding to zip: %s", _err.Error())
+		}
+
+	} else if errors.Is(err, os.ErrNotExist) {
+		log.Infof(color.ColorString(color.Yellow, "Error: no files found at: %s\n"), includePath)
+	} else {
+		log.Info(err)
+
+	}
+}
+
+func GetTotalSize(pathToDir string) (int64, error) {
+	var totalFileSize int64 = 0
+	err := filepath.Walk(pathToDir,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				return nil
+			}
+			totalFileSize += WalkSizeFunction(info)
+			return nil
+		})
+	return totalFileSize, err
+}
+func CopyIncludePathToZip(zipfile *zip.Writer, pathToDir string) error {
+	err := filepath.Walk(pathToDir,
+		func(path string, info os.FileInfo, err error) error {
+			ok := WalkCopyFunction(path, info, err, zipfile, WriteFileToZip)
+			return ok
+		})
+	return err
+
 }
 
 // WriteLineResults - outputs results to the screen as they complete (from the channel) and then returns the entire set
@@ -159,7 +199,7 @@ func WriteLineResults() []registration.TaskResult {
 			payload := ""
 			if result.Result.Status == tasks.Info {
 				truncated := ""
-				newlineRegexp := regexp.MustCompile("\\n")
+				newlineRegexp := regexp.MustCompile(`\n`)
 				newSummary := newlineRegexp.ReplaceAllString(result.Result.Summary, " ")
 				if len(newSummary) > 50 {
 					truncated = "..."
@@ -167,9 +207,9 @@ func WriteLineResults() []registration.TaskResult {
 				payload = fmt.Sprintf(" [%.50s%s] ", newSummary, truncated)
 			}
 			if result.WasOverride {
-				log.FixedPrefix(20, ColorString(result.Result.Status, result.Result.Status.StatusToString()), result.Task.Identifier().String()+payload+ColorString(LightRed, " (override)"))
+				log.FixedPrefix(20, color.ColorString(result.Result.Status, result.Result.Status.StatusToString()), result.Task.Identifier().String()+payload+color.ColorString(color.LightRed, " (override)"))
 			} else {
-				log.FixedPrefix(20, ColorString(result.Result.Status, result.Result.Status.StatusToString()), result.Task.Identifier().String()+payload)
+				log.FixedPrefix(20, color.ColorString(result.Result.Status, result.Result.Status.StatusToString()), result.Task.Identifier().String()+payload)
 			}
 		} else {
 			//Using 2 here because filteredCounter is also used to determine if we've filtered anything to intiate that block later on.
@@ -190,7 +230,7 @@ func WriteLineResults() []registration.TaskResult {
 			partialMessage = " results not shown: "
 		}
 
-		filteredOutput := ColorString(Gray, strconv.Itoa(filteredCounter)+partialMessage+filteredToString(filtered))
+		filteredOutput := color.ColorString(color.Gray, strconv.Itoa(filteredCounter)+partialMessage+filteredToString(filtered))
 		log.Info(filteredOutput)
 	}
 	log.Info("See nrdiag-output.json for full results.")

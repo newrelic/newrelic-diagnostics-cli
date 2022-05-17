@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package profiler
@@ -36,12 +37,20 @@ func (p DotNetProfilerEnvVarKey) Dependencies() []string {
 
 // Execute -  This does not take options
 func (p DotNetProfilerEnvVarKey) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
+	// abort if it isn't installed
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Did not detect .Net Agent as being installed, this check did not run",
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
+
 	return validateEnvInstrumentationKeys()
 
 }
@@ -98,7 +107,7 @@ func validateEnvInstrumentationKeys() (result tasks.Result) {
 
 	return tasks.Result{
 		Status:  tasks.Warning,
-		Summary: `Some environment variables needed for system wide/non-IIS .NET application profiling are not set. If you are attempting to instrument a non-IIS .NET framework application, re-run the .NET agent installer and select the "Instrument all .NET framework applications" option on the "Custom Setup" screen.`,
+		Summary: "Some of these environment variables needed for system wide/non-IIS .NET application profiling are not set:\nCOR_ENABLE_PROFILING=1\n" + `NEWRELIC_INSTALL_PATH=C:\Program Files\New Relic\.NET Agent` + "\nCOR_PROFILER={XXXXXXXXXX}\n" + `If you are attempting to instrument a non-IIS .NET framework application, re-run the .NET agent installer and select the "Instrument all .NET framework applications" option on the "Custom Setup" screen.`,
 		URL:     "https://docs.newrelic.com/docs/agents/net-agent/installation/install-net-agent-windows#enabling-the-agent",
 	}
 

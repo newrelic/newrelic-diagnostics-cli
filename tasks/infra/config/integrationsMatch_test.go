@@ -82,8 +82,8 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				}
 
 				expectedResult := tasks.Result{
-					Status:  tasks.None,
-					Summary: "Task did not meet requirements necessary to run: type assertion failure",
+					Status:  tasks.Error,
+					Summary: tasks.AssertionErrorSummary,
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
@@ -154,6 +154,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							},
 						},
 						Status: tasks.Success,
+					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 0,
+						},
 					},
 				}
 
@@ -349,6 +356,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Status: tasks.Success,
 					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 0,
+						},
+					},
 				}
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
@@ -522,6 +536,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Status: tasks.Success,
 					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 0,
+						},
+					},
 				}
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
@@ -627,6 +648,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							},
 						},
 						Status: tasks.Success,
+					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 8,
+							Patch: 0,
+						},
 					},
 				}
 
@@ -734,6 +762,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Status: tasks.Success,
 					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 8,
+							Patch: 0,
+						},
+					},
 				}
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
@@ -840,6 +875,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							},
 						},
 						Status: tasks.Success,
+					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 0,
+						},
 					},
 				}
 
@@ -954,6 +996,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Status: tasks.Success,
 					},
+					"Infra/Agent/Version": {
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 0,
+						},
+					},
 				}
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
@@ -1047,6 +1096,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 					},
 					Status: tasks.Success,
 				},
+				"Infra/Agent/Version": {
+					Payload: tasks.Ver{
+						Major: 1,
+						Minor: 7,
+						Patch: 0,
+					},
+				},
 			}
 
 			expectedResult := tasks.Result{
@@ -1136,6 +1192,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 					},
 					Status: tasks.Success,
 				},
+				"Infra/Agent/Version": {
+					Payload: tasks.Ver{
+						Major: 1,
+						Minor: 7,
+						Patch: 0,
+					},
+				},
 			}
 
 			expectedResult := tasks.Result{
@@ -1224,6 +1287,13 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 					},
 					Status: tasks.Success,
+				},
+				"Infra/Agent/Version": {
+					Payload: tasks.Ver{
+						Major: 1,
+						Minor: 7,
+						Patch: 0,
+					},
 				},
 			}
 

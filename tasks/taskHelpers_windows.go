@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package tasks
@@ -56,23 +57,23 @@ type GetFileVersionFunc func(string) (string, error)
 
 func GetFileVersion(file string) (string, error) {
 	if !FileExists(file) {
-		return "", errors.New("File does not exist")
+		return "", errors.New("file does not exist")
 	}
 
 	size := fileVersionInfoSize(file)
 	if size == 0 {
-		return "", errors.New("No permissions or No version information found")
+		return "", errors.New("no permissions or No version information found")
 	}
 
 	info := make([]byte, size)
 	ok := fileVersionInfo(file, info)
 	if !ok {
-		return "", errors.New("GetFileVersionInfo failed")
+		return "", errors.New("getFileVersionInfo failed")
 	}
 
 	parameters, ok := queryInfoValue(info)
 	if !ok {
-		return "", errors.New("QueryInfoValue failed")
+		return "", errors.New("gueryInfoValue failed")
 	}
 	version := parameters.fileVersion()
 
@@ -190,7 +191,7 @@ func GetProcInfoByPid(pid string) (ProcInfoStruct, error) {
 		procInfoStruct = append(procInfoStruct, blankInfo)
 	}
 	if err != nil {
-		err = errors.New("No matching process found ")
+		err = errors.New("no matching process found ")
 		return procInfoStruct[0], err
 	}
 	return procInfoStruct[0], err
@@ -202,7 +203,7 @@ func GetProcInfoByName(name string) ([]ProcInfoStruct, error) {
 	query := "SELECT Name,CommandLine,ExecutablePath,ProcessId FROM Win32_Process WHERE name LIKE \"" + name + "\""
 	err := wmi.Query(query, &procInfoStruct)
 	if err == nil && len(procInfoStruct) < 1 {
-		err = errors.New("No matching process found ")
+		err = errors.New("no matching process found ")
 		return procInfoStruct, err
 	}
 	return procInfoStruct, err
@@ -268,7 +269,7 @@ func isLocalUserAdmin(username string) (bool, error) {
 
 	if dataPointer == uintptr(0) {
 		log.Debug("Unable to determine local user.")
-		return false, errors.New("Unable to determine local user.")
+		return false, errors.New("unable to determine local user.")
 	}
 
 	var data = (*USER_INFO_1)(unsafe.Pointer(dataPointer))

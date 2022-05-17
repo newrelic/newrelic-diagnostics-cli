@@ -71,7 +71,7 @@ func TestInfraConfigDataDirectoryCollect_Execute(t *testing.T) {
 		}, nil
 	}
 	var mockDataDirError = func([]string) ([]tasks.FileCopyEnvelope, error) {
-		return []tasks.FileCopyEnvelope{}, errors.New("No data directory detected")
+		return []tasks.FileCopyEnvelope{}, errors.New("no data directory detected")
 	}
 	var mockDataPath = func(string) []string {
 		return []string{}
@@ -102,7 +102,7 @@ func TestInfraConfigDataDirectoryCollect_Execute(t *testing.T) {
 		},
 			want: tasks.Result{
 				Status:  tasks.Error,
-				Summary: "Unable to get Infrastructure data directory: No data directory detected",
+				Summary: "Unable to get Infrastructure data directory: no data directory detected",
 			}},
 	}
 	for _, tt := range tests {
@@ -158,7 +158,6 @@ func Test_getDataDir(t *testing.T) {
 					Identifier: "Infra/Config/DataDirectoryCollect"},
 			},
 		},
-		
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

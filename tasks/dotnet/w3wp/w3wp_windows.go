@@ -1,6 +1,8 @@
+//go:build windows
 // +build windows
 
 package w3wp
+
 import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"

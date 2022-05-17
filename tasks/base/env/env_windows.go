@@ -16,7 +16,7 @@ func RegisterWinWith(registrationFunc func(tasks.Task, bool)) {
 		fileOpener:     os.Open,
 		getEnvVars:     tasks.GetShellEnvVars,
 		getCurrentUser: user.Current,
-		isUserAdmin: tasks.IsUserAdmin,
+		isUserAdmin:    tasks.IsUserAdmin,
 	}, true)
 	registrationFunc(BaseEnvIisCheck{}, true)
 }

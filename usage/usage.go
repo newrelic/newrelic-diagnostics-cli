@@ -21,29 +21,6 @@ import (
 const defaultProtocolVersion = "1.0"
 const defaultUsageEndpoint = "http://localhost:3000/usage"
 
-/*
-dotnet: licenseKey
-dotnetcore: -licenseKey
-go: config not parsed
-infra: license_key
-java: license_key
-node: licenseKey
-php: newrelic.license
-python: license_key
-Ruby: license_key
-*/
-
-var licenseKeyConfigNames = []string{
-	"license_key",
-	"licenseKey",
-	"-licenseKey",
-	"newrelic.license",
-}
-
-// type Survey struct {
-// 	URI string `json:"uri"`
-// }
-
 type usageResponse struct {
 	Survey struct {
 		Prompt string
@@ -228,23 +205,23 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 	}
 
 	for _, result := range results {
-		if result.Result.Status == tasks.Success {
-			if result.Task.Identifier().String() == "Base/Log/ReportingTo" {
-				runTimeMetaData.RpmApps = getRPMdetails(result.Result)
+		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
+			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
+		}
+
+		if result.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && result.Result.Status == tasks.Success {
+			licenseKeyToSources, ok := result.Result.Payload.(map[string][]string)
+			//We do not need the value of sources(if lk is env var or comes from config file, etc) for this operation
+			reducedLicenseKeys := []string{}
+
+			for lk := range licenseKeyToSources {
+				reducedLicenseKeys = append(reducedLicenseKeys, lk)
 			}
 
-			if result.Task.Identifier().String() == "Base/Config/LicenseKey" {
-				licenseKeyToSources, ok := result.Result.Payload.(map[string][]string)
-				//We do not need the value of sources(if lk is env var or comes from config file, etc) for this operation
-				reducedLicenseKeys := []string{}
-
-				for lk := range licenseKeyToSources {
-					reducedLicenseKeys = append(reducedLicenseKeys, lk)
-				}
-
-				if ok {
-					runTimeMetaData.LicenseKeys = reducedLicenseKeys
-				}
+			if ok {
+				runTimeMetaData.LicenseKeys = reducedLicenseKeys
+			} else {
+				log.Info("Unable to send licenseKeys metadata for Haberdasher because of a Type Assertion error")
 			}
 		}
 	}
@@ -264,7 +241,6 @@ func genRequestHeaders(m metaData) map[string]string {
 // postData initiates an HTTP POST request to the provided *usageAPI.URL endpoint with content-type JSON header
 // and the passed string as the request body.
 func (u *usageAPI) postData(data string, headers map[string]string) (usageResponse, error) {
-
 	var response httpResponse
 	if len(u.URL) == 0 {
 		// u.URL is assigned by build script. If not present, fall back to default
@@ -294,7 +270,7 @@ func (u *usageAPI) postData(data string, headers map[string]string) (usageRespon
 	// Check the response
 	if response.statusCode != 200 {
 		log.Debug("Unexpected status code from usage endpoint:", response.statusCode)
-		return usageResponse{}, errors.New("Unexpected status code")
+		return usageResponse{}, errors.New("unexpected status code")
 	}
 
 	var responseData usageResponse

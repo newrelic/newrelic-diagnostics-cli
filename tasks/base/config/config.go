@@ -1,9 +1,9 @@
 package config
 
 import (
+	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 )
 
 // RegisterWith - will register any plugins in this package
@@ -25,6 +25,6 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	}, true)
 }
 
-func haberdasherHSMService(licenseKeys []string) ([]haberdasher.HSMresult, *haberdasher.Response, error)	{
+func haberdasherHSMService(licenseKeys []string) ([]haberdasher.HSMresult, *haberdasher.Response, error) {
 	return haberdasher.DefaultClient.Tasks.CheckHSM(licenseKeys)
 }

@@ -95,7 +95,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	}
 
 	// No system props then let's check for config files
-	if upstream["Base/Config/Validate"].Status != tasks.Success && (upstream["Base/Config/Validate"].Status != tasks.Warning) {
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		return tasks.Result{
 			Status:  tasks.None,
 			Summary: "Task did not meet requirements necessary to run: no validated config files to check",
@@ -107,7 +107,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -149,19 +149,22 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 
 func getAppNameFromEnvVar(upstream map[string]tasks.Result) AppNameInfo {
 
-	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info {
+		envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 
-	if !ok {
-		logger.Debug("Task did not meet requirements necessary to run: type assertion failure")
+		if !ok {
+			logger.Debug("Task did not meet requirements necessary to run: type assertion failure")
+		}
+		appname, isPresent := envVars[appNameEnvVarKey]
+		if !isPresent {
+			return AppNameInfo{}
+		}
+		return AppNameInfo{
+			Name:     appname,
+			FilePath: appNameEnvVarKey,
+		}
 	}
-	appname, isPresent := envVars[appNameEnvVarKey]
-	if !isPresent {
-		return AppNameInfo{}
-	}
-	return AppNameInfo{
-		Name:     appname,
-		FilePath: appNameEnvVarKey,
-	}
+	return AppNameInfo{}
 }
 
 func getAppNamesFromConfig(configElements []ValidateElement) []AppNameInfo {

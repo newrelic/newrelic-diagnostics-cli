@@ -44,8 +44,8 @@ var PythonVersionAgentSupportability = map[string][]string{
 
 var SupportedJavaVersions = map[string][]string{
 	// supported vendors
-	"OpenJDK":    []string{"1.7-1.9.*", "7-14.*"},
-	"HotSpot":    []string{"1.7-1.9.*", "7-14.*"},
+	"OpenJDK":    []string{"1.7-1.9.*", "7-15.*"},
+	"HotSpot":    []string{"1.7-1.9.*", "7-15.*"},
 	"JRockit":    []string{"1-1.6.0.50"},
 	"Coretto":    []string{"1.8-1.9.*", "8-11.*"},
 	"Zulu":       []string{"1.8-1.9.*", "8-12.*"},
@@ -65,11 +65,13 @@ var SupportedForJavaAgent4 = map[string][]string{
 
 var NodeSupportedVersions = map[string][]string{
 	"12": []string{"6.0.0+"},
-	"10": []string{"4.6.0+"},
+	"10": []string{"4.6.0-7.*"},
 }
 
+//https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
 // .NET framework as keys and .NET agent as values
 var DotnetFrameworkSupportedVersions = map[string][]string{
+	"4.8": []string{"7.0.0+"},
 	"4.7": []string{"7.0.0+"},
 	"4.6": []string{"7.0.0+"}, //should be inclusive of version such as 4.6.1
 	"4.5": []string{"7.0.0+"},
@@ -85,6 +87,7 @@ var DotnetFrameworkOldVersions = map[string][]string{
 //.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
 
 var DotnetCoreSupportedVersions = map[string][]string{
+	"6.0": []string{"9.2.0+"},
 	"5.0": []string{"8.35.0+"},
 	"3.1": []string{"8.21.34.0+"},
 	"3.0": []string{"8.21.34.0+"},

@@ -21,6 +21,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	}, true)
 	registrationFunc(InfraConfigIntegrationsValidateJson{}, true)
 	registrationFunc(InfraConfigValidateJMX{
-		mCmdExecutor: tasks.MultiCmdExecutor,
+		mCmdExecutor:             tasks.MultiCmdExecutor,
+		getJMXProcessCmdlineArgs: getJMXProcessCmdlineArgs,
 	}, true)
 }

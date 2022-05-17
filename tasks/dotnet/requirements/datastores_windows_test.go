@@ -132,13 +132,17 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 		Context("With unsuccessful upstream", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": tasks.Result{
+						Status: tasks.Failure,
+					},
+				}
 			})
 			It("Should return None status", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal(".Net Agent not installed, this task didn't run"))
+				Expect(result.Summary).To(Equal(tasks.UpstreamFailedSummary + "DotNet/Agent/Installed"))
 			})
 		})
 
@@ -206,7 +210,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 						return "2.2", nil
 					}
 					// Fall through, mock received unexpected input. (Shouldn't happen)
-					return "", errors.New("Red Alert, Red Alert")
+					return "", errors.New("red Alert, Red Alert")
 				}
 			})
 			It("Should return Success status", func() {
@@ -244,7 +248,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 						return "1.0", nil
 					}
 					// Fall through, mock received unexpected input. (Shouldn't happen)
-					return "", errors.New("Danger Danger Will Robinson")
+					return "", errors.New("danger Danger Will Robinson")
 				}
 			})
 			It("Should return Failure status", func() {
@@ -278,7 +282,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 						return "2.2", nil
 					}
 					// Fall through, mock received unexpected input. (Shouldn't happen)
-					return "", errors.New("What are you doing, Dave?")
+					return "", errors.New("what are you doing, Dave?")
 
 				}
 			})
@@ -306,7 +310,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 					return []string{"/foo/MongoDB.Driver.dll"}
 				}
 				p.getFileVersion = func(input string) (string, error) {
-					return "", errors.New("Unable to determine version")
+					return "", errors.New("unable to determine version")
 				}
 			})
 			It("Should return Warning status", func() {

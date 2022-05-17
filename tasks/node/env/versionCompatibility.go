@@ -52,8 +52,8 @@ func (p NodeEnvVersionCompatibility) Execute(options tasks.Options, upstream map
 	agentVersion, valid := upstream["Node/Agent/Version"].Payload.(string)
 	if !ok || !valid {
 		return tasks.Result{
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
-			Status:  tasks.None,
+			Summary: tasks.AssertionErrorSummary,
+			Status:  tasks.Error,
 		}
 	}
 	sanitizedNodeVersion := sanitizeNodeVersion(nodeVersion.String())

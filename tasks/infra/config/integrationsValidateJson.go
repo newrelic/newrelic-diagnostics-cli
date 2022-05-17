@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
@@ -60,8 +61,8 @@ func (p InfraConfigIntegrationsValidateJson) Execute(options tasks.Options, upst
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -75,7 +76,7 @@ func (p InfraConfigIntegrationsValidateJson) Execute(options tasks.Options, upst
 			yamlInMapCount++
 			//Loop through its respective keys in yamlKeyMap
 			for _, field := range yamlKeyMap[yamlFile.Config.FileName] {
-				foundFields := yamlFile.ParsedResult.FindKey(field)
+				foundFields := yamlFile.ParsedResult.FindKey(strings.ToLower(field))
 				//Validate json value, if invalid, append to invalidJson array
 				for _, key := range foundFields {
 					jsonValue := key.Value()

@@ -1,8 +1,8 @@
 package env
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -38,24 +38,31 @@ func (t DotNetCoreEnvVersions) Dependencies() []string {
 // Execute - The core work within each task
 func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
+	if upstream["Base/Env/CollectEnvVars"].Status != tasks.Info {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "No environment variables found. This task did not run",
+		}
+	}
+
 	// Gather env variables from upstream
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the map[string]string I know it should return
 	if !ok {
-		logger.Debug("DotNetCoreVersions - Error gathering Environment Variables from upstream.")
-	} else {
-		logger.Debug("DotNetCoreVersions - Successfully gathered Environment Variables from upstream.")
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
 	}
-
 	versions, errorMessage := checkVersions(envVars)
 
 	if len(versions) < 1 {
 		return tasks.Result{
-			Status: tasks.Error,
+			Status:  tasks.Error,
 			Summary: errorMessage,
 		}
 	}
 	return tasks.Result{
-		Status: tasks.Info,
+		Status:  tasks.Info,
 		Summary: strings.Join(versions, ", "),
 		Payload: versions,
 	}
@@ -65,7 +72,7 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 	errorMessage := "Unable to complete this health check because we ran into some unexpected errors when attempting to collect this application's .NET Core SDK version:\n"
 	versions := []string{}
 	// first check if version is accesible through the cmdline
-	//dotnet --version will Display .NET Core SDK version. Ex: 5.0.101
+	//dotnet --version will Display .NET Core SDK version https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet. Ex: 5.0.101
 	version, err := tasks.CmdExecutor("dotnet", "--version")
 
 	if err != nil {
@@ -95,12 +102,13 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 			}
 			logger.Debug("DotNetCoreVersions - Error reading '", directory, "'. Error: ", err.Error())
 			errorMessage += fmt.Sprint("Unable to read from dotnet sdk path:\n%w\n", err)
-			continue      // go to the next directory
+			continue // go to the next directory
 		}
 
+		r, _ := regexp.Compile(`^\d+[.]\d+[.]\d+$`)
 		for _, dir := range subDirs {
 			dirName := dir.Name()
-			versionMatch, _ := regexp.MatchString(`^\d+[.]\d+[.]\d+$`, dirName) // ensure we just have the version dirs and not nuget's
+			versionMatch := r.MatchString(dirName) // ensure we just have the version dirs and not nuget's
 			//logger.Debug(dirName)
 			if versionMatch { // filter out NuGet's dirs
 				versions = append(versions, dirName)
@@ -112,10 +120,13 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 }
 
 func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr error) {
-	pathVarSplit := []string{}
-	var searchString string
-	netCoreLocWin := []string{`C:\Program Files\dotnet\sdk`}
-	netCoreLocLinux := []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
+
+	var (
+		searchString    string
+		pathVarSplit    []string
+		netCoreLocWin   = []string{`C:\Program Files\dotnet\sdk`}
+		netCoreLocLinux = []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
+	)
 
 	switch os := runtime.GOOS; os {
 	case "windows":
@@ -132,7 +143,7 @@ func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr err
 		searchString = `/dotnet`
 	default:
 		logger.Debug("DotNetCoreVersions error, Unknown OS: ", os)
-		return nil, errors.New("DotNetCoreVersions task encountered unknown OS: " + os)
+		return nil, errors.New("task DotNetCoreVersions encountered unknown OS: " + os)
 	}
 	if envVars["DOTNET_INSTALL_PATH"] != "" {
 		dirsToRead = appendIfUnique(dirsToRead, filepath.Join(envVars["DOTNET_INSTALL_PATH"], "sdk"))
@@ -147,7 +158,7 @@ func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr err
 }
 
 func checkPathVarForDotnet(paths []string, searchString string) string {
-	if paths != nil {
+	if len(paths) > 0 {
 		for _, path := range paths {
 			if strings.Contains(path, searchString) {
 				logger.Debug("DotNetCoreVersions - Found dotnet core dir in path var: ", path)

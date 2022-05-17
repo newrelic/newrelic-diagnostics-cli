@@ -8,7 +8,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func TestJavaJVMVendorsVersion(t *testing.T) {
@@ -719,7 +719,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			BeforeEach(func() {
 				javaExecutable = ""
 				p.cmdExec = func(name string, arg ...string) ([]byte, error) {
-					return nil, errors.New("Unable to execute")
+					return nil, errors.New("unable to execute")
 				}
 			})
 
@@ -1013,7 +1013,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			})
 
 			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("The task Java/JVM/VendorsVersions encountered an error while detecting all running Java processes."))
+				Expect(result.Summary).To(Equal(tasks.ThisProgramFullName + " was unable to detect any running Java processes because we ran into an error: an error message"))
 			})
 		})
 		Context("when there are no Java processes running", func() {
@@ -1117,7 +1117,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				p.getCmdLineArgs = func(proc process.Process) (string, error) {
 					// Generate an error for one process
 					if proc.Pid == 1 {
-						return "", errors.New("Couldn't do that! Error")
+						return "", errors.New("couldn't do that! Error")
 					} else {
 						// All other processes are valid
 						return "/usr/local/bin/javarooski/java", nil
@@ -1216,7 +1216,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 					}, nil
 				}
 				p.cmdExec = func(string, ...string) ([]byte, error) {
-					return []byte(""), errors.New("Duke wuz here")
+					return []byte(""), errors.New("duke wuz here")
 				}
 
 				p.getCmdLineArgs = func(process.Process) (string, error) {
@@ -1252,7 +1252,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 					}, nil
 				}
 				p.cmdExec = func(string, ...string) ([]byte, error) {
-					return []byte(""), errors.New("Duke wuz here")
+					return []byte(""), errors.New("duke wuz here")
 				}
 
 				p.getCmdLineArgs = func(process.Process) (string, error) {

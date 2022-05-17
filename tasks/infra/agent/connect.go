@@ -108,7 +108,7 @@ func makeRequests(urls map[string]string, HTTPagent requestFunc) map[string]Requ
 			body, err = ioutil.ReadAll(response.Body)
 
 			if err != nil {
-				err = errors.New("Read error - There was an issue reading the body: " + err.Error())
+				err = errors.New("read error - There was an issue reading the body: " + err.Error())
 			}
 			response.Body.Close()
 		}

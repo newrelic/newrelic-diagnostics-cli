@@ -154,7 +154,10 @@ func checkFrameworkVerIsSupported(frameworkVer string) (bool, []string) {
 
 func checkDependencies(upstream map[string]tasks.Result) (bool, string) {
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
-		return false, "Did not detect .Net Agent as being installed, this check did not run"
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return false, tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed"
+		}
+		return false, tasks.UpstreamFailedSummary + "DotNet/Agent/Installed"
 	}
 
 	if upstream["DotNet/Env/TargetVersion"].Status != tasks.Info {

@@ -5,10 +5,10 @@ package docs
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestBaseLogCount(t *testing.T) {
@@ -90,11 +90,11 @@ var _ = Describe("Base/Log/Count", func() {
 			})
 
 			It("should return an expected none result status", func() {
-				Expect(result.Status).To(Equal(tasks.None))
+				Expect(result.Status).To(Equal(tasks.Error))
 			})
 
 			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("Task did not meet requirements necessary to run: type assertion failure"))
+				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
 			})
 		})
 

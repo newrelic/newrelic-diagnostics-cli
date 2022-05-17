@@ -28,7 +28,7 @@ func (p BaseEnvDetectAWS) Dependencies() []string {
 // Execute - The core work within each task
 func (p BaseEnvDetectAWS) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result
-	if p.checkAWSMetaData() == true {
+	if p.checkAWSMetaData() {
 		result = tasks.Result{
 			Status:  tasks.Success,
 			Summary: "Successfully detected AWS.",
@@ -48,7 +48,7 @@ func (p BaseEnvDetectAWS) checkAWSMetaData() bool {
 		Method:         "GET",
 		URL:            "http://169.254.169.254/latest/meta-data",
 		TimeoutSeconds: 2,
-		BypassProxy: true,
+		BypassProxy:    true,
 	}
 	resp, err := p.httpGetter(wrapper)
 
@@ -58,8 +58,5 @@ func (p BaseEnvDetectAWS) checkAWSMetaData() bool {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		return true
-	}
-	return false
+	return resp.StatusCode == 200
 }

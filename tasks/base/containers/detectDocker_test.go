@@ -3,10 +3,10 @@ package containers
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 
 	"io/ioutil"
 	"os/exec"
@@ -54,7 +54,6 @@ var _ = Describe("Base/Containers/DetectDocker", func() {
 		dockerInfoOutput, err := ioutil.ReadFile("./fixtures/dockerInfoOutput")
 		//dockerInfoOutputString := string(dockerInfoOutput);
 
-
 		if err != nil {
 			log.Info("Error with reading fixture: " + err.Error())
 		}
@@ -80,7 +79,6 @@ var _ = Describe("Base/Containers/DetectDocker", func() {
 
 		})
 
-
 		Context("If there is no error with running docker info and JSON is invalid but we dont get ServerVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
@@ -96,7 +94,6 @@ var _ = Describe("Base/Containers/DetectDocker", func() {
 			})
 
 		})
-
 
 		Context("If Docker is running but output can't be parsed from json", func() {
 			BeforeEach(func() {
@@ -115,7 +112,6 @@ var _ = Describe("Base/Containers/DetectDocker", func() {
 
 		})
 
-
 		Context("If DockerDaemon is determined to be running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
@@ -133,10 +129,10 @@ var _ = Describe("Base/Containers/DetectDocker", func() {
 			It("Should have a payload of info command output", func() {
 
 				expectedPayload := tasks.DockerInfo{
-					Driver: "overlay2",
+					Driver:        "overlay2",
 					ServerVersion: "19.03.4",
-					MemTotal: 2095968256,
-					NCPU: 4,
+					MemTotal:      2095968256,
+					NCPU:          4,
 				}
 				Expect(result.Payload).To(Equal(expectedPayload))
 			})

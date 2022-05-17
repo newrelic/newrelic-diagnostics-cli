@@ -8,7 +8,7 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 type supportabilityStatus int
@@ -62,7 +62,7 @@ func (p JavaJVMVendorsVersions) Execute(options tasks.Options, upstream map[stri
 		log.Debug(p.Identifier(), "- Error getting list of running Java processes. Error is: ", err.Error())
 
 		return tasks.Result{
-			Summary: fmt.Sprintf("The task %s encountered an error while detecting all running Java processes.", p.Identifier()),
+			Summary: fmt.Sprintf(tasks.ThisProgramFullName+" was unable to detect any running Java processes because we ran into an error: %s", err.Error()),
 			Status:  tasks.Error,
 		}
 	}
@@ -229,11 +229,12 @@ func parseJavaExecutable(cmdLineArgs string) string {
 
 	//first pass, splitting on ' -'
 	argsSplitByDash := strings.Split(cmdLineArgs, " -")
+	r, _ := regexp.Compile(".*java.exe$|.*java$")
 	for _, cmdLineArg := range argsSplitByDash {
 		sanitizedCmdLineArg := sanitizeCmdLineArg(cmdLineArg)
 
 		/* does the arg string end in java or java.exe(windows) */
-		match, _ := regexp.MatchString(".*java.exe$|.*java$", sanitizedCmdLineArg)
+		match := r.MatchString(sanitizedCmdLineArg)
 		if match {
 			return sanitizedCmdLineArg
 		}
@@ -241,8 +242,9 @@ func parseJavaExecutable(cmdLineArgs string) string {
 
 	//second pass, splitting on ' '
 	argsSplitBySpace := strings.Split(cmdLineArgs, " ")
+	r2, _ := regexp.Compile(".*java$")
 	for _, cmdLineArg := range argsSplitBySpace {
-		match, _ := regexp.MatchString(".*java$", cmdLineArg)
+		match := r2.MatchString(cmdLineArg)
 		if match {
 			return cmdLineArg
 		}

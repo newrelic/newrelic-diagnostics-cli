@@ -1,12 +1,13 @@
-// +build  !darwin !linux
+//go:build !darwin || !linux
+// +build !darwin !linux
 
 package requirements
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
@@ -41,13 +42,18 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 		Context("With unsuccessful upstream", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {
+						Status:  tasks.None,
+						Summary: tasks.NoAgentDetectedSummary,
+					},
+				}
 			})
 			It("Should return None status", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Did not detect .Net Agent as being installed, this check did not run"))
+				Expect(result.Summary).To(Equal(tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed"))
 			})
 		})
 		Context("With invalid payload from hostinfo task", func() {

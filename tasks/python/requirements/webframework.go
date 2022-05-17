@@ -61,8 +61,8 @@ func (t PythonRequirementsWebframework) Execute(options tasks.Options, upstream 
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -90,7 +90,7 @@ func checkWebframework(pipFreezeOutput []string) (result tasks.Result) {
 			if err != nil {
 				log.Debugf("Encountered %s while attempting to parse the framework version.", err)
 			}
-			if v == true {
+			if v {
 				compatibleCustomerFrameworks = append(compatibleCustomerFrameworks, pipFreezeOutputItem)
 
 			}

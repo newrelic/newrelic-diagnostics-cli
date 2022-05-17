@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package profiler
@@ -36,11 +37,18 @@ func (p DotNetProfilerInstrumentationPossible) Dependencies() []string {
 //Uses results of wasRegKey,w3svcRegKey, and envVarKey tasks to determin if they are set in such a way that instrumentation is possible
 func (p DotNetProfilerInstrumentationPossible) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result
-	if (upstream["DotNet/Agent/Installed"].Status == tasks.Failure) || (upstream["DotNet/Agent/Installed"].Status == tasks.None) {
-
-		result.Status = tasks.None
-		result.Summary = "Did not detect .Net Agent as being installed, this check did not run"
-		return result
+	// abort if it isn't installed
+	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
+		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
+			return tasks.Result{
+				Status:  tasks.None,
+				Summary: tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed",
+			}
+		}
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
+		}
 	}
 
 	wasSet := upstream["DotNet/Profiler/WasRegKey"].Status

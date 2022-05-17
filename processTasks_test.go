@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/suites"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 )
 
 func TestProcessTasks(t *testing.T) {
@@ -225,6 +226,54 @@ var _ = Describe("processFlagsSuites()", func() {
 			_, err := processFlagsSuites(flagValue, osArgs)
 
 			Expect(err).To(BeNil())
+		})
+	})
+
+})
+
+var _ = Describe("getLicenseKey()", func() {
+
+	var (
+		//inputs
+		taskResult tasks.Result
+		//output
+		expectedError error
+	)
+
+	Context("when the task validatedLicenseKey is in the proper format", func() {
+		BeforeEach(func() {
+			taskResult = tasks.Result{
+				Status:      1,
+				Summary:     "This does not matter",
+				URL:         "",
+				FilesToCopy: []tasks.FileCopyEnvelope{},
+				Payload:     map[string][]string{"NEW_RELIC_LICENSE_KEY": {"correctformatprovided"}},
+			}
+		})
+		It("Should return with the above error", func() {
+			_, err := getLicenseKey(taskResult)
+
+			Expect(err).To(BeNil())
+
+		})
+	})
+
+	Context("when the task validateLicenseKey is not in the proper format", func() {
+		BeforeEach(func() {
+			expectedError = fmt.Errorf("unable to retrieve license Key")
+			taskResult = tasks.Result{
+				Status:      1,
+				Summary:     "This does not matter",
+				URL:         "",
+				FilesToCopy: []tasks.FileCopyEnvelope{},
+				Payload:     map[string]string{"NEW_RELIC_LICENSE_KEY": "incorrectinterfaceprovided"},
+			}
+		})
+		It("Should return with the above error", func() {
+			_, err := getLicenseKey(taskResult)
+
+			Expect(err).To(Equal(expectedError))
+
 		})
 	})
 

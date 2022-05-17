@@ -37,8 +37,6 @@ func (m mockFileInfo) Sys() interface{} {
 	return nil
 }
 
-
-
 func TestVersionCheckJboss(t *testing.T) {
 
 	JbossVersionsTests := []struct {
@@ -113,7 +111,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"JBOSS_HOME": "/foo"}},
 				}
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
-					return []string{}, errors.New("Version file didn't exist")
+					return []string{}, errors.New("version file didn't exist")
 				}
 				p.fileExists = func(string) bool {
 					return true
@@ -134,7 +132,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"JBOSS_HOME": "/foo"}},
 				}
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
-					return []string{}, errors.New("There they are all sitting in a row")
+					return []string{}, errors.New("there they are all sitting in a row")
 				}
 				p.fileExists = func(string) bool {
 					return true
@@ -213,7 +211,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 					} else if search == "Enterprise Application Platform - Version ([0-9.]+.*)" {
 						return []string{"", "6.2"}, nil
 					}
-					return []string{}, errors.New("I shouldn't get here")
+					return []string{}, errors.New("i shouldn't get here")
 				}
 			})
 			It("Should return success result Summary", func() {
@@ -244,7 +242,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				}
 				p.runtimeOs = "linux"
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
-					return []string{}, errors.New("I've got a lovely bunch of coconuts")
+					return []string{}, errors.New("i've got a lovely bunch of coconuts")
 				}
 				p.listDir = func(directory string, _ readDirFunc) []string {
 					if directory == filepath.FromSlash("fixtures/eapFiles") {
@@ -273,7 +271,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				}
 				p.runtimeOs = "windows"
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
-					return []string{}, errors.New("Version file didn't exist")
+					return []string{}, errors.New("version file didn't exist")
 				}
 				p.listDir = func(directory string, _ readDirFunc) []string {
 					return []string{"foo"}
@@ -298,7 +296,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				}
 				p.runtimeOs = "windows"
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
-					return []string{}, errors.New("I am the black knight")
+					return []string{}, errors.New("i am the black knight")
 				}
 				p.listDir = func(directory string, _ readDirFunc) []string {
 					if directory == filepath.FromSlash("foo/eapFiles") {
@@ -372,7 +370,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				Expect(result).To(Equal(""))
 			})
 			It("Should return err", func() {
-				Expect(resultErr.Error()).To(Equal("Unable to detect JBoss directory"))
+				Expect(resultErr.Error()).To(Equal("unable to detect JBoss directory"))
 			})
 		})
 	})
@@ -390,7 +388,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When unable to list the directory", func() {
 			BeforeEach(func() {
 				mockReadDir = func(string) ([]os.FileInfo, error) {
-					return []os.FileInfo{}, errors.New("Totally tubular error here")
+					return []os.FileInfo{}, errors.New("totally tubular error here")
 				}
 			})
 			It("Should return empty result", func() {
@@ -430,7 +428,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				Expect(result).To(Equal(""))
 			})
 			It("Should return expected error", func() {
-				Expect(resultErr.Error()).To(Equal("Version file didn't exist"))
+				Expect(resultErr.Error()).To(Equal("version file didn't exist"))
 			})
 		})
 		Context("When versionFilePath exists and an error is returned reading file", func() {
@@ -509,7 +507,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				Expect(file).To(Equal(""))
 			})
 			It("Should return expected error", func() {
-				Expect(fileError.Error()).To(Equal("Error parsing JBOSS_HOME path in jboss-eap.conf"))
+				Expect(fileError.Error()).To(Equal("error parsing JBOSS_HOME path in jboss-eap.conf"))
 			})
 
 		})
@@ -533,10 +531,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When default jboss 7 file exists", func() {
 			BeforeEach(func() {
 				p.fileExists = func(file string) bool {
-					if file == "/etc/default/jboss-eap.conf" {
-						return false
-					}
-					return true
+					return file != "/etc/default/jboss-eap.conf"
 				}
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
 					return []string{`JBOSS_HOME="/app"`}, nil
@@ -563,7 +558,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				Expect(file).To(Equal(""))
 			})
 			It("Should return an error", func() {
-				Expect(fileError.Error()).To(Equal("Unable to detect JBoss directory"))
+				Expect(fileError.Error()).To(Equal("unable to detect JBoss directory"))
 			})
 
 		})
@@ -613,7 +608,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 					return false
 				}
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
-					return []string{}, errors.New("This is bad")
+					return []string{}, errors.New("this is bad")
 				}
 				p.findFiles = func([]string, []string) []string {
 					return []string{"awesomeist_file"}
@@ -623,7 +618,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 				Expect(file).To(Equal(""))
 			})
 			It("Should return expected error", func() {
-				Expect(fileError.Error()).To(Equal("Unable to detect JBoss directory"))
+				Expect(fileError.Error()).To(Equal("unable to detect JBoss directory"))
 			})
 
 		})

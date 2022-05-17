@@ -16,20 +16,20 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Version            bool
 		YesToAll           bool
 		ShowOverrideHelp   bool
+		AutoAttach         bool
 		UsageOptOut        bool
 		Proxy              string
 		ProxyUser          string
 		ProxyPassword      string
 		Tasks              string
-		AttachmentKey      string
 		ConfigFile         string
 		Override           string
 		OutputPath         string
 		Filter             string
-		FileUpload         string
 		BrowserURL         string
 		AttachmentEndpoint string
 		Suites             string
+		Include            string
 	}
 
 	sampleFlags := fields{
@@ -41,19 +41,19 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Version:            true,
 		YesToAll:           false,
 		ShowOverrideHelp:   true,
+		AutoAttach:         true,
 		Proxy:              "string",
 		ProxyUser:          "string",
 		ProxyPassword:      "",
 		Tasks:              "string",
-		AttachmentKey:      "string",
 		ConfigFile:         "string",
 		Override:           "",
 		OutputPath:         "",
 		Filter:             "string",
-		FileUpload:         "string",
 		BrowserURL:         "string",
 		AttachmentEndpoint: "string",
 		Suites:             "string",
+		Include:            "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
@@ -65,19 +65,19 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ConfigFlag{Name: "version", Value: true},
 		ConfigFlag{Name: "yesToAll", Value: false},
 		ConfigFlag{Name: "showOverrideHelp", Value: true},
+		ConfigFlag{Name: "autoAttach", Value: true},
 		ConfigFlag{Name: "proxy", Value: true},
 		ConfigFlag{Name: "proxyUser", Value: true},
 		ConfigFlag{Name: "proxyPassword", Value: false},
 		ConfigFlag{Name: "tasks", Value: "string"},
-		ConfigFlag{Name: "attachmentKey", Value: "string"},
 		ConfigFlag{Name: "configFile", Value: true},
 		ConfigFlag{Name: "override", Value: false},
 		ConfigFlag{Name: "outputPath", Value: false},
 		ConfigFlag{Name: "filter", Value: "string"},
-		ConfigFlag{Name: "fileUpload", Value: true},
 		ConfigFlag{Name: "browserURL", Value: true},
 		ConfigFlag{Name: "attachmentEndpoint", Value: true},
 		ConfigFlag{Name: "suites", Value: "string"},
+		ConfigFlag{Name: "include", Value: "string"},
 	}
 
 	tests := []struct {
@@ -102,20 +102,20 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				Version:            tt.fields.Version,
 				YesToAll:           tt.fields.YesToAll,
 				ShowOverrideHelp:   tt.fields.ShowOverrideHelp,
+				AutoAttach:         tt.fields.AutoAttach,
 				UsageOptOut:        tt.fields.UsageOptOut,
 				Proxy:              tt.fields.Proxy,
 				ProxyUser:          tt.fields.ProxyUser,
 				ProxyPassword:      tt.fields.ProxyPassword,
 				Tasks:              tt.fields.Tasks,
-				AttachmentKey:      tt.fields.AttachmentKey,
 				ConfigFile:         tt.fields.ConfigFile,
 				Override:           tt.fields.Override,
 				OutputPath:         tt.fields.OutputPath,
 				Filter:             tt.fields.Filter,
-				FileUpload:         tt.fields.FileUpload,
 				BrowserURL:         tt.fields.BrowserURL,
 				AttachmentEndpoint: tt.fields.AttachmentEndpoint,
 				Suites:             tt.fields.Suites,
+				Include:            tt.fields.Include,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)

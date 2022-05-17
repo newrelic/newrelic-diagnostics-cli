@@ -7,16 +7,17 @@
 		"VeryQuiet": false,
 		"YesToAll": false,
 		"ShowOverrideHelp": false,
+		"AutoAttach": false,
 		"ProxySpecified": false,
 		"SkipVersionCheck": false,
 		"Tasks": "",
-		"AttachmentKey": "",
 		"ConfigFile": "",
 		"Override": "",
 		"OutputPath": "",
 		"Filter": "",
 		"BrowserURL": "",
-		"Suites": ""
+		"Suites": "",
+		"Include": ""
 	},
 	"Results": [
 		{

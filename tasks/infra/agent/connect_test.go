@@ -8,20 +8,20 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 type mockReader struct{}
 
 func (p mockReader) Read([]byte) (int, error) {
-	return 0, errors.New("Banana")
+	return 0, errors.New("banana")
 }
 
 func (p mockReader) Close() error {
-	return errors.New("Banana")
+	return errors.New("banana")
 }
 
 func TestInfraAgentConnect(t *testing.T) {
@@ -110,14 +110,14 @@ var _ = Describe("Infra/Agent/Connect", func() {
 				}
 
 				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-					return &http.Response{Body: mockReader{}}, errors.New("Failed request (timeout)")
+					return &http.Response{Body: mockReader{}}, errors.New("failed request (timeout)")
 				}
 			})
 			It("Should return a failed status", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should have a summary with network error message", func() {
-				Expect(result.Summary).To(ContainSubstring("Failed request (timeout)"))
+				Expect(result.Summary).To(ContainSubstring("failed request (timeout)"))
 			})
 		})
 
@@ -146,7 +146,7 @@ var _ = Describe("Infra/Agent/Connect", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should have a summary with body read error message", func() {
-				Expect(result.Summary).To(ContainSubstring("Banana"))
+				Expect(result.Summary).To(ContainSubstring("banana"))
 			})
 		})
 

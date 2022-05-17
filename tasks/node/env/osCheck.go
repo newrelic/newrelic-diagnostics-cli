@@ -44,7 +44,7 @@ func (p NodeEnvOsCheck) Execute(options tasks.Options, upstream map[string]tasks
 
 	if upstream["Node/Config/Agent"].Status != tasks.Success {
 		result.Status = tasks.None
-		result.Summary = "Node agent not detected"
+		result.Summary = "Node agent config file not detected"
 		return result
 	}
 

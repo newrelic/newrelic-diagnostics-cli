@@ -8,7 +8,6 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
 	infraConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
 	"gopkg.in/yaml.v3"
 )
@@ -62,8 +61,8 @@ func (p InfraEnvNrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
@@ -133,7 +132,7 @@ func getMBeanQueriesFromJMVMetricsYml(collectionFilesStr string) ([]string, erro
 		yamlFile, err := ioutil.ReadFile(path)
 		if err != nil {
 			log.Debugf("failed to open %s: %s", path, err)
-			return []string{}, fmt.Errorf("We got a parsing error from %s: %s", path, err.Error())
+			return []string{}, fmt.Errorf("we got a parsing error from %s: %s", path, err.Error())
 		}
 		// Parse the file (Sample file: https://github.com/newrelic/nri-jmx/blob/master/jvm-metrics.yml.sample)
 		var c collectionDefinitionParser
@@ -155,7 +154,7 @@ func getMBeanQueriesFromJMVMetricsYml(collectionFilesStr string) ([]string, erro
 	return formattedQueries, nil
 }
 
-func executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig config.JmxConfig) ([]string, map[string]string) {
+func executeNrjmxCmdToFindBeans(mBeanQueries []string, jmxConfig infraConfig.JmxConfig) ([]string, map[string]string) {
 
 	errorCmdOutputs := make(map[string]string)
 	emptyCmdOutputs := []string{}

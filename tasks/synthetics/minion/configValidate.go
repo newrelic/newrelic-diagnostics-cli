@@ -41,7 +41,6 @@ func (ms MinionSettings) MarshalJSON() ([]byte, error) {
 
 // SyntheticsMinionConfigValidate - Validates private minion configuration
 type SyntheticsMinionConfigValidate struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
-	name string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -71,7 +70,7 @@ func (p SyntheticsMinionConfigValidate) Execute(options tasks.Options, upstream 
 		return result
 	}
 
-	if upstream["Base/Config/Validate"].Status != tasks.Success {
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		log.Debug("[SyntheticsMinionConfigValidate] - Failing because Base/Config/Validate failed")
 		result.Status = tasks.Failure
 		result.Summary = "private-location-settings.json file not found on private minion. \nCheck settings at: http://<MINION_IP_ADDRESS>/setup"
@@ -127,7 +126,7 @@ func (p SyntheticsMinionConfigValidate) Execute(options tasks.Options, upstream 
 
 	// Validate HSM config
 	log.Debug("Validating verified script execution configuration...")
-	if settings.Hsm == true && settings.HsmPwd == "" {
+	if settings.Hsm && settings.HsmPwd == "" {
 		result.Status = tasks.Failure
 		result.Summary = "Verified Script Execution is enabled, but no password is provided"
 		result.URL = "https://docs.newrelic.com/docs/synthetics/new-relic-synthetics/private-locations/install-configure-private-minions#configure"
@@ -183,10 +182,7 @@ func parseToStruct(in tasks.ValidateBlob) (MinionSettings, []string) {
 
 // isKeyValid - Determines if private location key is valid. Currently just checks length
 func isKeyValid(key string) bool {
-	if len(key) != 36 {
-		return false
-	}
-	return true
+	return len(key) == 36
 }
 
 func walkSyntheticsConfig(in tasks.ValidateBlob) map[string]interface{} {

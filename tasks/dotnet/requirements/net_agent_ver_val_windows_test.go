@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package requirements
@@ -43,13 +44,17 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 		Context("With unsuccessful upstream agent detection", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {
+						Status: tasks.Failure,
+					},
+				}
 			})
 			It("Should return None status", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Did not detect .Net Agent as being installed, this check did not run"))
+				Expect(result.Summary).To(Equal(tasks.UpstreamFailedSummary + "DotNet/Agent/Installed"))
 			})
 		})
 		Context("With unsuccessful upstream DotnetTarget", func() {

@@ -1,0 +1,41 @@
+name: Rollback
+
+on:
+  release:
+    types: [deleted]
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.13.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Fetch Latest Release
+        uses: gregziegan/fetch-latest-release@v2.0.0
+        id: flr
+        with:
+          github_token: ${{ github.token }}
+      - name: delete latest release tag
+        shell: bash
+        run: |
+            echo "deleting tag associated with latest release:"
+            git push --delete origin ${{ steps.flr.outputs.tag_name }}
+#Alternatively we could use the Github Context ref("ref": "refs/tags/v.test") to delete the current tag_name we just deleted manually
+      - name: remove nrdiag zip files from download.newrelic.com related to last release
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run : |
+          echo "starting release rollback process ..."
+          ./scripts/rollback.sh
+
+
+

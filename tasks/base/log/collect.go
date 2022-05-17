@@ -83,7 +83,7 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 		})
 	} else {
 		//ignoring secure logs for now
-		logs = collectFilePaths(envVars, configElements, foundSysProps)
+		logs = collectFilePaths(envVars, configElements, foundSysProps, options)
 	}
 
 	if len(logs) > 0 {
@@ -152,14 +152,4 @@ func pruneLog(file *os.File, logChannel chan string) {
 	}
 
 	close(logChannel)
-
-	return
-}
-
-func limitLength(s string, length int) string {
-	if len(s) < length {
-		return s
-	}
-
-	return s[:length]
 }

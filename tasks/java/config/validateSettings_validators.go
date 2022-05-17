@@ -11,8 +11,8 @@ type ValidationStatus string
 
 const (
 	Valid   ValidationStatus = "Valid"
-	Invalid                  = "Invalid"
-	Unknown                  = "Unknown"
+	Invalid ValidationStatus = "Invalid"
+	Unknown ValidationStatus = "Unknown"
 )
 
 type ValidationResult struct {

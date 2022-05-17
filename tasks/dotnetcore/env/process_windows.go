@@ -51,7 +51,7 @@ func buildProcInfo(p tasks.ProcInfoStruct) (procInfo ProcessArgs) {
 	logger.Debug("DotNetCoreEnvProcess cmdLine - ", procInfo.CmdLine)
 
 	// get current working directory
-	procInfo.Cwd = ""     // ProcInfoStruct has ExecutablePath but that is not CWD
+	procInfo.Cwd = "" // ProcInfoStruct has ExecutablePath but that is not CWD
 	logger.Debug("DotNetCoreEnvProcess cwd - Not implemented on Windows")
 
 	// get env vars

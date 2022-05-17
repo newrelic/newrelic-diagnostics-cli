@@ -20,11 +20,10 @@ func main() {
 	log.Debugf("Run ID: %s\n", runID)
 	log.Debug("nrdiag was run with options", os.Args)
 
-	_, err := processHTTPProxy()
-
 	//Error setting proxy and they specifically included one so let's break out of the program before we attempt any non-proxied calls.
+	_, err := processHTTPProxy()
 	if err != nil {
-		log.Debug("Proxy configuration found, but unable to use. \nError: " + err.Error() + "\nExiting program.")
+		log.Info("Proxy configuration found, but unable to use. \nError: " + err.Error() + "\nExiting program.")
 		os.Exit(3)
 	}
 
@@ -58,9 +57,6 @@ func main() {
 		processHelp()
 	} else if config.Flags.Version {
 		version.ProcessVersion(promptUser)
-	} else if config.Flags.FileUpload != "" {
-		// Do arbitrary file upload here
-		uploadCustomerFile()
 	} else if config.Flags.Interactive {
 		// do interactive stuff
 	} else {
@@ -69,11 +65,23 @@ func main() {
 		// ... the called function is responsible for decrementing when done
 		var wg sync.WaitGroup
 
-		wg.Add(1) // run the tasks in goroutine
-		go processTasks(options, overrides, &wg)
-
 		// zip file is passed around as a dependency for other functions
 		zipfile := output.CreateZip()
+
+		// create the filelist file, exit if it can't be created
+		flErr := output.CreateFileList()
+		if flErr != nil {
+			log.Info("Error creating filelist", err)
+			os.Exit(3)
+		}
+
+		// check if any files/directories should be included in the zip
+		if config.Flags.Include != "" {
+			output.HandleIncludeFlag(zipfile, config.Flags.Include)
+		}
+
+		wg.Add(1) // run the tasks in goroutine
+		go processTasks(options, overrides, &wg)
 
 		wg.Add(1) // collect files the tasks produce and add them to the zip file
 		go output.ProcessFilesChannel(zipfile, &wg)
@@ -95,6 +103,10 @@ func main() {
 
 		// copy our output file(s) to the zip file
 		output.CopyOutputToZip(zipfile)
+
+		// copy the file list to the zip file last to ensure it's up to date
+		output.CopyFileListToZip(zipfile)
+
 		// ...and close it out
 		output.CloseZip(zipfile)
 
@@ -118,7 +130,7 @@ func main() {
 				command = os.Args[0]
 				option = "-h suites"
 			}
-			log.Infof("\n\nTo diagnose a specific product or issue, see task suites options: '%s %s'\n\n", command, option)
+			log.Infof("\n\nFor better results, run Diagnostics CLI with the 'suites' option to target a New Relic product. To learn how to use this option, run: '%s %s'\n\n", command, option)
 		}
 	}
 }

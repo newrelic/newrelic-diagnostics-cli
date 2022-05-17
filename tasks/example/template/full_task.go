@@ -56,51 +56,76 @@ func (p ExampleTemplateFullTask) Execute(options tasks.Options, upstream map[str
 
 	// This is what we will use to pass the output from this task back to the core and report to the UI
 
-	result := tasks.Result{
-		// Base case result - Use the None status if the check didn't have anything to judge
-		Status:  tasks.None,
-		Summary: "There were no config files from which to pull the log level",
+	if !upstream["Base/Config/Validate"].HasPayload() {
+		return tasks.Result{
+			// Base case result - Use the None status if the check didn't have anything to judge
+			Status:  tasks.None,
+			Summary: "There were no config files from which to pull the log level",
+		}
 	}
 
 	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 
 	if !ok { //!ok means the type assertion failed: no []config.ValidateElement found in upstream payload
-		result.Summary = "Task did not meet requirements necessary to run: type assertion failure"
-		return result
-	} else if len(validations) == 0 { //upstream payload is correct type, but upstream task found no valid config files
-		return result
-	} else {
-		payload := []ExamplePayload{}
-		for _, validation := range validations { //Iterate through all my results since I may have more than one result to parse through
-			// Now I want to check to ensure I have the agent language type I'm concerned about
-			logLevel := validation.ParsedResult.FindKey("log_level")
-			//This returns a slice of ValidateBlob so I need to walk through them
-			if len(logLevel) == 0 {
-				result.Status = tasks.Failure
-				result.Summary = "Config file doesn't contain log_level"
-			}
-			for _, value := range logLevel {
-				log.Debug("Path to log_level is ", value.PathAndKey())
-				log.Debug("value of log_level is ", value.Value())
-				payload = append(payload, ExamplePayload{Key: value.PathAndKey(), Value: value.Value()})
-
-				//This is kind of broken, actually... since it loops but only takes the last result. Good thing it's just an example.
-				//At least the payload will have everything!
-				switch value.Value() {
-				case "finest":
-					result.Status = tasks.Success //Setting this task's status to Success, we found what we expected/wanted
-					result.Summary = "Log level is finest"
-				case "info":
-					result.Status = tasks.Warning //Setting a task's status to Warning for things that aren't necessarily bad, but might concern us
-					result.Summary = "Log level is info, you may want to consider updating the log level to finest before uploading logs to support"
-				default:
-					result.Status = tasks.Error // User error if something went wrong, but we're not sure if it was our fault or theirs (this isn't the best example)
-					result.Summary = "We were unable to determine the log level"
-				}
-			}
-			result.Payload = payload
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
-	return result
+
+	if len(validations) == 0 { //upstream payload is correct type, but upstream task found no valid config files
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "There were no config files from which to pull the log level",
+		}
+	}
+
+	payload := []ExamplePayload{}
+	for _, validation := range validations { //Iterate through all my results since I may have more than one result to parse through
+		// Now I want to check to ensure I have the agent language type I'm concerned about
+		logLevel := validation.ParsedResult.FindKey("log_level")
+		//This returns a slice of ValidateBlob so I need to walk through them
+		if len(logLevel) == 0 {
+			return tasks.Result{
+				Status:  tasks.Failure,
+				Summary: "Config file doesn't contain log_level",
+			}
+		}
+		for _, value := range logLevel {
+			log.Debug("Path to log_level is ", value.PathAndKey())
+			log.Debug("value of log_level is ", value.Value())
+			payload = append(payload, ExamplePayload{Key: value.PathAndKey(), Value: value.Value()})
+
+			//This is kind of broken, actually... since it loops but only takes the last result. Good thing it's just an example.
+			//At least the payload will have everything!
+			switch value.Value() {
+			case "finest":
+				return tasks.Result{
+					Status:  tasks.Success,
+					Summary: "Log level is finest",
+					Payload: payload,
+				}
+			case "info":
+				//Setting a task's status to Warning for things that aren't necessarily bad, but might concern us
+				return tasks.Result{
+					Status:  tasks.Warning,
+					Summary: "Log level is info, you may want to consider updating the log level to finest before uploading logs to support",
+					Payload: payload,
+				}
+			default:
+				// User error if something went wrong, but we're not sure if it was our fault or theirs (this isn't the best example)
+				return tasks.Result{
+					Status:  tasks.Error,
+					Summary: "We were unable to determine the log level",
+					Payload: payload,
+				}
+			}
+		}
+	}
+	return tasks.Result{
+		Status:  tasks.None,
+		Summary: "We were unable to determine the log level",
+		Payload: payload,
+	}
 	// Additional functions defined within the task should be added below the standard methods to keep code consistent
 }

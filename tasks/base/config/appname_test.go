@@ -71,7 +71,7 @@ var _ = Describe("Base/Config/AppName", func() {
 
 				expectedResult := tasks.Result{
 					Status:  tasks.Error,
-					Summary: "Task did not meet requirements necessary to run: type assertion failure",
+					Summary: tasks.AssertionErrorSummary,
 				}
 
 				Expect(p.Execute(executeOptions, executeUpstream)).To(Equal(expectedResult))
@@ -113,7 +113,7 @@ var _ = Describe("Base/Config/AppName", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
 					"Base/Env/CollectEnvVars": tasks.Result{
-						Status: tasks.Success,
+						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_LICENSE_KEY": "my-license-key",
 						},
@@ -220,7 +220,7 @@ var _ = Describe("Base/Config/AppName", func() {
 				executeUpstream := map[string]tasks.Result{
 
 					"Base/Env/CollectEnvVars": tasks.Result{
-						Status: tasks.Success,
+						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_APP_NAME": "mysolid-appname",
 						},
@@ -263,7 +263,7 @@ var _ = Describe("Base/Config/AppName", func() {
 				executeUpstream := map[string]tasks.Result{
 
 					"Base/Env/CollectEnvVars": tasks.Result{
-						Status: tasks.Success,
+						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_LICENSE_KEY": "my-license-key",
 						},

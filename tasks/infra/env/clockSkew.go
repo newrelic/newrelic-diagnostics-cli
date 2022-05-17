@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	errResponseMissingDateHeader = errors.New("Date header not found in collector response")
+	errResponseMissingDateHeader = errors.New("date header not found in collector response")
 )
 
 const (
@@ -49,12 +49,19 @@ func (p InfraEnvClockSkew) Dependencies() []string {
 // Execute - Returns result containing the log_file value(s) parsed from any found newrelic-infra.yml files previously collected.
 func (p InfraEnvClockSkew) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
+	if upstream["Infra/Agent/Connect"].Status == tasks.None {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "Unable to urls from Infra/Agent/Connect. This task did not run",
+		}
+	}
+
 	requestURLs, ok := upstream["Infra/Agent/Connect"].Payload.(map[string]string)
 
 	if !ok {
 		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Task did not meet requirements necessary to run: type assertion failure",
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 

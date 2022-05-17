@@ -32,11 +32,11 @@ func isFileWithNETAgentConfigPath(filename string) bool {
 // Example: <add key = "NewRelic.ConfigFile" value="C:\Path-to-alternate-config-dir\newrelic.config" />
 func getNETAgentConfigPathFromFile(filepath string) (string, error) {
 	file, err := os.Open(filepath)
-	defer file.Close()
 	if err != nil {
 		log.Debugf("Unable to open '%s': %s\n", filepath, err.Error())
 		return "", err
 	}
+	defer file.Close()
 
 	parsedFile, err := parseXML(file)
 	if err != nil {
@@ -75,7 +75,7 @@ func getNETAgentConfigPathFromFile(filepath string) (string, error) {
 	// .NET docs state this needs to be an absolute filepath, so we'll honor that instead
 	// of implementing additional logic for handling a directory
 	if pathInfo.IsDir() {
-		return "", errors.New("Expected absolute filepath")
+		return "", errors.New("expected absolute filepath")
 	}
 
 	return agentConfigPath, nil

@@ -81,16 +81,16 @@ var _ = Describe("Base/Env/InitSystem", func() {
 
 				p.runtimeOs = "linux"
 				p.evalSymlink = func(string) (string, error) {
-					return "", errors.New("Could not resolve symlink!")
+					return "", errors.New("could not resolve symlink!")
 				}
 			})
 
 			It("should return an expected error result status", func() {
-				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Status).To(Equal(tasks.None))
 			})
 
 			It("should return an expected error result summary", func() {
-				Expect(result.Summary).To(Equal("Unable to read symbolic link for /sbin/init: Could not resolve symlink!"))
+				Expect(result.Summary).To(Equal("Unable to read symbolic link for /sbin/init: could not resolve symlink!"))
 			})
 		})
 

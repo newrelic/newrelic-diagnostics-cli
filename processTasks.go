@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
@@ -17,7 +18,6 @@ import (
 )
 
 func processTasksToRun() {
-
 	log.Debugf("There are %d tasks in this queue\n", len(registration.Work.WorkQueue))
 
 	if config.Flags.Tasks != "" {
@@ -75,7 +75,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 		for _, value := range overrides {
 			// Initialize the taskOptions object
 			log.Debugf("override %s: %s", value.Identifier, value.value)
-			if strings.ToLower(value.Identifier.String()) == strings.ToLower(task.Identifier().String()) {
+			if strings.EqualFold(value.Identifier.String(), task.Identifier().String()) {
 				log.Debug("Adding override to task namedTaskOptions", value.key, ":", value.value)
 				namedTaskOptions.Options[value.key] = value.value
 			}
@@ -128,6 +128,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 
 		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
 		registration.Work.ResultsChannel <- taskResult
+
 		if len(result.FilesToCopy) > 0 {
 			log.Debug(" - writing result to file channel")
 			registration.Work.FilesChannel <- taskResult
@@ -154,8 +155,21 @@ func processFlagsTasks(flagValue string) []string {
 	return validatedIdentifiers
 }
 
-func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error) {
+func getLicenseKey(thisResult tasks.Result) ([]string, error) {
+	licenseKeyToSources, ok := thisResult.Payload.(map[string][]string)
+	if !ok {
+		return nil, fmt.Errorf("unable to retrieve license Key")
+	}
+	log.Debug("Valid License Key(s) provided")
+	validLicenseKeys := []string{}
+	for lk := range licenseKeyToSources {
+		validLicenseKeys = append(validLicenseKeys, lk)
+	}
+	return validLicenseKeys, nil
 
+}
+
+func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error) {
 	suiteIdentifiers := sanitizeAndParseFlagValue(flagValue)
 	sanitizedArgs := sanitizeOSArgs(args)
 
@@ -188,21 +202,47 @@ func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error)
 func processUploads() {
 	log.Debug("processing uploads")
 
-	if config.Flags.AttachmentKey == "" {
-		return
-	}
+	//get timestamp to use attachment
+	timestamp := time.Now().UTC().Format(time.RFC3339)
 
 	if config.Flags.YesToAll {
-		Upload(config.Flags.AttachmentKey)
+		checkAttachmentFlags(timestamp)
 		return
 	}
 
 	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
-		"Do you want to attach these files to the support ticket matching the attachment key?"
+		"Do you want to upload these to your New Relic account?"
 	if promptUser(question) {
-		Upload(config.Flags.AttachmentKey)
+		checkAttachmentFlags(timestamp)
 	}
 
+}
+
+func checkAttachmentFlags(timestamp string) {
+	var ValidLicenseKeys []string
+
+	//check for validated license keys and upload with those keys
+	if config.Flags.AutoAttach {
+		for _, taskResult := range registration.Work.Results {
+			if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
+				LicenseKeys, err := getLicenseKey(taskResult.Result)
+				if err != nil {
+					log.Debug("Could not retrieve a license key, automatic attachment will not be possible")
+					return
+				} else {
+					ValidLicenseKeys = LicenseKeys
+				}
+
+			} else if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status != tasks.Success {
+				log.Info("No valid license keys specified, upload to New Relic Account cannot be completed")
+				return
+			}
+		}
+		for _, licenseKey := range ValidLicenseKeys {
+			log.Info("Uploading files by Account ID...")
+			Upload(licenseKey, timestamp)
+		}
+	}
 }
 
 func sanitizeOSArgs(osArgs []string) []string {
