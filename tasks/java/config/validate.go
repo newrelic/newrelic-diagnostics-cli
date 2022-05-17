@@ -12,7 +12,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 // JavaConfigValidate - This struct defined the sample plugin which can be used as a starting point

@@ -5,7 +5,7 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 // PHPDaemonRunning - Retrieve status of newrelic-daemon processes for PHP Agent
