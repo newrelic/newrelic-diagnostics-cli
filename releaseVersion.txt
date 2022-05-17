@@ -1,4 +1,4 @@
-majorMinor=2.1
+majorMinor=2.2
 buildNumber=0
-currentReleaseVersion=2.1.0
-prevReleaseVersion=2.0.0
+currentReleaseVersion=2.2.0
+prevReleaseVersion=2.1.0
