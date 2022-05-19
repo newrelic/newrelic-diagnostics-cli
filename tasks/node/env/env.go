@@ -26,4 +26,9 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		Getwd:      os.Getwd,
 		fileFinder: tasks.FindFiles,
 	}, true)
+
+	registrationFunc(NodeEnvYarnVersion{
+		cmdExecutor:      tasks.CmdExecutor,
+		yarnVersionGetter: getYarnVersion,
+	}, true)
 }

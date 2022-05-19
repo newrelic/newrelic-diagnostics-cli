@@ -1,7 +1,6 @@
 package env
 
 import (
-	"fmt"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -10,9 +9,11 @@ import (
 
 // NodeEnvYarnVersion - This struct defines the Ruby version
 type NodeEnvYarnVersion struct {
-	// cmdExecutor      tasks.CmdExecFunc
-	// npmVersionGetter getNpmVersionFunc
+  cmdExecutor      tasks.CmdExecFunc
+	yarnVersionGetter getYarnVersionFunc
 }
+
+type getYarnVersionFunc func(tasks.CmdExecFunc) (string, error)
 
 // Identifier - This returns the Category, Subcategory and Name of each task
 func (p NodeEnvYarnVersion) Identifier() tasks.Identifier {
@@ -21,7 +22,7 @@ func (p NodeEnvYarnVersion) Identifier() tasks.Identifier {
 
 // Explain - Returns the help text for each individual task
 func (p NodeEnvYarnVersion) Explain() string {
-	return "Determine NPM version"
+	return "Determine Yarn version"
 }
 
 // Dependencies - Returns the dependencies for each task.
@@ -33,34 +34,36 @@ func (p NodeEnvYarnVersion) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p NodeEnvYarnVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
+	var result tasks.Result //pass the result back to core and report to UI
 
 	if upstream["Node/Env/Version"].Status != tasks.Info {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Node.js is not installed. This task did not run",
-		}
+		result.Status = tasks.None
+		result.Summary = "Node.js was not detected. This task didn't run."
+		return result
 	}
 
-	yarnVersion, err := getYarnVersion()
-
+	yarnVersion, err := p.yarnVersionGetter(p.cmdExecutor)
 	if err != nil {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Yarn is not installed",
-		}
+		result.Status = tasks.Error
+		result.Summary = "Unable to execute command: $ yarn -v. Error: " + err.Error()
+		return result
 	}
 
-	return tasks.Result{
-		Status:  tasks.Info,
-		Summary: fmt.Sprintf("We found yarn version: %s", yarnVersion),
-		Payload: yarnVersion,
+	if len(yarnVersion) > 0 {
+		result.Summary = yarnVersion
+		result.Status = tasks.Info
+		return result
 	}
+
+	result.Status = tasks.Error
+	result.Summary = "Unable to get yarn version."
+	return result
 }
 
-func getYarnVersion() (string, error) {
-	version, err := tasks.CmdExecutor("yarn", "-v") //output example:1.22.5
+func getYarnVersion(commandExecutor tasks.CmdExecFunc) (string, error) {
+	version, err := commandExecutor("yarn", "-v") //output example:1.22.5
 	if err != nil {
-		log.Debug("Error running npm -v ", version) //-bash: yarn: command not found
+		log.Debug("Error running yarn -v ", version) //-bash: yarn: command not found
 		return "", err
 	}
 	return strings.TrimSpace(string(version)), nil
