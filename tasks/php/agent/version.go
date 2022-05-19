@@ -2,6 +2,7 @@ package agent
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
@@ -114,6 +115,7 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 	// Other result - multiple agent versions found
 	return tasks.Result{
 		Status:  tasks.Warning,
-		Summary: fmt.Sprintf("Expected 1, but found %d versions of the PHP Agent", len(agentVersions)),
+		Summary: fmt.Sprintf("Expected 1, but found %d versions of the PHP Agent: %s", len(agentVersions), strings.Join(agentVersions, ", ")),
+		URL: "https://discuss.newrelic.com/t/relic-solution-php-agent-not-reporting-web-data/53291",
 	}
 }
