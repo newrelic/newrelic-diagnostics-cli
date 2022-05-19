@@ -28,6 +28,13 @@ then
   aws s3 cp ${ZIPFILENAME} s3://${S3_BUCKET}/nrdiag/
   aws s3 cp nrdiag_latest.zip s3://${S3_BUCKET}/nrdiag/
   aws s3 cp bin/version.txt s3://${S3_BUCKET}/nrdiag/
+
+  echo "Finding oldest release on download.newrelic.com"
+  OLD_RELEASE=$(aws s3api list-objects-v2 --bucket ${S3_BUCKET} --prefix nrdiag/ --query 'sort_by(Contents[?Key && contains(Key, `.zip`) == `true` && contains(Key, `nrdiag`) == `true`], &LastModified)[:1].[Key]' --output text)
+
+  echo "Oldest Release found: ${OLD_RELEASE}"
+  echo "Deleting ${OLD_RELEASE}"
+  aws s3 rm s3://${S3_BUCKET}/${OLD_RELEASE}
   
 else
   echo "The input passed for github.event.release.name was not a valid number. The release process did not run."
