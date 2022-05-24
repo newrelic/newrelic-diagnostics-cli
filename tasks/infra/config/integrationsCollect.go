@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strings"
 
+	c "github.com/newrelic/newrelic-diagnostics-cli/config"
+	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
@@ -61,6 +64,7 @@ func (p InfraConfigIntegrationsCollect) Execute(options tasks.Options, upstream 
 	if len(configFiles) > 0 {
 		var configElements []config.ConfigElement
 		var fileCopyEnvelopes []tasks.FileCopyEnvelope
+		var cannotCollectConfigFiles []string
 		for _, file := range configFiles {
 			dir, fileName := filepath.Split(file)
 			configElements = append(configElements, config.ConfigElement{FileName: fileName, FilePath: dir})
@@ -68,12 +72,22 @@ func (p InfraConfigIntegrationsCollect) Execute(options tasks.Options, upstream 
 			question := fmt.Sprintf("We've found a file that may contain secure information: %s\n", file) +
 				"Include this file in nrdiag-output.zip?"
 			if tasks.PromptUser(question, options) {
+				if !c.Flags.Quiet {
+					log.Info("Adding file to Diagnostics CLI zip file: ", file)
+				}
 				fileCopyEnvelopes = append(fileCopyEnvelopes, tasks.FileCopyEnvelope{Path: file})
+			} else {
+				cannotCollectConfigFiles = append(cannotCollectConfigFiles, file)
 			}
 		}
+		warningSummaryCannotCollect := ""
+		if len(cannotCollectConfigFiles) > 0 {
+			warningSummaryCannotCollect += "\nThe following files were not collected because the user opted out from including them in the nrdiag-output.zip: " + strings.Join(cannotCollectConfigFiles, ", ")
+		}
+
 		return tasks.Result{
 			Status:      tasks.Success,
-			Summary:     fmt.Sprintf("%d on-host integration yml file(s) found", len(configFiles)),
+			Summary:     fmt.Sprintf("%d on-host integration yml file(s) found", len(configFiles)) + warningSummaryCannotCollect,
 			Payload:     configElements,
 			FilesToCopy: fileCopyEnvelopes,
 		}
