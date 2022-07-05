@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -23,12 +24,12 @@ var testServer *httptest.Server
 
 func setup() {
 	testServer = httptest.NewServer((http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/success" {
+		if strings.Contains(r.URL.Path, "/success") {
 			w.WriteHeader(200)
 			w.Write([]byte{})
 		}
-		if r.URL.Path == "/error" {
-			w.WriteHeader(400)
+		if strings.Contains(r.URL.Path, "/error") {
+			w.WriteHeader(500)
 			w.Write([]byte{})
 		}
 	})))
@@ -78,7 +79,7 @@ func Test_uploadFilesToAccount(t *testing.T) {
 		Path:        "/",
 		Filename:    "file1.zip",
 		NewFilename: "file1-timestamp.zip",
-		Filesize:    1000,
+		Filesize:    4,
 		URL:         "",
 		Key:         "testKey",
 	}
@@ -86,7 +87,7 @@ func Test_uploadFilesToAccount(t *testing.T) {
 		Path:        "/",
 		Filename:    "file1.json",
 		NewFilename: "file1-timestamp.json",
-		Filesize:    1000,
+		Filesize:    4,
 		URL:         "",
 		Key:         "testKey",
 	}
@@ -135,7 +136,7 @@ func Test_uploadFilesToAccount(t *testing.T) {
 	}
 }
 
-func TestAttachDeps_GetAttachmentsEndpoint(t *testing.T) {
+func TestAttachDeps_getAttachmentsEndpoint(t *testing.T) {
 	tests := []struct {
 		name                    string
 		attachmentEndpoint      string
@@ -165,8 +166,7 @@ func TestAttachDeps_GetAttachmentsEndpoint(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			config.Flags.AttachmentEndpoint = tt.flagsAttachmentEndpoint
 			config.AttachmentEndpoint = tt.attachmentEndpoint
-			a := AttachDeps{}
-			if got := a.GetAttachmentsEndpoint(); got != tt.want {
+			if got := getAttachmentsEndpoint(); got != tt.want {
 				t.Errorf("AttachDeps.GetAttachmentsEndpoint() = %v, want %v", got, tt.want)
 			}
 		})
@@ -208,15 +208,14 @@ func TestAttachDeps_GetWrapper(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			config.Flags.AttachmentEndpoint = ""
 			config.AttachmentEndpoint = ""
-			a := AttachDeps{}
-			if got := a.GetWrapper(tt.args.file, tt.args.fileSize, tt.args.attachmentKey); !reflect.DeepEqual(got, tt.want) {
+			if got := getWrapper(tt.args.file, tt.args.fileSize, tt.args.attachmentKey); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AttachDeps.GetWrapper() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestAttachDeps_MakeRequest(t *testing.T) {
+func TestAttachDeps_makeRequest(t *testing.T) {
 	setup()
 	defer teardown()
 	mockAttachDeps := mocks.MAttachDeps{}
@@ -265,8 +264,7 @@ func TestAttachDeps_MakeRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			a := AttachDeps{}
-			got, err := a.MakeRequest(tt.args.wrapper)
+			got, err := makeRequest(tt.args.wrapper)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AttachDeps.MakeRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -299,8 +297,7 @@ var _ = Describe("GetAttachmentEndpoints", func() {
 			expectedResult = "http://localhost:3000/attachments"
 		})
 		It("Should return default attachment endpoint (localhost)", func() {
-			deps := AttachDeps{}
-			result := deps.GetAttachmentsEndpoint()
+			result := getAttachmentsEndpoint()
 			Expect(result).To(Equal(expectedResult))
 		})
 	})
@@ -311,8 +308,7 @@ var _ = Describe("GetAttachmentEndpoints", func() {
 			expectedResult = "http://diag.datanerd.us/attachments"
 		})
 		It("Should return flag attachment endpoint", func() {
-			deps := AttachDeps{}
-			result := deps.GetAttachmentsEndpoint()
+			result := getAttachmentsEndpoint()
 			Expect(result).To(Equal(expectedResult))
 		})
 	})
@@ -323,8 +319,7 @@ var _ = Describe("GetAttachmentEndpoints", func() {
 			expectedResult = "http://diag.datanerd.us/attachments"
 		})
 		It("Should return attachment endpoint", func() {
-			deps := AttachDeps{}
-			result := deps.GetAttachmentsEndpoint()
+			result := getAttachmentsEndpoint()
 			Expect(result).To(Equal(expectedResult))
 		})
 	})

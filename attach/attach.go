@@ -36,9 +36,6 @@ type jsonResponse struct {
 type IAttachDeps interface {
 	GetFileSize(file string) int64
 	GetReader(file string) (*bytes.Reader, error)
-	GetWrapper(file *bytes.Reader, fileSize int64, attachmentKey string) httpHelper.RequestWrapper
-	MakeRequest(wrapper httpHelper.RequestWrapper) (*http.Response, error)
-	GetAttachmentsEndpoint() string
 }
 
 type AttachDeps struct{}
@@ -93,10 +90,10 @@ func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, dep
 			return err
 		}
 
-		wrapper := deps.GetWrapper(reader, files.Filesize, attachmentKey)
+		wrapper := getWrapper(reader, files.Filesize, attachmentKey)
 
 		log.Debug("Starting upload")
-		res, err := deps.MakeRequest(wrapper)
+		res, err := makeRequest(wrapper)
 
 		if err != nil {
 			log.Info("Error uploading file", err)
@@ -115,7 +112,7 @@ func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, dep
 	return nil
 }
 
-func (a AttachDeps) GetAttachmentsEndpoint() string {
+func getAttachmentsEndpoint() string {
 	if config.Flags.AttachmentEndpoint != "" { //If local development flag is supplied
 		return config.Flags.AttachmentEndpoint
 	} else if config.AttachmentEndpoint != "" { //Else if its a binary build
@@ -125,17 +122,17 @@ func (a AttachDeps) GetAttachmentsEndpoint() string {
 	return defaultAttachmentEndpoint
 }
 
-func (a AttachDeps) MakeRequest(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+func makeRequest(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 	return httpHelper.MakeHTTPRequest(wrapper)
 }
 
-func (a AttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, attachmentKey string) httpHelper.RequestWrapper {
+func getWrapper(file *bytes.Reader, fileSize int64, attachmentKey string) httpHelper.RequestWrapper {
 	headers := make(map[string]string)
 	headers["Attachment-Key"] = attachmentKey
 
 	wrapper := httpHelper.RequestWrapper{
 		Method:         "POST",
-		URL:            a.GetAttachmentsEndpoint() + "/upload_s3",
+		URL:            getAttachmentsEndpoint() + "/upload_s3",
 		Payload:        file,
 		Length:         fileSize,
 		TimeoutSeconds: awsUploadTimeoutSeconds,
@@ -310,8 +307,7 @@ func getUploadURL(requestURL string) (jsonResponse, error) {
 }
 
 func buildGetRequestURL(filename, attachmentKey string, filesize int64) string {
-	deps := AttachDeps{}
-	requestURL := deps.GetAttachmentsEndpoint() + "/upload_url"
+	requestURL := getAttachmentsEndpoint() + "/upload_url"
 	log.Debug("Making call to get zip file endpoint")
 
 	// Now add the parameters to the URL
