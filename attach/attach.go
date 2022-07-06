@@ -80,7 +80,6 @@ func getFilesForUpload(identifyingKey string, timestamp string, filetype string,
 	return thisFile
 }
 
-
 func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) error {
 	for _, files := range filesToUpload {
 		log.Debug("Opening", files.Path+"/"+files.Filename, "for upload")
@@ -90,7 +89,7 @@ func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, dep
 			return err
 		}
 
-		wrapper := getWrapper(reader, files.Filesize, attachmentKey)
+		wrapper := getWrapper(reader, files.Filesize, files.NewFilename, attachmentKey)
 
 		log.Debug("Starting upload")
 		res, err := makeRequest(wrapper)
@@ -126,13 +125,13 @@ func makeRequest(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 	return httpHelper.MakeHTTPRequest(wrapper)
 }
 
-func getWrapper(file *bytes.Reader, fileSize int64, attachmentKey string) httpHelper.RequestWrapper {
+func getWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
 	headers := make(map[string]string)
 	headers["Attachment-Key"] = attachmentKey
 
 	wrapper := httpHelper.RequestWrapper{
 		Method:         "POST",
-		URL:            getAttachmentsEndpoint() + "/upload_s3",
+		URL:            getAttachmentsEndpoint() + "/upload_s3?filename=" + filename,
 		Payload:        file,
 		Length:         fileSize,
 		TimeoutSeconds: awsUploadTimeoutSeconds,

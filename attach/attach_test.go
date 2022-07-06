@@ -177,6 +177,7 @@ func TestAttachDeps_GetWrapper(t *testing.T) {
 	type args struct {
 		file          *bytes.Reader
 		fileSize      int64
+		filename      string
 		attachmentKey string
 	}
 	mockAttachDeps := mocks.MAttachDeps{}
@@ -191,11 +192,12 @@ func TestAttachDeps_GetWrapper(t *testing.T) {
 			args: args{
 				file:          mockFile,
 				fileSize:      mockFile.Size(),
+				filename:      "mockFile",
 				attachmentKey: "testKey",
 			},
 			want: httpHelper.RequestWrapper{
 				Method:         "POST",
-				URL:            "http://localhost:3000/attachments/upload_s3",
+				URL:            "http://localhost:3000/attachments/upload_s3?filename=mockFile",
 				Headers:        map[string]string{"Attachment-Key": "testKey"},
 				Payload:        mockFile,
 				Length:         mockFile.Size(),
@@ -208,7 +210,7 @@ func TestAttachDeps_GetWrapper(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			config.Flags.AttachmentEndpoint = ""
 			config.AttachmentEndpoint = ""
-			if got := getWrapper(tt.args.file, tt.args.fileSize, tt.args.attachmentKey); !reflect.DeepEqual(got, tt.want) {
+			if got := getWrapper(tt.args.file, tt.args.fileSize, tt.args.filename, tt.args.attachmentKey); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AttachDeps.GetWrapper() = %v, want %v", got, tt.want)
 			}
 		})
