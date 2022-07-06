@@ -6,7 +6,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

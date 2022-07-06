@@ -1,7 +1,7 @@
 $EXENAME="newrelic-diagnostics-cli"
 echo "Running go get -t ./..."
 go get -t ./...
-go get github.com/onsi/ginkgo/ginkgo # needed to pull down the ginkgo binary
+go get github.com/onsi/ginkgo/v2/ginkgo # needed to pull down the ginkgo binary
 
 go build 
 echo "Running unit tests"

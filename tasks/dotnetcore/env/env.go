@@ -10,5 +10,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	log.Debug("Registering DotNetCore/Env/*")
 
 	registrationFunc(DotNetCoreEnvProcess{}, true)
-	registrationFunc(DotNetCoreEnvVersions{}, true)
+	registrationFunc(DotNetCoreEnvVersions{
+		cmdExec: tasks.CmdExecutor,
+	}, true)
 }
