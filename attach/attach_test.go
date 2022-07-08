@@ -26,11 +26,9 @@ func setup() {
 	testServer = httptest.NewServer((http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "/success") {
 			w.WriteHeader(200)
-			w.Write([]byte{})
 		}
 		if strings.Contains(r.URL.Path, "/error") {
 			w.WriteHeader(500)
-			w.Write([]byte{})
 		}
 	})))
 }
