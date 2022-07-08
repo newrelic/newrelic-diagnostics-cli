@@ -43,6 +43,7 @@ type userFlags struct {
 	AttachmentEndpoint string
 	Suites             string
 	Include            string
+	LegacyAttach			 bool
 	InNewRelicCLI      bool
 }
 
@@ -199,6 +200,8 @@ func ParseFlags() {
 	}
 
 	Flags.InNewRelicCLI = (os.Getenv("NEWRELIC_CLI_SUBPROCESS") != "")
+
+	Flags.LegacyAttach = (os.Getenv("NEWRELIC_LEGACY_ATTACH") != "")
 }
 
 // UsagePayload gathers and sanitizes user command line input
