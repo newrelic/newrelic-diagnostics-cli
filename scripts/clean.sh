@@ -31,3 +31,15 @@ fi
 if rm -r ./bin/ 2> /dev/null
   then echo "...removed bin directory"
 fi
+
+for file in ./nrdiag*.zip; do
+  if rm -r "$file" 2> /dev/null; then
+    echo "...removed $file"
+  fi
+done
+
+for file in ./nrdiag*/; do
+  if rm -r "$file" 2> /dev/null; then
+    echo "...removed $file"
+  fi
+done

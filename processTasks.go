@@ -15,6 +15,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/attach"
 )
 
 func processTasksToRun() {
@@ -240,7 +241,12 @@ func checkAttachmentFlags(timestamp string) {
 		}
 		for _, licenseKey := range ValidLicenseKeys {
 			log.Info("Uploading files by Account ID...")
-			Upload(licenseKey, timestamp)
+			if config.Flags.LegacyAttach {
+				attach.UploadLegacy(licenseKey, timestamp)
+			} else {
+				attachDeps := new(attach.AttachDeps)
+				attach.Upload(licenseKey, timestamp, attachDeps)
+			}
 		}
 	}
 }

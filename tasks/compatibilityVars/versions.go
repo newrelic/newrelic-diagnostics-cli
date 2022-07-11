@@ -44,23 +44,24 @@ var PythonVersionAgentSupportability = map[string][]string{
 
 var SupportedJavaVersions = map[string][]string{
 	// supported vendors
-	"OpenJDK":    []string{"1.7-1.9.*", "7-15.*"},
-	"HotSpot":    []string{"1.7-1.9.*", "7-15.*"},
-	"JRockit":    []string{"1-1.6.0.50"},
-	"Coretto":    []string{"1.8-1.9.*", "8-11.*"},
+	"OpenJDK":    []string{"1.8-1.9.*", "8-18.*"},
+	"HotSpot":    []string{"1.8-1.9.*", "8-16.*"},
+	"Coretto":    []string{"1.8.*", "8.*", "11.*", "17.*"},
 	"Zulu":       []string{"1.8-1.9.*", "8-12.*"},
-	"IBM":        []string{"1.7-1.8.*", "7-8.*"},
+	"IBM":        []string{"1.8.*", "8.*"},
 	"Oracle":     []string{"1.5.*", "5.0.*"},
 	"Zing":       []string{"1.8-1.9.*", "8-11.*"},
 	"OpenJ9":     []string{"1.8-1.9.*", "8-13.*"},
-	"Dragonwell": []string{"1.8-1.9.*", "8-11.*"},
+	"Dragonwell": []string{"1.8.*", "8.*", "11.*"},
 }
 
-//Supported only with Java agent 4.3.x:
-var SupportedForJavaAgent4 = map[string][]string{
+//Supported only with legacy versions of the Java agent
+var SupportedForJavaAgentLegacy = map[string][]string{
 	"Apple":   []string{"1.6.*", "6.*"},
-	"IBM":     []string{"1.6.*", "6.*"},
-	"HotSpot": []string{"1.6.*", "6.*"},
+	"OpenJDK": []string{"1.7.*", "7.*"},
+	"IBM":     []string{"1.6-1.7.*", "6-7.*"},
+	"HotSpot": []string{"1.5-1.7.*", "5-7.*"},
+	"JRockit": []string{"1-1.6.0.50"},
 }
 
 var NodeSupportedVersions = map[string][]string{

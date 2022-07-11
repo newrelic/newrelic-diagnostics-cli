@@ -193,8 +193,8 @@ var _ = Describe("Php/Agent/Verson", func() {
 			It("Should return task result status of Warning", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
-			It("Should return task result summary of Expected 1, but found 2  versions of the PHP Agent", func() {
-				Expect(result.Summary).To(Equal("Expected 1, but found 2 versions of the PHP Agent"))
+			It("Should return task result summary of Expected 1, but found 2 versions of the PHP Agent: 7.5.0.199, TestingMoreThanOneAgentVersion", func() {
+				Expect(result.Summary).To(Equal("Expected 1, but found 2 versions of the PHP Agent: 7.5.0.199, TestingMoreThanOneAgentVersion"))
 			})
 		})
 	})

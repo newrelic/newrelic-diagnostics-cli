@@ -78,28 +78,28 @@ func TestCheckSupported(t *testing.T) {
 		{os: "windows", vendor: "Zulu", version: "1.7.0.152", result: false},
 
 		// IBM JVM versions 7 and 8 for Linux
-		{os: "linux", vendor: "IBM", version: "1.7.5", result: true},
+		{os: "linux", vendor: "IBM", version: "1.7.5", result: false},
 		{os: "linux", vendor: "IBM", version: "1.8.1", result: true},
 
 		{os: "windows", vendor: "IBM", version: "1.8.1", result: false},
 		{os: "darwin", vendor: "IBM", version: "1.8.1", result: false},
 
 		// OpenJDK JVM versions 7 to 13 for Linux, Windows, and OS X
-		{os: "linux", vendor: "OpenJDK", version: "1.7.0.152", result: true},
+		{os: "linux", vendor: "OpenJDK", version: "1.7.0.152", result: false},
 		{os: "linux", vendor: "OpenJDK", version: "1.8", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "9", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "10.0", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "12", result: true},
 
-		{os: "windows", vendor: "OpenJDK", version: "1.7.0.152", result: true},
+		{os: "windows", vendor: "OpenJDK", version: "1.7.0.152", result: false},
 		{os: "windows", vendor: "OpenJDK", version: "1.8", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "9", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "10.0", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "12", result: true},
 
-		{os: "darwin", vendor: "OpenJDK", version: "1.7.0.152", result: true},
+		{os: "darwin", vendor: "OpenJDK", version: "1.7.0.152", result: false},
 		{os: "darwin", vendor: "OpenJDK", version: "1.8", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "9", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "10.0", result: true},
@@ -113,27 +113,27 @@ func TestCheckSupported(t *testing.T) {
 		{os: "darwin", vendor: "OpenJDK", version: "3", result: false},
 
 		// Oracle HotSpot JVM versions 7 to 12 for Linux, Solaris, Windows, and OS X
-		{os: "linux", vendor: "HotSpot", version: "1.7.0.152", result: true},
+		{os: "linux", vendor: "HotSpot", version: "1.7.0.152", result: false},
 		{os: "linux", vendor: "HotSpot", version: "1.8", result: true},
-		{os: "linux", vendor: "HotSpot", version: "7", result: true},
+		{os: "linux", vendor: "HotSpot", version: "7", result: false},
 		{os: "linux", vendor: "HotSpot", version: "8", result: true},
 		{os: "linux", vendor: "HotSpot", version: "9", result: true},
 		{os: "linux", vendor: "HotSpot", version: "10.0", result: true},
 		{os: "linux", vendor: "HotSpot", version: "11.0.1", result: true},
 		{os: "linux", vendor: "HotSpot", version: "12", result: true},
 
-		{os: "windows", vendor: "HotSpot", version: "1.7.0.152", result: true},
+		{os: "windows", vendor: "HotSpot", version: "1.7.0.152", result: false},
 		{os: "windows", vendor: "HotSpot", version: "1.8", result: true},
-		{os: "windows", vendor: "HotSpot", version: "7", result: true},
+		{os: "windows", vendor: "HotSpot", version: "7", result: false},
 		{os: "windows", vendor: "HotSpot", version: "8", result: true},
 		{os: "windows", vendor: "HotSpot", version: "9", result: true},
 		{os: "windows", vendor: "HotSpot", version: "10.0", result: true},
 		{os: "windows", vendor: "HotSpot", version: "11.0.1", result: true},
 		{os: "windows", vendor: "HotSpot", version: "12", result: true},
 
-		{os: "darwin", vendor: "HotSpot", version: "1.7.0.152", result: true},
+		{os: "darwin", vendor: "HotSpot", version: "1.7.0.152", result: false},
 		{os: "darwin", vendor: "HotSpot", version: "1.8", result: true},
-		{os: "darwin", vendor: "HotSpot", version: "7", result: true},
+		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
 		{os: "darwin", vendor: "HotSpot", version: "8", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "9", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "10.0", result: true},
@@ -144,24 +144,24 @@ func TestCheckSupported(t *testing.T) {
 		{os: "linux", vendor: "Coretto", version: "1.7.0.152", result: false},
 		{os: "linux", vendor: "Coretto", version: "1.8", result: true},
 		{os: "linux", vendor: "Coretto", version: "8", result: true},
-		{os: "linux", vendor: "Coretto", version: "9", result: true},
-		{os: "linux", vendor: "Coretto", version: "10.0", result: true},
+		{os: "linux", vendor: "Coretto", version: "9", result: false},
+		{os: "linux", vendor: "Coretto", version: "10.0", result: false},
 		{os: "linux", vendor: "Coretto", version: "11.0.1", result: true},
 		{os: "linux", vendor: "Coretto", version: "12", result: false},
 
 		{os: "windows", vendor: "Coretto", version: "1.7.0.152", result: false},
 		{os: "windows", vendor: "Coretto", version: "1.8", result: true},
 		{os: "windows", vendor: "Coretto", version: "8", result: true},
-		{os: "windows", vendor: "Coretto", version: "9", result: true},
-		{os: "windows", vendor: "Coretto", version: "10.0", result: true},
+		{os: "windows", vendor: "Coretto", version: "9", result: false},
+		{os: "windows", vendor: "Coretto", version: "10.0", result: false},
 		{os: "windows", vendor: "Coretto", version: "11.0.1", result: true},
 		{os: "windows", vendor: "Coretto", version: "12", result: false},
 
 		{os: "darwin", vendor: "Coretto", version: "1.7.0.152", result: false},
 		{os: "darwin", vendor: "Coretto", version: "1.8", result: true},
 		{os: "darwin", vendor: "Coretto", version: "8", result: true},
-		{os: "darwin", vendor: "Coretto", version: "9", result: true},
-		{os: "darwin", vendor: "Coretto", version: "10.0", result: true},
+		{os: "darwin", vendor: "Coretto", version: "9", result: false},
+		{os: "darwin", vendor: "Coretto", version: "10.0", result: false},
 		{os: "darwin", vendor: "Coretto", version: "11.0.1", result: true},
 		{os: "darwin", vendor: "Coretto", version: "12", result: false},
 
@@ -193,8 +193,8 @@ func TestCheckSupported(t *testing.T) {
 		//Linux tests
 
 		//Only supported in linux
-		{os: "linux", vendor: "IBM", version: "1.7.0.152", result: true},
-		{os: "linux", vendor: "IBM", version: "7", result: true},
+		{os: "linux", vendor: "IBM", version: "1.7.0.152", result: false},
+		{os: "linux", vendor: "IBM", version: "7", result: false},
 		{os: "linux", vendor: "IBM", version: "1.8", result: true},
 		{os: "linux", vendor: "IBM", version: "8", result: true},
 		{os: "linux", vendor: "IBM", version: "9", result: false},
@@ -225,10 +225,10 @@ func TestCheckSupported(t *testing.T) {
 		{os: "linux", vendor: "OpenJDK", version: "1.8.0.152", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "1.6.0", result: false},
-		{os: "linux", vendor: "HotSpot", version: "1.7.0.16", result: true},
+		{os: "linux", vendor: "HotSpot", version: "1.7.0.16", result: false},
 		{os: "linux", vendor: "HotSpot", version: "1.8.0.161", result: true},
 		{os: "linux", vendor: "HotSpot", version: "Unknown", result: false},
-		{os: "linux", vendor: "JRockit", version: "1.6.0.49", result: true},
+		{os: "linux", vendor: "JRockit", version: "1.6.0.49", result: false},
 		{os: "linux", vendor: "JRockit", version: "1.6.0.101", result: false},
 		{os: "linux", vendor: "JRockit", version: "9.0.4", result: false},
 		{os: "linux", vendor: "Coretto", version: "1.8.1", result: true},
@@ -242,10 +242,10 @@ func TestCheckSupported(t *testing.T) {
 		{os: "windows", vendor: "OpenJDK", version: "1.8.0.152", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "1.6.0", result: false},
-		{os: "windows", vendor: "HotSpot", version: "1.7.0.16", result: true},
+		{os: "windows", vendor: "HotSpot", version: "1.7.0.16", result: false},
 		{os: "windows", vendor: "HotSpot", version: "1.8.0.161", result: true},
 		{os: "windows", vendor: "HotSpot", version: "Unknown", result: false},
-		{os: "windows", vendor: "JRockit", version: "1.6.0.49", result: true},
+		{os: "windows", vendor: "JRockit", version: "1.6.0.49", result: false},
 		{os: "windows", vendor: "JRockit", version: "1.6.0.101", result: false},
 		{os: "windows", vendor: "JRockit", version: "9.0.4", result: false},
 		{os: "windows", vendor: "Coretto", version: "1.8.1", result: true},
@@ -260,10 +260,10 @@ func TestCheckSupported(t *testing.T) {
 		{os: "darwin", vendor: "OpenJDK", version: "1.8.0.152", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "1.6.0", result: false},
-		{os: "darwin", vendor: "HotSpot", version: "1.7.0.16", result: true},
+		{os: "darwin", vendor: "HotSpot", version: "1.7.0.16", result: false},
 		{os: "darwin", vendor: "HotSpot", version: "1.8.0.161", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "Unknown", result: false},
-		{os: "darwin", vendor: "JRockit", version: "1.6.0.49", result: true},
+		{os: "darwin", vendor: "JRockit", version: "1.6.0.49", result: false},
 		{os: "darwin", vendor: "JRockit", version: "1.6.0.101", result: false},
 		{os: "darwin", vendor: "JRockit", version: "9.0.4", result: false},
 		{os: "darwin", vendor: "Coretto", version: "1.8.1", result: true},
@@ -300,11 +300,9 @@ func TestCheckLegacySupported(t *testing.T) {
 		// Compatibility tests taken from:
 		// https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent
 
-		// Updated: 4/8/2019
-
-		// Apple Hotspot JVM version 6 for OS X
+		// Apple Hotspot JVM for OS X
 		{os: "darwin", vendor: "HotSpot", version: "6", result: true},
-		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
+		{os: "darwin", vendor: "HotSpot", version: "7", result: true},
 
 		{os: "darwin", vendor: "Apple", version: "6", result: true},
 		{os: "darwin", vendor: "Apple", version: "7", result: false},
@@ -312,21 +310,21 @@ func TestCheckLegacySupported(t *testing.T) {
 		{os: "windows", vendor: "Apple", version: "6", result: false},
 		{os: "linux", vendor: "Apple", version: "6", result: false},
 
-		// Oracle Hotspot JVM version 6.0 for Linux, Solaris, Windows, OS X
+		// Oracle Hotspot JVM for Linux, Solaris, Windows, OS X
 		{os: "linux", vendor: "HotSpot", version: "6", result: true},
-		{os: "linux", vendor: "HotSpot", version: "7", result: false},
+		{os: "linux", vendor: "HotSpot", version: "7", result: true},
 
 		{os: "windows", vendor: "HotSpot", version: "6", result: true},
-		{os: "windows", vendor: "HotSpot", version: "7", result: false},
+		{os: "windows", vendor: "HotSpot", version: "7", result: true},
 
 		{os: "darwin", vendor: "HotSpot", version: "6", result: true},
-		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
+		{os: "darwin", vendor: "HotSpot", version: "7", result: true},
 
 		// No "os: solaris" tests because we don't compile the Diagnostics CLI for Solaris
 
-		// IBM JVM version 6 for Linux
+		// IBM JVM for Linux
 		{os: "linux", vendor: "IBM", version: "6", result: true},
-		{os: "linux", vendor: "IBM", version: "7", result: false},
+		{os: "linux", vendor: "IBM", version: "7", result: true},
 
 		{os: "darwin", vendor: "IBM", version: "6", result: false},
 		{os: "darwin", vendor: "IBM", version: "7", result: false},
@@ -334,7 +332,7 @@ func TestCheckLegacySupported(t *testing.T) {
 		{os: "windows", vendor: "IBM", version: "6", result: false},
 		{os: "windows", vendor: "IBM", version: "7", result: false},
 
-		{os: "windows", vendor: "HotSpot", version: "7", result: false},
+		{os: "windows", vendor: "HotSpot", version: "7", result: true},
 	}
 
 	for _, test := range matchFullySupportedTests {
@@ -482,7 +480,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 		Context("when IBM vendor is running on Linux", func() {
 			BeforeEach(func() {
 				vendor = "IBM"
-				version = "1.7"
+				version = "1.8"
 				p.runtimeGOOS = "linux"
 			})
 
