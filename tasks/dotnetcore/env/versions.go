@@ -80,15 +80,15 @@ func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[strin
 }
 
 func (t DotNetCoreEnvVersions) checkVersions(envVars map[string]string) ([]string, string) {
+	var errMessage, errorMessages string
+	var versions []string
+	keepGoing := true
 	source := 0
-	errorMessages := ""
-	versions, errMessage, keepGoing := t.checkVersionWithSource(envVars, source)
 	for keepGoing {
-		source++
-		errorMessages += errMessage
 		versions, errMessage, keepGoing = t.checkVersionWithSource(envVars, source)
+		errorMessages += errMessage
+		source++
 	}
-	errorMessages += errMessage
 
 	return versions, errorMessages
 }
