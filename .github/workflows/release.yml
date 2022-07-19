@@ -7,12 +7,12 @@ on:
 jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/v.')
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.13.x
+          go-version: 1.18.x
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -23,6 +23,7 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
           PROD_HABERDASHER_URL: ${{ secrets.PROD_HABERDASHER_URL }}
           PROD_ATTACHMENT_ENDPOINT: ${{ secrets.PROD_ATTACHMENT_ENDPOINT }}
           PROD_USAGE_ENDPOINT: ${{ secrets.PROD_USAGE_ENDPOINT }}
