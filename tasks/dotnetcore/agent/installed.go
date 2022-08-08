@@ -1,21 +1,10 @@
 package agent
 
 import (
-	"runtime"
-
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-var (
-	windowsCoreInstallPaths = []string{
-		// DLL paths for .NET agent >= 8.19
-		`C:\Program Files\New Relic\.NET Agent\netcore\`,
-		// DLL paths for .NET agent < 8.19
-		`C:\Program Files\New Relic\.NET Agent\`,
-	}
-	linuxCoreInstallPath = "/usr/local/newrelic-netcore20-agent/"
-	coreAgentDllFilename = "NewRelic.Agent.Core.dll"
-)
+var coreAgentDllFilename = "NewRelic.Agent.Core.dll"
 
 type DotNetCoreAgentInstalled struct {
 }
@@ -37,32 +26,28 @@ func (p DotNetCoreAgentInstalled) Dependencies() []string {
 
 // Execute - This tasks checks if the .Net Agent is installed by looking for required dlls
 func (p DotNetCoreAgentInstalled) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-
 	dllPath, isDllFilesFound := checkForAgentDll()
 
 	if !isDllFilesFound {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "The .NET CoreCLR agent is not installed in: " + dllPath,
+			Summary: "Unable to locate the .NET Core agent's installation files",
 		}
 	}
 
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: "Found the .NET CoreCLR Agent installed in: " + dllPath,
+		Summary: "Found the .NET Core Agent installed in: " + dllPath,
 		Payload: dllPath,
 	}
 }
 
 // checks for NewRelic.Agent.Core.dll in directory.
 func checkForAgentDll() (string, bool) {
-	if runtime.GOOS == "windows" {
-		for _, path := range windowsCoreInstallPaths {
-			if tasks.FileExists(path + coreAgentDllFilename) {
-				return path, true
-			}
+	for _, path := range DotNetCoreAgentPaths {
+		if tasks.FileExists(path + coreAgentDllFilename) {
+			return path, true
 		}
-		return "", false
 	}
-	return linuxCoreInstallPath, tasks.FileExists(linuxCoreInstallPath + coreAgentDllFilename)
+	return "", false
 }
