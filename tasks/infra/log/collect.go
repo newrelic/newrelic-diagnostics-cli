@@ -2,6 +2,8 @@ package log
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
@@ -10,6 +12,7 @@ import (
 // InfraLogCollect - This struct defined the sample plugin which can be used as a starting point
 type InfraLogCollect struct {
 	validatePaths func([]string) []tasks.CollectFileStatus
+	findFiles     func([]string, []string) []string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -54,7 +57,7 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 		}
 	}
 
-	logFilePaths := getLogFilePaths(configElements)
+	logFilePaths := p.getLogFilePaths(configElements)
 
 	if len(logFilePaths) < 1 {
 		return tasks.Result{
@@ -105,8 +108,8 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 	}
 }
 
-// getLogFilePaths - Retrives log_file paths from a slice of config validate elements
-func getLogFilePaths(configElements []config.ValidateElement) []string {
+// getLogFilePaths - Retrieves log files paths from a slice of config validate elements
+func (p InfraLogCollect) getLogFilePaths(configElements []config.ValidateElement) []string {
 	filePaths := []string{}
 	//Loop over parsed config elements
 	for _, configFile := range configElements {
@@ -114,14 +117,25 @@ func getLogFilePaths(configElements []config.ValidateElement) []string {
 		//Check if current config element is desired filename
 		if configFile.Config.FileName == "newrelic-infra.yml" {
 
-			//Check desired config element for log_file key
-			foundKeys := configFile.ParsedResult.FindKey("log_file")
+			//Check desired config element for log/file new key configuration option
+			logFile := configFile.ParsedResult.FindKeyByPath("/log/file")
+			//New log configuration allows log rotation with custom timestamp on log filename
+			if logFile.Value() != "" {
+				// search for log, rotated and gz files (filename is made with the base name of the logfile)
+				searchPattern := []string{"^" + strings.TrimSuffix(filepath.Base(logFile.Value()), filepath.Ext(logFile.Value())) + "*"}
+				// Gather all files
+				filePaths = append(filePaths, p.findFiles(searchPattern, []string{filepath.Dir(logFile.Value())})...)
+			} else {
+				//Check desired config element for log_file old key configuration option
+				foundKeys := configFile.ParsedResult.FindKey("log_file")
 
-			//Loop over found log_file keys in parsed config
-			for _, key := range foundKeys {
-				//Extract log_file value
-				filePaths = append(filePaths, key.Value())
+				//Loop over found log_file keys in parsed config
+				for _, key := range foundKeys {
+					//Extract log_file value
+					filePaths = append(filePaths, key.Value())
+				}
 			}
+
 		}
 	}
 	return filePaths
