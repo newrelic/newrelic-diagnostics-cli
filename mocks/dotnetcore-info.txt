@@ -1,0 +1,34 @@
+.NET SDK (reflecting any global.json):
+ Version:   6.0.101
+ Commit:    ef49f6213a
+
+Runtime Environment:
+ OS Name:     ubuntu
+ OS Version:  20.04
+ OS Platform: Linux
+ RID:         ubuntu.20.04-x64
+ Base Path:   /usr/share/dotnet/sdk/6.0.101/
+
+Host (useful for support):
+  Version: 6.0.1
+  Commit:  3a25a7f1cc
+
+.NET SDKs installed:
+  2.1.818 [/usr/share/dotnet/sdk]
+  3.1.416 [/usr/share/dotnet/sdk]
+  5.0.404 [/usr/share/dotnet/sdk]
+  6.0.101 [/usr/share/dotnet/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.All 2.1.30 [/usr/share/dotnet/shared/Microsoft.AspNetCore.All]
+  Microsoft.AspNetCore.App 2.1.30 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.AspNetCore.App 3.1.22 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.AspNetCore.App 5.0.13 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.AspNetCore.App 6.0.1 [/usr/share/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 2.1.30 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+  Microsoft.NETCore.App 3.1.22 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+  Microsoft.NETCore.App 5.0.13 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+  Microsoft.NETCore.App 6.0.1 [/usr/share/dotnet/shared/Microsoft.NETCore.App]
+
+To install additional .NET runtimes or SDKs:
+  https://aka.ms/dotnet-download

@@ -10,7 +10,7 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 )
@@ -116,7 +116,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			options := tasks.Options{}
 			result := p.Execute(options, upstream)
 			It("Should return parsed xml", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
 						Expect(err).To(BeNil())
@@ -147,7 +147,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			options := tasks.Options{}
 			result := p.Execute(options, upstream)
 			It("Should return parsed xml and error", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				//Windows and Linux have different filesystem error messages in this particular context.
 				//We overwrite the error message here to be OS neutral so the same test works across both OSes
@@ -191,7 +191,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			options := tasks.Options{}
 			result := p.Execute(options, upstream)
 			It("Should return two errors", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
@@ -221,7 +221,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, _ := parseXML(file)
 			result.Sort()
 			It("Should return matching basic xml ValidateBlob", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -247,7 +247,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, _ := parseXML(file)
 			result.Sort()
 			It("Should return matching basic xml ValidateBlob", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -320,7 +320,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, err := parseJs(file)
 			result.Sort()
 			It("Should return matching basic js ValidateBlob", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -337,7 +337,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			defer file.Close()
 			result, _ := parseJs(file)
 			It("Should return special character key in ValidateBlob", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -355,7 +355,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, _ := parseJs(file)
 			result.Sort()
 			It("Should return matching typescript config", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -372,7 +372,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, _ := parseJs(file)
 			result.Sort()
 			It("Should return matching es6 config", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -389,7 +389,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, _ := parseJs(file)
 			result.Sort()
 			It("Should return matching array elements", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -439,7 +439,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			result, err := ParseYaml(reader)
 			result.Sort()
 			It("Should return matching basic yml ValidateBlob", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
@@ -574,7 +574,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			}
 			result, processErr := processConfig(input)
 			It("Should return parsed yml", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
@@ -594,7 +594,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			}
 			result, processErr := processConfig(input)
 			It("Should return parsed json", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
@@ -614,7 +614,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			}
 			result, processErr := processConfig(input)
 			It("Should return parsed js", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
@@ -633,7 +633,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			}
 			result, processErr := processConfig(input)
 			It("Should return parsed cfg", func() {
-				goldenFile := goldenFileName(CurrentGinkgoTestDescription().TestText)
+				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
 					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {

@@ -11,10 +11,11 @@ if grep -R --include="*.go" -n "\"path\"" ./ *.go; then
 fi
 
 go get -t ./...
-go get github.com/onsi/ginkgo/ginkgo
+go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@latest
+go get github.com/onsi/ginkgo/v2
 go build
 
-ginkgo -skipPackage dotnet/agent,dotnet/requirements,dotnet/env -noColor -keepGoing -r 
+ginkgo --skip-package dotnet/agent,dotnet/requirements,dotnet/env --no-color --keep-going -r -timeout=1h
 
 # This can be run from the madhatter-build dockerfile with
 # docker run --rm madhatter-build:latest ./publish.sh
