@@ -11,5 +11,6 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	registrationFunc(InfraLogLevelCheck{}, true)
 	registrationFunc(InfraLogCollect{
 		validatePaths: tasks.ValidatePaths,
+		findFiles:     tasks.FindFiles,
 	}, true)
 }

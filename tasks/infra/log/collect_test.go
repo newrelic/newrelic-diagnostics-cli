@@ -6,7 +6,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -240,13 +240,13 @@ If you are working with a support ticket, manually provide your New Relic log fi
 
 		})
 	})
-	Describe("getLogFilePaths()", func() {
+	Describe("getLogFilePaths() with old log file configuration option", func() {
 		var (
 			result            []string
 			parsedConfigFiles []config.ValidateElement
 		)
 		JustBeforeEach(func() {
-			result = getLogFilePaths(parsedConfigFiles)
+			result = p.getLogFilePaths(parsedConfigFiles)
 		})
 		Context("When given a slice of validate elements containing log file entries", func() {
 			parsedConfigFiles = []config.ValidateElement{
@@ -263,6 +263,47 @@ If you are working with a support ticket, manually provide your New Relic log fi
 			}
 			It("Should return a slice of log_file paths", func() {
 				expectedResult := []string{"/var/log/messages"}
+				Expect(result).To(Equal(expectedResult))
+			})
+		})
+
+	})
+	Describe("getLogFilePaths() with new log file configuration option", func() {
+		var (
+			result            []string
+			parsedConfigFiles []config.ValidateElement
+		)
+		JustBeforeEach(func() {
+			result = p.getLogFilePaths(parsedConfigFiles)
+		})
+		Context("When given a slice of validate elements containing log file entries", func() {
+			parsedConfigFiles = []config.ValidateElement{
+				config.ValidateElement{
+					Config: config.ConfigElement{
+						FileName: "newrelic-infra.yml",
+						FilePath: "/etc/",
+					},
+					ParsedResult: tasks.ValidateBlob{
+						Key:      "log/file",
+						RawValue: "/var/log/newrelic-infra/newrelic-infra.log",
+					},
+				},
+			}
+			p.findFiles = func([]string, []string) []string {
+				return []string{
+					"/var/log/newrelic-infra/newrelic-infra.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_11-12-04.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_12-12-03.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-11_12-12-03.log.gz",
+				}
+			}
+			It("Should return a slice of log_file paths", func() {
+				expectedResult := []string{
+					"/var/log/newrelic-infra/newrelic-infra.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_11-12-04.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_12-12-03.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-11_12-12-03.log.gz",
+				}
 				Expect(result).To(Equal(expectedResult))
 			})
 		})
