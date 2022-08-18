@@ -4,7 +4,7 @@
 package requirements
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"

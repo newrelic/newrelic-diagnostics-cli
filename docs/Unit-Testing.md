@@ -37,8 +37,8 @@ You should read the following article before moving forward with this readme:
 You can install Ginkgo by running the following commands in your terminal:
 
 ```
-$ go get github.com/onsi/ginkgo/ginkgo
-$ go get github.com/onsi/gomega/...
+$ go install github.com/onsi/ginkgo/v2/ginkgo@latest
+$ go install github.com/onsi/gomega/...
 ```
 
 # Writing unit tests
@@ -90,7 +90,7 @@ package log
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

@@ -148,6 +148,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		paths = append(paths, "/etc/")
 		paths = append(paths, "/opt/newrelic/synthetics/.newrelic/synthetics/minion/")
 		paths = append(paths, "/usr/local/newrelic-netcore20-agent/")
+		paths = append(paths, "/usr/local/newrelic-dotnet-agent/") // https://github.com/newrelic/newrelic-diagnostics-cli/issues/114
 	}
 
 	//Find insecure paths

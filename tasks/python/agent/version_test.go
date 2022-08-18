@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

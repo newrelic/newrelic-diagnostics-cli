@@ -47,11 +47,11 @@ func (t InfraLogLevelCheck) Execute(options tasks.Options, upstream map[string]t
 	}
 
 	validationLevel := logLevelCheck(validations)
-	if validationLevel != "1" {
+	if !verboseEnabled(validationLevel) {
 		result.Status = tasks.Warning
-		result.Summary = "Infrastructure logging level not set to verbose. If troubleshooting an Infrastructure issue, please set verbose: 1 in newrelic-infra.yml."
+		result.Summary = "Infrastructure logging level not set to verbose (debug/trace). If troubleshooting an Infrastructure issue, please set log level to: debug in newrelic-infra.yml."
 		result.URL = "https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/troubleshooting/generate-logs-troubleshooting-infrastructure"
-	} else if validationLevel == "1" {
+	} else {
 		result.Status = tasks.Success
 		result.Summary = "Infrastructure logging level is set to verbose."
 	}
@@ -63,12 +63,30 @@ func (t InfraLogLevelCheck) Execute(options tasks.Options, upstream map[string]t
 func logLevelCheck(configs []config.ValidateElement) string {
 	for _, config := range configs {
 		if config.Config.FileName == "newrelic-infra.yml" {
-			result := config.ParsedResult.FindKey("verbose")
-			if len(result) == 1 {
-				return result[0].Value()
+			logLevel := config.ParsedResult.FindKeyByPath("/log/level")
+			if logLevel.Value() != "" {
+				return logLevel.Value()
+			} else {
+				result := config.ParsedResult.FindKey("verbose")
+				if len(result) == 1 {
+					return result[0].Value()
+				}
 			}
 		}
 	}
 	return ""
+}
 
+//verboseEnabled checks if log level is higher than info or old verbose value is set to debug/trace
+func verboseEnabled(level string) bool {
+	switch level {
+	//"1" => debug
+	//"3" => debug + forwarding
+	//"4" => trace
+	//"5" => trace + forwarding
+	case "debug", "trace", "1", "3", "4", "5":
+		return true
+	default:
+		return false
+	}
 }

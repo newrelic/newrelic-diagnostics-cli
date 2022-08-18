@@ -6,7 +6,7 @@ package requirements
 import (
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
