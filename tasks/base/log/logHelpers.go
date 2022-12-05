@@ -136,7 +136,7 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		paths = append(paths, "/var/log")                                 //For Syn Minion and Infra
 		paths = append(paths, "/var/log/newrelic")                        // For PHP agent and daemon log
 		paths = append(paths, "/usr/local/newrelic-netcore20-agent/logs") // for dotnetcore up to v10
-		paths = append(paths, "/usr/local/newrelic-dotnet-agent") // for dotnetcore v10+
+		paths = append(paths, "/usr/local/newrelic-dotnet-agent/logs") // for dotnetcore v10+
 	}
 	/*
 		Collect log file paths in this order
