@@ -125,7 +125,7 @@ func (p BaseCollectorConnectUS) prepareResult(body, statusCode string) tasks.Res
 	var result tasks.Result
 
 	if statusCode == "200" {
-		log.Debug("Successfully connected")
+		log.Debug("Successfully connected (US Region)")
 		result.Status = tasks.Success
 		result.Summary = "Status Code = " + statusCode + " Body = " + body
 	} else {
