@@ -3,11 +3,16 @@ package agent
 // Tests for Infra/Config/IntegrationsCollect
 
 import (
+	"bytes"
 	"errors"
+	"io/ioutil"
+	"net/http"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -138,8 +143,14 @@ var _ = Describe("Infra/Agent/Version", func() {
 					},
 				}
 				p.runtimeOS = "darwin"
+				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+					return &http.Response{
+						Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2022-11-17T10:50:43Z"}`))),
+					}, nil
+				}
+				p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
 				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
-					return []byte("New Relic Infrastructure Agent version: 1.5.40"), nil
+					return []byte("New Relic Infrastructure Agent version: 1.14.0"), nil
 				}
 
 			})
@@ -149,7 +160,42 @@ var _ = Describe("Infra/Agent/Version", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("1.5.40"))
+				Expect(result.Summary).To(Equal("1.14.0"))
+			})
+		})
+
+		Context("Infrastructure agent is present and with unsupported version", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Env/CollectEnvVars": tasks.Result{
+						Status:  tasks.Info,
+						Payload: map[string]string{},
+					},
+					"Infra/Config/Agent": tasks.Result{
+						Status: tasks.Success,
+					},
+				}
+				p.runtimeOS = "darwin"
+				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+					return &http.Response{
+						Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2020-11-17T10:50:43Z"}`))),
+					}, nil
+				}
+				p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
+				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
+					return []byte("New Relic Infrastructure Agent version: 1.13.0"), nil
+				}
+
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal(errUnsupportedVersion.Error()))
 			})
 		})
 
@@ -168,7 +214,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 				}
 				p.runtimeOS = "windows"
 				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
-					return []byte("New Relic Infrastructure Agent version: 1.5.40"), nil
+					return []byte("New Relic Infrastructure Agent version: 1.13.0"), nil
 				}
 
 			})
@@ -300,6 +346,43 @@ var _ = Describe("Infra/Agent/Version", func() {
 
 				It("should expect the newrelic-infra binary to exist in the PATH", func() {
 					Expect(result).To(Equal(`newrelic-infra`))
+				})
+			})
+		})
+
+		Describe("validatePublishDate()", func() {
+
+			var (
+				version tasks.Ver
+				err     error
+			)
+
+			JustBeforeEach(func() {
+				err = p.validatePublishDate(version)
+			})
+			Context("Version prior to 1.12.0", func() {
+				BeforeEach(func() {
+					version = tasks.Ver{Major: 1, Minor: 11, Patch: 0, Build: 0}
+				})
+
+				It("should return unsupported version error", func() {
+					Expect(err).To(Equal(errUnsupportedVersion))
+				})
+			})
+
+			Context("Up-to-date version", func() {
+				BeforeEach(func() {
+					version = tasks.Ver{Major: 1, Minor: 33, Patch: 0, Build: 0}
+					p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+						return &http.Response{
+							Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2021-11-22T10:50:43Z"}`))),
+						}, nil
+					}
+					p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
+				})
+
+				It("should not return an error", func() {
+					Expect(err).To(BeNil())
 				})
 			})
 		})

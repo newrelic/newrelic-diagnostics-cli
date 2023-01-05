@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -16,9 +15,7 @@ type InfraAgentConnect struct {
 	httpGetter requestFunc
 }
 
-type requestFunc func(wrapper httpHelper.RequestWrapper) (*http.Response, error)
-
-//RequestResult - contains HTTP response and error status data, Id is to distinguish requests from many, in this case region
+// RequestResult - contains HTTP response and error status data, Id is to distinguish requests from many, in this case region
 type RequestResult struct {
 	Id         string
 	URL        string
