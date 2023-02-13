@@ -11,13 +11,14 @@ import (
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	//"github.com/newrelic/newrelic-diagnostics-cli/internal/streaming"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-//WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>
+// WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>
 func WriteOutputHeader() {
 	log.Info(color.ColorString(color.White, "\nCheck Results\n-------------------------------------------------\n"))
 }
@@ -64,7 +65,7 @@ func WriteSummary(data []registration.TaskResult) {
 	}
 }
 
-//WriteOutputFile will output a JSON file with the results of the run
+// WriteOutputFile will output a JSON file with the results of the run
 func WriteOutputFile(data []registration.TaskResult) {
 	outputJSON(getResultsJSON(data))
 }
@@ -211,6 +212,7 @@ func WriteLineResults() []registration.TaskResult {
 			} else {
 				log.FixedPrefix(20, color.ColorString(result.Result.Status, result.Result.Status.StatusToString()), result.Task.Identifier().String()+payload)
 			}
+			//streaming.WriteLine(result.Result.Status.StatusToString() + " " + result.Task.Identifier().String() + " [" + result.Result.Summary + "]")
 		} else {
 			//Using 2 here because filteredCounter is also used to determine if we've filtered anything to intiate that block later on.
 			filteredCounter++

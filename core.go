@@ -6,6 +6,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
+	"github.com/newrelic/newrelic-diagnostics-cli/internal/streaming"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
 	"github.com/newrelic/newrelic-diagnostics-cli/usage"
@@ -38,6 +39,15 @@ func main() {
 		log.Info("No Haberdasher base URL set. Defaulting to localhost")
 	} else {
 		haberdasher.DefaultClient.SetBaseURL(config.HaberdasherURL)
+	}
+
+	// Setup guided diag streaming
+	if config.Flags.Stream && config.Flags.ApiKey != "" {
+		streamingErr := streaming.Initialize(config.Flags.ApiKey)
+		defer streaming.Close()
+		if streamingErr != nil {
+			log.Info("Error initializing streaming. \nError: " + streamingErr.Error() + "\n")
+		}
 	}
 
 	if config.Flags.Version && config.Flags.Quiet {

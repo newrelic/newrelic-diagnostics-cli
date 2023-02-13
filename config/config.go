@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//Verbosity is the current log level
+// Verbosity is the current log level
 type Verbosity int
 
 const (
@@ -18,7 +18,7 @@ const (
 	Verbose
 )
 
-//userFlags is a struct containing the commandline arguments passed in at runtime
+// userFlags is a struct containing the commandline arguments passed in at runtime
 type userFlags struct {
 	Verbose            bool
 	Interactive        bool
@@ -43,7 +43,10 @@ type userFlags struct {
 	AttachmentEndpoint string
 	Suites             string
 	Include            string
-	LegacyAttach			 bool
+	ApiKey             string
+	AccountId          string
+	Stream             bool
+	LegacyAttach       bool
 	InNewRelicCLI      bool
 }
 
@@ -52,7 +55,7 @@ type ConfigFlag struct {
 	Value interface{} `json:"value"`
 }
 
-//MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
+// MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
 func (f userFlags) MarshalJSON() ([]byte, error) {
 	proxySpecified := false
 	if f.Proxy != "" || f.ProxyPassword != "" || f.ProxyUser != "" {
@@ -76,6 +79,8 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		BrowserURL       string
 		Suites           string
 		Include          string
+		AccountId        string
+		Stream           bool
 	}{
 		Verbose:          f.Verbose,
 		Quiet:            f.Quiet,
@@ -93,13 +98,15 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		BrowserURL:       f.BrowserURL,
 		Suites:           f.Suites,
 		Include:          f.Include,
+		AccountId:        f.AccountId,
+		Stream:           f.Stream,
 	})
 }
 
-//LogLevel is the current log level for output to the screen
+// LogLevel is the current log level for output to the screen
 var LogLevel Verbosity
 
-//Flags story configuration information
+// Flags story configuration information
 var Flags = userFlags{}
 
 // Version of the application
@@ -178,6 +185,8 @@ func ParseFlags() {
 		flag.StringVar(&Flags.AttachmentEndpoint, "attachment-endpoint", defaultString, "The endpoint to send attachments to. (NR ONLY)")
 	}
 
+	flag.BoolVar(&Flags.Stream, "stream", false, "Used to stream the results directly to Guided Diagnostics.")
+
 	flag.Parse()
 
 	if Flags.VeryQuiet {
@@ -202,6 +211,10 @@ func ParseFlags() {
 	Flags.InNewRelicCLI = (os.Getenv("NEWRELIC_CLI_SUBPROCESS") != "")
 
 	Flags.LegacyAttach = (os.Getenv("NEWRELIC_LEGACY_ATTACH") != "")
+
+	Flags.ApiKey = os.Getenv("NEW_RELIC_API_KEY")
+
+	Flags.AccountId = os.Getenv("NEW_RELIC_ACCOUNT_ID")
 }
 
 // UsagePayload gathers and sanitizes user command line input

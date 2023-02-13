@@ -9,13 +9,14 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/attach"
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/internal/streaming"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/newrelic/newrelic-diagnostics-cli/attach"
 )
 
 func processTasksToRun() {
@@ -129,7 +130,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 
 		registration.Work.Results[task.Identifier().String()] = taskResult //This should be done in output.go but due to async causes issues
 		registration.Work.ResultsChannel <- taskResult
-
+		streaming.WriteTask(taskResult)
 		if len(result.FilesToCopy) > 0 {
 			log.Debug(" - writing result to file channel")
 			registration.Work.FilesChannel <- taskResult
