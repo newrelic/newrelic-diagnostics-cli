@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
-var tlsRegKeyPath = `SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Client`
+var tlsRegKeyPath = `SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client`
 
 type DotNetProfilerTLSRegKey struct {
 	name string
@@ -79,19 +79,19 @@ func validateTLSRegKeys() (*TLSRegKey, error) {
 }
 
 func compareTLSRegKeys(tlsRegKeys *TLSRegKey) tasks.Result {
-	if tlsRegKeys.Enabled == 0 && tlsRegKeys.DisabledByDefault == 1 {
+	if tlsRegKeys.Enabled == 1 && tlsRegKeys.DisabledByDefault == 0 {
+		return tasks.Result{
+			Status:  tasks.Success,
+			Summary: "You have TLS 1.2 enabled",
+		}
+	} else if tlsRegKeys.Enabled == 0 && tlsRegKeys.DisabledByDefault == 1 {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: "You have disabled TLS 1.0. When this is disabled, no data appears to New Relic. Consider enabling TLS 1.2",
-		}
-	} else if tlsRegKeys.Enabled == 1 && tlsRegKeys.DisabledByDefault == 0 {
-		return tasks.Result{
-			Status:  tasks.Warning,
-			Summary: "You have enabled TLS 1.0. TLS 1.0/1.1 have been EOL'd so consider enabling TLS 1.2",
+			Summary: "You have disabled TLS 1.2. Consult these docs to enable TLS 1.2 https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry",
 		}
 	}
 	return tasks.Result{
-		Status:  tasks.Error,
-		Summary: "Check your setting for TLS 1.0 and consider enabling TLS 1.2",
+		Status:  tasks.Warning,
+		Summary: "Check your registry settings and consider enabling TLS 1.2 https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry",
 	}
 }
