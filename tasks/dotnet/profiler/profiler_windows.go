@@ -27,4 +27,5 @@ func RegisterWinWith(registrationFunc func(tasks.Task, bool)) {
 	registrationFunc(DotNetProfilerW3svcRegKey{}, true)
 	registrationFunc(DotNetProfilerWasRegKey{}, true)
 	registrationFunc(DotNetProfilerEnvVarKey{}, true)
+	registrationFunc(DotNetTLSRegKey{}, true)
 }

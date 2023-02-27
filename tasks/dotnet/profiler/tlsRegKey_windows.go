@@ -10,8 +10,10 @@ import (
 )
 
 var tlsRegKeyPath = `SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.2\Client`
+var SchCryptoRegKeyPath_1 = `SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.30319`
+var SchCryptoRegKeyPath_2 = `SOFTWARE\Microsoft\.NETFramework\v4.0.30319`
 
-type DotNetProfilerTLSRegKey struct {
+type DotNetTLSRegKey struct {
 	name string
 }
 
@@ -20,21 +22,21 @@ type TLSRegKey struct {
 	DisabledByDefault int
 }
 
-func (p DotNetProfilerTLSRegKey) Identifier() tasks.Identifier {
+func (p DotNetTLSRegKey) Identifier() tasks.Identifier {
 	return tasks.IdentifierFromString("DotNet/Profiler/TLSRegKey")
 }
 
-func (p DotNetProfilerTLSRegKey) Explain() string {
+func (p DotNetTLSRegKey) Explain() string {
 	return "Validate at least one version of TLS is enabled: Required by .NET"
 }
 
-func (p DotNetProfilerTLSRegKey) Dependencies() []string {
+func (p DotNetTLSRegKey) Dependencies() []string {
 	return []string{
 		"DotNet/Agent/Installed",
 	}
 }
 
-func (p DotNetProfilerTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
+func (p DotNetTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	if upstream["DotNet/Agent/Installed"].Status != tasks.Success {
 		if upstream["DotNet/Agent/Installed"].Summary == tasks.NoAgentDetectedSummary {
 			return tasks.Result{
@@ -47,6 +49,26 @@ func (p DotNetProfilerTLSRegKey) Execute(op tasks.Options, upstream map[string]t
 			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
+	schCryptoKey_1, schErr_1 := validateSchUseStrongCryptoKeys(SchCryptoRegKeyPath_1)
+	if schErr_1 != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: schErr_1.Error(),
+		}
+	}
+	schCryptoKey_2, schErr_2 := validateSchUseStrongCryptoKeys(SchCryptoRegKeyPath_2)
+	if schErr_2 != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: schErr_1.Error(),
+		}
+	}
+	if *schCryptoKey_1 != 1 || *schCryptoKey_2 != 1 {
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: "SchUseStrongCrypto must be enabled.  See more in these docs https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry",
+		}
+	}
 	tlsRegKeys, err := validateTLSRegKeys()
 	if err != nil {
 		return tasks.Result{
@@ -55,6 +77,22 @@ func (p DotNetProfilerTLSRegKey) Execute(op tasks.Options, upstream map[string]t
 		}
 	}
 	return compareTLSRegKeys(tlsRegKeys)
+}
+
+func validateSchUseStrongCryptoKeys(path string) (*int, error) {
+	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, path, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
+	if err != nil {
+		log.Debug("SchUseStrongCrypto Registry Key Check. Error opening SchUseStrongCrypto Registry Key. Error = ", err.Error())
+		return nil, err
+	}
+	defer regKey.Close()
+
+	schUseStrongCrypto, _, eErr := regKey.GetIntegerValue("SchUseStrongCrypto")
+	if eErr != nil {
+		return nil, err
+	}
+	n := int(schUseStrongCrypto)
+	return &n, nil
 }
 
 func validateTLSRegKeys() (*TLSRegKey, error) {
