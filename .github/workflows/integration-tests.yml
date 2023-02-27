@@ -17,17 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18.x
           cache: true
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install dependencies
-        run: go mod tidy
       - name: Cache deps
         uses: actions/cache@v3
         with:
