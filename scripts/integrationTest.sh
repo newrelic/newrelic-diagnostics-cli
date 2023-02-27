@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
-echo "Running go get -t"
+echo "Running go get -t and go mod tidy"
 go get -t
+go mod tidy
 
 
 # Individual tests can be run by name by running   ./integrationTest.sh 'JavaVersionPresent,RunningPHPDaemon'
