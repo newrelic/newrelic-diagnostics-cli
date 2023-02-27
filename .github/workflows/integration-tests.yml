@@ -6,9 +6,9 @@ name: Integration Testing
 # events but only for the main and develop branches
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -25,7 +25,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-         fetch-depth: 0
+          fetch-depth: 0
+      - name: Install dependencies
+        run: go mod tidy
       - name: Cache deps
         uses: actions/cache@v3
         with:
@@ -50,4 +52,3 @@ jobs:
           fetch-depth: 0
       - name: Test
         run: .\scripts\integrationTest_windows.ps1
-      
