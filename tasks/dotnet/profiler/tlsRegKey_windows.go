@@ -14,7 +14,9 @@ var SchCryptoRegKeyPath_1 = `SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.0.3
 var SchCryptoRegKeyPath_2 = `SOFTWARE\Microsoft\.NETFramework\v4.0.30319`
 
 type DotNetTLSRegKey struct {
-	name string
+	name                           string
+	validateTLSRegKeys             func() (*TLSRegKey, error)
+	validateSchUseStrongCryptoKeys func(string) (*int, error)
 }
 
 type TLSRegKey struct {
@@ -49,14 +51,14 @@ func (p DotNetTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Res
 			Summary: tasks.UpstreamFailedSummary + "DotNet/Agent/Installed",
 		}
 	}
-	schCryptoKey_1, schErr_1 := validateSchUseStrongCryptoKeys(SchCryptoRegKeyPath_1)
+	schCryptoKey_1, schErr_1 := p.validateSchUseStrongCryptoKeys(SchCryptoRegKeyPath_1)
 	if schErr_1 != nil {
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: schErr_1.Error(),
 		}
 	}
-	schCryptoKey_2, schErr_2 := validateSchUseStrongCryptoKeys(SchCryptoRegKeyPath_2)
+	schCryptoKey_2, schErr_2 := p.validateSchUseStrongCryptoKeys(SchCryptoRegKeyPath_2)
 	if schErr_2 != nil {
 		return tasks.Result{
 			Status:  tasks.Error,
@@ -69,17 +71,17 @@ func (p DotNetTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Res
 			Summary: "SchUseStrongCrypto must be enabled.  See more in these docs https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry",
 		}
 	}
-	tlsRegKeys, err := validateTLSRegKeys()
+	tlsRegKeys, err := p.validateTLSRegKeys()
 	if err != nil {
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: err.Error(),
 		}
 	}
-	return compareTLSRegKeys(tlsRegKeys)
+	return p.compareTLSRegKeys(tlsRegKeys)
 }
 
-func validateSchUseStrongCryptoKeys(path string) (*int, error) {
+func ValidateSchUseStrongCryptoKeys(path string) (*int, error) {
 	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, path, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 	if err != nil {
 		log.Debug("SchUseStrongCrypto Registry Key Check. Error opening SchUseStrongCrypto Registry Key. Error = ", err.Error())
@@ -95,7 +97,7 @@ func validateSchUseStrongCryptoKeys(path string) (*int, error) {
 	return &n, nil
 }
 
-func validateTLSRegKeys() (*TLSRegKey, error) {
+func ValidateTLSRegKeys() (*TLSRegKey, error) {
 	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, tlsRegKeyPath, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 	if err != nil {
 		log.Debug("TLS Registry Key Check. Error opening TLS Registry Key. Error = ", err.Error())
@@ -116,7 +118,7 @@ func validateTLSRegKeys() (*TLSRegKey, error) {
 	return &TLSRegKey{Enabled: int(enabled), DisabledByDefault: int(disabledByDefault)}, nil
 }
 
-func compareTLSRegKeys(tlsRegKeys *TLSRegKey) tasks.Result {
+func (p DotNetTLSRegKey) compareTLSRegKeys(tlsRegKeys *TLSRegKey) tasks.Result {
 	if tlsRegKeys.Enabled == 1 && tlsRegKeys.DisabledByDefault == 0 {
 		return tasks.Result{
 			Status:  tasks.Success,
