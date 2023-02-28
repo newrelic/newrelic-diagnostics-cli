@@ -3,6 +3,7 @@ package profiler
 import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/dotnet/repository"
 )
 
 // How the system env vars look as of December 2019
@@ -28,8 +29,7 @@ func RegisterWinWith(registrationFunc func(tasks.Task, bool)) {
 	registrationFunc(DotNetProfilerWasRegKey{}, true)
 	registrationFunc(DotNetProfilerEnvVarKey{}, true)
 	registrationFunc(DotNetTLSRegKey{
-		name:                           "DotNet/Profiler/TLSRegKey",
-		validateTLSRegKeys:             ValidateTLSRegKeys,
-		validateSchUseStrongCryptoKeys: ValidateSchUseStrongCryptoKeys,
+		name:         "DotNet/Profiler/TLSRegKey",
+		validateKeys: new(repository.ValidateKeys),
 	}, true)
 }
