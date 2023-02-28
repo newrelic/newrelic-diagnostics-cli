@@ -13,6 +13,11 @@ require (
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
+	github.com/onsi/ginkgo/v2 v2.8.4
+	github.com/onsi/gomega v1.27.1
+	github.com/shirou/gopsutil/v3 v3.22.11
+	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4
+	github.com/stretchr/testify v1.8.1
 	golang.org/x/sys v0.5.0
 	gopkg.in/cheggaaa/pb.v1 v1.0.28
 	gopkg.in/yaml.v3 v3.0.1
