@@ -30,7 +30,6 @@ func (p BaseCollectorTLS) Explain() string {
 func (p BaseCollectorTLS) Dependencies() []string {
 	return []string{
 		"Base/Config/ProxyDetect",
-		"Base/Config/RegionDetect",
 	}
 }
 
