@@ -7,8 +7,8 @@ require (
 	github.com/clbanning/mxj v1.8.4
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
-	github.com/onsi/ginkgo/v2 v2.8.3
-	github.com/onsi/gomega v1.27.0
+	github.com/onsi/ginkgo/v2 v2.8.4
+	github.com/onsi/gomega v1.27.1
 	github.com/shirou/gopsutil/v3 v3.22.11
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4
 	github.com/stretchr/testify v1.8.1

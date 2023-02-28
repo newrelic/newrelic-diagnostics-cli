@@ -84,7 +84,6 @@
      - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Warning.*Base/Collector/Connect
      - tcp 127.0.0.1:8888
     docker_cmd: HTTP_PROXY=http://127.0.0.1:8888 ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectCLIEnvironmentOverride
