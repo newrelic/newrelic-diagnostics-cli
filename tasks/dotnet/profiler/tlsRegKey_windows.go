@@ -55,7 +55,7 @@ func (p DotNetTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Res
 	if schErr_2 != nil {
 		return tasks.Result{
 			Status:  tasks.Error,
-			Summary: schErr_1.Error(),
+			Summary: schErr_2.Error(),
 		}
 	}
 	if *schCryptoKey_1 != 1 || *schCryptoKey_2 != 1 {
