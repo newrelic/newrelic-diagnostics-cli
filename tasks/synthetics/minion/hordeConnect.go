@@ -62,7 +62,7 @@ func (p SyntheticsMinionHordeConnect) Execute(options tasks.Options, upstream ma
 		if err != nil {
 			result.Status = tasks.Warning
 			result.Summary = "Succesful connection to synthetics-horde.nr-data.net with current settings, but unable to parse response body"
-			result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks#synthetics-private"
+			result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 			return result
 		}
 		result.Status = tasks.Success
@@ -81,11 +81,11 @@ func (p SyntheticsMinionHordeConnect) Execute(options tasks.Options, upstream ma
 	case -7:
 		result.Status = tasks.Failure
 		result.Summary = "Unable to complete request to synthetics-horde.nr-data.net: " + err.Error()
-		result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks#synthetics-private"
+		result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 	default:
 		result.Status = tasks.Failure
 		result.Summary = "Expected 200 response. Received: " + strconv.Itoa(hordeResponse.ResponseCode)
-		result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks#synthetics-private"
+		result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 	}
 
 	return result

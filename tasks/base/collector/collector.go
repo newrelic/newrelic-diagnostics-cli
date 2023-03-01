@@ -16,4 +16,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	registrationFunc(BaseCollectorConnectEU{
 		httpGetter: httpHelper.MakeHTTPRequest,
 	}, true)
+	registrationFunc(BaseCollectorTLS{
+		httpGetter: httpHelper.MakeHTTPRequest,
+	}, true)
 }

@@ -36,11 +36,11 @@ func (p BaseCollectorConnectUS) Dependencies() []string {
 	}
 }
 
-// Execute - Attempts to connect to the US collector status/mongrel endpont
+// Execute - Attempts to connect to the US collector endpont
 func (p BaseCollectorConnectUS) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	p.upstream = upstream
 
-	url := "https://collector.newrelic.com/status/mongrel"
+	url := "https://collector.newrelic.com/jserrors/ping"
 
 	// Was the task not explicitely provided on -t ?
 	if !config.Flags.IsForcedTask(p.Identifier().String()) {
@@ -125,7 +125,7 @@ func (p BaseCollectorConnectUS) prepareResult(body, statusCode string) tasks.Res
 	var result tasks.Result
 
 	if statusCode == "200" {
-		log.Debug("Successfully connected")
+		log.Debug("Successfully connected (US Region)")
 		result.Status = tasks.Success
 		result.Summary = "Status Code = " + statusCode + " Body = " + body
 	} else {

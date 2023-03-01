@@ -44,7 +44,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	}
 
 	baseDockerFrom := []string{
-		"FROM ubuntu:16.04",
+		"FROM ubuntu:22.04",
 		"RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qqy unzip apt-transport-https ca-certificates",
 	}
 
