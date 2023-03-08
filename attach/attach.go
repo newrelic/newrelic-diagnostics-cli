@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -38,6 +39,11 @@ type IAttachDeps interface {
 	GetReader(file string) (*bytes.Reader, error)
 }
 
+type attachResponse struct {
+	URL     string `json:"url"`
+	Success bool   `json:"success"`
+}
+
 type AttachDeps struct{}
 
 const awsUploadTimeoutSeconds = 7200
@@ -61,10 +67,21 @@ func Upload(identifyingKey string, timestamp string, dependencies IAttachDeps) {
 	}
 
 	log.Debug("Uploading to account")
-	err := uploadFilesToAccount(filesToUpload, identifyingKey, dependencies)
+	urls, err := uploadFilesToAccount(filesToUpload, identifyingKey, dependencies)
 	if err != nil {
 		log.Fatalf("Error uploading large file: %s", err.Error())
 	}
+	printedUrls := make(map[string]bool)
+	log.Info("Successfully uploaded to account!! Find your latest run here: ")
+	for _, url := range urls {
+		if !printedUrls[url] {
+			infoStr := fmt.Sprintf("\t%v\n", url)
+			filteredOutput := color.ColorString(color.LightBlue, infoStr)
+			log.Infof(filteredOutput)
+		}
+		printedUrls[url] = true
+	}
+
 	log.Debug("Successfully uploaded to account")
 
 }
@@ -80,13 +97,14 @@ func getFilesForUpload(identifyingKey string, timestamp string, filetype string,
 	return thisFile
 }
 
-func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) error {
+func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) ([]string, error) {
+	var urlsToReturn []string
 	for _, files := range filesToUpload {
 		log.Debug("Opening", files.Path+"/"+files.Filename, "for upload")
 		reader, err := deps.GetReader(files.Path + "/" + files.Filename)
 		if err != nil {
 			log.Info("Error uploading", err)
-			return err
+			return nil, err
 		}
 
 		wrapper := getWrapper(reader, files.Filesize, files.NewFilename, attachmentKey)
@@ -96,19 +114,26 @@ func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, dep
 
 		if err != nil {
 			log.Info("Error uploading file", err)
-			return err
+			return nil, err
 		}
 		if res.StatusCode != 200 {
 			log.Info("Error uploading, status code was", res.Status)
 			body, _ := ioutil.ReadAll(res.Body)
 			log.Debug("Body was", string(body))
 			log.Debug("headers were", res.Header)
-			return errors.New(res.Status)
+			return nil, errors.New(res.Status)
 		}
 		log.Debug("Upload finished with status:  ", res.Status)
+		bodyBytes, _ := ioutil.ReadAll(res.Body)
+		var bodyJson attachResponse
+		marshallErr := json.Unmarshal(bodyBytes, &bodyJson)
+		if marshallErr != nil {
+			return nil, marshallErr
+		}
+		urlsToReturn = append(urlsToReturn, bodyJson.URL)
 
 	}
-	return nil
+	return urlsToReturn, nil
 }
 
 func getAttachmentsEndpoint() string {
