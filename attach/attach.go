@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
@@ -130,7 +131,9 @@ func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, dep
 		if marshallErr != nil {
 			return nil, marshallErr
 		}
-		urlsToReturn = append(urlsToReturn, bodyJson.URL)
+		if !strings.Contains(files.Filename, ".zip") {
+			urlsToReturn = append(urlsToReturn, bodyJson.URL)
+		}
 
 	}
 	return urlsToReturn, nil
