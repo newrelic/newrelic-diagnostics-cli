@@ -103,11 +103,11 @@ func getFilesForUpload(identifyingKey string, timestamp string, filetype string,
 func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) ([]string, error) {
 	var urlsToReturn []string
 	for _, files := range filesToUpload {
+		newUrl, err := uploadFile(files, attachmentKey, deps)
+		if err != nil {
+			return nil, err
+		}
 		if !strings.Contains(files.Filename, ".zip") {
-			newUrl, err := uploadFile(files, attachmentKey, deps)
-			if err != nil {
-				return nil, err
-			}
 			urlsToReturn = append(urlsToReturn, *newUrl)
 		}
 	}
