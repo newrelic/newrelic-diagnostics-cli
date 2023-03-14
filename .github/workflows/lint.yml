@@ -3,7 +3,7 @@ on:
   pull_request:
    paths-ignore:
       - 'README.md'
-      - '**/*_test.go'
+      - '*_test.go'
 jobs:
   golangci:
     strategy:
