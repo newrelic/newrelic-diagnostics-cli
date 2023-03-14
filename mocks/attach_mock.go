@@ -12,7 +12,7 @@ type MAttachDeps struct {
 	mock.Mock
 }
 
-func (m MAttachDeps) GetFileSize(file string) int64 {
+func (m *MAttachDeps) GetFileSize(file string) int64 {
 	ret := m.Called(file)
 
 	var r0 int64
@@ -23,7 +23,7 @@ func (m MAttachDeps) GetFileSize(file string) int64 {
 	return r0
 }
 
-func (m MAttachDeps) GetReader(file string) (*bytes.Reader, error) {
+func (m *MAttachDeps) GetReader(file string) (*bytes.Reader, error) {
 	ret := m.Called(file)
 
 	var r0 *bytes.Reader
@@ -39,7 +39,7 @@ func (m MAttachDeps) GetReader(file string) (*bytes.Reader, error) {
 	return r0, r1
 }
 
-func (m MAttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
+func (m *MAttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
 	ret := m.Called(file, fileSize, filename, attachmentKey)
 
 	var r0 httpHelper.RequestWrapper
@@ -50,7 +50,7 @@ func (m MAttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, filename str
 	return r0
 }
 
-func (m MAttachDeps) GetUrlsToReturn(res *http.Response) (*string, error) {
+func (m *MAttachDeps) GetUrlsToReturn(res *http.Response) (*string, error) {
 	ret := m.Called(res)
 
 	var r0 *string
