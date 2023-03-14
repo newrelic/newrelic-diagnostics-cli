@@ -11,8 +11,8 @@ import (
 type MAttachDeps struct {
 	mock.Mock
 }
-type MockAttachResponse struct {
-	URL string
+type MUploadFile struct {
+	mock.Mock
 }
 
 func (m MAttachDeps) GetFileSize(file string) int64 {
