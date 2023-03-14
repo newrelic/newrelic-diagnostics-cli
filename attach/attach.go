@@ -11,8 +11,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -36,6 +38,13 @@ type jsonResponse struct {
 type IAttachDeps interface {
 	GetFileSize(file string) int64
 	GetReader(file string) (*bytes.Reader, error)
+	GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper
+	GetUrlsToReturn(res *http.Response) (*string, error)
+}
+
+type AttachResponse struct {
+	URL     string `json:"url"`
+	Success bool   `json:"success"`
 }
 
 type AttachDeps struct{}
@@ -61,10 +70,21 @@ func Upload(identifyingKey string, timestamp string, dependencies IAttachDeps) {
 	}
 
 	log.Debug("Uploading to account")
-	err := uploadFilesToAccount(filesToUpload, identifyingKey, dependencies)
+	urls, err := uploadFilesToAccount(filesToUpload, identifyingKey, dependencies)
 	if err != nil {
 		log.Fatalf("Error uploading large file: %s", err.Error())
 	}
+	printedUrls := make(map[string]bool)
+	log.Info("Successfully uploaded to account!! Find your latest run here: ")
+	for _, url := range urls {
+		if !printedUrls[url] {
+			infoStr := fmt.Sprintf("\t%v\n", url)
+			filteredOutput := color.ColorString(color.LightBlue, infoStr)
+			log.Infof(filteredOutput)
+		}
+		printedUrls[url] = true
+	}
+
 	log.Debug("Successfully uploaded to account")
 
 }
@@ -80,35 +100,50 @@ func getFilesForUpload(identifyingKey string, timestamp string, filetype string,
 	return thisFile
 }
 
-func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) error {
+func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) ([]string, error) {
+	var urlsToReturn []string
 	for _, files := range filesToUpload {
-		log.Debug("Opening", files.Path+"/"+files.Filename, "for upload")
-		reader, err := deps.GetReader(files.Path + "/" + files.Filename)
+		newUrl, err := uploadFile(files, attachmentKey, deps)
 		if err != nil {
-			log.Info("Error uploading", err)
-			return err
+			return nil, err
 		}
-
-		wrapper := getWrapper(reader, files.Filesize, files.NewFilename, attachmentKey)
-
-		log.Debug("Starting upload")
-		res, err := makeRequest(wrapper)
-
-		if err != nil {
-			log.Info("Error uploading file", err)
-			return err
+		if !strings.Contains(files.Filename, ".zip") {
+			urlsToReturn = append(urlsToReturn, *newUrl)
 		}
-		if res.StatusCode != 200 {
-			log.Info("Error uploading, status code was", res.Status)
-			body, _ := ioutil.ReadAll(res.Body)
-			log.Debug("Body was", string(body))
-			log.Debug("headers were", res.Header)
-			return errors.New(res.Status)
-		}
-		log.Debug("Upload finished with status:  ", res.Status)
-
 	}
-	return nil
+	return urlsToReturn, nil
+}
+
+func uploadFile(files UploadFiles, attachmentKey string, deps IAttachDeps) (*string, error) {
+	log.Debug("Opening", files.Path+"/"+files.Filename, "for upload")
+	reader, err := deps.GetReader(files.Path + "/" + files.Filename)
+	if err != nil {
+		log.Info("Error uploading", err)
+		return nil, err
+	}
+
+	wrapper := deps.GetWrapper(reader, files.Filesize, files.NewFilename, attachmentKey)
+
+	log.Debug("Starting upload")
+	res, err := makeRequest(wrapper)
+
+	if err != nil {
+		log.Info("Error uploading file", err)
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		log.Info("Error uploading, status code was", res.Status)
+		body, _ := ioutil.ReadAll(res.Body)
+		log.Debug("Body was", string(body))
+		log.Debug("headers were", res.Header)
+		return nil, errors.New(res.Status)
+	}
+	log.Debug("Upload finished with status:  ", res.Status)
+	newUrl, urlError := deps.GetUrlsToReturn(res)
+	if urlError != nil {
+		return nil, urlError
+	}
+	return newUrl, nil
 }
 
 func getAttachmentsEndpoint() string {
@@ -123,21 +158,6 @@ func getAttachmentsEndpoint() string {
 
 func makeRequest(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 	return httpHelper.MakeHTTPRequest(wrapper)
-}
-
-func getWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
-	headers := make(map[string]string)
-	headers["Attachment-Key"] = attachmentKey
-
-	wrapper := httpHelper.RequestWrapper{
-		Method:         "POST",
-		URL:            getAttachmentsEndpoint() + "/upload_s3?filename=" + filename,
-		Payload:        file,
-		Length:         fileSize,
-		TimeoutSeconds: awsUploadTimeoutSeconds,
-	}
-	wrapper.Headers = headers
-	return wrapper
 }
 
 func (a AttachDeps) GetFileSize(file string) int64 {
@@ -156,6 +176,32 @@ func (a AttachDeps) GetReader(file string) (*bytes.Reader, error) {
 		return nil, err
 	}
 	return bytes.NewReader(data), err
+}
+
+func (a AttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
+	headers := make(map[string]string)
+	headers["Attachment-Key"] = attachmentKey
+
+	wrapper := httpHelper.RequestWrapper{
+		Method:         "POST",
+		URL:            getAttachmentsEndpoint() + "/upload_s3?filename=" + filename,
+		Payload:        file,
+		Length:         fileSize,
+		TimeoutSeconds: awsUploadTimeoutSeconds,
+	}
+	wrapper.Headers = headers
+	return wrapper
+}
+
+func (a AttachDeps) GetUrlsToReturn(res *http.Response) (*string, error) {
+	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	var bodyJson AttachResponse
+	marshallErr := json.Unmarshal(bodyBytes, &bodyJson)
+	if marshallErr != nil {
+		return nil, marshallErr
+	}
+	return &bodyJson.URL, nil
+
 }
 
 // All the functions below are legacy and may be removed at any time

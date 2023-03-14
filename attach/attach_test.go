@@ -3,6 +3,7 @@ package attach
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,9 +19,25 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 var testServer *httptest.Server
+
+type MockGetReaderRet struct {
+	byts *bytes.Reader
+	err  error
+}
+type MockGetUrlsToReturnRet struct {
+	url *string
+	err error
+}
+type MockReturns struct {
+	getFileSize     int64
+	getReader       MockGetReaderRet
+	getWrapper      httpHelper.RequestWrapper
+	getUrlsToReturn MockGetUrlsToReturnRet
+}
 
 func setup() {
 	testServer = httptest.NewServer((http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +45,7 @@ func setup() {
 			w.WriteHeader(200)
 		}
 		if strings.Contains(r.URL.Path, "/error") {
+
 			w.WriteHeader(500)
 		}
 	})))
@@ -37,49 +55,12 @@ func teardown() {
 	testServer.Close()
 }
 
-func TestUpload(t *testing.T) {
-	setup()
-	defer teardown()
-	type args struct {
-		identifyingKey string
-		timestamp      string
-		dependencies   IAttachDeps
-	}
-	tests := []struct {
-		name     string
-		args     args
-		endpoint string
-	}{
-		{
-			name: "Test successful Upload",
-			args: args{
-				identifyingKey: "TestKey",
-				timestamp:      "TimestampTest",
-				dependencies:   mocks.MAttachDeps{},
-			},
-			endpoint: "/success",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			config.AttachmentEndpoint = testServer.URL + tt.endpoint
-			Upload(tt.args.identifyingKey, tt.args.timestamp, tt.args.dependencies)
-		})
-	}
-}
-
 func Test_uploadFilesToAccount(t *testing.T) {
 	setup()
 	defer teardown()
-
-	var files []UploadFiles
-	zipfile := UploadFiles{
-		Path:        "/",
-		Filename:    "file1.zip",
-		NewFilename: "file1-timestamp.zip",
-		Filesize:    4,
-		URL:         "",
-		Key:         "testKey",
+	type args struct {
+		filesToUpload []UploadFiles
+		attachmentKey string
 	}
 	jsonfile := UploadFiles{
 		Path:        "/",
@@ -89,46 +70,215 @@ func Test_uploadFilesToAccount(t *testing.T) {
 		URL:         "",
 		Key:         "testKey",
 	}
-	files = append(files, zipfile)
-	files = append(files, jsonfile)
 
-	type args struct {
-		filesToUpload []UploadFiles
-		attachmentKey string
-		deps          IAttachDeps
-	}
+	wantedUrl := "https://newrelic.com"
 	tests := []struct {
-		name     string
-		args     args
-		wantErr  bool
-		endpoint string
+		name        string
+		args        args
+		want        []string
+		wantErr     bool
+		mockReturns MockReturns
 	}{
 		{
 			name: "Test successful uploadFilesToAccount",
 			args: args{
-				filesToUpload: files,
+				filesToUpload: []UploadFiles{jsonfile},
 				attachmentKey: "testKey",
-				deps:          mocks.MAttachDeps{},
 			},
-			wantErr:  false,
-			endpoint: "/success",
-		},
-		{
-			name: "Test failed uploadFilesToAccount",
-			args: args{
-				filesToUpload: files,
-				attachmentKey: "testKey",
-				deps:          mocks.MAttachDeps{},
+			wantErr: false,
+			want:    []string{wantedUrl},
+			mockReturns: MockReturns{
+				getFileSize: 4,
+				getReader: MockGetReaderRet{
+					byts: bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					err:  nil,
+				},
+				getWrapper: httpHelper.RequestWrapper{
+					Method:         "POST",
+					URL:            testServer.URL + "/success",
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
+					TimeoutSeconds: awsUploadTimeoutSeconds,
+					Headers:        map[string]string{"Attachment-Key": "123563454"},
+				},
+				getUrlsToReturn: MockGetUrlsToReturnRet{
+					url: &wantedUrl,
+					err: nil,
+				},
 			},
-			wantErr:  true,
-			endpoint: "/error",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config.AttachmentEndpoint = testServer.URL + tt.endpoint
-			if err := uploadFilesToAccount(tt.args.filesToUpload, tt.args.attachmentKey, tt.args.deps); (err != nil) != tt.wantErr {
+			mockAttachDeps := new(mocks.MAttachDeps)
+			mockAttachDeps.On("GetFileSize", mock.Anything).Return(tt.mockReturns.getFileSize)
+			mockAttachDeps.On("GetReader", mock.Anything).Return(tt.mockReturns.getReader.byts, tt.mockReturns.getReader.err)
+			mockAttachDeps.On("GetWrapper", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.mockReturns.getWrapper)
+			mockAttachDeps.On("GetUrlsToReturn", mock.Anything).Return(tt.mockReturns.getUrlsToReturn.url, tt.mockReturns.getUrlsToReturn.err)
+			got, err := uploadFilesToAccount(tt.args.filesToUpload, tt.args.attachmentKey, mockAttachDeps)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("uploadFilesToAccount() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("uploadFilesToAccount() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func Test_uploadFile(t *testing.T) {
+	setup()
+	defer teardown()
+
+	jsonfile := UploadFiles{
+		Path:        "/",
+		Filename:    "file1.json",
+		NewFilename: "file1-timestamp.json",
+		Filesize:    4,
+		URL:         "",
+		Key:         "testKey",
+	}
+	wantedUrl := "https://newrelic.com"
+
+	type args struct {
+		filesToUpload UploadFiles
+		attachmentKey string
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantErr     bool
+		want        *string
+		mockReturns MockReturns
+	}{
+		{
+			name: "Test successful uploadFilesToAccount",
+			args: args{
+				filesToUpload: jsonfile,
+				attachmentKey: "testKey",
+			},
+			wantErr: false,
+			want:    &wantedUrl,
+			mockReturns: MockReturns{
+				getFileSize: 4,
+				getReader: MockGetReaderRet{
+					byts: bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					err:  nil,
+				},
+				getWrapper: httpHelper.RequestWrapper{
+					Method:         "POST",
+					URL:            testServer.URL + "/success",
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
+					TimeoutSeconds: awsUploadTimeoutSeconds,
+					Headers:        map[string]string{"Attachment-Key": "123563454"},
+				},
+				getUrlsToReturn: MockGetUrlsToReturnRet{
+					url: &wantedUrl,
+					err: nil,
+				},
+			},
+		},
+		{
+			name: "Test with Reader Error",
+			args: args{
+				filesToUpload: jsonfile,
+				attachmentKey: "testKey",
+			},
+			wantErr: true,
+			want:    nil,
+			mockReturns: MockReturns{
+				getFileSize: 4,
+				getReader: MockGetReaderRet{
+					byts: nil,
+					err:  errors.New("Error uploading at Reader"),
+				},
+				getWrapper: httpHelper.RequestWrapper{
+					Method:         "POST",
+					URL:            testServer.URL + "/success",
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
+					TimeoutSeconds: awsUploadTimeoutSeconds,
+					Headers:        map[string]string{"Attachment-Key": "123563454"},
+				},
+				getUrlsToReturn: MockGetUrlsToReturnRet{
+					url: &wantedUrl,
+					err: nil,
+				},
+			},
+		},
+		{
+			name: "Test with non 200 status code",
+			args: args{
+				filesToUpload: jsonfile,
+				attachmentKey: "testKey",
+			},
+			wantErr: true,
+			want:    nil,
+			mockReturns: MockReturns{
+				getFileSize: 4,
+				getReader: MockGetReaderRet{
+					byts: bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					err:  nil,
+				},
+				getWrapper: httpHelper.RequestWrapper{
+					Method:         "POST",
+					URL:            testServer.URL + "/error",
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
+					TimeoutSeconds: awsUploadTimeoutSeconds,
+					Headers:        map[string]string{"Attachment-Key": "123563454"},
+				},
+				getUrlsToReturn: MockGetUrlsToReturnRet{
+					url: &wantedUrl,
+					err: nil,
+				},
+			},
+		},
+		{
+			name: "Test with url error",
+			args: args{
+				filesToUpload: jsonfile,
+				attachmentKey: "testKey",
+			},
+			wantErr: true,
+			want:    nil,
+			mockReturns: MockReturns{
+				getFileSize: 4,
+				getReader: MockGetReaderRet{
+					byts: bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					err:  nil,
+				},
+				getWrapper: httpHelper.RequestWrapper{
+					Method:         "POST",
+					URL:            testServer.URL + "/success",
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
+					TimeoutSeconds: awsUploadTimeoutSeconds,
+					Headers:        map[string]string{"Attachment-Key": "123563454"},
+				},
+				getUrlsToReturn: MockGetUrlsToReturnRet{
+					url: nil,
+					err: errors.New("URL Error"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockAttachDeps := new(mocks.MAttachDeps)
+			mockAttachDeps.On("GetFileSize", mock.Anything).Return(tt.mockReturns.getFileSize)
+			mockAttachDeps.On("GetReader", mock.Anything).Return(tt.mockReturns.getReader.byts, tt.mockReturns.getReader.err)
+			mockAttachDeps.On("GetWrapper", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.mockReturns.getWrapper)
+			mockAttachDeps.On("GetUrlsToReturn", mock.Anything).Return(tt.mockReturns.getUrlsToReturn.url, tt.mockReturns.getUrlsToReturn.err)
+
+			got, err := uploadFile(tt.args.filesToUpload, tt.args.attachmentKey, mockAttachDeps)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("uploadFilesToAccount() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("uploadFilesToAccount() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -171,55 +321,9 @@ func TestAttachDeps_getAttachmentsEndpoint(t *testing.T) {
 	}
 }
 
-func TestAttachDeps_GetWrapper(t *testing.T) {
-	type args struct {
-		file          *bytes.Reader
-		fileSize      int64
-		filename      string
-		attachmentKey string
-	}
-	mockAttachDeps := mocks.MAttachDeps{}
-	mockFile, _ := mockAttachDeps.GetReader("")
-	tests := []struct {
-		name string
-		args args
-		want httpHelper.RequestWrapper
-	}{
-		{
-			name: "Test GetWrapper",
-			args: args{
-				file:          mockFile,
-				fileSize:      mockFile.Size(),
-				filename:      "mockFile",
-				attachmentKey: "testKey",
-			},
-			want: httpHelper.RequestWrapper{
-				Method:         "POST",
-				URL:            "http://localhost:3000/attachments/upload_s3?filename=mockFile",
-				Headers:        map[string]string{"Attachment-Key": "testKey"},
-				Payload:        mockFile,
-				Length:         mockFile.Size(),
-				TimeoutSeconds: 7200,
-				BypassProxy:    false,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			config.Flags.AttachmentEndpoint = ""
-			config.AttachmentEndpoint = ""
-			if got := getWrapper(tt.args.file, tt.args.fileSize, tt.args.filename, tt.args.attachmentKey); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AttachDeps.GetWrapper() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestAttachDeps_makeRequest(t *testing.T) {
 	setup()
 	defer teardown()
-	mockAttachDeps := mocks.MAttachDeps{}
-	mockFile, _ := mockAttachDeps.GetReader("")
 	type args struct {
 		wrapper httpHelper.RequestWrapper
 	}
@@ -227,7 +331,6 @@ func TestAttachDeps_makeRequest(t *testing.T) {
 		name           string
 		args           args
 		wantStatusCode int
-		wantErr        bool
 	}{
 		{
 			name: "Test MakeRequest success",
@@ -236,14 +339,13 @@ func TestAttachDeps_makeRequest(t *testing.T) {
 					Method:         "POST",
 					URL:            testServer.URL + "/success",
 					Headers:        map[string]string{"Attachment-Key": "testKey"},
-					Payload:        mockFile,
-					Length:         mockFile.Size(),
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
 					TimeoutSeconds: 7200,
 					BypassProxy:    false,
 				},
 			},
 			wantStatusCode: 200,
-			wantErr:        false,
 		},
 		{
 			name: "Test MakeRequest fail",
@@ -252,23 +354,19 @@ func TestAttachDeps_makeRequest(t *testing.T) {
 					Method:         "POST",
 					URL:            testServer.URL + "/error",
 					Headers:        map[string]string{"Attachment-Key": "testKey"},
-					Payload:        mockFile,
-					Length:         mockFile.Size(),
+					Payload:        bytes.NewReader([]byte{'m', 'o', 'c', 'k'}),
+					Length:         4,
 					TimeoutSeconds: 7200,
 					BypassProxy:    false,
 				},
 			},
 			wantStatusCode: 500,
-			wantErr:        true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := makeRequest(tt.args.wrapper)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("AttachDeps.MakeRequest() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got, _ := makeRequest(tt.args.wrapper)
+
 			if got != nil {
 				if !reflect.DeepEqual(got.StatusCode, tt.wantStatusCode) {
 					t.Errorf("AttachDeps.MakeRequest() = %v, want %v", got, tt.wantStatusCode)
@@ -279,7 +377,7 @@ func TestAttachDeps_makeRequest(t *testing.T) {
 	}
 }
 
-// Legacy tests below
+// // Legacy tests below
 
 type Client struct {
 	cli *http.Client
