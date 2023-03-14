@@ -11,9 +11,6 @@ import (
 type MAttachDeps struct {
 	mock.Mock
 }
-type MUploadFile struct {
-	mock.Mock
-}
 
 func (m MAttachDeps) GetFileSize(file string) int64 {
 	ret := m.Called(file)
