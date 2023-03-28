@@ -33,7 +33,7 @@ checkOS() {
         ;;
     esac
 
-    case $ARCH in
+    case ${ARCH} in
     arm64 | aarch64)
         ARCH="arm64"
         ;;
