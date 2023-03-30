@@ -42,7 +42,6 @@ $base_url = "https://download.newrelic.com"
 $version = $null
 try {
     $version = $WebClient.DownloadString("${base_url}/nrdiag/version.txt").Trim();
-    $WebClient.DownloadFile("${base_url}/nrdiag/nrdiag_${version}_Windows_${arch}.zip", "$env:TEMP\nrdiag_${version}_Windows_${arch}.zip");
 }
 catch {
     Write-Output "`nCould not download the latest version of the New Relic Diagnostics CLI.`n`nCheck your firewall settings. If you are using a proxy, make sure that you are able to access https://download.newrelic.com and that you have set the HTTPS_PROXY environment variable with your full proxy URL.`n"
