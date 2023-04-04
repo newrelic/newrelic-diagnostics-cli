@@ -98,7 +98,7 @@ uploadToAws() {
   for file in *; do
     aws s3 cp ${file} s3://${S3_BUCKET}/${BASE_DIR}/${file}
   done
-  aws s3 cp s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_${VERSION}.zip s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_latest.zip
+  aws s3 cp s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_${VERSION}.zip s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_latest.zip --copy-props none
   cd ../..
 }
 
