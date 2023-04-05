@@ -98,14 +98,14 @@ uploadToAws() {
   for file in *; do
     aws s3 cp ${file} s3://${S3_BUCKET}/${BASE_DIR}/${file}
   done
-  aws s3 cp s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_${VERSION}.zip s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_latest.zip
+  aws s3 cp s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_${VERSION}.zip s3://${S3_BUCKET}/${BASE_DIR}/nrdiag_latest.zip --copy-props none
   cd ../..
 }
 
 removeOldestFromAws() {
   echo "Finding all files for oldest release on download.newrelic.com"
   local aws_sort_query='sort_by(Contents[?Key && (contains(Key, `.zip`) == `true` || contains(Key, `.tar.gz`) == `true`) && contains(Key, `nrdiag`) == `true` && contains(Key, `latest`) == `false` && contains(Key, `'"${VERSION}"'`) == `false` && contains(Key, `'"${PREV_VERSION}"'`) == `false`], &LastModified)[].[Key]'
-  IFS=$'\n' read -r -d '' -a old_releases < <(aws s3api list-objects-v2 --bucket ${S3_BUCKET} --prefix nrdiag/ --query "${aws_sort_query}" --output text && printf '\0')
+  IFS=$'\n' read -r -d '' -a old_releases < <(aws s3api list-objects-v2 --bucket "${S3_BUCKET}" --prefix "${BASE_DIR}"/ --query "${aws_sort_query}" --output text && printf '\0')
   for rel in "${old_releases[@]}"; do
     aws s3 rm s3://${S3_BUCKET}/${rel}
   done
