@@ -17,14 +17,17 @@ var RubyVersionAgentSupportability = map[string][]string{
 
 var PythonVersionAgentSupportability = map[string][]string{
 	//the keys are the python version and the values are the agent versions that support that specific version
-	"3.8": []string{"5.2.3.131+"},
-	"3.7": []string{"3.4.0.95+"},
-	"3.6": []string{"2.80.0.60+"},
-	"3.5": []string{"2.78.0.57+"},
-	"3.4": []string{"2.42.0.35-4.20.0.120"},
-	"3.3": []string{"2.42.0.35-3.4.0.95"},
-	"2.7": []string{"2.42.0.35+"},
-	"2.6": []string{"2.42.0.35-3.4.0.95"},
+	"3.11": []string{"8.3.0+"},
+	"3.10": []string{"7.2.0.167+"},
+	"3.9":  []string{"5.20.1.150+"},
+	"3.8":  []string{"5.2.3.131+"},
+	"3.7":  []string{"3.4.0.95+"},
+	"3.6":  []string{"2.80.0.60-7.16.0.178"},
+	"3.5":  []string{"2.78.0.57+"},
+	"3.4":  []string{"2.42.0.35-4.20.0.120"},
+	"3.3":  []string{"2.42.0.35-3.4.0.95"},
+	"2.7":  []string{"2.42.0.35+"},
+	"2.6":  []string{"2.42.0.35-3.4.0.95"},
 }
 
 /*
@@ -55,7 +58,7 @@ var SupportedJavaVersions = map[string][]string{
 	"Dragonwell": []string{"1.8.*", "8.*", "11.*"},
 }
 
-//Supported only with legacy versions of the Java agent
+// Supported only with legacy versions of the Java agent
 var SupportedForJavaAgentLegacy = map[string][]string{
 	"Apple":   []string{"1.6.*", "6.*"},
 	"OpenJDK": []string{"1.7.*", "7.*"},
@@ -69,7 +72,7 @@ var NodeSupportedVersions = map[string][]string{
 	"10": []string{"4.6.0-7.*"},
 }
 
-//https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
+// https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
 // .NET framework as keys and .NET agent as values
 var DotnetFrameworkSupportedVersions = map[string][]string{
 	"4.8": []string{"7.0.0+"},
