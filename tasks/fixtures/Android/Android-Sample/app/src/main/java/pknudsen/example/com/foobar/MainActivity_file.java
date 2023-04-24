@@ -186,7 +186,7 @@ public class MainActivity extends Activity {
             public void run() {
                 try
                 {
-                    String stringUrl = "https://test.com";
+                    String stringUrl = "https://something";
                     OkHttpClient httpClient = new OkHttpClient();
                     URL url = new URL(stringUrl);
 
@@ -217,7 +217,7 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    URL u = new URL("http://google.com/_badgiffy.gif");
+                    URL u = new URL("http://something/_badgiffy.gif");
 
                     HttpURLConnection connection = (HttpURLConnection) u.openConnection();
                     InputStream is = connection.getInputStream();
@@ -254,7 +254,7 @@ public class MainActivity extends Activity {
                 textView2.startAnimation(as);
 
                 OkRequests okRequest = new OkRequests();
-                okRequest.okRun("https://arcane-meadow-5051.herokuapp.com/services/time/est");
+                okRequest.okRun("https://something/services/time/est");
 
 
                 textView2.setText("Request sent!");
@@ -269,7 +269,7 @@ public class MainActivity extends Activity {
 
                 //Make a request to a .NET WebAPI box to test x-newrelic-id case sensitivity
                 OkRequests fooBar = new OkRequests();
-                fooBar.okRun("http://arcane-meadow-5051.herokuapp.com/services/time/PST");
+                fooBar.okRun("http://something/services/time/PST");
                 textView2.startAnimation(as);
                 textView2.setText("Request sent!");
             }
@@ -282,7 +282,7 @@ public class MainActivity extends Activity {
             public void onClick(View view) {
                 //Make a request to a .NET WebAPI box to test x-newrelic-id case sensitivity
                 OkRequests foobar = new OkRequests();
-                foobar.okRun("http://ec2-54-200-51-186.us-west-2.compute.amazonaws.com/api/api/products/1");
+                foobar.okRun("http://something/api/api/products/1");
                 textView2.startAnimation(as);
                 textView2.setText("Request sent!");
             }
