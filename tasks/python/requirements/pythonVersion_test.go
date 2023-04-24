@@ -185,6 +185,102 @@ var _ = Describe("Python/Requirements/PythonVersion", func() {
 				Expect(result.URL).To(Equal("https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic"))
 			})
 		})
+		Context("3.11 fail Python supportability", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+
+				upstream = map[string]tasks.Result{
+					"Python/Env/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "3.11",
+					},
+					"Python/Agent/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "5.10.0.138",
+					},
+				}
+			})
+
+			It("should return an expected summary for 3.11", func() {
+
+				Expect(result.Status).To(Equal(tasks.Failure))
+				Expect(result.Summary).To(Equal("Your 3.11 Python version is not supported by this specific Python Agent Version. You'll have to use a different version of the Python Agent, 8.3.0 as the minimum, to ensure the agent works as expected."))
+				Expect(result.URL).To(Equal("https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic"))
+			})
+		})
+		Context("3.11 success Python supportability", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+
+				upstream = map[string]tasks.Result{
+					"Python/Env/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "3.11",
+					},
+					"Python/Agent/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "8.3.1",
+					},
+				}
+			})
+
+			It("should return an expected summary for 3.11", func() {
+
+				Expect(result.Status).To(Equal(tasks.Success))
+				Expect(result.Summary).To(Equal("Your Python version is supported by the Python Agent."))
+
+			})
+		})
+		Context("3.9 fail Python supportability", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+
+				upstream = map[string]tasks.Result{
+					"Python/Env/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "3.9",
+					},
+					"Python/Agent/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "5.10.0.138",
+					},
+				}
+			})
+
+			It("should return an expected summary for 3.9", func() {
+
+				Expect(result.Status).To(Equal(tasks.Failure))
+				Expect(result.Summary).To(Equal("Your 3.9 Python version is not supported by this specific Python Agent Version. You'll have to use a different version of the Python Agent, 5.20.1.150 as the minimum, to ensure the agent works as expected."))
+				Expect(result.URL).To(Equal("https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic"))
+			})
+		})
+		Context("3.9 success Python supportability", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+
+				upstream = map[string]tasks.Result{
+					"Python/Env/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "3.9.15",
+					},
+					"Python/Agent/Version": tasks.Result{
+						Status:  tasks.Info,
+						Payload: "8.7.0",
+					},
+				}
+			})
+
+			It("should return an expected summary for 3.9", func() {
+
+				Expect(result.Status).To(Equal(tasks.Success))
+				Expect(result.Summary).To(Equal("Your Python version is supported by the Python Agent."))
+
+			})
+		})
 
 	})
 })
