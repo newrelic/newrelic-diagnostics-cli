@@ -1,6 +1,7 @@
 package entity
 
+import "github.com/newrelic/newrelic-diagnostics-cli/tasks"
+
 type TLSRegKey struct {
-	Enabled           int
-	DisabledByDefault int
+	CmdExec tasks.CmdExecFunc
 }

@@ -2,12 +2,16 @@ package env
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-
+	"github.com/newrelic/newrelic-diagnostics-cli/domain/repository"
+	"github.com/newrelic/newrelic-diagnostics-cli/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 func TestEnv(t *testing.T) {
@@ -58,44 +62,132 @@ var _ = Describe("PythonEnvVersion", func() {
 			})
 		})
 
-		Context("When 'python --version' command can not be run", func() {
-			It("should return an error result", func() {
-				successfullDependency := map[string]tasks.Result{
-					"Python/Config/Agent": tasks.Result{Status: tasks.Success},
-				}
-				p.cmdExec = mockCommandExecuteError
-				Expect(p.Execute(tasks.Options{}, successfullDependency).Status).To(Equal(tasks.Error))
-			})
-		})
-
-		Context("When 'python --version' runs successfully", func() {
-			It("should return an info result when python version can be parsed", func() {
-				successfullDependency := map[string]tasks.Result{
-					"Python/Config/Agent": tasks.Result{Status: tasks.Success},
-				}
-				p.cmdExec = mockCommandExecuteSuccess
-				Expect(p.Execute(tasks.Options{}, successfullDependency).Status).To(Equal(tasks.Info))
-			})
-			It("should return an error result when python version can not be parsed", func() {
-				successfullDependency := map[string]tasks.Result{
-					"Python/Config/Agent": tasks.Result{Status: tasks.Success},
-				}
-				p.cmdExec = mockCommandExecuteBadOutput
-				Expect(p.Execute(tasks.Options{}, successfullDependency).Status).To(Equal(tasks.Error))
-			})
-		})
 	})
 
-	Describe("parsePythonVersion()", func() {
-		It("should return ('123', true) when passed 'Python 123 '", func() {
-			versionString, isValid := parsePythonVersion([]byte("Python 123 "))
-			Expect(versionString).To(Equal("123"))
-			Expect(isValid).To(BeTrue())
-		})
-		It("should return ('', false) when passed 'Pyrhon 123 '", func() {
-			versionString, isValid := parsePythonVersion([]byte("Pyrhon 123 "))
-			Expect(versionString).To(Equal(""))
-			Expect(isValid).To(BeFalse())
-		})
-	})
+	// Describe("parsePythonVersion()", func() {
+	// 	It("should return ('123', true) when passed 'Python 123 '", func() {
+	// 		versionString, isValid := parsePythonVersion([]byte("Python 123 "))
+	// 		Expect(versionString).To(Equal("123"))
+	// 		Expect(isValid).To(BeTrue())
+	// 	})
+	// 	It("should return ('', false) when passed 'Pyrhon 123 '", func() {
+	// 		versionString, isValid := parsePythonVersion([]byte("Pyrhon 123 "))
+	// 		Expect(versionString).To(Equal(""))
+	// 		Expect(isValid).To(BeFalse())
+	// 	})
+	// })
 })
+
+func TestPythonEnvVersion_RunPythonCommands(t *testing.T) {
+	mPythonEnv := new(mocks.MPythonVersionDeps)
+	type fields struct {
+		iPythonEnvVersion repository.IPythonEnvVersion
+	}
+	tests := []struct {
+		name              string
+		fields            fields
+		want              tasks.Result
+		mockPythonReturn  tasks.Result
+		mockPython3Return tasks.Result
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Initial Success",
+			fields: fields{
+				iPythonEnvVersion: mPythonEnv,
+			},
+			want: tasks.Result{
+				Status:  tasks.Success,
+				Summary: "SUCCESS\nSUCCESS",
+				Payload: "SUCCESS,SUCCESS",
+			},
+			mockPythonReturn: tasks.Result{
+				Status:  tasks.Info,
+				Summary: "SUCCESS",
+				Payload: "PAYLOAD",
+			},
+			mockPython3Return: tasks.Result{
+				Status:  tasks.Info,
+				Summary: "SUCCESS",
+				Payload: "PAYLOAD",
+			},
+		},
+		{
+			name: "python --version fails",
+			fields: fields{
+				iPythonEnvVersion: mPythonEnv,
+			},
+			want: tasks.Result{
+				Status:  tasks.Warning,
+				Summary: "FAIL\nSUCCESS",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+				Payload: "SUCCESS",
+			},
+			mockPythonReturn: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAIL",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+			},
+			mockPython3Return: tasks.Result{
+				Status:  tasks.Info,
+				Summary: "SUCCESS",
+				Payload: "PAYLOAD",
+			},
+		},
+		{
+			name: "python3 --version fails",
+			fields: fields{
+				iPythonEnvVersion: mPythonEnv,
+			},
+			want: tasks.Result{
+				Status:  tasks.Warning,
+				Summary: "FAIL\nSUCCESS",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+				Payload: "SUCCESS",
+			},
+			mockPythonReturn: tasks.Result{
+				Status:  tasks.Info,
+				Summary: "SUCCESS",
+				Payload: "PAYLOAD",
+			},
+			mockPython3Return: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAIL",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+			},
+		},
+		{
+			name: "Both python --version and python3 --version fails",
+			fields: fields{
+				iPythonEnvVersion: mPythonEnv,
+			},
+			want: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAIL\nFAIL",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+			},
+			mockPythonReturn: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAIL",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+			},
+			mockPython3Return: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAIL",
+				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mPythonEnv.On("CheckPythonVersion", mock.Anything).Return(tt.mockPythonReturn).Once()
+			mPythonEnv.On("CheckPythonVersion", mock.Anything).Return(tt.mockPython3Return).Once()
+			p := PythonEnvVersion{
+				iPythonEnvVersion: tt.fields.iPythonEnvVersion,
+			}
+			if got := p.RunPythonCommands(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PythonEnvVersion.RunPythonCommands() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
