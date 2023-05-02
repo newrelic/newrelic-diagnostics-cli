@@ -116,7 +116,7 @@ func TestPythonEnvDependencies_getProjectDependencies(t *testing.T) {
 			},
 		},
 		{
-			name: "pip --freeze returns an error and pip3 --freeze returns a success",
+			name: "pip freeze returns an error and pip3 freeze returns a success",
 			fields: fields{
 				iPipEnvVersion: mPipEnv,
 			},
@@ -138,7 +138,7 @@ func TestPythonEnvDependencies_getProjectDependencies(t *testing.T) {
 			},
 		},
 		{
-			name: "pip3 --freeze returns an error and pip --freeze returns a success",
+			name: "pip3 freeze returns an error and pip freeze returns a success",
 			fields: fields{
 				iPipEnvVersion: mPipEnv,
 			},
