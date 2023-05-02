@@ -9,7 +9,7 @@ type MPipVersionDeps struct {
 	mock.Mock
 }
 
-func (m MPipVersionDeps) CheckPipVersion(pipCmd string) tasks.Result {
+func (m *MPipVersionDeps) CheckPipVersion(pipCmd string) tasks.Result {
 	ret := m.Called(pipCmd)
 
 	var r0 tasks.Result

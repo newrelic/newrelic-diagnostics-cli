@@ -9,7 +9,7 @@ type MPythonVersionDeps struct {
 	mock.Mock
 }
 
-func (m MPythonVersionDeps) CheckPythonVersion(pythonCmd string) tasks.Result {
+func (m *MPythonVersionDeps) CheckPythonVersion(pythonCmd string) tasks.Result {
 	ret := m.Called(pythonCmd)
 
 	var r0 tasks.Result
