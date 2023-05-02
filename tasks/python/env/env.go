@@ -9,10 +9,12 @@ import (
 // RegisterWith - will register any plugins in this package
 func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	log.Debug("Registering Python/Env/*")
-	pythonCmd := repository.PythonEnv{CmdExec: tasks.CmdExecutor}
-
+	pythonEnv := repository.PythonEnv{CmdExec: tasks.CmdExecutor}
+	pipEnv := repository.PipEnv{}
 	registrationFunc(PythonEnvVersion{
-		iPythonEnvVersion: pythonCmd},
+		iPythonEnvVersion: pythonEnv},
 		true)
-	registrationFunc(PythonEnvDependencies{}, true)
+	registrationFunc(PythonEnvDependencies{
+		iPipEnvVersion: pipEnv,
+	}, true)
 }
