@@ -29,8 +29,8 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		BrowserURL         string
 		AttachmentEndpoint string
 		Suites             string
-		APIKey             string
 		Include            string
+		APIKey             string
 	}
 
 	sampleFlags := fields{
@@ -54,8 +54,8 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		BrowserURL:         "string",
 		AttachmentEndpoint: "string",
 		Suites:             "string",
-		APIKey:             "string",
 		Include:            "string",
+		APIKey:             "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
@@ -79,8 +79,8 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		{Name: "browserURL", Value: true},
 		{Name: "attachmentEndpoint", Value: true},
 		{Name: "suites", Value: "string"},
-		{Name: "apiKey", Value: "string"},
 		{Name: "include", Value: "string"},
+		{Name: "apiKey", Value: "string"},
 	}
 
 	tests := []struct {
@@ -118,8 +118,8 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				BrowserURL:         tt.fields.BrowserURL,
 				AttachmentEndpoint: tt.fields.AttachmentEndpoint,
 				Suites:             tt.fields.Suites,
-				APIKey:             tt.fields.APIKey,
 				Include:            tt.fields.Include,
+				APIKey:             tt.fields.APIKey,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)
