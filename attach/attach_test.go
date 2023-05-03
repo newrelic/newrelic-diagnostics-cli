@@ -115,7 +115,7 @@ func Test_uploadFilesToAccount(t *testing.T) {
 			mockAttachDeps.On("GetReader", mock.Anything).Return(tt.mockReturns.getReader.byts, tt.mockReturns.getReader.err)
 			mockAttachDeps.On("GetWrapper", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.mockReturns.getWrapper)
 			mockAttachDeps.On("GetUrlsToReturn", mock.Anything).Return(tt.mockReturns.getUrlsToReturn.url, tt.mockReturns.getUrlsToReturn.err)
-			got, err := uploadFilesToAccount(tt.args.filesToUpload, tt.args.attachmentKey, mockAttachDeps)
+			got, err := uploadFilesToAccount("upload_s3", tt.args.filesToUpload, tt.args.attachmentKey, mockAttachDeps)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("uploadFilesToAccount() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -272,7 +272,7 @@ func Test_uploadFile(t *testing.T) {
 			mockAttachDeps.On("GetWrapper", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.mockReturns.getWrapper)
 			mockAttachDeps.On("GetUrlsToReturn", mock.Anything).Return(tt.mockReturns.getUrlsToReturn.url, tt.mockReturns.getUrlsToReturn.err)
 
-			got, err := uploadFile(tt.args.filesToUpload, tt.args.attachmentKey, mockAttachDeps)
+			got, err := uploadFile("upload_s3", tt.args.filesToUpload, tt.args.attachmentKey, mockAttachDeps)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("uploadFilesToAccount() error = %v, wantErr %v", err, tt.wantErr)
 				return

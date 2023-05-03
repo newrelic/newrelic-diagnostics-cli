@@ -21,3 +21,5 @@ replacement.txt
 hog.out
 #goenv
 .go-version
+#coverage file
+coverage.out
