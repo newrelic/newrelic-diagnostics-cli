@@ -79,6 +79,6 @@ func (p PythonEnvVersion) RunPythonCommands() tasks.Result {
 	return tasks.Result{
 		Status:  tasks.Success,
 		Summary: successStr,
-		Payload: strings.Join(successesToReturn, ","),
+		Payload: successesToReturn,
 	}
 }

@@ -36,7 +36,7 @@ func (t PythonRequirementsPythonVersion) Dependencies() []string {
 // Execute - The core work within this task
 func (t PythonRequirementsPythonVersion) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
-	if upstream["Python/Env/Version"].Status != tasks.Info {
+	if upstream["Python/Env/Version"].Status == tasks.Error {
 		return tasks.Result{
 			Status:  tasks.None,
 			Summary: "Python version not detected. This task didn't run.",
@@ -50,17 +50,24 @@ func (t PythonRequirementsPythonVersion) Execute(options tasks.Options, upstream
 		}
 	}
 
-	pyVersion := upstream["Python/Env/Version"].Payload.(string)
+	pyVersions := upstream["Python/Env/Version"].Payload.([]string)
 	agentVersion := upstream["Python/Agent/Version"].Payload.(string)
+	var requiredAgentVersions []string
+	var unsupportedAgentVersions []string
+	for _, version := range pyVersions {
+		sanitizedPyVersion := removePyVersionPatch(version)
+		requiredAgentVersion, isPythonVersionSupported := compatibilityVars.PythonVersionAgentSupportability[sanitizedPyVersion]
+		if !isPythonVersionSupported {
+			unsupportedAgentVersions = append(unsupportedAgentVersions, requiredAgentVersion...)
+		} else {
+			requiredAgentVersions = append(requiredAgentVersions, requiredAgentVersion...)
+		}
+	}
 
-	sanitizedPyVersion := removePyVersionPatch(pyVersion)
-
-	requiredAgentVersions, isPythonVersionSupported := compatibilityVars.PythonVersionAgentSupportability[sanitizedPyVersion]
-
-	if !isPythonVersionSupported {
+	if len(requiredAgentVersions) == 0 {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: fmt.Sprintf("Your %s Python version is not in the list of supported versions by the Python Agent. Please review our documentation on version requirements", pyVersion),
+			Summary: fmt.Sprintf("None of your versions of Python (%s) are in the list of supported versions by the Python Agent. Please review our documentation on version requirements", strings.Join(pyVersions, ",")),
 			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
 		}
 	}
@@ -83,7 +90,15 @@ func (t PythonRequirementsPythonVersion) Execute(options tasks.Options, upstream
 
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: fmt.Sprintf("Your %s Python version is not supported by this specific Python Agent Version. You'll have to use a different version of the Python Agent, %s as the minimum, to ensure the agent works as expected.", pyVersion, minimumRequiredVersion),
+			Summary: fmt.Sprintf("Your %s Python version is not supported by this specific Python Agent Version. You'll have to use a different version of the Python Agent, %s as the minimum, to ensure the agent works as expected.", strings.Join(requiredAgentVersions, ","), minimumRequiredVersion),
+			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+		}
+	}
+
+	if len(unsupportedAgentVersions) > 0 {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: fmt.Sprintf("Some of your versions of Python (%s) are supported by the Python Agent while other versions (%s) aren't. Please review our documentation on version requirements", strings.Join(requiredAgentVersions, ","), strings.Join(unsupportedAgentVersions, ",")),
 			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
 		}
 	}
