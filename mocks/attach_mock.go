@@ -39,7 +39,7 @@ func (m *MAttachDeps) GetReader(file string) (*bytes.Reader, error) {
 	return r0, r1
 }
 
-func (m *MAttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
+func (m *MAttachDeps) GetWrapper(endpoint string, file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
 	ret := m.Called(file, fileSize, filename, attachmentKey)
 
 	var r0 httpHelper.RequestWrapper
