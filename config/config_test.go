@@ -79,7 +79,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		{Name: "browserURL", Value: true},
 		{Name: "attachmentEndpoint", Value: true},
 		{Name: "suites", Value: "string"},
-		{Name: "api-key", Value: "string"},
+		{Name: "apiKey", Value: "string"},
 		{Name: "include", Value: "string"},
 	}
 
