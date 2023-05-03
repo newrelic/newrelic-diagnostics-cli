@@ -29,6 +29,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		BrowserURL         string
 		AttachmentEndpoint string
 		Suites             string
+		APIKey             string
 		Include            string
 	}
 
@@ -53,31 +54,33 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		BrowserURL:         "string",
 		AttachmentEndpoint: "string",
 		Suites:             "string",
+		APIKey:             "string",
 		Include:            "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
-		ConfigFlag{Name: "verbose", Value: true},
-		ConfigFlag{Name: "interactive", Value: true},
-		ConfigFlag{Name: "quiet", Value: true},
-		ConfigFlag{Name: "veryQuiet", Value: false},
-		ConfigFlag{Name: "help", Value: false},
-		ConfigFlag{Name: "version", Value: true},
-		ConfigFlag{Name: "yesToAll", Value: false},
-		ConfigFlag{Name: "showOverrideHelp", Value: true},
-		ConfigFlag{Name: "autoAttach", Value: true},
-		ConfigFlag{Name: "proxy", Value: true},
-		ConfigFlag{Name: "proxyUser", Value: true},
-		ConfigFlag{Name: "proxyPassword", Value: false},
-		ConfigFlag{Name: "tasks", Value: "string"},
-		ConfigFlag{Name: "configFile", Value: true},
-		ConfigFlag{Name: "override", Value: false},
-		ConfigFlag{Name: "outputPath", Value: false},
-		ConfigFlag{Name: "filter", Value: "string"},
-		ConfigFlag{Name: "browserURL", Value: true},
-		ConfigFlag{Name: "attachmentEndpoint", Value: true},
-		ConfigFlag{Name: "suites", Value: "string"},
-		ConfigFlag{Name: "include", Value: "string"},
+		{Name: "verbose", Value: true},
+		{Name: "interactive", Value: true},
+		{Name: "quiet", Value: true},
+		{Name: "veryQuiet", Value: false},
+		{Name: "help", Value: false},
+		{Name: "version", Value: true},
+		{Name: "yesToAll", Value: false},
+		{Name: "showOverrideHelp", Value: true},
+		{Name: "autoAttach", Value: true},
+		{Name: "proxy", Value: true},
+		{Name: "proxyUser", Value: true},
+		{Name: "proxyPassword", Value: false},
+		{Name: "tasks", Value: "string"},
+		{Name: "configFile", Value: true},
+		{Name: "override", Value: false},
+		{Name: "outputPath", Value: false},
+		{Name: "filter", Value: "string"},
+		{Name: "browserURL", Value: true},
+		{Name: "attachmentEndpoint", Value: true},
+		{Name: "suites", Value: "string"},
+		{Name: "api-key", Value: "string"},
+		{Name: "include", Value: "string"},
 	}
 
 	tests := []struct {
@@ -115,6 +118,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				BrowserURL:         tt.fields.BrowserURL,
 				AttachmentEndpoint: tt.fields.AttachmentEndpoint,
 				Suites:             tt.fields.Suites,
+				APIKey:             tt.fields.APIKey,
 				Include:            tt.fields.Include,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
