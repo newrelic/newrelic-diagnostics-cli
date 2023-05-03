@@ -38,7 +38,7 @@ type jsonResponse struct {
 type IAttachDeps interface {
 	GetFileSize(file string) int64
 	GetReader(file string) (*bytes.Reader, error)
-	GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper
+	GetWrapper(endpoint string, file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper
 	GetUrlsToReturn(res *http.Response) (*string, error)
 }
 
@@ -54,7 +54,7 @@ const defaultAttachmentEndpoint = "http://localhost:3000/attachments"
 
 // Upload - takes the license key from ValidateLicenseKey
 // and uploads the output to account
-func Upload(identifyingKey string, timestamp string, dependencies IAttachDeps) {
+func Upload(endpoint string, identifyingKey string, timestamp string, dependencies IAttachDeps) {
 	log.Debugf("Attempting to attach file with key: %s\n", identifyingKey)
 	var filesToUpload []UploadFiles
 
@@ -70,7 +70,7 @@ func Upload(identifyingKey string, timestamp string, dependencies IAttachDeps) {
 	}
 
 	log.Debug("Uploading to account")
-	urls, err := uploadFilesToAccount(filesToUpload, identifyingKey, dependencies)
+	urls, err := uploadFilesToAccount(endpoint, filesToUpload, identifyingKey, dependencies)
 	if err != nil {
 		log.Fatalf("Error uploading large file: %s", err.Error())
 	}
@@ -100,10 +100,10 @@ func getFilesForUpload(identifyingKey string, timestamp string, filetype string,
 	return thisFile
 }
 
-func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) ([]string, error) {
+func uploadFilesToAccount(endpoint string, filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) ([]string, error) {
 	var urlsToReturn []string
 	for _, files := range filesToUpload {
-		newUrl, err := uploadFile(files, attachmentKey, deps)
+		newUrl, err := uploadFile(endpoint, files, attachmentKey, deps)
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +114,7 @@ func uploadFilesToAccount(filesToUpload []UploadFiles, attachmentKey string, dep
 	return urlsToReturn, nil
 }
 
-func uploadFile(files UploadFiles, attachmentKey string, deps IAttachDeps) (*string, error) {
+func uploadFile(endpoint string, files UploadFiles, attachmentKey string, deps IAttachDeps) (*string, error) {
 	log.Debug("Opening", files.Path+"/"+files.Filename, "for upload")
 	reader, err := deps.GetReader(files.Path + "/" + files.Filename)
 	if err != nil {
@@ -122,7 +122,7 @@ func uploadFile(files UploadFiles, attachmentKey string, deps IAttachDeps) (*str
 		return nil, err
 	}
 
-	wrapper := deps.GetWrapper(reader, files.Filesize, files.NewFilename, attachmentKey)
+	wrapper := deps.GetWrapper(endpoint, reader, files.Filesize, files.NewFilename, attachmentKey)
 
 	log.Debug("Starting upload")
 	res, err := makeRequest(wrapper)
@@ -178,13 +178,13 @@ func (a AttachDeps) GetReader(file string) (*bytes.Reader, error) {
 	return bytes.NewReader(data), err
 }
 
-func (a AttachDeps) GetWrapper(file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
+func (a AttachDeps) GetWrapper(endpoint string, file *bytes.Reader, fileSize int64, filename string, attachmentKey string) httpHelper.RequestWrapper {
 	headers := make(map[string]string)
 	headers["Attachment-Key"] = attachmentKey
 
 	wrapper := httpHelper.RequestWrapper{
 		Method:         "POST",
-		URL:            getAttachmentsEndpoint() + "/upload_s3?filename=" + filename,
+		URL:            getAttachmentsEndpoint() + "/" + endpoint + "?filename=" + filename,
 		Payload:        file,
 		Length:         fileSize,
 		TimeoutSeconds: awsUploadTimeoutSeconds,

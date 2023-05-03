@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//Verbosity is the current log level
+// Verbosity is the current log level
 type Verbosity int
 
 const (
@@ -18,7 +18,7 @@ const (
 	Verbose
 )
 
-//userFlags is a struct containing the commandline arguments passed in at runtime
+// userFlags is a struct containing the commandline arguments passed in at runtime
 type userFlags struct {
 	Verbose            bool
 	Interactive        bool
@@ -43,7 +43,8 @@ type userFlags struct {
 	AttachmentEndpoint string
 	Suites             string
 	Include            string
-	LegacyAttach			 bool
+	APIKey             string
+	LegacyAttach       bool
 	InNewRelicCLI      bool
 }
 
@@ -52,7 +53,7 @@ type ConfigFlag struct {
 	Value interface{} `json:"value"`
 }
 
-//MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
+// MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
 func (f userFlags) MarshalJSON() ([]byte, error) {
 	proxySpecified := false
 	if f.Proxy != "" || f.ProxyPassword != "" || f.ProxyUser != "" {
@@ -75,6 +76,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Filter           string
 		BrowserURL       string
 		Suites           string
+		APIKey           string
 		Include          string
 	}{
 		Verbose:          f.Verbose,
@@ -93,13 +95,14 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		BrowserURL:       f.BrowserURL,
 		Suites:           f.Suites,
 		Include:          f.Include,
+		APIKey:           f.APIKey,
 	})
 }
 
-//LogLevel is the current log level for output to the screen
+// LogLevel is the current log level for output to the screen
 var LogLevel Verbosity
 
-//Flags story configuration information
+// Flags story configuration information
 var Flags = userFlags{}
 
 // Version of the application
@@ -141,6 +144,8 @@ func ParseFlags() {
 
 	flag.BoolVar(&Flags.AutoAttach, "a", false, "alias for -attach")
 	flag.BoolVar(&Flags.AutoAttach, "attach", false, "Attach for automatic upload to New Relic account")
+
+	flag.StringVar(&Flags.APIKey, "api-key", defaultString, "API Key from New Relic for upload to New Relic account")
 
 	flag.BoolVar(&Flags.Help, "h", false, "alias for -help")
 	flag.BoolVar(&Flags.Help, "help", false, "Displays full list of command line options. If you do '-h tasks' it will list all tasks that can be run.")
@@ -230,6 +235,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		{Name: "suites", Value: f.Suites},
 		{Name: "include", Value: f.Include},
+		{Name: "apiKey", Value: f.APIKey},
 	}
 }
 

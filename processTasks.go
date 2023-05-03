@@ -9,13 +9,13 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/attach"
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/newrelic/newrelic-diagnostics-cli/attach"
 )
 
 func processTasksToRun() {
@@ -221,9 +221,13 @@ func processUploads() {
 
 func checkAttachmentFlags(timestamp string) {
 	var ValidLicenseKeys []string
+	attachDeps := new(attach.AttachDeps)
 
-	//check for validated license keys and upload with those keys
-	if config.Flags.AutoAttach {
+	if config.Flags.APIKey != "" {
+		//hit DAS
+		apiKey := config.Flags.APIKey
+		attach.Upload("upload_api", apiKey, timestamp, attachDeps)
+	} else if config.Flags.AutoAttach { //check for validated license keys and upload with those keys
 		for _, taskResult := range registration.Work.Results {
 			if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
 				LicenseKeys, err := getLicenseKey(taskResult.Result)
@@ -245,7 +249,7 @@ func checkAttachmentFlags(timestamp string) {
 				attach.UploadLegacy(licenseKey, timestamp)
 			} else {
 				attachDeps := new(attach.AttachDeps)
-				attach.Upload(licenseKey, timestamp, attachDeps)
+				attach.Upload("upload_s3", licenseKey, timestamp, attachDeps)
 			}
 		}
 	}
