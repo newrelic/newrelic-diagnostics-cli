@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -34,7 +35,7 @@ func (t PythonRequirementsPythonVersion) Explain() string {
 func (t PythonRequirementsPythonVersion) Dependencies() []string {
 	return []string{
 		"Python/Env/Version",
-		"Python/Agent/Version",
+		"Python/Env/Dependencies",
 	}
 }
 
@@ -48,15 +49,23 @@ func (t PythonRequirementsPythonVersion) Execute(options tasks.Options, upstream
 		}
 	}
 
-	if upstream["Python/Agent/Version"].Status != tasks.Info {
+	if upstream["Python/Env/Dependencies"].Status == tasks.Error {
 		return tasks.Result{
 			Status:  tasks.None,
 			Summary: "Python Agent version not detected. This task didn't run.",
 		}
 	}
-
 	pyVersions := upstream["Python/Env/Version"].Payload.([]string)
-	agentVersion := upstream["Python/Agent/Version"].Payload.(string)
+
+	dependencies := upstream["Python/Env/Dependencies"].Payload.([]string)
+	agentVersion, err := GetNewRelicAgent(dependencies)
+	if err != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: fmt.Sprintf("There was an error when parsing your dependencies: %s. Use these docs to install the New Relic Agent", err.Error()),
+			URL:     "https://docs.newrelic.com/install/python/",
+		}
+	}
 	var unsupportedPythonVersions []string
 	var supportedPythonVersions []string
 	unsupportedAgentVersionsMap := make(map[string]UnsupportedVersions)
@@ -127,4 +136,19 @@ func removePyVersionPatch(pyVersion string) string {
 		return versionDigits[0] + "." + versionDigits[1]
 	}
 	return pyVersion
+}
+
+func GetNewRelicAgent(dependencies []string) (string, error) {
+	regexPattern := `newrelic==(\d+(\.\d+)*)`
+	re, _ := regexp.Compile(regexPattern)
+
+	for _, dep := range dependencies {
+		result := re.FindStringSubmatch(dep)
+		if len(result) > 0 {
+			matchedString := result[1]
+			return matchedString, nil
+		}
+
+	}
+	return "", errors.New("could not find New Relic Python agent")
 }

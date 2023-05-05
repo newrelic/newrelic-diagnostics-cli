@@ -47,17 +47,20 @@ func (p PythonEnvVersion) Execute(options tasks.Options, upstream map[string]tas
 func (p PythonEnvVersion) RunPythonCommands() tasks.Result {
 	var errorsToReturn []string
 	var successesToReturn []string
+	var payloadToReturn []string
 	result_1 := p.iPythonEnvVersion.CheckPythonVersion("python")
 	if result_1.Status == tasks.Error {
 		errorsToReturn = append(errorsToReturn, result_1.Summary)
 	} else {
 		successesToReturn = append(successesToReturn, result_1.Summary)
+		payloadToReturn = append(payloadToReturn, result_1.Payload.(string))
 	}
 	result_2 := p.iPythonEnvVersion.CheckPythonVersion("python3")
 	if result_2.Status == tasks.Error {
 		errorsToReturn = append(errorsToReturn, result_2.Summary)
 	} else {
 		successesToReturn = append(successesToReturn, result_2.Summary)
+		payloadToReturn = append(payloadToReturn, result_2.Payload.(string))
 	}
 	errorStr := strings.Join(errorsToReturn, "\n")
 	successStr := strings.Join(successesToReturn, "\n")
@@ -72,13 +75,13 @@ func (p PythonEnvVersion) RunPythonCommands() tasks.Result {
 		return tasks.Result{
 			Status:  tasks.Warning,
 			Summary: errorStr + "\n" + successStr,
-			Payload: successStr,
+			Payload: payloadToReturn,
 			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
 		}
 	}
 	return tasks.Result{
 		Status:  tasks.Success,
 		Summary: successStr,
-		Payload: successesToReturn,
+		Payload: payloadToReturn,
 	}
 }

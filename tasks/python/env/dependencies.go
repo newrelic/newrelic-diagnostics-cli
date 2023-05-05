@@ -81,6 +81,7 @@ func (t PythonEnvDependencies) getProjectDependencies() tasks.Result {
 	}
 	errorStr := strings.Join(errorsToReturn, "\n")
 	successStr := strings.Join(summariesToReturn, "\n")
+	payloadWithoutDup := removeDuplicates(payloadToReturn)
 	if len(errorsToReturn) == 2 {
 		return tasks.Result{
 			Status:  tasks.Error,
@@ -91,14 +92,29 @@ func (t PythonEnvDependencies) getProjectDependencies() tasks.Result {
 		return tasks.Result{
 			Status:      tasks.Warning,
 			Summary:     errorStr + "\n" + successStr,
-			Payload:     payloadToReturn,
+			Payload:     payloadWithoutDup,
 			FilesToCopy: fileToCopyToReturn,
 		}
 	}
+
 	return tasks.Result{
 		Status:      tasks.Success,
 		Summary:     successStr,
-		Payload:     payloadToReturn,
+		Payload:     payloadWithoutDup,
 		FilesToCopy: fileToCopyToReturn,
 	}
+}
+
+func removeDuplicates(slice []string) []string {
+	uniqueStrings := make(map[string]bool)
+	result := []string{}
+
+	for _, str := range slice {
+		if _, exists := uniqueStrings[str]; !exists {
+			uniqueStrings[str] = true
+			result = append(result, str)
+		}
+	}
+
+	return result
 }
