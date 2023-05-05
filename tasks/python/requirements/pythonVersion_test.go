@@ -34,7 +34,7 @@ var _ = Describe("Python/Requirements/PythonVersion", func() {
 	Describe("Dependencies()", func() {
 		It("Should return an expected slice of dependencies", func() {
 			expectedDependencies := []string{"Python/Env/Version",
-				"Python/Agent/Version"}
+				"Python/Env/Dependencies"}
 			Expect(p.Dependencies()).To(Equal(expectedDependencies))
 		})
 	})
@@ -72,14 +72,14 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Python/Agent/Version returns non info",
+			name: "Python/Env/Dependencies returns error",
 			tr:   PythonRequirementsPythonVersion{},
 			args: args{
 				options: tasks.Options{
 					Options: map[string]string{"Option1": "option"},
 				},
 				upstream: map[string]tasks.Result{
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Error,
 						Summary: "ERROR",
 					},
@@ -103,10 +103,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"1.1"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "8.3.0",
+						Payload: []string{"newrelic==8.3.0"},
 					},
 				},
 			},
@@ -114,6 +114,32 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 				Status:  tasks.Failure,
 				Summary: "None of your versions of Python (1.1) are supported by the Python Agent. Please review our documentation on version requirements",
 				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+			},
+		},
+		{
+			name: "Python Agent Version cannot be parsed from output",
+			tr:   PythonRequirementsPythonVersion{},
+			args: args{
+				options: tasks.Options{
+					Options: map[string]string{"Option1": "option"},
+				},
+				upstream: map[string]tasks.Result{
+					"Python/Env/Version": {
+						Status:  tasks.Info,
+						Summary: "SUMMARY",
+						Payload: []string{"3.3"},
+					},
+					"Python/Env/Dependencies": {
+						Status:  tasks.Info,
+						Summary: "SUMMARY",
+						Payload: []string{"BADVERSION"},
+					},
+				},
+			},
+			want: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "There was an error when parsing your dependencies: could not find New Relic Python agent. Use these docs to install the New Relic Agent",
+				URL:     "https://docs.newrelic.com/install/python/",
 			},
 		},
 		{
@@ -129,16 +155,17 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.3"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "BADVERSION",
+						Payload: []string{"newrelic==BADVERSION"},
 					},
 				},
 			},
 			want: tasks.Result{
 				Status:  tasks.Error,
-				Summary: "We ran into an error while parsing your current agent version BADVERSION. unable to parse version: BADVERSION",
+				Summary: "There was an error when parsing your dependencies: could not find New Relic Python agent. Use these docs to install the New Relic Agent",
+				URL:     "https://docs.newrelic.com/install/python/",
 			},
 		},
 		{
@@ -154,10 +181,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.3"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "8.3.0",
+						Payload: []string{"newrelic==8.3.0"},
 					},
 				},
 			},
@@ -180,10 +207,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.3", "3.11"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "8.3.1",
+						Payload: []string{"newrelic==8.3.1"},
 					},
 				},
 			},
@@ -206,10 +233,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.1", "3.3", "3.11"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "8.3.1",
+						Payload: []string{"newrelic==8.3.1"},
 					},
 				},
 			},
@@ -232,10 +259,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.1", "1.1", "3.3", "3.11"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "8.3.1",
+						Payload: []string{"newrelic==8.3.1"},
 					},
 				},
 			},
@@ -258,10 +285,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.1", "1.1", "3.3", "3.9", "3.8"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "5.20.4",
+						Payload: []string{"newrelic==5.20.4"},
 					},
 				},
 			},
@@ -284,10 +311,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.9"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "5.20.4",
+						Payload: []string{"newrelic==5.20.4"},
 					},
 				},
 			},
@@ -309,10 +336,10 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 						Summary: "SUMMARY",
 						Payload: []string{"3.9", "3.8"},
 					},
-					"Python/Agent/Version": {
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Summary: "SUMMARY",
-						Payload: "5.20.4",
+						Payload: []string{"newrelic==5.20.4"},
 					},
 				},
 			},
