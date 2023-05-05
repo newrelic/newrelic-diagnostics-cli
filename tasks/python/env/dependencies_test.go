@@ -99,7 +99,7 @@ func TestPythonEnvDependencies_getProjectDependencies(t *testing.T) {
 			want: tasks.Result{
 				Status:      tasks.Success,
 				Summary:     "SUCCESS\nSUCCESS",
-				Payload:     []string{"PAYLOAD", "PAYLOAD"},
+				Payload:     []string{"PAYLOAD"},
 				FilesToCopy: []tasks.FileCopyEnvelope{filesToCopy[0], filesToCopy[0]},
 			},
 			mockPipReturn: tasks.Result{
