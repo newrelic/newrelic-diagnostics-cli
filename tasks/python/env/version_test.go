@@ -99,7 +99,7 @@ func TestPythonEnvVersion_RunPythonCommands(t *testing.T) {
 			want: tasks.Result{
 				Status:  tasks.Success,
 				Summary: "SUCCESS\nSUCCESS",
-				Payload: "SUCCESS,SUCCESS",
+				Payload: []string{"PAYLOAD", "PAYLOAD"},
 			},
 			mockPythonReturn: tasks.Result{
 				Status:  tasks.Info,
@@ -121,7 +121,7 @@ func TestPythonEnvVersion_RunPythonCommands(t *testing.T) {
 				Status:  tasks.Warning,
 				Summary: "FAIL\nSUCCESS",
 				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
-				Payload: "SUCCESS",
+				Payload: []string{"PAYLOAD"},
 			},
 			mockPythonReturn: tasks.Result{
 				Status:  tasks.Error,
@@ -143,7 +143,7 @@ func TestPythonEnvVersion_RunPythonCommands(t *testing.T) {
 				Status:  tasks.Warning,
 				Summary: "FAIL\nSUCCESS",
 				URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
-				Payload: "SUCCESS",
+				Payload: []string{"PAYLOAD"},
 			},
 			mockPythonReturn: tasks.Result{
 				Status:  tasks.Info,
