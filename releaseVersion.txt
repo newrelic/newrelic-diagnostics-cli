@@ -1,4 +1,4 @@
 majorMinor=2.5
-buildNumber=2
+buildNumber=0
 currentReleaseVersion=2.5
 prevReleaseVersion=2.4.2
