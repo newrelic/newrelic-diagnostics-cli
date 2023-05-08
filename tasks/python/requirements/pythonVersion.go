@@ -55,9 +55,22 @@ func (t PythonRequirementsPythonVersion) Execute(options tasks.Options, upstream
 			Summary: "Python Agent version not detected. This task didn't run.",
 		}
 	}
-	pyVersions := upstream["Python/Env/Version"].Payload.([]string)
+	pyVersions, pyOk := upstream["Python/Env/Version"].Payload.([]string)
 
-	dependencies := upstream["Python/Env/Dependencies"].Payload.([]string)
+	if !pyOk {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: "Error parsing the Python Version.",
+		}
+	}
+
+	dependencies, depOk := upstream["Python/Env/Dependencies"].Payload.([]string)
+	if !depOk {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: "Error parsing the Python dependencies.",
+		}
+	}
 	agentVersion, err := GetNewRelicAgent(dependencies)
 	if err != nil {
 		return tasks.Result{

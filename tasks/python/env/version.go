@@ -53,14 +53,29 @@ func (p PythonEnvVersion) RunPythonCommands() tasks.Result {
 		errorsToReturn = append(errorsToReturn, result_1.Summary)
 	} else {
 		successesToReturn = append(successesToReturn, result_1.Summary)
-		payloadToReturn = append(payloadToReturn, result_1.Payload.(string))
+		convertedPayload, pyOk := result_1.Payload.(string)
+		if !pyOk {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: "Error parsing the Python Version.",
+			}
+		}
+		payloadToReturn = append(payloadToReturn, convertedPayload)
+
 	}
 	result_2 := p.iPythonEnvVersion.CheckPythonVersion("python3")
 	if result_2.Status == tasks.Error {
 		errorsToReturn = append(errorsToReturn, result_2.Summary)
 	} else {
 		successesToReturn = append(successesToReturn, result_2.Summary)
-		payloadToReturn = append(payloadToReturn, result_2.Payload.(string))
+		convertedPayload, pyOk := result_2.Payload.(string)
+		if !pyOk {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: "Error parsing the Python Version.",
+			}
+		}
+		payloadToReturn = append(payloadToReturn, convertedPayload)
 	}
 	errorStr := strings.Join(errorsToReturn, "\n")
 	successStr := strings.Join(successesToReturn, "\n")

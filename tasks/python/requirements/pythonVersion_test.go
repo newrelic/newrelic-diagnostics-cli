@@ -348,6 +348,56 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 				Summary: "Your 3.9,3.8 Python version(s) are supported by the Python Agent.",
 			},
 		},
+		{
+			name: "Python Version not a slice of string",
+			tr:   PythonRequirementsPythonVersion{},
+			args: args{
+				options: tasks.Options{
+					Options: map[string]string{"Option1": "option"},
+				},
+				upstream: map[string]tasks.Result{
+					"Python/Env/Version": {
+						Status:  tasks.Info,
+						Summary: "SUMMARY",
+						Payload: "3.9, 3.8",
+					},
+					"Python/Env/Dependencies": {
+						Status:  tasks.Info,
+						Summary: "SUMMARY",
+						Payload: []string{"newrelic==5.20.4"},
+					},
+				},
+			},
+			want: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "Error parsing the Python Version.",
+			},
+		},
+		{
+			name: "Python deps not slice of string",
+			tr:   PythonRequirementsPythonVersion{},
+			args: args{
+				options: tasks.Options{
+					Options: map[string]string{"Option1": "option"},
+				},
+				upstream: map[string]tasks.Result{
+					"Python/Env/Version": {
+						Status:  tasks.Info,
+						Summary: "SUMMARY",
+						Payload: []string{"3.9", "3.8"},
+					},
+					"Python/Env/Dependencies": {
+						Status:  tasks.Info,
+						Summary: "SUMMARY",
+						Payload: "newrelic==5.20.4",
+					},
+				},
+			},
+			want: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "Error parsing the Python dependencies.",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
