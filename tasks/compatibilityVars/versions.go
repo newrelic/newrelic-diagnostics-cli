@@ -2,17 +2,20 @@ package compatibilityVars
 
 var RubyVersionAgentSupportability = map[string][]string{
 	//the keys are the ruby version and the values are the agent versions that support that specific version
-	"2.7":   []string{"6.9.0.363+"},
-	"2.6":   []string{"5.7.0.350+"},
-	"2.5":   []string{"4.8.0.341+"},
-	"2.4":   []string{"3.18.0.329+"},
-	"2.3":   []string{"3.9.9.275+"},
-	"2.2":   []string{"3.9.9.275+"},
-	"2.1":   []string{"3.9.9.275+"},
-	"2.0":   []string{"3.9.6.257+"},
-	"1.9.3": []string{"3.9.6.257-3.18.1.330"},
-	"1.9.2": []string{"3.9.6.257-3.18.1.330"},
-	"1.8.7": []string{"3.9.6.257-3.18.1.330"},
+	"3.2":   {"8.15.0+"},
+	"3.1":   {"8.3.0+"},
+	"3.0":   {"6.15.0+"},
+	"2.7":   {"6.9.0.363+"},
+	"2.6":   {"5.7.0.350+"},
+	"2.5":   {"4.8.0.341+"},
+	"2.4":   {"3.18.0.329+"},
+	"2.3":   {"3.9.9.275-8.16.0"},
+	"2.2":   {"3.9.9.275-8.16.0"},
+	"2.1":   {"3.9.9.275-6.15.0"},
+	"2.0":   {"3.9.6.257-6.15.0"},
+	"1.9.3": {"3.9.6.257-3.18.1.330"},
+	"1.9.2": {"3.9.6.257-3.18.1.330"},
+	"1.8.7": {"3.9.6.257-3.18.1.330"},
 }
 
 var PythonVersionAgentSupportability = map[string]string{
@@ -47,57 +50,57 @@ var PythonVersionAgentSupportability = map[string]string{
 
 var SupportedJavaVersions = map[string][]string{
 	// supported vendors
-	"OpenJDK":    []string{"1.8-1.9.*", "8-18.*"},
-	"HotSpot":    []string{"1.8-1.9.*", "8-16.*"},
-	"Coretto":    []string{"1.8.*", "8.*", "11.*", "17.*"},
-	"Zulu":       []string{"1.8-1.9.*", "8-12.*"},
-	"IBM":        []string{"1.8.*", "8.*"},
-	"Oracle":     []string{"1.5.*", "5.0.*"},
-	"Zing":       []string{"1.8-1.9.*", "8-11.*"},
-	"OpenJ9":     []string{"1.8-1.9.*", "8-13.*"},
-	"Dragonwell": []string{"1.8.*", "8.*", "11.*"},
+	"OpenJDK":    {"1.8-1.9.*", "8-18.*"},
+	"HotSpot":    {"1.8-1.9.*", "8-16.*"},
+	"Coretto":    {"1.8.*", "8.*", "11.*", "17.*"},
+	"Zulu":       {"1.8-1.9.*", "8-12.*"},
+	"IBM":        {"1.8.*", "8.*"},
+	"Oracle":     {"1.5.*", "5.0.*"},
+	"Zing":       {"1.8-1.9.*", "8-11.*"},
+	"OpenJ9":     {"1.8-1.9.*", "8-13.*"},
+	"Dragonwell": {"1.8.*", "8.*", "11.*"},
 }
 
 // Supported only with legacy versions of the Java agent
 var SupportedForJavaAgentLegacy = map[string][]string{
-	"Apple":   []string{"1.6.*", "6.*"},
-	"OpenJDK": []string{"1.7.*", "7.*"},
-	"IBM":     []string{"1.6-1.7.*", "6-7.*"},
-	"HotSpot": []string{"1.5-1.7.*", "5-7.*"},
-	"JRockit": []string{"1-1.6.0.50"},
+	"Apple":   {"1.6.*", "6.*"},
+	"OpenJDK": {"1.7.*", "7.*"},
+	"IBM":     {"1.6-1.7.*", "6-7.*"},
+	"HotSpot": {"1.5-1.7.*", "5-7.*"},
+	"JRockit": {"1-1.6.0.50"},
 }
 
 var NodeSupportedVersions = map[string][]string{
-	"12": []string{"6.0.0+"},
-	"10": []string{"4.6.0-7.*"},
+	"12": {"6.0.0+"},
+	"10": {"4.6.0-7.*"},
 }
 
 // https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
 // .NET framework as keys and .NET agent as values
 var DotnetFrameworkSupportedVersions = map[string][]string{
-	"4.8": []string{"7.0.0+"},
-	"4.7": []string{"7.0.0+"},
-	"4.6": []string{"7.0.0+"}, //should be inclusive of version such as 4.6.1
-	"4.5": []string{"7.0.0+"},
+	"4.8": {"7.0.0+"},
+	"4.7": {"7.0.0+"},
+	"4.6": {"7.0.0+"}, //should be inclusive of version such as 4.6.1
+	"4.5": {"7.0.0+"},
 }
 
 var DotnetFrameworkOldVersions = map[string][]string{
 	//To instrument applications running on .NET Framework version 4.0 and lower, you must run a version of the New Relic .NET agent earlier than 7.0
-	"4.0": []string{"5.1.*-6.*"}, //5.0 and lower are EOL versions
-	"3.5": []string{"5.1.*-6.*"},
+	"4.0": {"5.1.*-6.*"}, //5.0 and lower are EOL versions
+	"3.5": {"5.1.*-6.*"},
 	//Doc says .NET Framework 3.0 and 2.0 are no longer supported as September 2020:https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework
 }
 
 //.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
 
 var DotnetCoreSupportedVersions = map[string][]string{
-	"6.0": []string{"9.2.0+"},
-	"5.0": []string{"8.35.0+"},
-	"3.1": []string{"8.21.34.0+"},
-	"3.0": []string{"8.21.34.0+"},
-	"2.2": []string{"8.19.353.0+"},
-	"2.1": []string{"8.19.353.0+"},
-	"2.0": []string{"8.19.353.0+"},
+	"6.0": {"9.2.0+"},
+	"5.0": {"8.35.0+"},
+	"3.1": {"8.21.34.0+"},
+	"3.0": {"8.21.34.0+"},
+	"2.2": {"8.19.353.0+"},
+	"2.1": {"8.19.353.0+"},
+	"2.0": {"8.19.353.0+"},
 }
 
 //https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-core#net-version
