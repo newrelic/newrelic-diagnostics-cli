@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
@@ -18,16 +19,12 @@ var (
 const (
 	// Clock Skew over 60 seconds is not manageable
 	skewThresholdSeconds = 60
-
-	//OS specific links to provide user if clock skew is detected
-	troubleshootingURLwindows = "https://docs.microsoft.com/en-us/windows-server/networking/windows-time-service/configuring-systems-for-high-accuracy?tabs=MinPollInterval"
-	troubleshootingURLlinux   = "https://www.maketecheasier.com/sync-linux-time-with-ntp-server/"
 )
 
 // InfraEnvClockSkew - This struct defined the sample plugin which can be used as a starting point
 type InfraEnvClockSkew struct {
 	httpGetter        func(httpHelper.RequestWrapper) (*http.Response, error)
-	checkForClockSkew func(time.Time) (bool, int, time.Time)
+	checkForClockSkew func(time.Time, time.Time) (bool, int)
 	runtimeOS         string
 }
 
@@ -52,11 +49,10 @@ func (p InfraEnvClockSkew) Execute(options tasks.Options, upstream map[string]ta
 	if upstream["Infra/Agent/Connect"].Status == tasks.None {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "Unable to urls from Infra/Agent/Connect. This task did not run",
+			Summary: "Unable to retrieve urls from Infra/Agent/Connect. This task did not run",
 		}
 	}
-
-	requestURLs, ok := upstream["Infra/Agent/Connect"].Payload.(map[string]string)
+	collectorURLs, ok := upstream["Infra/Agent/Connect"].Payload.([]string)
 
 	if !ok {
 		return tasks.Result{
@@ -65,15 +61,12 @@ func (p InfraEnvClockSkew) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
-	var apiEndpoint string
-
-	for _, value := range requestURLs {
-		apiEndpoint = value
-		break
-	}
-
-	if len(apiEndpoint) == 0 {
-		apiEndpoint = "https://infra-api.newrelic.com"
+	apiEndpoint, err := p.getCollectorURL(collectorURLs)
+	if err != nil {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: "Unable to determine New Relic collector URL from Infra/Agent/Connect task",
+		}
 	}
 
 	collectorTime, err := p.getCollectorTime(apiEndpoint)
@@ -84,23 +77,18 @@ func (p InfraEnvClockSkew) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
-	isClockDiffRelevant, diffSeconds, hostTime := p.checkForClockSkew(collectorTime)
+	timeNow := time.Now().In(time.UTC)
+	isClockDiffRelevant, diffSeconds := p.checkForClockSkew(collectorTime, timeNow)
 
 	if isClockDiffRelevant {
 		summary := fmt.Sprintf("Detected clock skew of %v seconds between host and New Relic collector. This could lead to chart irregularities:", diffSeconds)
-		summary += fmt.Sprintf("\n\t%-16v%s", "Host time:", hostTime.String())
+		summary += fmt.Sprintf("\n\t%-16v%s", "Host time:", timeNow.String())
 		summary += fmt.Sprintf("\n\t%-16v%s", "Collector time:", collectorTime.String())
 		summary += "\nYour host may be affected by clock skew. Please consider using NTP to keep your host clocks in sync."
 
 		result := tasks.Result{
 			Status:  tasks.Failure,
 			Summary: summary,
-		}
-
-		if p.runtimeOS == "windows" {
-			result.URL = troubleshootingURLwindows
-		} else {
-			result.URL = troubleshootingURLlinux
 		}
 
 		return result
@@ -143,9 +131,20 @@ func (p InfraEnvClockSkew) getCollectorTime(apiEndpoint string) (time.Time, erro
 	return serverTime.In(time.UTC), nil
 }
 
-func checkForClockSkew(collectorTime time.Time) (bool, int, time.Time) {
-	hostTime := time.Now().In(time.UTC)
-	diff := hostTime.Sub(collectorTime)
+func (p InfraEnvClockSkew) getCollectorURL(collectorURLs []string) (string, error) {
+	if len(collectorURLs) == 0 {
+		return "", errors.New("unable to determine Infrastructure collector URL")
+	}
+	for _, URL := range collectorURLs {
+		if strings.Contains(URL, "infra-api") {
+			return URL, nil
+		}
+	}
+	return collectorURLs[0], nil
+}
+
+func checkForClockSkew(collectorTime time.Time, timeNow time.Time) (bool, int) {
+	diff := timeNow.Sub(collectorTime)
 	diffSeconds := int(math.Abs(diff.Seconds()))
-	return (diffSeconds > skewThresholdSeconds), diffSeconds, hostTime
+	return (diffSeconds > skewThresholdSeconds), diffSeconds
 }
