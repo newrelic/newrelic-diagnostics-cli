@@ -18,6 +18,14 @@ const (
 	Verbose
 )
 
+type Region string
+
+const (
+	USRegion Region = "us"
+	EURegion Region = "eu"
+	NoRegion Region = "none"
+)
+
 // userFlags is a struct containing the commandline arguments passed in at runtime
 type userFlags struct {
 	Verbose            bool
@@ -44,6 +52,7 @@ type userFlags struct {
 	Suites             string
 	Include            string
 	APIKey             string
+	Region             string
 	LegacyAttach       bool
 	InNewRelicCLI      bool
 }
@@ -78,6 +87,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Suites           string
 		APIKey           string
 		Include          string
+		Region           string
 	}{
 		Verbose:          f.Verbose,
 		Quiet:            f.Quiet,
@@ -96,6 +106,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Suites:           f.Suites,
 		Include:          f.Include,
 		APIKey:           f.APIKey,
+		Region:           f.Region,
 	})
 }
 
@@ -108,11 +119,29 @@ var Flags = userFlags{}
 // Version of the application
 var Version string
 
-// UsageEndpoint is the haberdasher endpoint to which usage statistics are sent
+// USUsageEndpoint is the haberdasher endpoint to which usage statistics are sent for US accounts
+var USUsageEndpoint string
+
+// EUUsageEndpoint is the haberdasher endpoint to which usage statistics are sent for EU accounts
+var EUUsageEndpoint string
+
+// EUUsageEndpoint is the haberdasher endpoint to which usage statistics are sent
 var UsageEndpoint string
+
+// USAttachmentEndpoint is the haberdasher endpoint to which attachments are sent for US accounts
+var USAttachmentEndpoint string
+
+// EUAttachmentEndpoint is the haberdasher endpoint to which attachments are sent for EU accounts
+var EUAttachmentEndpoint string
 
 // AttachmentEndpoint is the haberdasher endpoint to which attachments are sent
 var AttachmentEndpoint string
+
+// USHaberdasherURL is the base url for the Haberdasher service in the US
+var USHaberdasherURL string
+
+// EUHaberdasherURL is the base url for the Haberdasher service in the EU
+var EUHaberdasherURL string
 
 // HaberdasherURL is the base url for the Haberdasher service
 var HaberdasherURL string
@@ -176,7 +205,10 @@ func ParseFlags() {
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
-	flag.StringVar(&Flags.Include, "include", defaultString, " Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
+	flag.StringVar(&Flags.Include, "include", defaultString, "Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
+
+	flag.StringVar(&Flags.Region, "r", defaultString, "alias for -region")
+	flag.StringVar(&Flags.Region, "region", defaultString, "The region your New Relic account is in. Accepted values: EU or US. Case insensitive. (Default: US)")
 
 	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
@@ -192,7 +224,7 @@ func ParseFlags() {
 		Flags.Filter = ""
 	}
 
-	//This has to be in the config init otherwise you don't get logs as expected
+	// This has to be in the config init otherwise you don't get logs as expected
 	if Flags.Verbose {
 		LogLevel = Verbose
 	} else {
@@ -202,6 +234,23 @@ func ParseFlags() {
 	if Flags.BrowserURL != "" {
 		Flags.Override = "Browser/Agent/GetSource.url=" + Flags.BrowserURL + "," + Flags.Override
 		Flags.Tasks = "Browser/Agent/Detect," + Flags.Tasks
+	}
+
+	// Set the endpoints based on region
+	switch parseRegionFlagAndEnv(Flags.Region, os.Getenv("NEW_RELIC_REGION")) {
+	case EURegion:
+		UsageEndpoint = EUUsageEndpoint
+		// Only set AttachmentEndpoint if the `-attachment-endpoint` flag was not used
+		if Flags.AttachmentEndpoint == "" {
+			AttachmentEndpoint = EUAttachmentEndpoint
+		}
+		HaberdasherURL = EUHaberdasherURL
+	default:
+		UsageEndpoint = USUsageEndpoint
+		if Flags.AttachmentEndpoint == "" {
+			AttachmentEndpoint = USAttachmentEndpoint
+		}
+		HaberdasherURL = USHaberdasherURL
 	}
 
 	Flags.InNewRelicCLI = (os.Getenv("NEWRELIC_CLI_SUBPROCESS") != "")
@@ -236,6 +285,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "suites", Value: f.Suites},
 		{Name: "include", Value: f.Include},
 		{Name: "apiKey", Value: f.APIKey},
+		{Name: "region", Value: f.Region},
 	}
 }
 
@@ -255,4 +305,45 @@ func (f userFlags) IsForcedTask(identifier string) bool {
 		}
 	}
 	return false
+}
+
+// parseRegionFlagAndEnv - Parse region flag and region env variable, determine which to use.
+// Prioritize in this order:
+// - Use the command line flag if that is provided
+// - If flag is not provided, use env variable NEW_RELIC_REGION, if present
+// - If neither the flag or env variable are present, default to US
+func parseRegionFlagAndEnv(regionFromFlag string, regionFromEnv string) Region {
+	regionFlag := stringToRegion(regionFromFlag)
+	regionEnv := stringToRegion(regionFromEnv)
+
+	// No region provided, use default US
+	if regionFlag == NoRegion && regionEnv == NoRegion {
+		return USRegion
+	}
+	// Both the command line flag and the env variable were provided, priority is flag
+	if regionFlag != NoRegion && regionEnv != NoRegion {
+		return regionFlag
+	}
+	// Region was provided via env
+	if regionFlag == NoRegion && regionEnv != NoRegion {
+		return regionEnv
+	}
+	// Region was provided via flag
+	if regionFlag != NoRegion && regionEnv == NoRegion {
+		return regionFlag
+	}
+	// if we somehow got here, go with default US
+	return USRegion
+}
+
+// stringToRegion - converts region string to Region type
+func stringToRegion(region string) Region {
+	r := strings.TrimSpace(strings.ToLower(region))
+	if r == "eu" {
+		return EURegion
+	}
+	if r == "us" {
+		return USRegion
+	}
+	return NoRegion
 }

@@ -31,6 +31,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Suites             string
 		Include            string
 		APIKey             string
+		Region             string
 	}
 
 	sampleFlags := fields{
@@ -56,6 +57,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Suites:             "string",
 		Include:            "string",
 		APIKey:             "string",
+		Region:             "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
@@ -81,6 +83,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		{Name: "suites", Value: "string"},
 		{Name: "include", Value: "string"},
 		{Name: "apiKey", Value: "string"},
+		{Name: "region", Value: "string"},
 	}
 
 	tests := []struct {
@@ -120,6 +123,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				Suites:             tt.fields.Suites,
 				Include:            tt.fields.Include,
 				APIKey:             tt.fields.APIKey,
+				Region:             tt.fields.Region,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)
@@ -152,6 +156,143 @@ func Test_boolifyFlag(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := boolifyFlag(tt.args.inputFlag); got != tt.want {
 				t.Errorf("boolifyFlag() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_stringToRegion(t *testing.T) {
+	type args struct {
+		region string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Region
+	}{
+		{
+			name: "lower case US string to region type",
+			args: args{
+				region: "us",
+			},
+			want: USRegion,
+		},
+		{
+			name: "upper case US string to region type",
+			args: args{
+				region: "US",
+			},
+			want: USRegion,
+		},
+		{
+			name: "lower case EU string to region type",
+			args: args{
+				region: "eu",
+			},
+			want: EURegion,
+		},
+		{
+			name: "upper case EU string to region type",
+			args: args{
+				region: "EU",
+			},
+			want: EURegion,
+		},
+		{
+			name: "blank region string to region type",
+			args: args{
+				region: "",
+			},
+			want: NoRegion,
+		},
+		{
+			name: "unknown region string to region type",
+			args: args{
+				region: "unknown",
+			},
+			want: NoRegion,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := stringToRegion(tt.args.region); got != tt.want {
+				t.Errorf("stringToRegion() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseRegionFlagAndEnv(t *testing.T) {
+	type args struct {
+		regionFromFlag string
+		regionFromEnv  string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Region
+	}{
+		{
+			name: "Both provided - Flag gets priority",
+			args: args{ 
+				regionFromFlag: "us",
+				regionFromEnv: "eu",
+			},
+			want: USRegion,
+		},
+		{
+			name: "Only env provided",
+			args: args{ 
+				regionFromFlag: "",
+				regionFromEnv: "eu",
+			},
+			want: EURegion,
+		},
+		{
+			name: "Only flag provided",
+			args: args{ 
+				regionFromFlag: "eu",
+				regionFromEnv: "",
+			},
+			want: EURegion,
+		},
+		{
+			name: "Nothing provided - default to US",
+			args: args{ 
+				regionFromFlag: "",
+				regionFromEnv: "",
+			},
+			want: USRegion,
+		},
+		{
+			name: "Invalid env provided - use flag",
+			args: args{ 
+				regionFromFlag: "us",
+				regionFromEnv: "invalid",
+			},
+			want: USRegion,
+		},
+		{
+			name: "Invalid flag provided - use env",
+			args: args{ 
+				regionFromFlag: "invalid",
+				regionFromEnv: "eu",
+			},
+			want: EURegion,
+		},
+		{
+			name: "Invalid flag and env provided - use default US",
+			args: args{ 
+				regionFromFlag: "invalid",
+				regionFromEnv: "invalid",
+			},
+			want: USRegion,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := parseRegionFlagAndEnv(tt.args.regionFromFlag, tt.args.regionFromEnv); got != tt.want {
+				t.Errorf("parseRegionFlagAndEnv() = %v, want %v", got, tt.want)
 			}
 		})
 	}
