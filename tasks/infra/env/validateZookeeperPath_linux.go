@@ -237,6 +237,9 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 	zookeeper_hosts: '[{"host": "something10.company.com", "port": 5101},{"host": "something11.company.com", "port": 5101},{"host": "something12.company.com", "port": 5101}]'
 	*/
 	zookeeperHostsBlobs := kafkaConfigPair.Configuration.ParsedResult.FindKey("zookeeper_hosts")
+	if len(zookeeperHostsBlobs) == 0 {
+		return ZookeeperConfig{}, fmt.Errorf("could not find a key for zookeeper_hosts")
+	}
 	var zookeeperHosts []*ZookeeperHost
 	jsonErr := json.Unmarshal([]byte(zookeeperHostsBlobs[0].Value()), &zookeeperHosts)
 	if jsonErr != nil {
@@ -251,8 +254,8 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 	return zookeeperExtractedConfig, nil
 }
 
-//not been used currently, though it may come handy later if we encounter bugs:
-//nolint
+// not been used currently, though it may come handy later if we encounter bugs:
+// nolint
 func cmdOutputHasBrokerIds(cmdOutput string) bool {
 	captureGroup := `\[([0-9]|,|\s)+\]`
 	re := regexp.MustCompile(captureGroup)
