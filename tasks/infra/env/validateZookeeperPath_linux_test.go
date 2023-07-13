@@ -2,7 +2,13 @@ package env
 
 import (
 	"errors"
+	"fmt"
+	"reflect"
+	"testing"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	infraConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/infra/config"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -80,3 +86,79 @@ var _ = Describe("Infra/Env/ValidateZookeeperPath", func() {
 	})
 
 })
+
+func Test_getZookeeperConfigFromYml(t *testing.T) {
+	type args struct {
+		kafkaConfigPair *infraConfig.IntegrationFilePair
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      ZookeeperConfig
+		wantErr   bool
+		wantedErr error
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Initial Zookeeper Test",
+			args: args{
+				kafkaConfigPair: &infraConfig.IntegrationFilePair{
+					Configuration: config.ValidateElement{
+						ParsedResult: tasks.ValidateBlob{
+							Key:      "zookeeper_path",
+							Path:     "",
+							RawValue: "",
+							Children: []tasks.ValidateBlob{
+								{
+									Key:      "zookeeper_path",
+									Path:     "",
+									RawValue: "",
+								},
+							},
+						},
+					},
+				},
+			},
+			want:      ZookeeperConfig{},
+			wantErr:   true,
+			wantedErr: fmt.Errorf("multiple keys found for zookeeper_path"),
+		},
+		{
+			name: "With no zookeeper_hosts",
+			args: args{
+				kafkaConfigPair: &infraConfig.IntegrationFilePair{
+					Configuration: config.ValidateElement{
+						ParsedResult: tasks.ValidateBlob{
+							Key:      "zookeeper_path",
+							Path:     "",
+							RawValue: "",
+							Children: []tasks.ValidateBlob{
+								{
+									Key:      "zookeeper_hostssss",
+									Path:     "",
+									RawValue: []map[interface{}]interface{}{{"host": "something10.company.com", "port": 5101}, {"host": "something11.company.com", "port": 5101}},
+									Children: []tasks.ValidateBlob{},
+								},
+							},
+						},
+					},
+				},
+			},
+			want:      ZookeeperConfig{},
+			wantErr:   true,
+			wantedErr: fmt.Errorf("multiple keys found for zookeeper_path"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getZookeeperConfigFromYml(tt.args.kafkaConfigPair)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getZookeeperConfigFromYml() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getZookeeperConfigFromYml() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
