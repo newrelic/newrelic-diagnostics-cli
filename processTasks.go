@@ -211,12 +211,13 @@ func processUploads() {
 		return
 	}
 
-	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
-		"Do you want to upload these to your New Relic account?"
-	if promptUser(question) {
-		checkAttachmentFlags(timestamp)
+	if config.Flags.APIKey != "" || config.Flags.AutoAttach {
+		question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
+			"Do you want to upload these to your New Relic account?"
+		if promptUser(question) {
+			checkAttachmentFlags(timestamp)
+		}
 	}
-
 }
 
 func checkAttachmentFlags(timestamp string) {
