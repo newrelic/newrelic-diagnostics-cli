@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
@@ -173,10 +174,12 @@ func uploadFileMultipart(endpoint string, files UploadFiles, attachmentKey strin
 		req.Header.Add("Content-Type", writer.FormDataContentType())
 		req.Header.Add("Attachment-Key", attachmentKey)
 		req.Header.Set("User-Agent", "Nrdiag_/"+config.Version)
-
 		bar.Start()
 
-		res, err = http.DefaultClient.Do(req)
+		httpClient := &http.Client{
+			Timeout: 300 * time.Second,
+		}
+		res, err = httpClient.Do(req)
 		if err != nil {
 			log.Info("Error uploading file", err)
 			done <- err
