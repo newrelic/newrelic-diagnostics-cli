@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,6 +17,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
+	"gopkg.in/cheggaaa/pb.v1"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -103,7 +106,7 @@ func getFilesForUpload(identifyingKey string, timestamp string, filetype string,
 func uploadFilesToAccount(endpoint string, filesToUpload []UploadFiles, attachmentKey string, deps IAttachDeps) ([]string, error) {
 	var urlsToReturn []string
 	for _, files := range filesToUpload {
-		newUrl, err := uploadFile(endpoint, files, attachmentKey, deps)
+		newUrl, err := uploadFileMultipart(endpoint, files, attachmentKey, deps)
 		if err != nil {
 			return nil, err
 		}
@@ -144,6 +147,93 @@ func uploadFile(endpoint string, files UploadFiles, attachmentKey string, deps I
 		return nil, urlError
 	}
 	return newUrl, nil
+}
+
+func uploadFileMultipart(endpoint string, files UploadFiles, attachmentKey string, deps IAttachDeps) (*string, error) {
+	path := files.Path + "/" + files.Filename
+	f, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	contentLength := emptyMultipartSize("file", path) + files.Filesize
+
+	pipeOut, pipeIn := io.Pipe()
+	bar := pb.New(int(files.Filesize)).SetUnits(pb.U_BYTES)
+	writer := multipart.NewWriter(pipeIn)
+	done := make(chan error)
+	var res *http.Response
+	go func() {
+		url := getAttachmentsEndpoint() + "/" + endpoint + "?filename=" + files.NewFilename
+		req, err := http.NewRequest(http.MethodPost, url, pipeOut)
+		if err != nil {
+			done <- err
+			return
+		}
+
+		req.ContentLength = contentLength
+		req.Header.Add("Content-Type", writer.FormDataContentType())
+		req.Header.Add("Attachment-Key", attachmentKey)
+		req.Header.Set("User-Agent", "Nrdiag_/"+config.Version)
+
+		bar.Start()
+
+		res, err = http.DefaultClient.Do(req)
+		if err != nil {
+			log.Info("Error uploading file", err)
+			done <- err
+			return
+		}
+
+		done <- nil
+	}()
+
+	partWriter, err := writer.CreateFormFile("file", path)
+	if err != nil {
+		return nil, err
+	}
+	out := io.MultiWriter(partWriter, bar)
+	_, err = io.Copy(out, f)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = writer.Close(); err != nil {
+		return nil, err
+	}
+
+	if err = pipeIn.Close(); err != nil {
+		return nil, err
+	}
+
+	if err = <-done; err != nil {
+		return nil, err
+	}
+
+	bar.Finish()
+	if res.StatusCode != 200 {
+		log.Info("Error uploading, status code was", res.Status)
+		body, _ := ioutil.ReadAll(res.Body)
+		log.Debug("Body was", string(body))
+		log.Debug("headers were", res.Header)
+		return nil, errors.New(res.Status)
+	}
+	defer res.Body.Close()
+
+	log.Debug("Upload finished with status:  ", res.Status)
+	newUrl, urlError := deps.GetUrlsToReturn(res)
+	if urlError != nil {
+		return nil, urlError
+	}
+	return newUrl, nil
+}
+
+func emptyMultipartSize(fieldname, filename string) int64 {
+	body := &bytes.Buffer{}
+	form := multipart.NewWriter(body)
+	form.CreateFormFile(fieldname, filename)
+	form.Close()
+	return int64(body.Len())
 }
 
 func getAttachmentsEndpoint() string {
