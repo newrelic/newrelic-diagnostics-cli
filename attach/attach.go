@@ -156,7 +156,6 @@ func uploadFileMultipart(endpoint string, files UploadFiles, attachmentKey strin
 		return nil, err
 	}
 	defer f.Close()
-	contentLength := emptyMultipartSize("file", path) + files.Filesize
 
 	pipeOut, pipeIn := io.Pipe()
 	bar := pb.New(int(files.Filesize)).SetUnits(pb.U_BYTES)
@@ -171,7 +170,6 @@ func uploadFileMultipart(endpoint string, files UploadFiles, attachmentKey strin
 			return
 		}
 
-		req.ContentLength = contentLength
 		req.Header.Add("Content-Type", writer.FormDataContentType())
 		req.Header.Add("Attachment-Key", attachmentKey)
 		req.Header.Set("User-Agent", "Nrdiag_/"+config.Version)
@@ -226,14 +224,6 @@ func uploadFileMultipart(endpoint string, files UploadFiles, attachmentKey strin
 		return nil, urlError
 	}
 	return newUrl, nil
-}
-
-func emptyMultipartSize(fieldname, filename string) int64 {
-	body := &bytes.Buffer{}
-	form := multipart.NewWriter(body)
-	form.CreateFormFile(fieldname, filename)
-	form.Close()
-	return int64(body.Len())
 }
 
 func getAttachmentsEndpoint() string {
