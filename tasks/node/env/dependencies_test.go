@@ -31,7 +31,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 	})
 	Describe("Dependencies()", func() {
 		It("Should return an slice required to run this task", func() {
-			expectedDependencies := []string{"Node/Env/NpmVersion", "Node/Config/Agent"}
+			expectedDependencies := []string{"Node/Env/NpmVersion", "Node/Config/Agent", "Node/Env/YarnVersion"}
 			Expect(p.Dependencies()).To(Equal(expectedDependencies))
 		})
 	})
@@ -82,7 +82,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return a None result summary", func() {
-				Expect(result.Summary).To(Equal("NPM is not installed. This task did not run"))
+				Expect(result.Summary).To(Equal("Unable to detect NPM or Yarn. This task did not run"))
 			})
 		})
 		Context("When getModulesList gets an error", func() {
@@ -104,7 +104,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return a Failure result summary", func() {
-				Expect(result.Summary).To(Equal("an error message: npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
+				Expect(result.Summary).To(Equal("an error message: npm threw an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
 			})
 		})
 		Context("When NodeModulesVersions length is zero", func() {
@@ -131,7 +131,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Summary).To(Equal("We failed to parse the output of npm ls, but have included it in nrdiag-output.zip. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
 			})
 		})
-		Context("When getModulesList returns a succesful output that we pass to tasks.FileCopyEnvelope", func() {
+		Context("When getModulesList returns a successful output that we pass to tasks.FileCopyEnvelope", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
@@ -222,7 +222,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			modulesVersions = p.getNodeModulesVersions(modulesList)
 		})
 
-		Context("When given a multiline string(modulesList)", func() {
+		Context("When given a multiline string(modulesList) npm", func() {
 			BeforeEach(func() {
 				npmLsLines := []string{
 					"/Users/shuayhuaca/Desktop/projects/node/nannynow/server/node_modules/express:express@4.16.4:undefined", "/Users/shuayhuaca/Desktop/projects/node/nannynow/server/node_modules/mongoose:mongoose@5.4.0:undefined", "/Users/shuayhuaca/Desktop/projects/node/nannynow/server/node_modules/babel-jest:babel-jest@23.6.0:undefined",
@@ -233,6 +233,17 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(modulesVersions).To(Equal(dependencyInfo))
 			})
 		})
-	})
 
+		Context("When given a multiline string(modulesList) yarn", func() {
+			BeforeEach(func() {
+				yarnListLines := []string{
+					"├─ express@4.16.4", "├─ mongoose@5.4.0", "└─ babel-jest@23.6.0",
+				}
+				modulesList = strings.Join(yarnListLines, "\n")
+			})
+			It("should return an slice of modulesVersions struct", func() {
+				Expect(modulesVersions).To(Equal(dependencyInfo))
+			})
+		})
+	})
 })
