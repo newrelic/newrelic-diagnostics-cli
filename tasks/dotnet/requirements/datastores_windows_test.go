@@ -146,7 +146,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 		})
 
-		Context("When no ddls are found", func() {
+		Context("When no dlls are found", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{

@@ -26,8 +26,8 @@ var _ = Describe("Python/Requirements/Webframework", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Check web framework compatibility with New Relic Python agent"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Check web framework compatibility with New Relic Python agent"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

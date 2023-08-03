@@ -31,8 +31,8 @@ var _ = Describe("iOS/Agent/Version", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanation string", func() {
-			expectedExaplanation := "Determine New Relic iOS agent version"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Determine New Relic iOS agent version"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

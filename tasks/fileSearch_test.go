@@ -261,8 +261,8 @@ var _ = Describe("file search Task helpers", func() {
 			})
 
 			It("should return only last result", func() {
-				expecteVersionMatch := "7.5.0.199"
-				Expect(matches[1]).To(Equal(expecteVersionMatch))
+				expectedVersionMatch := "7.5.0.199"
+				Expect(matches[1]).To(Equal(expectedVersionMatch))
 			})
 			It("should return a nil error", func() {
 				Expect(err).To(BeNil())

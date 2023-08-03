@@ -89,7 +89,7 @@ func (p InfraEnvNrjmxMbeans) Execute(options tasks.Options, upstream map[string]
 
 	var summaryFailure string
 	if len(mbeansNotFound) > 0 {
-		summaryFailure = fmt.Sprintf("These queries returned an empty object({}): %s\nThis can mean that either those mBeans are not available to this JMX server or that the queries targetting them may need to be reformatted in the metrics yml file.\n", strings.Join(mbeansNotFound, ", "))
+		summaryFailure = fmt.Sprintf("These queries returned an empty object({}): %s\nThis can mean that either those mBeans are not available to this JMX server or that the queries targeting them may need to be reformatted in the metrics yml file.\n", strings.Join(mbeansNotFound, ", "))
 	}
 
 	var summaryErr string

@@ -257,7 +257,7 @@ func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
 	output, err := p.mCmdExecutor(cmd1, cmd2)
 	log.Debug("output", string(output))
 	//nrjmx returns an error exit code (in err) and the meaningful error in output if there is a failure connecting
-	//if nrjmx is not installed, output will be empty and the meaninful msg will be in err
+	//if nrjmx is not installed, output will be empty and the meaningful msg will be in err
 	if err != nil {
 		if len(output) == 0 {
 			return err

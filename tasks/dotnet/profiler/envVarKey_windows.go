@@ -55,13 +55,13 @@ func (p DotNetProfilerEnvVarKey) Execute(op tasks.Options, upstream map[string]t
 
 }
 
-//queries the regestry for env keys and validates them against expected standards
+//queries the registry for env keys and validates them against expected standards
 func validateEnvInstrumentationKeys() (result tasks.Result) {
 
 	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, envNetAgentRegPath, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 
 	if err != nil {
-		log.Debug("Error opening Enviroment Reg Key. Error = ", err.Error())
+		log.Debug("Error opening Environment Reg Key. Error = ", err.Error())
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: "Could not open Environment Reg Key " + err.Error(),

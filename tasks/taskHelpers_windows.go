@@ -73,7 +73,7 @@ func GetFileVersion(file string) (string, error) {
 
 	parameters, ok := queryInfoValue(info)
 	if !ok {
-		return "", errors.New("gueryInfoValue failed")
+		return "", errors.New("queryInfoValue failed")
 	}
 	version := parameters.fileVersion()
 
@@ -86,7 +86,7 @@ func GetFileVersion(file string) (string, error) {
 	), nil
 }
 
-// FileVersion concatenates MostSignificantBits and LessSigfinicantBits to a uint64 value.
+// FileVersion concatenates MostSignificantBits and LessSignificantBits to a uint64 value.
 func (fv FILEINFO) fileVersion() uint64 {
 	return uint64(fv.MostSignificantBits)<<32 | uint64(fv.LessSignificantBits)
 }
@@ -106,7 +106,7 @@ func fileVersionInfo(path string, data []byte) bool {
 }
 
 // Calls the exported method GetFileVersionInfoSize of version.dll
-// Check the existance of Version Information on the file and returns the size in bytes of it
+// Check the existence of Version Information on the file and returns the size in bytes of it
 //
 // see https://msdn.microsoft.com/en-us/library/windows/desktop/ms647005(v=vs.85).aspx
 func fileVersionInfoSize(path string) uint32 {
@@ -148,7 +148,7 @@ func queryInfoValue(block []byte) (FILEINFO, bool) {
 type GetProcessorArchFunc func() (string, error)
 
 //Checks the Windows machine's Processor Architecture. Will return x86 for 32 bit systems and AMD64 for 64 bit systems.
-//Can return other types or undefined for some types of non-x86 and non-x64 precossors
+//Can return other types or undefined for some types of non-x86 and non-x64 processors
 //best practice is to explicitly check for x86 or AMD64
 func GetProcessorArch() (procType string, errorReg error) {
 

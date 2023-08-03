@@ -29,8 +29,8 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Collect New Relic Infrastructure on-host integration configuration and definition files"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Collect New Relic Infrastructure on-host integration configuration and definition files"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

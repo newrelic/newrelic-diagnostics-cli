@@ -79,7 +79,7 @@ var _ = Describe("Base/Containers/DetectDocker", func() {
 
 		})
 
-		Context("If there is no error with running docker info and JSON is invalid but we dont get ServerVersion", func() {
+		Context("If there is no error with running docker info and JSON is invalid but we do not get ServerVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				p.executeCommand = func(name string, arg ...string) ([]byte, error) {

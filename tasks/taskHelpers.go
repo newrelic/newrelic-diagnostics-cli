@@ -439,10 +439,10 @@ func (v ValidateBlob) insertChildKey(insertKey string, value interface{}) (outpu
 	depth := strings.Count(v.PathAndKey(), "/")
 
 	//split up the key to have the actual key
-	split := strings.Split(insertKey, "/") //Skip the first / here to ignore the preceeding / when calculating
+	split := strings.Split(insertKey, "/") //Skip the first / here to ignore the preceding / when calculating
 	key := split[len(split)-1]
 	if split[0] == "" {
-		split = split[1:] // drop first element to ignore the preceeding /
+		split = split[1:] // drop first element to ignore the preceding /
 	}
 	newSplit := split[:len(split)-1] // drop last element of the slice to build the path
 	path := ""
@@ -663,7 +663,7 @@ func (e EnvironmentVariables) WithCustomFilter(customFilter []string, includeDef
 	return
 }
 
-// FindCaseInsensitive - searches for a specific variable case insenstive
+// FindCaseInsensitive - searches for a specific variable case insensitive
 func (e EnvironmentVariables) FindCaseInsensitive(envVar string) string {
 	r := regexp.MustCompile("(?i)" + envVar)
 	for key, value := range e.All {
@@ -862,7 +862,7 @@ func MakeMapFromString(src string, pairSeparator string, valueSeparator string) 
 
 // StreamWrapper provides a means to bundle a channel for publishing data,
 // and a channel for publishing errors.
-// Each is paired with a waitgroup if needed
+// Each is paired with a WaitGroup if needed
 type StreamWrapper struct {
 	Stream      chan string
 	StreamWg    *sync.WaitGroup

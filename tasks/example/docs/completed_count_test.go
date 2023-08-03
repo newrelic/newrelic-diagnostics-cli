@@ -34,8 +34,8 @@ var _ = Describe("Base/Log/Count", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Count log files collected."
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Count log files collected."
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

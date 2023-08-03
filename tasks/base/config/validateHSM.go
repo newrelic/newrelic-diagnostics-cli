@@ -3,11 +3,12 @@ package config
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"strconv"
-	"strings"
 )
 
 var HSM_CONFIG_NAMES = []string{
@@ -72,7 +73,7 @@ func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[strin
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 
 	if !ok {
-		log.Debug("Could not check env vars for HSM validationn")
+		log.Debug("Could not check env vars for HSM validation")
 	} else {
 		t.envVars = envVars
 	}

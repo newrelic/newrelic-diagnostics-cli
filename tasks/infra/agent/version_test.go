@@ -34,8 +34,8 @@ var _ = Describe("Infra/Agent/Version", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Determine version of New Relic Infrastructure agent"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Determine version of New Relic Infrastructure agent"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

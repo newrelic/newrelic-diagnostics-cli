@@ -883,7 +883,7 @@ func Test_ParseVersion(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Abitrary chars in version throws error and returns zeroed version",
+			name: "Arbitrary chars in version throws error and returns zeroed version",
 			args: args{
 				version: "4.0b1",
 			},

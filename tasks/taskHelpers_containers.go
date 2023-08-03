@@ -208,7 +208,7 @@ func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 }
 
 //StreamContainerLogsById will perform a buffered stream of `docker logs` command for a containerId.
-//We perform a buffered read since logging can be quite large and we dont want to put it all in memory.
+//We perform a buffered read since logging can be quite large and we don't want to put it all in memory.
 //@containerId - the containerId to collect logs from
 //@bufferedCmdExec - the buffered command exec to use, which should return a scanner.
 //@sw - StreamWrapper that has the channel to send log output to and the channel to send errors through

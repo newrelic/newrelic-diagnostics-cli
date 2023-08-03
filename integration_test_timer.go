@@ -57,7 +57,7 @@ func (t *testTimer) StopTimer() {
 	t.Duration = t.EndTime.Sub(t.StartTime).Seconds()
 }
 
-// WrapUp is called when an individual test completes to collect its ending timestmap and calculate duration.
+// WrapUp is called when an individual test completes to collect its ending timestamp and calculate duration.
 func (i IntegrationTestRun) WrapUp() IntegrationTestRun {
 	i.EndTime = time.Now()
 	i.Duration = i.EndTime.Sub(i.StartTime).Seconds()
@@ -127,7 +127,7 @@ func processTestTimings(resultsToProcess []IntegrationTestRun) string {
 }
 
 // MarshalJSON is used for custom JSON marshaling for IntegrationTestRun to format it for the Insights custom
-// locally sourced small batch cage free artisinal gluten free/free range event POST payload.
+// locally sourced small batch cage free artisanal gluten free/free range event POST payload.
 func (i IntegrationTestRun) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		EventType           string  `json:"eventType"`

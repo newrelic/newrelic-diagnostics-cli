@@ -32,7 +32,7 @@ func VersionIsCompatible(version string, requirements []string) (bool, error) {
 	return versionToCheck.CheckCompatibility(requirements)
 }
 
-// CheckCompatibility takes a slice of string compatibilty requirements and
+// CheckCompatibility takes a slice of string compatibility requirements and
 // returns a bool indicating whether the receiver is compatible.
 // Any unsupplied version components will default to zero, e.g. "8" becomes "8.0.0.0"
 // Individual compatibility requirements can be expressed as follows:

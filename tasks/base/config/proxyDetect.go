@@ -137,7 +137,7 @@ func (p BaseConfigProxyDetect) Execute(options tasks.Options, upstream map[strin
 			log.Debug(proxyConfig)
 			return tasks.Result{
 				Status:  tasks.Success,
-				Summary: fmt.Sprintf("We have succesfully detected a proxy URL set %s via New Relic proxy settings using %s\n", proxyURL, proxyConfig.proxySource),
+				Summary: fmt.Sprintf("We have successfully detected a proxy URL set %s via New Relic proxy settings using %s\n", proxyURL, proxyConfig.proxySource),
 				Payload: proxyConfig,
 			}
 		}

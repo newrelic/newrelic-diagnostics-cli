@@ -60,7 +60,7 @@ tasks/morty/agent/agent.go
 
 This is where you register the task(s) for the Morty agent, so that they can be used and run by the Diagnostics CLI core. Just add a...
 
-```
+```go
 registrationFunc(MortyAgentTaskname{}, true)
 ```
 
@@ -79,11 +79,11 @@ There are 4 required functions for a task.
 There is 1 main variable for a task. 
 * `Result`: This is where you store the results of the task. This is a struct that looks like this:
 
-```
+```go
 type Result struct {
 	Status      Status      // something like tasks.Success or tasks.Failure
 	Summary     string      // verbiage that explains what the task found
-	URL         string      // a URL pointing to documention about the findings of the task; "required" on Warning or Failure, desireable on any status, needs to help explain the findings
+	URL         string      // a URL pointing to documentation about the findings of the task; "required" on Warning or Failure, desireable on any status, needs to help explain the findings
 	FilesToCopy []string    // List of files identified by the task to be included in zip file
 	Payload     interface{} // task defined list of returned data. This is what is used by downstream tasks so data format agreements are between tasks
 }

@@ -52,7 +52,7 @@ func main() {
 
 	go processTasksToRun()
 
-	// if statments for doing stuff with args
+	// if statements for doing stuff with args
 	if config.Flags.Help {
 		processHelp()
 	} else if config.Flags.Version {

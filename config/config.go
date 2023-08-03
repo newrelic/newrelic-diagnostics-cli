@@ -186,7 +186,7 @@ func ParseFlags() {
 	flag.StringVar(&Flags.Proxy, "proxy", defaultString, "Proxy should be in the format http(s)://proxyIp:proxyPort Not necessary in most cases… will override config file if used)")
 
 	flag.StringVar(&Flags.ProxyUser, "proxy-user", defaultString, "Proxy username, if necessary")
-	flag.StringVar(&Flags.ProxyPassword, "proxy-pw", defaultString, "Proxy pasword, if necessary")
+	flag.StringVar(&Flags.ProxyPassword, "proxy-pw", defaultString, "Proxy password, if necessary")
 
 	flag.StringVar(&Flags.Override, "o", defaultString, "alias for -override")
 	flag.StringVar(&Flags.Override, "override", defaultString, "Specify overrides for detected values. Format <Identifier>.<property>=<value> - example '-o Base/Config/Validate.agentLanguage=PHP'")
@@ -196,7 +196,7 @@ func ParseFlags() {
 	flag.BoolVar(&Flags.YesToAll, "y", false, "alias for -yes")
 	flag.BoolVar(&Flags.YesToAll, "yes", false, "Say 'yes' to any prompt that comes up while running.")
 
-	flag.StringVar(&Flags.Filter, "filter", "success,warning,failure,error,info", "Filter results based on status. Accepted values: Success, Warning, Failure, Error, None or Info. Multiple values can be provided in commma separated list. e.g: \"Success,Warning,Failure\"")
+	flag.StringVar(&Flags.Filter, "filter", "success,warning,failure,error,info", "Filter results based on status. Accepted values: Success, Warning, Failure, Error, None or Info. Multiple values can be provided in comma separated list. e.g: \"Success,Warning,Failure\"")
 
 	flag.BoolVar(&Flags.Quiet, "q", false, "Quiet output; only prints the high level results and not the explanatory output. Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'")
 	flag.BoolVar(&Flags.VeryQuiet, "qq", false, "Very quiet output; only prints a single summary line for output (implies '-q'). Suppresses file addition warnings if '-y' is also used. Does not contradict '-v'. Inclusion filters are ignored.")
@@ -299,8 +299,8 @@ func boolifyFlag(inputFlag string) bool {
 func (f userFlags) IsForcedTask(identifier string) bool {
 	identifiers := strings.Split(f.Tasks, ",")
 	for _, ident := range identifiers {
-		trimmedIdentifer := strings.TrimSpace(ident)
-		if strings.EqualFold(identifier, trimmedIdentifer) {
+		trimmedIdentifier := strings.TrimSpace(ident)
+		if strings.EqualFold(identifier, trimmedIdentifier) {
 			return true
 		}
 	}

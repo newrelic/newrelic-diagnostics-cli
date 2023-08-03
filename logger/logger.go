@@ -51,7 +51,7 @@ func Infof(format string, s ...interface{}) {
 
 //Fatal is wrapper for log.Fatal(). Prints message followed by a call to os.Exit(1).
 func Fatal(s ...interface{}) {
-	// log.Fatal("Exception occured!") or log.Fatal(err)
+	// log.Fatal("Exception occurred!") or log.Fatal(err)
 	log.Fatal(s...)
 }
 
