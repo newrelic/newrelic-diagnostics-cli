@@ -457,7 +457,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 				Expect(err).To(BeNil())
 			})
 		})
-		Context("With unparseable string version", func() {
+		Context("With unparsable string version", func() {
 			BeforeEach(func() {
 				version = "llama"
 				agentName = "DotNet"

@@ -16,12 +16,12 @@ import (
 const versionURL = `http://download.newrelic.com/nrdiag/version.txt`
 const downloadURL = `http://download.newrelic.com/nrdiag/nrdiag_latest.zip`
 
-// ProcessAutoVersionCheck - looks at the program version and warnds the user if it is out of date, takes no actions
+// ProcessAutoVersionCheck - looks at the program version and warns the user if it is out of date, takes no actions
 func ProcessAutoVersionCheck() bool {
 	return processAutoVersionCheck(logger.Log, getOnlineVersion)
 }
 
-// ProcessVersion - looks at the program version and warnds the user if it is out of date, prompts user and is able to download
+// ProcessVersion - looks at the program version and warns the user if it is out of date, prompts user and is able to download
 func ProcessVersion(promptUser func(string) bool) {
 	processVersion(logger.Log, promptUser, getOnlineVersion, getLatestVersion)
 }

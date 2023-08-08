@@ -62,7 +62,7 @@ func TestAndroidAgentDetect_Explain(t *testing.T) {
 		p    AndroidAgentDetect
 		want string
 	}{
-		{name: "Should say -  Detects Android Environemnt",
+		{name: "Should say -  Detects Android Environment",
 			p:    AndroidAgentDetect{},
 			want: "Detect if running in Android environment"},
 	}

@@ -230,7 +230,7 @@ func (t ByChild) Less(i, j int) bool {
 	return pathandkeys[0] == c1
 }
 
-// Sort sorts an inplace object, organizing the children alphabetically
+// Sort sorts an in-place object, organizing the children alphabetically
 func (v ValidateBlob) Sort() {
 
 	if !v.IsLeaf() {

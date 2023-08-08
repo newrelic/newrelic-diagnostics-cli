@@ -79,7 +79,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 		return tasks.Result{
 			Status:  tasks.Success,
 			Summary: fmt.Sprintf("A unique application name was found through the New Relic App name environment variable: %s", appNameInfoFromEnvVar.Name),
-			Payload: []AppNameInfo{appNameInfoFromEnvVar}, //though is a single item, we still add them to a slice of AppNameInfo to stay consistant with a future upstream payload type assertion
+			Payload: []AppNameInfo{appNameInfoFromEnvVar}, //though is a single item, we still add them to a slice of AppNameInfo to stay consistent with a future upstream payload type assertion
 		}
 	}
 

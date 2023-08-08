@@ -47,7 +47,7 @@ func (p BaseEnvInitSystem) Execute(options tasks.Options, upstream map[string]ta
 	initPath, err := p.evalSymlink("/sbin/init")
 	if err != nil {
 		return tasks.Result{
-			Status:  tasks.None, //this is not a relevant task to any other downstream task that is why I'm chaging from tasks.Error to tasks.None. Otherwise this error surfaces to the user a little too often: /sbin/init: no such file or directory
+			Status:  tasks.None, //this is not a relevant task to any other downstream task that is why I'm changing from tasks.Error to tasks.None. Otherwise this error surfaces to the user a little too often: /sbin/init: no such file or directory
 			Summary: fmt.Sprintf("Unable to read symbolic link for /sbin/init: %s", err.Error()),
 		}
 	}

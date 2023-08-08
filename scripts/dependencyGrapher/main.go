@@ -110,11 +110,11 @@ func parseDependencies(fileContent string) []string {
 
 	//remove newlines
 	re = regexp.MustCompile(`\r?\n`)
-	flattendedConent := re.ReplaceAllString(filteredContent, "")
+	flattenedContent := re.ReplaceAllString(filteredContent, "")
 
 	//grab slice of strings returned from Dependencies()
 	re = regexp.MustCompile(`Dependencies\(\) \[\]string\s*{\s*return\s*\[\]string{\s*([^}]+)\s*}`)
-	matches := re.FindStringSubmatch(flattendedConent)
+	matches := re.FindStringSubmatch(flattenedContent)
 
 	dependencies := []string{}
 

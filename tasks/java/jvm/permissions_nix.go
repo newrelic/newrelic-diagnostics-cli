@@ -23,7 +23,7 @@ import (
 
 var (
 	jarPathSysPropSource    = "-javaagent:"
-	logPathEnvVarSource     = "NEW_RELIC_LOG" //The unqualified log file name(not a path) or the string STDOUT which will log to standard out. The latter would inmediately give a "permission denied" error so no much need to troubleshoot for this option
+	logPathEnvVarSource     = "NEW_RELIC_LOG" //The unqualified log file name(not a path) or the string STDOUT which will log to standard out. The latter would immediately give a "permission denied" error so no much need to troubleshoot for this option
 	logPathConfigFileSource = "log_file_path" //the directory must already exist if specified
 	logPathSysPropSource    = "-Dnewrelic"
 	logPathDefaultLocation  = "/logs/newrelic_agent.log"

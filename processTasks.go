@@ -65,7 +65,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 		log.Debug("Running :", task.Identifier())
 		log.Debug("Incoming options are", options)
 
-		// Check for dependancies on the task and include results if dependent
+		// Check for dependencies on the task and include results if dependent
 		dependentResults := make(map[string]tasks.Result)
 		for _, depIdent := range task.Dependencies() {
 			log.Debug("dependency for processing: ", depIdent)

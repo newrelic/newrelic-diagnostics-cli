@@ -68,7 +68,7 @@ func TestRubyEnvVersion_Execute(t *testing.T) {
 		args   args
 		want   tasks.Result
 	}{
-		{name: "should return None result if upstream dependancy failed",
+		{name: "should return None result if upstream dependency failed",
 			fields: fields{},
 			args: args{
 				options: tasks.Options{},

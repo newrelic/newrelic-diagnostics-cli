@@ -58,9 +58,9 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 	//attempt to find system properties related to logs in payload
 	foundSysProps := make(map[string]string)
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
-		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		processes, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
-			for _, process := range proccesses {
+			for _, process := range processes {
 				for _, sysPropKey := range logSysProps {
 					sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
 					if isPresent {

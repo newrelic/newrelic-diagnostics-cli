@@ -221,7 +221,7 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Some Python Version is compatible and one has no compatiblity",
+			name: "Some Python Version is compatible and one has no compatibility",
 			tr:   PythonRequirementsPythonVersion{},
 			args: args{
 				options: tasks.Options{
@@ -247,7 +247,7 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Some Python Version is compatible and multiple have no compatiblity",
+			name: "Some Python Version is compatible and multiple have no compatibility",
 			tr:   PythonRequirementsPythonVersion{},
 			args: args{
 				options: tasks.Options{
@@ -273,7 +273,7 @@ func TestPythonRequirementsPythonVersion_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "Multiple Python Version is compatible and multiple have no compatiblity",
+			name: "Multiple Python Version is compatible and multiple have no compatibility",
 			tr:   PythonRequirementsPythonVersion{},
 			args: args{
 				options: tasks.Options{

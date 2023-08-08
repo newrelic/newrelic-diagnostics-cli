@@ -57,13 +57,13 @@ With dependency injection, we can provide "mock" HTTP request functions (depende
 
 Let's refactor `makeCollectorRequest()`. To do so, we need to:
 
-1. Add a field to the task struct for each of our external depencies. 
+1. Add a field to the task struct for each of our external dependencies. 
 2. Attach our `makeCollectorRequest()` function to the task struct as a struct method (so it can reference its dependencies defined as struct fields)
 3. Define our "in-production" dependency when registering our task with the Diagnostics CLI task runner, i.e. creating the task struct instance.
 
 ### (1) allow dependencies to be attached to the task struct as struct fields
 
-First, let's define a variable type that matches that of our actual (production) HTTP request function dependancy (`httpHelper.MakeHTTPRequest()`). This way, we can define task struct fields of this type. Our `makeCollectorRequest()` function will then reference those fields when making requests.
+First, let's define a variable type that matches that of our actual (production) HTTP request function dependency (`httpHelper.MakeHTTPRequest()`). This way, we can define task struct fields of this type. Our `makeCollectorRequest()` function will then reference those fields when making requests.
 
 `httpHelper.MakeHTTPRequest`'s method signature (parameters and return types) looks like this:
 
@@ -136,7 +136,7 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 ```
 
 In your unit tests, you can swap this dependency out for a dumb mock function that returns the same result every time, regardless of input.
-You can then specify this mock function when your initilizing your test task struct.  
+You can then specify this mock function when your initializing your test task struct.  
 
 These tests will be using the Ginkgo library. See [unit-testing.md](unit-testing.md) for more information.
 

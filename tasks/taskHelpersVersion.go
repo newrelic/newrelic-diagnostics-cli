@@ -176,14 +176,14 @@ func ParseVersion(version string) (Ver, error) {
 	return parsedVersion, nil
 }
 
-// VersionsJoin takes in a slice of Ver structs and delimeter and returns
-// a string of all versions in the slice, joined on that delimeter
-func VersionsJoin(versions []Ver, delimeter string) string {
+// VersionsJoin takes in a slice of Ver structs and delimiter and returns
+// a string of all versions in the slice, joined on that delimiter
+func VersionsJoin(versions []Ver, delimiter string) string {
 	var temp []string
 
 	for _, v := range versions {
 		temp = append(temp, v.String())
 	}
 
-	return strings.Join(temp, delimeter)
+	return strings.Join(temp, delimiter)
 }

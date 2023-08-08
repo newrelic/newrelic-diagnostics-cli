@@ -33,7 +33,7 @@ func (p BaseEnvCheckWindowsAdmin) Identifier() tasks.Identifier {
 
 // Explain - Returns the help text for each individual task
 func (p BaseEnvCheckWindowsAdmin) Explain() string {
-	return "Detect if running with Administrator priviliges"
+	return "Detect if running with Administrator privileges"
 }
 
 // Dependencies - Returns the dependencies for each task.

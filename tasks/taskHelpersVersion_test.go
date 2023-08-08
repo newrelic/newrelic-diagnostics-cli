@@ -1091,7 +1091,7 @@ func TestVer_CheckCompatibility(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Two component version passes three-component specification with plus on lefthand side",
+			name: "Two component version passes three-component specification with plus on left hand side",
 			fields: fields{
 				Major: 2,
 				Minor: 0,

@@ -77,7 +77,7 @@ func GetFileVersion(file string) (string, error) {
 	}
 	version := parameters.fileVersion()
 
-	// Bitwise rotation to return each of the octects correctly
+	// Bitwise rotation to return each of the octets correctly
 	return fmt.Sprintf("%d.%d.%d.%d",
 		version&0xFFFF000000000000>>48,
 		version&0x0000FFFF00000000>>32,

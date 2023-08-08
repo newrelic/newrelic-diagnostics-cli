@@ -20,7 +20,7 @@ The published release will trigger a release process to deploy a new version of 
 
 ## Steps for a rollback
 
-1. Manually delete the release from Release page https://github.com/newrelic/newrelic-diagnostics-cli/releases . This will trigger the github action worflow titled rollback.yml
+1. Manually delete the release from Release page https://github.com/newrelic/newrelic-diagnostics-cli/releases . This will trigger the github action workflow titled rollback.yml
 
 2. After the action has completed, you can verify in https://download.newrelic.com/nrdiag that the new release is not longer there and that the previous release is now the latest one (nrdiag_latest.zip).
 
