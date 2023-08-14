@@ -56,7 +56,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 				Expect(result.Summary).To(Equal(tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed"))
 			})
 		})
-		Context("With invalid payload from hostinfo task", func() {
+		Context("With invalid payload from HostInfo task", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{

@@ -131,7 +131,7 @@ var _ = Describe("JavaAppServerWebSphere", func() {
 			})
 		})
 
-		Context("When getwd returns direcotry but osexecutable returns error", func() {
+		Context("When getwd returns directory but osexecutable returns error", func() {
 			BeforeEach(func() {
 				p.osGetwd = func() (string, error) {
 					return "/foo", nil
@@ -223,7 +223,7 @@ var _ = Describe("JavaAppServerWebSphere", func() {
 				Expect(payload.Version).To(Equal("Unknown"))
 			})
 
-			Context("When returnsubString returns expected error", func() {
+			Context("When returnSubstring returns expected error", func() {
 				BeforeEach(func() {
 					files = []string{"version.txt"}
 
@@ -239,7 +239,7 @@ var _ = Describe("JavaAppServerWebSphere", func() {
 				})
 			})
 
-			Context("When returnsubString returns unexpected error", func() {
+			Context("When returnSubstring returns unexpected error", func() {
 				BeforeEach(func() {
 					files = []string{"version.txt"}
 

@@ -138,7 +138,7 @@ var _ = Describe("Node/Env/Version", func() {
 			It("Should return a success status", func() {
 				Expect(result.Status).To(Equal(tasks.Info))
 			})
-			It("Should return a succesful summary", func() {
+			It("Should return a successful summary", func() {
 				Expect(result.Summary).To(Equal("v10.7.0"))
 			})
 

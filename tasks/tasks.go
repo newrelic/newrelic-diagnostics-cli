@@ -12,7 +12,7 @@ import (
 type Result struct {
 	Status      Status
 	Summary     string             // customer facing verbiage
-	URL         string             // a URL pointing to documention about this task; "required" on Warning or Failure, desireable on any status
+	URL         string             // a URL pointing to documentation about this task; "required" on Warning or Failure, desireable on any status
 	FilesToCopy []FileCopyEnvelope // List of files identified by the task to be included in zip file
 	Payload     interface{}        // task defined list of returned data. This is what is used by downstream tasks so data format agreements are between tasks
 }
@@ -22,17 +22,17 @@ type Status int
 
 //Constants for use by the status property above
 const (
-	//None - this task does not apply to this system and has no meaninful data to report.
+	//None - this task does not apply to this system and has no meaningful data to report.
 	None Status = iota
 	//Success - A task has completed and identified the system conforms to our expectations
 	Success
-	//Warning - the system does not conform to our expecations, but may not actually be in a problematic state
+	//Warning - the system does not conform to our expectations, but may not actually be in a problematic state
 	Warning
-	//Failure - the system does not conform to expecations and we believe the system is in a broken state
+	//Failure - the system does not conform to expectations and we believe the system is in a broken state
 	Failure
-	//Error - an internal error has occured and we were unable to determine the state of this check (eg: permissions error)
+	//Error - an internal error has occurred and we were unable to determine the state of this check (eg: permissions error)
 	Error
-	//Info - A task has completed, but it has only collected information, no "judgements" here
+	//Info - A task has completed, but it has only collected information, no "judgments" here
 	Info
 )
 

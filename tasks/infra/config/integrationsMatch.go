@@ -257,7 +257,7 @@ func (p InfraConfigIntegrationsMatch) isValidIntegrationFilePath(integrationFile
 	return isValidPath, matchError
 }
 
-//Valdates that a map of IntegrationFilePair actually have defined Configuration and Definition files.
+//Validates that a map of IntegrationFilePair actually have defined Configuration and Definition files.
 //If IntegrationFilePair only has one file, it is removed from the map and captured as an IntegrationMatchError
 //If IntegrationFilePair has two files, this will validate that their integration names as parsed from the yaml match
 func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewerVersion bool) (map[string]*IntegrationFilePair, []IntegrationMatchError) {
@@ -320,7 +320,7 @@ func checkInfraVersion(upstream map[string]tasks.Result) (bool, string) {
 	}
 	infraVersionWithNewConfigFormat, err := tasks.ParseVersion("1.8.0")
 	if err != nil {
-		return false, tasks.ThisProgramFullName + " was unable to complete this health check because it ran into an unexpect error: " + err.Error()
+		return false, tasks.ThisProgramFullName + " was unable to complete this health check because it ran into an unexpected error: " + err.Error()
 	}
 	isRecentVersion := installedInfraVersion.IsGreaterThanEq(infraVersionWithNewConfigFormat)
 	return isRecentVersion, ""

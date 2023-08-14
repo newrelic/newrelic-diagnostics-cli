@@ -94,7 +94,7 @@ func (p BaseLogCopy) Execute(options tasks.Options, upstream map[string]tasks.Re
 
 	if hasValidLogs {
 		var filesToCopyToResult []tasks.FileCopyEnvelope
-		var successSummary = "Succesfully collected one or more New Relic Log file(s). Those file names will be listed in the nrdiag-output.json, under the payload section with the field 'CanCollect' set to true.\n"
+		var successSummary = "Successfully collected one or more New Relic Log file(s). Those file names will be listed in the nrdiag-output.json, under the payload section with the field 'CanCollect' set to true.\n"
 		for _, validPath := range validLogPaths {
 			filesToCopyToResult = append(filesToCopyToResult, tasks.FileCopyEnvelope{
 				Path:       validPath,
@@ -187,11 +187,11 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 	//attempt to find system properties related to logs in payload
 	foundSysProps := make(map[string]string)
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
-		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		processes, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if !ok {
 			return []LogElement{}, errors.New("type assertion error")
 		}
-		for _, process := range proccesses {
+		for _, process := range processes {
 			for _, sysPropKey := range logSysProps {
 				sysPropVal, isPresent := process.SysPropsKeyToVal[sysPropKey]
 				if isPresent {

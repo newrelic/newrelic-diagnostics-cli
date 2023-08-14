@@ -32,7 +32,7 @@ func (p BaseLogCount) Dependencies() []string {
 func (p BaseLogCount) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result
 
-	// Check if upstream depedency task status is a failure
+	// Check if upstream dependency task status is a failure
 	if upstream["Base/Log/Collect"].Status == tasks.Failure {
 		result = tasks.Result{
 			Status:  tasks.None,

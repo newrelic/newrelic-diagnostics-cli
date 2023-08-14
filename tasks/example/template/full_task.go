@@ -24,7 +24,7 @@ type ExamplePayload struct {
 func (el ExamplePayload) MarshalJSON() ([]byte, error) {
 	// This is a custom JSON Marshalling method. This can be useful for renaming or omitting struct elements from a payload
 	// before they're added to the JSON output file.  This is a contrived example - we're omitting SecretValue and renaming
-	// the struct elements which we could also have just named Path and Loglevel in the struct definition.
+	// the struct elements which we could also have just named Path and LogLevel in the struct definition.
 	return json.Marshal(&struct {
 		Path     string
 		LogLevel string

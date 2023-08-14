@@ -74,7 +74,7 @@ func ReturnStringSubmatchInFileAllMatches(search string, filepath string) ([][]s
 	return [][]string{}, nil
 }
 
-// ReturnStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relavtive or absolute path.
+// ReturnStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relative or absolute path.
 //Returns the first matching line if found.
 func ReturnStringSubmatchInFile(search string, filepath string) ([]string, error) {
 	fullResult, err := ReturnStringSubmatchInFileAllMatches(search, filepath)
@@ -87,7 +87,7 @@ func ReturnStringSubmatchInFile(search string, filepath string) ([]string, error
 	return fullResult[0], nil
 }
 
-// ReturnLastStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relavtive or absolute path.
+// ReturnLastStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relative or absolute path.
 //Returns the last matching line if found.
 func ReturnLastStringSubmatchInFile(search string, filepath string) ([]string, error) {
 	fullResult, err := ReturnStringSubmatchInFileAllMatches(search, filepath)

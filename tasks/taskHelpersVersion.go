@@ -32,7 +32,7 @@ func VersionIsCompatible(version string, requirements []string) (bool, error) {
 	return versionToCheck.CheckCompatibility(requirements)
 }
 
-// CheckCompatibility takes a slice of string compatibilty requirements and
+// CheckCompatibility takes a slice of string compatibility requirements and
 // returns a bool indicating whether the receiver is compatible.
 // Any unsupplied version components will default to zero, e.g. "8" becomes "8.0.0.0"
 // Individual compatibility requirements can be expressed as follows:
@@ -176,14 +176,14 @@ func ParseVersion(version string) (Ver, error) {
 	return parsedVersion, nil
 }
 
-// VersionsJoin takes in a slice of Ver structs and delimeter and returns
-// a string of all versions in the slice, joined on that delimeter
-func VersionsJoin(versions []Ver, delimeter string) string {
+// VersionsJoin takes in a slice of Ver structs and delimiter and returns
+// a string of all versions in the slice, joined on that delimiter
+func VersionsJoin(versions []Ver, delimiter string) string {
 	var temp []string
 
 	for _, v := range versions {
 		temp = append(temp, v.String())
 	}
 
-	return strings.Join(temp, delimeter)
+	return strings.Join(temp, delimiter)
 }

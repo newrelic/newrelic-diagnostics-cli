@@ -56,7 +56,7 @@ var _ = Describe("Infra/Env/ValidateZookeeperPath", func() {
 			})
 
 			It("should return an success result summary", func() {
-				Expect(resultSummary).To(Equal("We ran the command /opt/kafka_2.13-2.6.0/bin/zookeeper-shell.sh localhost:2181 ls /brokers/ids and succesfully connected to a broker or list of brokers:\nConnecting to localhost:2181\n\nWATCHER::\n\nWatchedEvent state:SyncConnected type:None path:null\n[]\n")) //NOTE: that this an empty list of brokers (which may imply that kafka is not running. Otherwise we would at least see: [0]. But all it matters here is that we are able at least to connect to Zookeeper)
+				Expect(resultSummary).To(Equal("We ran the command /opt/kafka_2.13-2.6.0/bin/zookeeper-shell.sh localhost:2181 ls /brokers/ids and successfully connected to a broker or list of brokers:\nConnecting to localhost:2181\n\nWATCHER::\n\nWatchedEvent state:SyncConnected type:None path:null\n[]\n")) //NOTE: that this an empty list of brokers (which may imply that kafka is not running. Otherwise we would at least see: [0]. But all it matters here is that we are able at least to connect to Zookeeper)
 				Expect(hasBrokersList).To(BeTrue())
 			})
 		})

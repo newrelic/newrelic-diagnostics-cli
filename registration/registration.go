@@ -140,7 +140,7 @@ func AddTaskToQueue(p tasks.Task) {
 
 	// somewhere in here may be a good place to detect dependency loops...
 	// if this task has dependencies *and* it's already in the  task list we are in an invalid state
-	// since it would be impossible to resolve the dependencies beore it runs
+	// since it would be impossible to resolve the dependencies before it runs
 
 	// if we have already created a key for the results then we aren't in the queue yet
 	log.Debug("Checking queue for ", p.Identifier(), ": ", queuedTasks[p.Identifier()])

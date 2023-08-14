@@ -79,7 +79,7 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 		if len(logFile) == 0 {
 			continue // didn't find a log file in this one - move on
 		}
-		// If you made it this far, :youhavephp (congrats)
+		// If you made it this far, you have php (congrats)
 		for _, value := range logFile {
 			// get the filename from this ValidateBlob - and strip " and ' chars
 			fileLocation := tasks.TrimQuotes(value.Value())
@@ -116,6 +116,6 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 	return tasks.Result{
 		Status:  tasks.Warning,
 		Summary: fmt.Sprintf("Expected 1, but found %d versions of the PHP Agent: %s", len(agentVersions), strings.Join(agentVersions, ", ")),
-		URL: "https://discuss.newrelic.com/t/relic-solution-php-agent-not-reporting-web-data/53291",
+		URL:     "https://discuss.newrelic.com/t/relic-solution-php-agent-not-reporting-web-data/53291",
 	}
 }

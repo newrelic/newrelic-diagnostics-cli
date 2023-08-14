@@ -174,7 +174,7 @@ func getLicenseKeysFromConfig(configElements []ValidateElement, configKeys []str
 			for _, key := range foundKeys {
 				// We only want to create unique licenseKey instances from a single config file
 				// This helps avoid the same license key being reported multiple times from same source
-				// Due to environment (prod/staging/developement etc) configuration
+				// Due to environment (prod/staging/development etc) configuration
 				if _, ok := keyDedupe[key.Value()]; ok {
 					continue
 				}

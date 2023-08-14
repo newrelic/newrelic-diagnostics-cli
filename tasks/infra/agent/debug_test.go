@@ -30,8 +30,8 @@ var _ = Describe("Infra/Agent/Debug", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Dynamically enable New Relic Infrastructure agent debug logging by running newrelic-infra-ctl"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Dynamically enable New Relic Infrastructure agent debug logging by running newrelic-infra-ctl"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

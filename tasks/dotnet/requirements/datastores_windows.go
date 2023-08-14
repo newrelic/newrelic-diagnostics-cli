@@ -16,7 +16,7 @@ type DotnetRequirementsDatastores struct {
 
 //This data type will store and track info on the different datastores
 //This allows for the logic to be agnostic to the requirements of the
-//individual datastore requrements, only the structs for a database should need to change if requirements change
+//individual datastore requirements, only the structs for a database should need to change if requirements change
 type dataStore struct {
 	name        string
 	version     string
@@ -115,7 +115,7 @@ func (p DotnetRequirementsDatastores) Execute(options tasks.Options, upstream ma
 	}
 
 	if cntBadVersion == 0 && cntNoVersion == 0 {
-		//sucess
+		//success
 		return tasks.Result{
 			Status:  tasks.Success,
 			Summary: "All datastores detected as compatible, see plugin.json for more details.",

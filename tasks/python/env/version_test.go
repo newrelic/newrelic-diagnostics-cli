@@ -53,7 +53,7 @@ var _ = Describe("PythonEnvVersion", func() {
 	})
 
 	Describe("Execute()", func() {
-		Context("When the tasks dependencies were unsuccessfull", func() {
+		Context("When the tasks dependencies were unsuccessful", func() {
 			It("should return a 'none' result.", func() {
 				failedDependency := map[string]tasks.Result{
 					"Python/Config/Agent": tasks.Result{Status: tasks.Failure},

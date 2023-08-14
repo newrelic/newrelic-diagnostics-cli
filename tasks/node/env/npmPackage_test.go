@@ -115,7 +115,7 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a success result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-				Expect(result.Summary).To(Equal("We have succesfully retrieved the following file(s):\npackage.json"))
+				Expect(result.Summary).To(Equal("We have successfully retrieved the following file(s):\npackage.json"))
 			})
 		})
 
@@ -140,7 +140,7 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a success result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-				Expect(result.Summary).To(Equal("We have succesfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
+				Expect(result.Summary).To(Equal("We have successfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
 			})
 		})
 		Context("When 3 files are found, but one is in node_modules", func() {
@@ -164,7 +164,7 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a success result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-				Expect(result.Summary).To(Equal("We have succesfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
+				Expect(result.Summary).To(Equal("We have successfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
 			})
 
 			It("Should should ignore files found in node_modules", func() {

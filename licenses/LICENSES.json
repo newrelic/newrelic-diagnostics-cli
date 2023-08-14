@@ -31,7 +31,7 @@
       {
         "source": "https://github.com/shirou/gopsutil",
         "name": "shirou/gopsutil",
-        "description": "Process and syastem information library",
+        "description": "Process and system information library",
         "license": "BSD 3 License",
         "licenseUrl": "https://github.com/shirou/gopsutil/blob/master/LICENSE"
       },

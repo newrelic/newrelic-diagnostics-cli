@@ -61,12 +61,12 @@ func (p SyntheticsMinionHordeConnect) Execute(options tasks.Options, upstream ma
 	case 200:
 		if err != nil {
 			result.Status = tasks.Warning
-			result.Summary = "Succesful connection to synthetics-horde.nr-data.net with current settings, but unable to parse response body"
+			result.Summary = "Successful connection to synthetics-horde.nr-data.net with current settings, but unable to parse response body"
 			result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 			return result
 		}
 		result.Status = tasks.Success
-		result.Summary = "Succesful connection to synthetics-horde.nr-data.net with current settings"
+		result.Summary = "Successful connection to synthetics-horde.nr-data.net with current settings"
 
 	case 403:
 		if upstream["Synthetics/Minion/ConfigValidate"].Status != tasks.Success {

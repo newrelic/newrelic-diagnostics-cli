@@ -25,7 +25,7 @@ func (s Status) StatusToString() string {
 	return statuses[s]
 }
 
-//StatusToString returns the staus for a result, used primarily for visual output
+//StatusToString returns the status for a result, used primarily for visual output
 func (r Result) StatusToString() string {
 	return r.Status.StatusToString()
 }

@@ -36,13 +36,13 @@ func (p BaseCollectorConnectEU) Dependencies() []string {
 	}
 }
 
-// Execute - Attempts to connect to the EU collector endpont
+// Execute - Attempts to connect to the EU collector endpoint
 func (p BaseCollectorConnectEU) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	p.upstream = upstream
 
 	url := "https://collector.eu.newrelic.com/jserrors/ping"
 
-	// Was the task not explicitely provided on -t ?
+	// Was the task not explicitly provided on -t ?
 	if !config.Flags.IsForcedTask(p.Identifier().String()) {
 		result := p.prepareEarlyResult()
 		// Early result received, bailing

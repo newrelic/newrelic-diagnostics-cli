@@ -34,8 +34,8 @@ var _ = Describe("Infra/Agent/Version", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Determine version of New Relic Infrastructure agent"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Determine version of New Relic Infrastructure agent"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -228,7 +228,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 			})
 		})
 
-		Context("Infrastructure agent is present but -version returns unparseable result", func() {
+		Context("Infrastructure agent is present but -version returns unparsable result", func() {
 
 			BeforeEach(func() {
 				options = tasks.Options{}
@@ -284,7 +284,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': fromlet was defrobozticated"))
 				})
 			})
-			Context("Infrastructure agent is present but version check returns unparseable version string", func() {
+			Context("Infrastructure agent is present but version check returns unparsable version string", func() {
 
 				BeforeEach(func() {
 					options = tasks.Options{}

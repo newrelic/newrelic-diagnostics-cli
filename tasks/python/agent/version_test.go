@@ -13,7 +13,7 @@ func TestPythonAgentVersion(t *testing.T) {
 	RunSpecs(t, "Python/Agent test suite")
 }
 
-var _ = Describe("Python/Agent/Verson", func() {
+var _ = Describe("Python/Agent/Version", func() {
 
 	Describe("searchLogs", func() {
 		var (

@@ -204,9 +204,9 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 
 	//search for config file in New Relic System Property
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
-		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		processes, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
-			for _, process := range proccesses {
+			for _, process := range processes {
 				configPath, isPresent := process.SysPropsKeyToVal[configSysProp]
 				if isPresent {
 					//Example path: -Dnewrelic.config.file=/usr/local/newrelic/newrelic.yml

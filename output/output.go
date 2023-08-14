@@ -212,7 +212,7 @@ func WriteLineResults() []registration.TaskResult {
 				log.FixedPrefix(20, color.ColorString(result.Result.Status, result.Result.Status.StatusToString()), result.Task.Identifier().String()+payload)
 			}
 		} else {
-			//Using 2 here because filteredCounter is also used to determine if we've filtered anything to intiate that block later on.
+			//Using 2 here because filteredCounter is also used to determine if we've filtered anything to initiate that block later on.
 			filteredCounter++
 			filtered[result.Result.Status]++
 		}

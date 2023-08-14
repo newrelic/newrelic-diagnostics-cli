@@ -7,7 +7,7 @@ We recommend **unit testing** to make up a majority of your code's test coverage
  * Are quicker to run than integration tests
  * Are more reliable
  * Result in more readable, testable, and maintainable code
- * Faciliate Test-driven Development
+ * Facilitate Test-driven Development
 
 If you believe you are unable to use unit tests to adequately test your code, please add your reasoning for not using unit tests.
 

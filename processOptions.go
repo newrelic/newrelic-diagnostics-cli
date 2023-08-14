@@ -255,7 +255,7 @@ func processOverrides() (tasks.Options, []override) {
 	if config.Flags.Override != "" {
 		//read task's argument
 		log.Debug("read task's argument ", config.Flags.Override)
-		//Split overrides to send them to the approrpriate task. This should be a comma seperated list of key value pairs
+		//Split overrides to send them to the appropriate task. This should be a comma separated list of key value pairs
 		//--override Base/Config/Validate/agentLanguage=java
 		overrides = parseOverrides(config.Flags.Override)
 		log.Debug("processed overrides are:", overrides[0].key)

@@ -1,6 +1,6 @@
 /.env({ separator: '__' })
 /agent_enabled: configuration.get('monitoring').newrelic && configuration.get('monitoring').newrelic.enabled
 /app_name/0: ${configuration.get('service').name}: ${configuration.get('service').environment}
-/license_key: configuration.get('monitoring').newrelic.licence
+/license_key: configuration.get('monitoring').newrelic.license
 /logging: {
 /logging.level: info

@@ -222,13 +222,13 @@ var _ = Describe("Dependency Grapher", func() {
 			})
 
 			It("should return map of only task file info", func() {
-				expectedTwoDepependencyMap := map[string]bool{
+				expectedTwoDependencyMap := map[string]bool{
 					"I/Am/Dependency1": true,
 					"I/Am/Dependency2": true,
 				}
-				expectedNoDepependencyMap := map[string]bool{}
-				Expect(result["Good/TaskFile/TwoDependencies"]).To(Equal(expectedTwoDepependencyMap))
-				Expect(result["Good/TaskFile/NoDependencies"]).To(Equal(expectedNoDepependencyMap))
+				expectedNoDependencyMap := map[string]bool{}
+				Expect(result["Good/TaskFile/TwoDependencies"]).To(Equal(expectedTwoDependencyMap))
+				Expect(result["Good/TaskFile/NoDependencies"]).To(Equal(expectedNoDependencyMap))
 			})
 
 			It("should not return an error", func() {

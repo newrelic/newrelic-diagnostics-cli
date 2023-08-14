@@ -21,7 +21,7 @@ type getListDllsFunc func() ([]string, error)
 
 //This data type will store and track info on the different Messaging Services
 //This allows for the logic to be agnostic to the requirements of the
-//individual Messaging Service requrements, only the structs for a Messaging Service should need to change if requirements change
+//individual Messaging Service requirements, only the structs for a Messaging Service should need to change if requirements change
 type messagingService struct {
 	name        string
 	version     string
@@ -226,7 +226,7 @@ func processMessagingServices(installedMessagingServices []messagingService) (ta
 	}
 
 	if cntBadVersion == 0 && cntNoVersion == 0 {
-		//sucess
+		//success
 		status := tasks.Success
 		summary := "All Messaging Services detected as compatible, see output.json for more details."
 		return status, summary, payload

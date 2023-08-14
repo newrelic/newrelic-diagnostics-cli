@@ -30,8 +30,8 @@ var _ = Describe("Python/Env/Dependencies", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Collect Python application packages"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Collect Python application packages"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 

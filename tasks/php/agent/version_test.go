@@ -11,10 +11,10 @@ import (
 
 func TestPHPAgentVersion(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Php/Agent/Verson test suite")
+	RunSpecs(t, "Php/Agent/Version test suite")
 }
 
-var _ = Describe("Php/Agent/Verson", func() {
+var _ = Describe("Php/Agent/Version", func() {
 	var p PHPAgentVersion //instance of our task struct to be used in tests
 
 	//Tests below!
@@ -61,7 +61,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			})
 		})
 		Context("When len(agentVersion) == 0 because ParsedResult.Key != 'newrelic.logfile'", func() {
-			mockValidateElmentNoAgent := config.ValidateElement{
+			mockValidateElementNoAgent := config.ValidateElement{
 				ParsedResult: tasks.ValidateBlob{
 					Key:      "wrongnewrelic.logfile",
 					Children: []tasks.ValidateBlob{},
@@ -72,7 +72,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 					"PHP/Config/Agent": tasks.Result{
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							mockValidateElmentNoAgent,
+							mockValidateElementNoAgent,
 						},
 					},
 				}
@@ -85,7 +85,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			})
 		})
 		Context("When len(agentVersion) == 1 because ParsedResult.Key contains only one 'newrelic.logfile' at Key field", func() {
-			mockValidateElmentOneAgentFile := config.ValidateElement{
+			mockValidateElementOneAgentFile := config.ValidateElement{
 				ParsedResult: tasks.ValidateBlob{
 					Key:      "newrelic.logfile",
 					Children: []tasks.ValidateBlob{},
@@ -96,7 +96,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 					"PHP/Config/Agent": tasks.Result{
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							mockValidateElmentOneAgentFile,
+							mockValidateElementOneAgentFile,
 						},
 					},
 				}
@@ -157,7 +157,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 			})
 		})
 		Context("When len(agentVersion) > 1 ", func() {
-			mockValidateElmentOneAgentFile := config.ValidateElement{
+			mockValidateElementOneAgentFile := config.ValidateElement{
 				ParsedResult: tasks.ValidateBlob{
 					Key:      "newrelic.logfile",
 					Children: []tasks.ValidateBlob{},
@@ -174,7 +174,7 @@ var _ = Describe("Php/Agent/Verson", func() {
 					"PHP/Config/Agent": tasks.Result{
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							mockValidateElmentOneAgentFile,
+							mockValidateElementOneAgentFile,
 							mockValidateElementNoChildren,
 						},
 					},

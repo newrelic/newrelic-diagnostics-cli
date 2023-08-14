@@ -56,11 +56,11 @@ func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]t
 
 	filesToCopy := []tasks.FileCopyEnvelope{tasks.FileCopyEnvelope{Path: "npm_ls_output.txt", Stream: stream}}
 	//The npm error exit status 1 should be an expected error
-	//if npm throws the famous npm ERR!, those messages are long. I rather not concatenate that ouput in the Summary, but still collect the output in a txt file to study the error
+	//if npm throws the famous npm ERR!, those messages are long. I rather not concatenate that output in the Summary, but still collect the output in a txt file to study the error
 	if npmErr != nil && (npmErr.Error() != "exit status 1") {
 		return tasks.Result{
 			Status:      tasks.Error,
-			Summary:     npmErr.Error() + ": npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies.",
+			Summary:     npmErr.Error() + ": npm threw an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies.",
 			FilesToCopy: filesToCopy,
 		}
 	}

@@ -48,7 +48,7 @@ func (p JavaAppServerWebSphere) Dependencies() []string {
 	return []string{}
 }
 
-// Execute - this function iterates through the working and nrdiag exeutable dirs, searches for key filenames
+// Execute - this function iterates through the working and nrdiag executable dirs, searches for key filenames
 // of files which should determine version information for websphere else it declares websphere not present
 func (p JavaAppServerWebSphere) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
