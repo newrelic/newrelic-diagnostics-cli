@@ -37,7 +37,6 @@ var OutputNow = time.Now
 
 //getResultsJSON takes in array of Result structs along with bool for indentation to be users. Outputs JSON of Results array -- if indented is true, output is nicely formatted.
 func getResultsJSON(data []registration.TaskResult) string {
-
 	outputData := resultsOutput{
 		RunDate:       OutputNow(),
 		NRDiagVersion: config.Version,
@@ -96,7 +95,6 @@ func mapContains(set map[string]struct{}, item string) bool {
 
 // CopyFilesToZip - Copies files to the zip archive
 func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
-
 	for _, envelope := range filesToZip {
 		//Add filepath and name to text file
 		addFileToFileList(envelope)

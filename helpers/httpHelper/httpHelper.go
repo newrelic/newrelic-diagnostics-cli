@@ -35,7 +35,6 @@ const defaultTimeoutSeconds = 30
 
 //MakeHTTPRequest -  takes the basics of a request and makes it
 func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
-
 	if wrapper.URL == "" || wrapper.Method == "" {
 		log.Info("Error: URL or method are not set")
 		return nil, errors.New("error: URL or method are not set")
@@ -44,6 +43,7 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 	// set up a progress bar if length is set
 	if wrapper.Length != 0 {
 		bar := pb.New(int(wrapper.Length)).SetUnits(pb.U_BYTES)
+		bar.ShowSpeed = true
 		bar.Start()
 		defer bar.Finish()
 		reader = bar.NewProxyReader(wrapper.Payload)

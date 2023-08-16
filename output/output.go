@@ -19,12 +19,11 @@ import (
 
 //WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>
 func WriteOutputHeader() {
-	log.Info(color.ColorString(color.White, "\nCheck Results\n-------------------------------------------------\n"))
+	log.Info(color.ColorString(color.White, "\nCheck Results\n-------------------------------------------------"))
 }
 
 // WriteSummary reports on any non-successful items and tells the user why they weren't successful
 func WriteSummary(data []registration.TaskResult) {
-
 	var failures []registration.TaskResult
 	for _, result := range data {
 		if result.Result.IsFailure() {
@@ -43,14 +42,13 @@ func WriteSummary(data []registration.TaskResult) {
 	var filtered [6]int //Int array corresponding with 6 statuses, to count any filtered results
 
 	for _, result := range failures {
-
 		if filteredResult(result.Result.StatusToString()) {
 			log.Info(color.ColorString(result.Result.Status, result.Result.StatusToString()), "-", result.Task.Identifier().String())
 			log.Info(result.Result.Summary)
 			if result.Result.URL != "" {
 				log.Info("See " + result.Result.URL + " for more information.")
 			}
-			log.Info("\n")
+			log.Infof("\n")
 		} else {
 			filteredCounter++
 			filtered[result.Result.Status]++

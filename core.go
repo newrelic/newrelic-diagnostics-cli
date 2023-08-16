@@ -8,6 +8,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/usage"
 	"github.com/newrelic/newrelic-diagnostics-cli/version"
 )
@@ -96,6 +97,7 @@ func main() {
 		}
 
 		// block on wait group so program does not exit prematurely
+		log.Info(color.ColorString(color.White, "Creating nrdiag-output.zip"))
 		wg.Wait()
 
 		// creates the output file
