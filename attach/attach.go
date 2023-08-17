@@ -69,7 +69,7 @@ func Upload(endpoint string, identifyingKey string, timestamp string, dependenci
 		return
 	}
 
-	log.Debug("Uploading to account")
+	log.Info(color.ColorString(color.White, "Uploading results to New Relic"))
 	urls, err := uploadFilesToAccount(endpoint, filesToUpload, identifyingKey, dependencies)
 	if err != nil {
 		log.Fatalf("Error uploading large file: %s", err.Error())
@@ -124,7 +124,7 @@ func uploadFile(endpoint string, files UploadFiles, attachmentKey string, deps I
 
 	wrapper := deps.GetWrapper(endpoint, reader, files.Filesize, files.NewFilename, attachmentKey)
 
-	log.Info(color.ColorString(color.White, "Uploading results to New Relic"))
+	log.Debug("Starting upload")
 	res, err := makeRequest(wrapper)
 
 	if err != nil {
