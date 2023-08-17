@@ -124,7 +124,7 @@ func uploadFile(endpoint string, files UploadFiles, attachmentKey string, deps I
 
 	wrapper := deps.GetWrapper(endpoint, reader, files.Filesize, files.NewFilename, attachmentKey)
 
-	log.Debug("Starting upload")
+	log.Info(color.ColorString(color.White, "Uploading results to New Relic"))
 	res, err := makeRequest(wrapper)
 
 	if err != nil {

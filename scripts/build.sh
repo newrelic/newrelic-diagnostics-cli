@@ -53,7 +53,7 @@ GOOS=darwin GOARCH=amd64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/mac/${EXENAME}_x64")
 
 echo "Building Mac arm64 $EXENAME"
-GOOS=darwin GOARCH=amd64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=darwin GOARCH=arm64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/mac/${EXENAME}_arm64")
 
 echo "Building Linux x64"
