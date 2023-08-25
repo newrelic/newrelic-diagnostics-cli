@@ -2,7 +2,7 @@ package collector
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"strconv"
 	"strings"
 
@@ -49,7 +49,7 @@ func (p BaseCollectorTLS) Execute(op tasks.Options, upstream map[string]tasks.Re
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return p.prepareResponseErrorResult(err, strconv.Itoa(resp.StatusCode))
 	}

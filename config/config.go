@@ -39,6 +39,8 @@ type userFlags struct {
 	ShowOverrideHelp   bool
 	AutoAttach         bool
 	UsageOptOut        bool
+	Run                bool
+	ListScripts        bool
 	Proxy              string
 	ProxyUser          string
 	ProxyPassword      string
@@ -53,6 +55,8 @@ type userFlags struct {
 	Include            string
 	APIKey             string
 	Region             string
+	Script             string
+	ScriptFlags        string
 	LegacyAttach       bool
 	InNewRelicCLI      bool
 }
@@ -78,6 +82,8 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		AutoAttach       bool
 		ProxySpecified   bool
 		SkipVersionCheck bool
+		Run              bool
+		ListScripts      bool
 		Tasks            string
 		ConfigFile       string
 		Override         string
@@ -88,6 +94,8 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		APIKey           string
 		Include          string
 		Region           string
+		Script           string
+		ScriptFlags      string
 	}{
 		Verbose:          f.Verbose,
 		Quiet:            f.Quiet,
@@ -97,6 +105,8 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		AutoAttach:       f.AutoAttach,
 		ProxySpecified:   proxySpecified,
 		SkipVersionCheck: f.SkipVersionCheck,
+		Run:              f.Run,
+		ListScripts:      f.ListScripts,
 		Tasks:            f.Tasks,
 		ConfigFile:       f.ConfigFile,
 		Override:         f.Override,
@@ -107,6 +117,8 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Include:          f.Include,
 		APIKey:           f.APIKey,
 		Region:           f.Region,
+		Script:           f.Script,
+		ScriptFlags:      f.ScriptFlags,
 	})
 }
 
@@ -210,6 +222,14 @@ func ParseFlags() {
 	flag.StringVar(&Flags.Region, "r", defaultString, "alias for -region")
 	flag.StringVar(&Flags.Region, "region", defaultString, "The region your New Relic account is in. Accepted values: EU or US. Case insensitive. (Default: US)")
 
+	flag.BoolVar(&Flags.ListScripts, "list-scripts", false, "List the scripts that are available")
+
+	flag.StringVar(&Flags.Script, "script", defaultString, "Specify a script to run")
+
+	flag.StringVar(&Flags.ScriptFlags, "script-flags", defaultString, "Used with -script to pass command line flags to pass to the script")
+
+	flag.BoolVar(&Flags.Run, "run", false, "Used with -script to run the script")
+
 	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
 		flag.StringVar(&Flags.AttachmentEndpoint, "attachment-endpoint", defaultString, "The endpoint to send attachments to. (NR ONLY)")
@@ -286,6 +306,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "include", Value: f.Include},
 		{Name: "apiKey", Value: f.APIKey},
 		{Name: "region", Value: f.Region},
+		{Name: "script", Value: f.Script},
 	}
 }
 

@@ -1,0 +1,5 @@
+name: example
+filename: example.sh
+description: This is an example script
+type: bash
+os: linux, darwin

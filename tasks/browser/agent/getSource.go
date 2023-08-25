@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"regexp"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
@@ -74,7 +74,7 @@ func (t BrowserAgentGetSource) Execute(options tasks.Options, upstream map[strin
 	}
 
 	stream := make(chan string)
-	responseBody, errReadingBody := ioutil.ReadAll(resp.Body)
+	responseBody, errReadingBody := io.ReadAll(resp.Body)
 	go streamSource(responseBody, stream)
 	if errReadingBody != nil {
 		return tasks.Result{

@@ -47,7 +47,7 @@ We host a public Slack with a dedicated channel for contributors and maintainers
 #### Go Version Support
 
 We'll aim to support the latest supported release of Go, along with the
-previous release (this project is using Go 1.14).  This doesn't mean that building with an older version of Go
+previous release (this project is using Go 1.18).  This doesn't mean that building with an older version of Go
 will not work, but we don't intend to support a Go version in this project that
 is not supported by the larger Go community.  Please see the [Go
 releases](https://golang.org/doc/go1.14) page for more details.

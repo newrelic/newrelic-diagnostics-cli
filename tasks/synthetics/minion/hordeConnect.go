@@ -1,7 +1,7 @@
 package minion
 
 import (
-	"io/ioutil"
+	"io"
 	"strconv"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
@@ -116,7 +116,7 @@ func hordeRequest(privateLocationKey string) (HTTPResponse, error) {
 	defer resp.Body.Close()
 
 	httpResponse.ResponseCode = resp.StatusCode
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	// Check for error parsing response body
 	if err != nil {
 		return httpResponse, err

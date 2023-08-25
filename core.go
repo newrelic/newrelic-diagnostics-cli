@@ -9,6 +9,7 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/usage"
 	"github.com/newrelic/newrelic-diagnostics-cli/version"
 )
@@ -35,7 +36,7 @@ func main() {
 	haberdasher.DefaultClient.SetRunID(runID)
 	haberdasher.DefaultClient.SetUserAgent("Nrdiag_/" + config.Version)
 
-	if config.HaberdasherURL == "" {
+	if config.HaberdasherURL == "" && !config.Flags.Quiet {
 		log.Info("No Haberdasher base URL set. Defaulting to localhost")
 	} else {
 		haberdasher.DefaultClient.SetBaseURL(config.HaberdasherURL)
@@ -49,6 +50,47 @@ func main() {
 		} else {
 			os.Exit(0)
 		}
+	}
+
+	// Set up script catalog
+	scriptCatalog := &scriptrunner.Catalog{
+		Deps: &scriptrunner.CatalogDependencies{},
+	}
+
+	// List available scripts
+	if config.Flags.ListScripts {
+		printScriptList(scriptCatalog)
+		os.Exit(0)
+	}
+
+	var scriptData *scriptrunner.ScriptData
+	if config.Flags.Script != "" {
+		scriptData = processScript(scriptCatalog)
+		// View script
+		if !config.Flags.Run {
+			log.Infof("%s\n", string(scriptData.Content))
+			os.Exit(0)
+		}
+
+		// Run script
+		log.Infof(color.ColorString(color.White, "\nRunning script: %s %s\n"), scriptData.Path, scriptData.Flags)
+		srunner := &scriptrunner.Runner{
+			Deps: &scriptrunner.RunnerDependencies{
+				CmdLineOptions: options,
+			},
+		}
+		scriptData.Output, err = srunner.Run(scriptData.Content, scriptData.Path, scriptData.Flags)
+		if err != nil {
+			log.Infof("Error while running script: %s", err.Error())
+		}
+
+		if len(scriptData.Output) > 0 {
+			// Print script output to screen
+			output.PrintScriptOutput(string(scriptData.Output))
+			// Write script output to a file
+			output.WriteScriptOutputFile(scriptData.OutputPath, scriptData.Output, options)
+		}
+
 	}
 
 	go processTasksToRun()
@@ -101,10 +143,16 @@ func main() {
 		wg.Wait()
 
 		// creates the output file
-		output.WriteOutputFile(outputResults)
+		output.WriteOutputFile(outputResults, scriptData)
 
 		// copy our output file(s) to the zip file
 		output.CopyOutputToZip(zipfile)
+		if scriptData != nil {
+			err := output.CopyScriptOutputToZip(scriptData.OutputPath, zipfile)
+			if err != nil {
+				log.Infof("Failed to copy script output to zip: %s\n", err.Error())
+			}
+		}
 
 		// copy the file list to the zip file last to ensure it's up to date
 		output.CopyFileListToZip(zipfile)

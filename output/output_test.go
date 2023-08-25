@@ -1,7 +1,7 @@
 package output
 
 import (
-	"io/ioutil"
+	"os"
 	"reflect"
 	"runtime"
 	"strings"
@@ -10,6 +10,7 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -19,28 +20,38 @@ func Test_GetResultsJSON(t *testing.T) {
 	}
 
 	fakeResults := generateResultArray()
+	fakeScriptResults := &scriptrunner.ScriptData{
+		Name:        "test",
+		Path:        "/home/test.sh",
+		Flags:       "-t",
+		Description: "this is a test",
+		Content:     []byte("test"),
+		OutputPath:  "/home/test.out",
+		Output:      []byte("test"),
+	}
 
 	expected := readFile("fixtures/test-output.json")
 	if runtime.GOOS == "windows" {
 		expected = readFile("fixtures/test-output_windows.json")
 	}
-	observed := getResultsJSON(fakeResults)
+	observed := getResultsJSON(fakeResults, fakeScriptResults)
 
 	//if you intended to make changes to the output JSON:
 	// - uncomment the next line of code for one run
 	// - inspect new-output.json to make sure it looks like what you expect
 	// - replace test-output.json with new-output.json
 	// - comment the line and run the test again
-	//ioutil.WriteFile("fixtures/new-output.json", []byte(observed), 0644)
+	//os.WriteFile("fixtures/new-output.json", []byte(observed), 0644)
 
 	if expected != observed {
 		t.Error("Expected:", expected, "Observed:", observed)
 	}
 }
 func Test_StreamDataOutput(t *testing.T) {
-
 	dataChannel := make(chan string)
-
+	OutputNow = func() time.Time {
+		return time.Date(2000, 12, 15, 17, 8, 00, 0, time.UTC)
+	}
 	fakeResults := []registration.TaskResult{
 		{
 			Task: registration.TasksForIdentifierString("Base/Log/Collect")[0],
@@ -54,6 +65,15 @@ func Test_StreamDataOutput(t *testing.T) {
 			},
 		},
 	}
+	fakeScriptResults := &scriptrunner.ScriptData{
+		Name:        "test",
+		Path:        "/home/test.sh",
+		Flags:       "-t",
+		Description: "this is a test",
+		Content:     []byte("test"),
+		OutputPath:  "/home/test.out",
+		Output:      []byte("test"),
+	}
 
 	go streamData(dataChannel)
 
@@ -61,14 +81,14 @@ func Test_StreamDataOutput(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		expected = readFile("fixtures/test-stream-output_windows.json")
 	}
-	observed := getResultsJSON(fakeResults)
+	observed := getResultsJSON(fakeResults, fakeScriptResults)
 
 	//if you intended to make changes to the output JSON:
 	// - uncomment the next line of code for one run
 	// - inspect new-output.json to make sure it looks like what you expect
 	// - replace test-stream-output.json with new-stream-output.json
 	// - comment the line and run the test again
-	//ioutil.WriteFile("fixtures/new-stream-output.json", []byte(observed), 0644)
+	//os.WriteFile("fixtures/new-stream-output.json", []byte(observed), 0644)
 
 	if expected != observed {
 		t.Error("Expected:", expected, "Observed:", observed)
@@ -141,7 +161,7 @@ func generateResultArray() []registration.TaskResult {
 }
 
 func readFile(file string) string {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		log.Info("error reading file", err)
 	}

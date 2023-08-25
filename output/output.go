@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,19 +12,24 @@ import (
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
+	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-//WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>
+// WriteOutputHeader takes in array of Result structs, returns color coded results overview in following format: <taskIdentifier>:<result>
 func WriteOutputHeader() {
 	log.Info(color.ColorString(color.White, "\nCheck Results\n-------------------------------------------------"))
 }
 
 // WriteSummary reports on any non-successful items and tells the user why they weren't successful
 func WriteSummary(data []registration.TaskResult) {
+	if len(data) < 1 {
+		return
+	}
 	var failures []registration.TaskResult
 	for _, result := range data {
 		if result.Result.IsFailure() {
@@ -62,9 +68,65 @@ func WriteSummary(data []registration.TaskResult) {
 	}
 }
 
-//WriteOutputFile will output a JSON file with the results of the run
-func WriteOutputFile(data []registration.TaskResult) {
-	outputJSON(getResultsJSON(data))
+func PrintScriptOutput(data string) {
+	if !config.Flags.Quiet {
+		logger.Info(color.ColorString(color.White, "\nScript Output\n--------------------------------------------------"))
+	}
+	logger.Info(data)
+}
+
+func WriteScriptOutputFile(filename string, output []byte, cmdLineOptions tasks.Options) {
+	keepGoing := true
+	if tasks.FileExists(filename) {
+		logger.Infof("File already exists: %s\n", filename)
+		keepGoing = tasks.PromptUser("Would you like to overwrite it?", cmdLineOptions)
+	}
+	if keepGoing {
+		err := os.WriteFile(filename, output, 0644)
+		if err != nil {
+			logger.Infof("Failed to save script output: %s\n", err.Error())
+		}
+	}
+}
+
+func CopyScriptOutputToZip(filename string, zipfile *zip.Writer) error {
+	info, err := os.Stat(filename)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	header, err := zip.FileInfoHeader(info)
+	if err != nil {
+		return err
+	}
+	header.Name = filepath.ToSlash("nrdiag-output/ScriptOutput/" + filename)
+	header.Method = zip.Deflate
+	writer, err := zipfile.CreateHeader(header)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(writer, file)
+	if err != nil {
+		return err
+	}
+
+	addFileToFileList(tasks.FileCopyEnvelope{
+		Path: filename,
+		Identifier: "ScriptOutput/",
+	})
+
+	return nil
+}
+
+// WriteOutputFile will output a JSON file with the results of the run
+func WriteOutputFile(data []registration.TaskResult, scriptResults *scriptrunner.ScriptData) {
+	outputJSON(getResultsJSON(data, scriptResults))
 }
 
 // ProcessFilesChannel - reads from the channels for files to copy and deals with them
@@ -175,6 +237,7 @@ func GetTotalSize(pathToDir string) (int64, error) {
 		})
 	return totalFileSize, err
 }
+
 func CopyIncludePathToZip(zipfile *zip.Writer, pathToDir string) error {
 	err := filepath.Walk(pathToDir,
 		func(path string, info os.FileInfo, err error) error {
@@ -231,7 +294,9 @@ func WriteLineResults() []registration.TaskResult {
 		filteredOutput := color.ColorString(color.Gray, strconv.Itoa(filteredCounter)+partialMessage+filteredToString(filtered))
 		log.Info(filteredOutput)
 	}
-	log.Info("See nrdiag-output.json for full results.")
+	if len(outputResults) > 0 {
+		log.Info("See nrdiag-output.json for full results.")
+	}
 	log.Debug("Done with writeLineResults")
 	return outputResults
 }
