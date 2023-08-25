@@ -5,14 +5,18 @@ import (
 	"flag"
 	"net/url"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"golang.org/x/exp/slices"
 )
 
 // validateHTTPProxy - basic input validation for the -proxy <proxy> flag argument
@@ -109,9 +113,9 @@ func processHelp() {
 //Usage: nrdiag --suites java,infra
 //Troubleshoot New Relic products with the following arguments
 
-//Arguments:
-//java			Java Agent
-//infra			Infrastructure Agent
+// Arguments:
+// java			Java Agent
+// infra			Infrastructure Agent
 func printSuites() {
 	log.Info("\nSuites are a targeted collection of diagnostic tasks.\n")
 	var command string
@@ -137,7 +141,7 @@ func printSuites() {
 	log.Info("\n")
 }
 
-//PrintTasks will output all the tasks that this app can run
+// PrintTasks will output all the tasks that this app can run
 func printTasks() {
 	var allTasks []tasks.Task
 
@@ -216,7 +220,7 @@ func printTasks() {
 
 }
 
-//PrintOptions will output all the command line options
+// PrintOptions will output all the command line options
 func printOptions() {
 	flag.PrintDefaults()
 }
@@ -262,4 +266,55 @@ func processOverrides() (tasks.Options, []override) {
 	}
 
 	return options, overrides
+}
+
+func processScript(catalog *scriptrunner.Catalog) *scriptrunner.ScriptData {
+	scriptData := &scriptrunner.ScriptData{}
+	cat, err := catalog.GetCatalog()
+	if err != nil {
+		log.Fatalf("Error while downloading script catalog: %s", err.Error())
+	}
+	scriptData.Name = config.Flags.Script
+	scriptData.Flags = config.Flags.ScriptFlags
+	scriptData.OutputPath = filepath.Join(config.Flags.OutputPath, scriptData.Name+".out")
+	idx := slices.IndexFunc(cat, func(c scriptrunner.CatalogItem) bool { return c.Name == scriptData.Name })
+	if idx < 0 {
+		log.Fatalf("Script does not exist in catalog")
+	}
+	scriptCatalogItem := cat[idx]
+	scriptData.Description = scriptCatalogItem.Description
+	scriptData.Path = filepath.Join(config.Flags.OutputPath, scriptCatalogItem.Filename)
+	scriptContent, err := catalog.GetScript(scriptCatalogItem)
+	if err != nil {
+		log.Fatalf("Error while downloading script: %s", err.Error())
+	}
+	scriptData.Content = scriptContent
+
+	return scriptData
+}
+
+func printScriptList(catalogRepo *scriptrunner.Catalog) {
+	catalog, err := catalogRepo.GetCatalog()
+	if err != nil {
+		log.Fatalf("Error while downloading script catalog: %s", err.Error())
+	}
+
+	if !config.Flags.Quiet {
+		log.Info(color.ColorString(color.White, "\nScript catalog\n--------------------------------------------------"))
+	}
+	for _, s := range catalog {
+		if !config.Flags.Quiet {
+			log.Infof(color.ColorString(color.White, "Name: "))
+		}
+		log.Info(s.Name)
+		if !config.Flags.Quiet {
+			log.Infof(color.ColorString(color.White, "Description: "))
+			log.Info(s.Description)
+			log.Infof(color.ColorString(color.White, "Type: "))
+			log.Info(s.Type)
+			log.Infof(color.ColorString(color.White, "OS: "))
+			log.Info(s.OS)
+			log.Info()
+		}
+	}
 }

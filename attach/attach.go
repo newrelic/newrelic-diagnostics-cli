@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -133,7 +134,7 @@ func uploadFile(endpoint string, files UploadFiles, attachmentKey string, deps I
 	}
 	if res.StatusCode != 200 {
 		log.Info("Error uploading, status code was", res.Status)
-		body, _ := ioutil.ReadAll(res.Body)
+		body, _ := io.ReadAll(res.Body)
 		log.Debug("Body was", string(body))
 		log.Debug("headers were", res.Header)
 		return nil, errors.New(res.Status)
@@ -194,7 +195,7 @@ func (a AttachDeps) GetWrapper(endpoint string, file *bytes.Reader, fileSize int
 }
 
 func (a AttachDeps) GetUrlsToReturn(res *http.Response) (*string, error) {
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyBytes, _ := io.ReadAll(res.Body)
 	var bodyJson AttachResponse
 	marshallErr := json.Unmarshal(bodyBytes, &bodyJson)
 	if marshallErr != nil {
@@ -290,7 +291,7 @@ func uploadAWS(filesToUpload []UploadFiles, attachmentKey string) error {
 		}
 		if res.StatusCode != 200 {
 			log.Info("Error uploading to AWS, status code was", res.Status)
-			body, _ := ioutil.ReadAll(res.Body)
+			body, _ := io.ReadAll(res.Body)
 			log.Debug("Body was", string(body))
 			log.Debug("headers were", res.Header)
 			return errors.New("error uploading, status code was " + res.Status)
@@ -318,7 +319,7 @@ func getUploadURL(requestURL string) (jsonResponse, error) {
 		return jsonResponse{}, fmt.Errorf("got %v status code from %s", res.StatusCode, requestURL)
 	}
 
-	bodyBytes, readErr := ioutil.ReadAll(res.Body)
+	bodyBytes, readErr := io.ReadAll(res.Body)
 	if readErr != nil {
 		return jsonResponse{}, readErr
 	}

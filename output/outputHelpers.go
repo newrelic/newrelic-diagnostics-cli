@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,6 +15,7 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -26,6 +26,15 @@ type resultsOutput struct {
 	NRDiagVersion string
 	Configuration interface{}
 	Results       []registration.TaskResult
+	Script        *scriptResultsOutput
+}
+
+type scriptResultsOutput struct {
+	Name            string
+	Description     string
+	Output          string
+	OutputPath      string
+	OutputTruncated bool
 }
 
 type (
@@ -34,14 +43,42 @@ type (
 
 // wee bit of a hack for testing
 var OutputNow = time.Now
+var MaxScriptOutputLen = 20000
 
-//getResultsJSON takes in array of Result structs along with bool for indentation to be users. Outputs JSON of Results array -- if indented is true, output is nicely formatted.
-func getResultsJSON(data []registration.TaskResult) string {
+func getAbsPath(path string) string {
+	scriptOutputAbsPath, err := filepath.Abs(path)
+	if err != nil {
+		return path
+	}
+	return scriptOutputAbsPath
+}
+
+func getTruncatedScriptOutputString(output []byte) (string, bool) {
+	if len(output) < MaxScriptOutputLen {
+		return string(output), false
+	}
+	return string(output[:MaxScriptOutputLen]), true
+}
+
+// getResultsJSON takes in array of Result structs along with bool for indentation to be users. Outputs JSON of Results array -- if indented is true, output is nicely formatted.
+func getResultsJSON(data []registration.TaskResult, scriptResults *scriptrunner.ScriptData) string {
+	var scriptOutput *scriptResultsOutput
+	if scriptResults != nil {
+		scriptOutputString, isTruncated := getTruncatedScriptOutputString(scriptResults.Output)
+		scriptOutput = &scriptResultsOutput{
+			Name:            scriptResults.Name,
+			Description:     scriptResults.Description,
+			Output:          scriptOutputString,
+			OutputPath:      getAbsPath(scriptResults.OutputPath),
+			OutputTruncated: isTruncated,
+		}
+	}
 	outputData := resultsOutput{
 		RunDate:       OutputNow(),
 		NRDiagVersion: config.Version,
 		Configuration: config.Flags,
 		Results:       data,
+		Script:        scriptOutput,
 	}
 
 	output, err := json.MarshalIndent(outputData, "", "	")
@@ -59,7 +96,7 @@ func outputJSON(json string) {
 		log.Info("Error creating directory", err)
 		log.Info(permissionsError)
 	}
-	_ = ioutil.WriteFile(jsonFile, []byte(json), 0644)
+	_ = os.WriteFile(jsonFile, []byte(json), 0644)
 }
 
 func CreateZip() *zip.Writer {
@@ -169,7 +206,7 @@ func addFileToFileList(file tasks.FileCopyEnvelope) {
 	}
 }
 
-//filteredResult - Checks if a result status (e.g. "Warning") was passed in the -filter flag. Returns a boolean
+// filteredResult - Checks if a result status (e.g. "Warning") was passed in the -filter flag. Returns a boolean
 func filteredResult(result string) bool {
 	lowercaseFilter := strings.Replace(strings.ToLower(config.Flags.Filter), " ", "", -1)
 
@@ -187,7 +224,7 @@ func filteredResult(result string) bool {
 	return false
 }
 
-//filteredToString - Takes an array of ints corresponding to the 5 statuses, with a counter for each: array[status] = status count
+// filteredToString - Takes an array of ints corresponding to the 5 statuses, with a counter for each: array[status] = status count
 // returns a string summary of instances:
 // IN: [3,1,0,0,2]
 // OUT: 3 Success, 1 Warning, 2 None
@@ -201,13 +238,13 @@ func filteredToString(filtered [6]int) string {
 	return strings.Join(outputStrings, ", ")
 }
 
-//CreateFileList - Create output file and wipe out if it already exists
+// CreateFileList - Create output file and wipe out if it already exists
 func CreateFileList() error {
-	err := ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
+	err := os.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
 	if err != nil {
 		return err
 	} else {
-		_ = ioutil.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
+		_ = os.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
 	}
 	return nil
 }

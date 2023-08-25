@@ -32,6 +32,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Include            string
 		APIKey             string
 		Region             string
+		Script             string
 	}
 
 	sampleFlags := fields{
@@ -58,6 +59,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Include:            "string",
 		APIKey:             "string",
 		Region:             "string",
+		Script:             "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
@@ -84,6 +86,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		{Name: "include", Value: "string"},
 		{Name: "apiKey", Value: "string"},
 		{Name: "region", Value: "string"},
+		{Name: "script", Value: "string"},
 	}
 
 	tests := []struct {
@@ -124,6 +127,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				Include:            tt.fields.Include,
 				APIKey:             tt.fields.APIKey,
 				Region:             tt.fields.Region,
+				Script:             tt.fields.Script,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)
@@ -234,57 +238,57 @@ func Test_parseRegionFlagAndEnv(t *testing.T) {
 	}{
 		{
 			name: "Both provided - Flag gets priority",
-			args: args{ 
+			args: args{
 				regionFromFlag: "us",
-				regionFromEnv: "eu",
+				regionFromEnv:  "eu",
 			},
 			want: USRegion,
 		},
 		{
 			name: "Only env provided",
-			args: args{ 
+			args: args{
 				regionFromFlag: "",
-				regionFromEnv: "eu",
+				regionFromEnv:  "eu",
 			},
 			want: EURegion,
 		},
 		{
 			name: "Only flag provided",
-			args: args{ 
+			args: args{
 				regionFromFlag: "eu",
-				regionFromEnv: "",
+				regionFromEnv:  "",
 			},
 			want: EURegion,
 		},
 		{
 			name: "Nothing provided - default to US",
-			args: args{ 
+			args: args{
 				regionFromFlag: "",
-				regionFromEnv: "",
+				regionFromEnv:  "",
 			},
 			want: USRegion,
 		},
 		{
 			name: "Invalid env provided - use flag",
-			args: args{ 
+			args: args{
 				regionFromFlag: "us",
-				regionFromEnv: "invalid",
+				regionFromEnv:  "invalid",
 			},
 			want: USRegion,
 		},
 		{
 			name: "Invalid flag provided - use env",
-			args: args{ 
+			args: args{
 				regionFromFlag: "invalid",
-				regionFromEnv: "eu",
+				regionFromEnv:  "eu",
 			},
 			want: EURegion,
 		},
 		{
 			name: "Invalid flag and env provided - use default US",
-			args: args{ 
+			args: args{
 				regionFromFlag: "invalid",
-				regionFromEnv: "invalid",
+				regionFromEnv:  "invalid",
 			},
 			want: USRegion,
 		},

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"runtime"
@@ -32,10 +31,9 @@ func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, d
 	return nil
 }
 
-//CreateDockerfile - This builds the raw Dockerfile from the slice of tests
+// CreateDockerfile - This builds the raw Dockerfile from the slice of tests
 func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, dockerfileLines []string) (string, error) {
-
-	f, _ := ioutil.TempFile("temp", imageName)
+	f, _ := os.CreateTemp("temp", imageName)
 	//Build base Dockerfile
 
 	if _, err := f.WriteString("\r\n"); err != nil {
@@ -111,7 +109,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	return f.Name(), nil
 }
 
-//RunDockerContainer - This runs the docker container from the image previously built
+// RunDockerContainer - This runs the docker container from the image previously built
 func RunDockerContainer(imageName string, hostsAdditions []string) (string, error) {
 	//Create docker container based on test name
 

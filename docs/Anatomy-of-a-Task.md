@@ -2,7 +2,7 @@
 
 ## Naming
 
-The name is a critical part of the nrdiag task and will drive both the file name itself, it's identity and the identifier.
+The name is a critical part of the nrdiag task and will drive both the file name itself, its identity and the identifier.
 
 Example of a task name: Node/Env/Version
 

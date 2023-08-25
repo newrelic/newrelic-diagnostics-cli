@@ -1,7 +1,7 @@
 package collector
 
 import (
-	"io/ioutil"
+	"io"
 	"reflect"
 	"strconv"
 
@@ -67,7 +67,7 @@ func (p BaseCollectorConnectUS) Execute(op tasks.Options, upstream map[string]ta
 	defer resp.Body.Close()
 
 	// Parse HTTP response body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		// body parse error result
 		return p.prepareResponseErrorResult(err, strconv.Itoa(resp.StatusCode))

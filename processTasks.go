@@ -39,7 +39,7 @@ func processTasksToRun() {
 
 		taskIdentifiers := suites.DefaultSuiteManager.FindTasksBySuites(matchedSuites)
 		registration.AddTasksByIdentifiers(taskIdentifiers)
-	} else {
+	} else if !config.Flags.Run { // only run all tasks if not running a script
 		registration.AddAllToQueue()
 	}
 	log.Debugf("There are %d tasks in this queue\n", len(registration.Work.WorkQueue))

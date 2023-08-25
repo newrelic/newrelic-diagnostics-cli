@@ -118,7 +118,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			It("Should return parsed xml", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -155,7 +155,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				normalizedPayload[len(normalizedPayload)-1].Error = "normalized file error"
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -194,7 +194,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result.Payload)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -224,7 +224,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -250,7 +250,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -323,7 +323,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -340,7 +340,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -358,7 +358,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -375,7 +375,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -392,7 +392,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -442,7 +442,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(result.String()), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -577,7 +577,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -597,7 +597,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -617,7 +617,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}
@@ -636,7 +636,7 @@ var _ = Describe("Base/Config/Validate", func() {
 				goldenFile := goldenFileName(CurrentSpecReport().LeafNodeText)
 
 				if updateGoldenFiles {
-					if err := ioutil.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
+					if err := os.WriteFile(goldenFile, []byte(fmt.Sprintf("#%v", result)), 0644); err != nil {
 						Expect(err).To(BeNil())
 					}
 				}

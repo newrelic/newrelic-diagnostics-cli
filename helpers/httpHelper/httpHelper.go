@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
@@ -12,7 +13,7 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-//RequestWrapper is a basic wrapper to streamline the use of http requests within the project
+// RequestWrapper is a basic wrapper to streamline the use of http requests within the project
 type RequestWrapper struct {
 	Method         string
 	URL            string
@@ -21,19 +22,24 @@ type RequestWrapper struct {
 	Length         int64
 	TimeoutSeconds int16
 	BypassProxy    bool
+	Params         url.Values
 }
 
-//NewHTTPRequestWrapper - returns a new request wrapper for creating an http request
+// NewHTTPRequestWrapper - returns a new request wrapper for creating an http request
 func NewHTTPRequestWrapper() RequestWrapper {
 	var wrapper RequestWrapper
 	wrapper.Method = "GET"
+	headers := make(map[string]string)
+	headers["User-Agent"] = "Nrdiag_/" + config.Version
+	wrapper.Headers = headers
+	wrapper.Params = url.Values{}
 	return wrapper
 }
 
-//Default request timeout of 30 seconds if no timeout value is passed to helper.
+// Default request timeout of 30 seconds if no timeout value is passed to helper.
 const defaultTimeoutSeconds = 30
 
-//MakeHTTPRequest -  takes the basics of a request and makes it
+// MakeHTTPRequest -  takes the basics of a request and makes it
 func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 	if wrapper.URL == "" || wrapper.Method == "" {
 		log.Info("Error: URL or method are not set")
@@ -51,6 +57,9 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 
 	//Now create our request object
 	req, _ := http.NewRequest(wrapper.Method, wrapper.URL, reader)
+
+	// Add the params to the query string
+	req.URL.RawQuery = wrapper.Params.Encode()
 
 	// Setting the content length header if supplied
 	if wrapper.Length != 0 {
@@ -92,8 +101,6 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 		Transport: transport,
 		Timeout:   time.Duration(wrapper.TimeoutSeconds) * time.Second,
 	}
-
-	req.Header.Set("User-Agent", "Nrdiag_/"+config.Version)
 
 	resp, err := client.Do(req)
 	if err != nil {

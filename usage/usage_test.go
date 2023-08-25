@@ -2,6 +2,7 @@ package usage
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -75,7 +76,7 @@ var samplePreparedConfig = []config.ConfigFlag{
 
 var apiStubReflectBody = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	body, _ := ioutil.ReadAll(r.Body)
+	body, _ := io.ReadAll(r.Body)
 	_, _ = w.Write(body)
 }))
 

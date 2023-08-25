@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -26,7 +25,7 @@ var quoted = regexp.MustCompile("^['`\"](.*)['`\"]$")
 type BaseConfigValidate struct {
 }
 
-//ValidateElement - the validation that was done against the config
+// ValidateElement - the validation that was done against the config
 type ValidateElement struct {
 	Config       ConfigElement
 	Status       tasks.Status
@@ -41,7 +40,7 @@ var (
 	errParsingYML         = "This can mean that you either have incorrect spacing/indentation around this line or that you have a syntax error, such as a missing/invalid character"
 )
 
-//MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
+// MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
 func (el ValidateElement) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		ConfigElement
@@ -210,10 +209,10 @@ func processConfig(config ConfigElement) (ValidateElement, error) {
 	}, nil
 }
 
-//ParseYaml - This function reads a yml file to a map that can be searched via the FindString function
+// ParseYaml - This function reads a yml file to a map that can be searched via the FindString function
 func ParseYaml(reader io.Reader) (tasks.ValidateBlob, error) {
 	var t interface{}
-	data, errFile := ioutil.ReadAll(reader)
+	data, errFile := io.ReadAll(reader)
 	if errFile != nil {
 		return tasks.ValidateBlob{}, fmt.Errorf("%v : %v", errConfigFileNotRead, errFile)
 	}
@@ -226,7 +225,7 @@ func ParseYaml(reader io.Reader) (tasks.ValidateBlob, error) {
 }
 
 func parseXML(reader io.Reader) (results tasks.ValidateBlob, err error) {
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return tasks.ValidateBlob{}, fmt.Errorf("%v : %v", errConfigFileNotRead, err)
 	}
@@ -248,7 +247,7 @@ func parseXML(reader io.Reader) (results tasks.ValidateBlob, err error) {
 
 func ParseJSON(reader io.Reader) (result tasks.ValidateBlob, err error) {
 	t := make(map[string]interface{})
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return tasks.ValidateBlob{}, fmt.Errorf("%v : %v", errConfigFileNotRead, err)
 	}
@@ -266,7 +265,7 @@ func ParseJSON(reader io.Reader) (result tasks.ValidateBlob, err error) {
 func ParseJSONarray(reader io.Reader) (result []tasks.ValidateBlob, err error) {
 	var validateBlobs []tasks.ValidateBlob
 	t := []map[string]interface{}{}
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return validateBlobs, fmt.Errorf("%v : %v", errConfigFileNotRead, err)
 	}

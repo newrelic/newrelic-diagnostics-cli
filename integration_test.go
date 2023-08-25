@@ -278,7 +278,7 @@ func runDockerTest(test integrationTest) (IntegrationTestRun, error) {
 func writeLogFile(logs, testName string) {
 	logfile := "logs/test_results_" + testName
 	testFile := filepath.Clean(logfile)
-	_ = ioutil.WriteFile(testFile, []byte(logs), 0644)
+	_ = os.WriteFile(testFile, []byte(logs), 0644)
 }
 
 func outputTestHelp(test integrationTest, dockerCMD string) {
@@ -290,7 +290,7 @@ func outputTestHelp(test integrationTest, dockerCMD string) {
 	log.Info("Test output in file", "logs/test_results_"+test.Name)
 }
 
-//SearchOutput - searching a byte buffer for an expected or not expected regex string, returns true and the offending regex that failed to match (or not match)
+// SearchOutput - searching a byte buffer for an expected or not expected regex string, returns true and the offending regex that failed to match (or not match)
 func searchOutput(input []byte, regexes []string, expected bool) (bool, string) {
 
 	// there isn't a verbose flag for tests, I change these to "Info" when I want to see them

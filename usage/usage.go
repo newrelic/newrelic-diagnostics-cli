@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"regexp"
 	"strings"
 	"time"
@@ -261,7 +261,7 @@ func (u *usageAPI) postData(data string, headers map[string]string) (usageRespon
 		return usageResponse{}, err
 	}
 
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyBytes, _ := io.ReadAll(res.Body)
 	bodyString := string(bodyBytes)
 
 	response.statusCode = res.StatusCode

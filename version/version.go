@@ -3,7 +3,6 @@ package version
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -41,7 +40,7 @@ func getOnlineVersion(log logger.API) string {
 		return ""
 	}
 
-	responseBody, er := ioutil.ReadAll(resp.Body)
+	responseBody, er := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if er != nil {
 		log.Info("error reading file download", er)

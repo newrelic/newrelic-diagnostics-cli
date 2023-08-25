@@ -114,3 +114,49 @@ func TestWalkSizeFunction(t *testing.T) {
 		})
 	}
 }
+
+func Test_getTruncatedScriptOutputString(t *testing.T) {
+	type args struct {
+		output []byte
+	}
+	tests := []struct {
+		name   string
+		args   args
+		maxLen int
+		want   string
+		want1  bool
+	}{
+		{
+			name: "No truncation",
+			args: args{
+				output: []byte("test"),
+			},
+			maxLen: 5,
+			want:   "test",
+			want1:  false,
+		},
+		{
+			name: "Yes truncation",
+			args: args{
+				output: []byte("test"),
+			},
+			maxLen: 2,
+			want:   "te",
+			want1:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			OrigMaxScriptOutputLen := MaxScriptOutputLen
+			MaxScriptOutputLen = tt.maxLen
+			got, got1 := getTruncatedScriptOutputString(tt.args.output)
+			if got != tt.want {
+				t.Errorf("getTruncatedScriptOutputString() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("getTruncatedScriptOutputString() got1 = %v, want %v", got1, tt.want1)
+			}
+			MaxScriptOutputLen = OrigMaxScriptOutputLen
+		})
+	}
+}
