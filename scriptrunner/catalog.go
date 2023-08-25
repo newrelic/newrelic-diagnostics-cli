@@ -15,7 +15,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const GitEndpoint = "https://api.github.com/repos/newrelic/newrelic-diagnostics-cli/contents/scriptrunner/catalog"
+const GitEndpoint = "https://api.github.com/repos/newrelic/newrelic-diagnostics-cli/contents/scriptcatalog"
 
 type CatalogItem struct {
 	Name        string

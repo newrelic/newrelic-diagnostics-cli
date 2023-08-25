@@ -2,7 +2,7 @@
 
 ## File structure
 
-Scripts are located in `scriptrunner/catalog/scripts`. Each script must also have a yml file associated with it, located in `scriptrunner/catalog`.
+Scripts are located in `scriptcatalog/scripts/`. Each script must also have a yml file associated with it, located in `scriptcatalog/`.
 
 ## Yaml schema definition
 
@@ -20,7 +20,7 @@ filename: string, required
 description: string, required
 
 # Scripting language used
-# Example: bash
+# Example: bash, powershell
 type: string, required
 
 # Supported operating systems
