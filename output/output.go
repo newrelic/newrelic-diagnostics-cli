@@ -118,6 +118,7 @@ func CopyScriptOutputToZip(filename string, zipfile *zip.Writer) error {
 
 	addFileToFileList(tasks.FileCopyEnvelope{
 		Path: filename,
+		Identifier: "ScriptOutput/",
 	})
 
 	return nil
