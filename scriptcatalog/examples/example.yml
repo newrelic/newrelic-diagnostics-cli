@@ -3,3 +3,6 @@ filename: example.sh
 description: This is an example script
 type: bash
 os: linux, darwin
+outputFiles:
+  - example_*.log
+  - example_*.gz

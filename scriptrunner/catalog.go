@@ -18,11 +18,12 @@ import (
 const GitEndpoint = "https://api.github.com/repos/newrelic/newrelic-diagnostics-cli/contents/scriptcatalog"
 
 type CatalogItem struct {
-	Name        string
-	Filename    string
-	Description string
-	Type        string
-	OS          string
+	Name        string   `yaml:"name"`
+	Filename    string   `yaml:"filename"`
+	Description string   `yaml:"description"`
+	Type        string   `yaml:"type"`
+	OS          string   `yaml:"os"`
+	OutputFiles []string `yaml:"outputFiles"`
 }
 
 type GitHubResponse struct {

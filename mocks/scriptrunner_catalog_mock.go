@@ -20,9 +20,16 @@ func (m *MockCatalogDependenciesSuccessful) MakeRequest(name ...string) (*http.R
 	}
 	content := []byte(`name: test
 filename: test.sh
-description: test
+description: |-
+  test
+  test
+  test
 type: bash
-os: darwin`)
+os: darwin
+outputFiles: 
+  - 'file*.log'
+  - '*file.log'
+`)
 	return &http.Response{
 		Body: io.NopCloser(bytes.NewReader([]byte(`{"Content": "` + base64.StdEncoding.EncodeToString(content) + `"}`))),
 	}, nil
@@ -56,4 +63,21 @@ func (m *MockCatalogDependencies403Error) MakeRequest(name ...string) (*http.Res
 		Body:       io.NopCloser(bytes.NewReader([]byte(``))),
 	}, nil
 
+}
+
+type MockScriptRunner struct{}
+
+func (m *MockScriptRunner) GetUUID() string {
+	return "1234-1234-1234-1234"
+}
+
+func (m *MockScriptRunner) ContinueIfExists(savepath string) bool {
+	return true
+}
+
+func (m *MockScriptRunner) SaveToDisk(body []byte, savepath string) error {
+	return nil
+}
+func (m *MockScriptRunner) RunScript(body []byte, savepath string, scriptOptions string) ([]byte, error) {
+	return []byte("mock"), nil
 }

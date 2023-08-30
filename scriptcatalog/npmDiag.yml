@@ -1,0 +1,13 @@
+name:  newrelic-npm-diagnostics
+filename: npmDiag.sh
+description: |-
+  Retrieves configuration files and logs from Network Performance Monitoring containers, or for running snmpwalk against a configured device.
+  Outputs a file called npmDiag-output.zip with --collect mode, or <deviceName>-snmpwalk.out with --walk mode.
+  Script requires different packages depending on the use case. Required packages are:
+    --collect: jq, zip
+    --walk: yq, snmp, jq
+type: bash
+os: linux, darwin
+filesCreated:
+  - npmDiag-output.zip
+  - '*-snmpwalk.out'

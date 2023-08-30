@@ -222,13 +222,13 @@ func ParseFlags() {
 	flag.StringVar(&Flags.Region, "r", defaultString, "alias for -region")
 	flag.StringVar(&Flags.Region, "region", defaultString, "The region your New Relic account is in. Accepted values: EU or US. Case insensitive. (Default: US)")
 
-	flag.BoolVar(&Flags.ListScripts, "list-scripts", false, "List the scripts that are available")
+	flag.BoolVar(&Flags.ListScripts, "list-scripts", false, "List available scripts")
 
-	flag.StringVar(&Flags.Script, "script", defaultString, "Specify a script to run")
+	flag.StringVar(&Flags.Script, "script", defaultString, "View or run a script")
 
-	flag.StringVar(&Flags.ScriptFlags, "script-flags", defaultString, "Used with -script to pass command line flags to pass to the script")
+	flag.StringVar(&Flags.ScriptFlags, "script-flags", defaultString, "Use with -run -script to pass command line flags to the script")
 
-	flag.BoolVar(&Flags.Run, "run", false, "Used with -script to run the script")
+	flag.BoolVar(&Flags.Run, "run", false, "Use with -script to run the script")
 
 	//if first arg looks like it was build with `go build`, then we are testing against Haberdasher staging or localhost endpoint
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {

@@ -87,7 +87,9 @@
 		"Name": "test",
 		"Description": "this is a test",
 		"Output": "test",
-		"OutputPath": "/home/test.out",
+		"OutputFiles": [
+			"/home/test.out"
+		],
 		"OutputTruncated": false
 	}
 }

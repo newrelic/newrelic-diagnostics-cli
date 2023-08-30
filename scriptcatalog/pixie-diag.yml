@@ -1,0 +1,8 @@
+name: pixie-diag
+filename: pixie-diag.sh
+description: Check the health of a Pixie-enabled cluster. The script runs standard Kubernetes commands in the namespace that Pixie is installed in and creates an output file.
+type: bash
+os: linux, darwin
+filesCreated:
+  - pixie_logs_*.gzip
+  - pixie_diag_*.log

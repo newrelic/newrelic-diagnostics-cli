@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
@@ -15,6 +16,7 @@ type IRunnerDependencies interface {
 	ContinueIfExists(savepath string) bool
 	SaveToDisk(body []byte, savepath string) error
 	RunScript(body []byte, savepath string, scriptOptions string) ([]byte, error)
+	GetUUID() string
 }
 
 type Runner struct {
@@ -26,18 +28,37 @@ type RunnerDependencies struct {
 }
 
 type ScriptData struct {
-	Name        string
-	Path        string
-	Flags       string
-	Description string
-	Content     []byte
-	OutputPath  string
-	Output      []byte
+	Name               string
+	Path               string
+	Flags              string
+	Description        string
+	Content            []byte
+	AddtlFilesPatterns []string
+	AddtlFiles         []string
+	Output             []byte
+	OutputPath         string
 }
 
 func (sr *Runner) Run(body []byte, savepath string, scriptOptions string) ([]byte, error) {
 	savepathWithId := sr.addUUIDToFilename(savepath)
 	return sr.Deps.RunScript(body, savepathWithId, scriptOptions)
+}
+
+func (sr *Runner) FindScriptAddtlFiles(filePatterns []string) []string {
+	if len(filePatterns) < 1 {
+		return []string{}
+	}
+	realPaths := []string{}
+	for _, p := range filePatterns {
+		matches, err := filepath.Glob(p)
+		if err != nil {
+			logger.Infof("Error collecting script file by pattern: %s\n%s", p, err.Error())
+			continue
+		}
+		realPaths = append(realPaths, matches...)
+
+	}
+	return realPaths
 }
 
 func (r *RunnerDependencies) RunScript(body []byte, savepathWithId string, scriptOptions string) ([]byte, error) {
@@ -51,6 +72,7 @@ func (r *RunnerDependencies) RunScript(body []byte, savepathWithId string, scrip
 	}
 
 	cmd := exec.Command(absPath, scriptOptions)
+	cmd.Dir = config.Flags.OutputPath
 	stdout, err := cmd.Output()
 	if err != nil {
 		return nil, err
@@ -77,11 +99,15 @@ func (r *RunnerDependencies) ContinueIfExists(savepath string) bool {
 	return true
 }
 
+func (r *RunnerDependencies) GetUUID() string {
+	return uuid.New().String()
+}
+
 func (sr *Runner) addUUIDToFilename(savepath string) string {
-	runid := uuid.New()
+	runid := sr.Deps.GetUUID()
 	dir, fullFilename := filepath.Split(savepath)
 	fileExt := filepath.Ext(fullFilename)
 	filenameNoExt := strings.TrimSuffix(fullFilename, fileExt)
-	newFilename := filenameNoExt + "-" + runid.String() + fileExt
+	newFilename := filenameNoExt + "-" + runid + fileExt
 	return filepath.Join(dir, newFilename)
 }
