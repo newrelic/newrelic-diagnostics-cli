@@ -179,7 +179,7 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 
 // CopySingleFileToZip - takes the named file and adds it to the zip file (assumes relative location to OutputPath)
 func CopySingleFileToZip(zipfile *zip.Writer, filename string) {
-	filePath := config.Flags.OutputPath + filename
+	filePath := filepath.Join(config.Flags.OutputPath, filename)
 	_, filelistErr := os.Stat(filePath)
 	if os.IsNotExist(filelistErr) {
 		log.Debug("Could not copy file to zip: ", filename)
