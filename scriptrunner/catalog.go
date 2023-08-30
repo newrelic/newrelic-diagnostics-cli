@@ -149,3 +149,23 @@ func (c *CatalogDependencies) MakeRequest(name ...string) (*http.Response, error
 	wrapper.Headers["X-GitHub-Api-Version"] = "2022-11-28"
 	return httpHelper.MakeHTTPRequest(wrapper)
 }
+
+// this is a mock used for development
+// func (c *CatalogDependencies) MakeRequest(name ...string) (*http.Response, error) {
+// 	if name == nil || name[0] == "" {
+// 		return &http.Response{
+// 			StatusCode: 200,
+// 			Body:       io.NopCloser(strings.NewReader(`[{"name": "example.yml"}]`)),
+// 		}, nil
+// 	}
+// 	if strings.HasSuffix(name[0], ".yml") {
+// 		return &http.Response{
+// 			StatusCode: 200,
+// 			Body:       io.NopCloser(strings.NewReader(`{"content": "base64-yaml-goes-here"}`)),
+// 		}, nil
+// 	}
+// 	return &http.Response{
+// 		StatusCode: 200,
+// 		Body:       io.NopCloser(strings.NewReader(`{"content": "base64-script-contents-go-here"}`)),
+// 	}, nil
+// }

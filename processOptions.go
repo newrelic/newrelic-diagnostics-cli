@@ -322,8 +322,10 @@ func printScriptList(catalogRepo *scriptrunner.Catalog) {
 			log.Info(s.Type)
 			log.Infof(color.ColorString(color.White, "OS: "))
 			log.Info(s.OS)
-			log.Infof(color.ColorString(color.White, "Output files: "))
-			log.Info("\n  -", strings.Join(s.OutputFiles, "\n  - "))
+			if len(s.OutputFiles) > 0 {
+				log.Infof(color.ColorString(color.White, "Output files: "))
+				log.Info("\n  -", strings.Join(s.OutputFiles, "\n  - "))
+			}
 			log.Info()
 		}
 	}
