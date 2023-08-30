@@ -4,5 +4,5 @@ description: This is an example script
 type: bash
 os: linux, darwin
 outputFiles:
-  - example_*.log
-  - example_*.gz
+  - "example_*.log"
+  - "example_*.gz"

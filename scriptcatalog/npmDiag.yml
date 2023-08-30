@@ -1,4 +1,4 @@
-name:  newrelic-npm-diagnostics
+name: newrelic-npm-diagnostics
 filename: npmDiag.sh
 description: |-
   Retrieves configuration files and logs from Network Performance Monitoring containers, or for running snmpwalk against a configured device.
@@ -8,6 +8,6 @@ description: |-
     --walk: yq, snmp, jq
 type: bash
 os: linux, darwin
-filesCreated:
-  - npmDiag-output.zip
-  - '*-snmpwalk.out'
+outputFiles:
+  - "npmDiag-output.zip"
+  - "*-snmpwalk.out"

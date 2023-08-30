@@ -6,7 +6,7 @@ Scripts are an additional datasource for information that isn't collected by a t
 
 Scripts should output to stdout. All output to stdout is collected and saved in a file based on the name of the script, ie: `name-of-script.out`. This is saved in the directory specified by `-output-path`, defaulting to the current directory.
 
-Scripts can also output files. Files should be created in the current working directory. If `-output-path` is used, the current working directory will be set to the path specified. All output files are included in the results zip in the `ScriptOutput/` directory. 
+Scripts can also output files. Files should be created in the current working directory. If `-output-path` is used, the current working directory will be set to the path specified. All output files are included in the results zip in the `ScriptOutput/` directory.
 
 ## Script results
 
@@ -27,7 +27,7 @@ The results of running a script can be found in the `nrdiag-output.json` file wi
 
 The `Output` field contains the stdout output. If it is over 20000 characters, it is truncated and the `OutputTruncated` field is set to `true`. Even if trucated, the full output is still available in the `ScriptOutput/` directory in the zip file.
 
-A list of files the script created can be found in the `Outputfiles` field. 
+A list of files the script created can be found in the `OutputFiles` field.
 
 ## Adding to the script catalog
 
