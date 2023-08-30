@@ -246,12 +246,9 @@ func checkAttachmentFlags(timestamp string) {
 		}
 		for _, licenseKey := range ValidLicenseKeys {
 			log.Info("Uploading files by Account ID...")
-			if config.Flags.LegacyAttach {
-				attach.UploadLegacy(licenseKey, timestamp)
-			} else {
-				attachDeps := new(attach.AttachDeps)
-				attach.Upload("upload_s3", licenseKey, timestamp, attachDeps)
-			}
+			attachDeps := new(attach.AttachDeps)
+			attach.Upload("upload_s3", licenseKey, timestamp, attachDeps)
+
 		}
 	}
 }
