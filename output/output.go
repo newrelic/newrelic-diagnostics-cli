@@ -12,7 +12,6 @@ import (
 	"sync"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
-	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
@@ -70,56 +69,61 @@ func WriteSummary(data []registration.TaskResult) {
 
 func PrintScriptOutput(data string) {
 	if !config.Flags.Quiet {
-		logger.Info(color.ColorString(color.White, "\nScript Output\n--------------------------------------------------"))
+		log.Info(color.ColorString(color.White, "\nScript Output\n--------------------------------------------------"))
 	}
-	logger.Info(data)
+	log.Info(data)
 }
 
 func WriteScriptOutputFile(filename string, output []byte, cmdLineOptions tasks.Options) {
 	keepGoing := true
 	if tasks.FileExists(filename) {
-		logger.Infof("File already exists: %s\n", filename)
+		log.Infof("File already exists: %s\n", filename)
 		keepGoing = tasks.PromptUser("Would you like to overwrite it?", cmdLineOptions)
 	}
 	if keepGoing {
 		err := os.WriteFile(filename, output, 0644)
 		if err != nil {
-			logger.Infof("Failed to save script output: %s\n", err.Error())
+			log.Infof("Failed to save script output: %s\n", err.Error())
 		}
 	}
 }
 
-func CopyScriptOutputToZip(filename string, zipfile *zip.Writer) error {
-	info, err := os.Stat(filename)
-	if err != nil {
-		return err
-	}
+func CopyScriptOutputsToZip(scriptData *scriptrunner.ScriptData, zipfile *zip.Writer) error {
+	filelist := []string{scriptData.OutputPath}
 
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+	filelist = append(filelist, scriptData.AddtlFiles...)
+	for _, filename := range filelist {
+		info, err := os.Stat(filename)
+		if err != nil {
+			return err
+		}
 
-	header, err := zip.FileInfoHeader(info)
-	if err != nil {
-		return err
-	}
-	header.Name = filepath.ToSlash("nrdiag-output/ScriptOutput/" + filename)
-	header.Method = zip.Deflate
-	writer, err := zipfile.CreateHeader(header)
-	if err != nil {
-		return err
-	}
-	_, err = io.Copy(writer, file)
-	if err != nil {
-		return err
-	}
+		file, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
 
-	addFileToFileList(tasks.FileCopyEnvelope{
-		Path: filename,
-		Identifier: "ScriptOutput/",
-	})
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+		header.Name = filepath.ToSlash("nrdiag-output/ScriptOutput/" + filename)
+		header.Method = zip.Deflate
+		writer, err := zipfile.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(writer, file)
+		if err != nil {
+			return err
+		}
+
+		addFileToFileList(tasks.FileCopyEnvelope{
+			Path:       filename,
+			Identifier: "ScriptOutput/",
+		})
+	}
 
 	return nil
 }

@@ -81,9 +81,10 @@ func main() {
 		}
 		scriptData.Output, err = srunner.Run(scriptData.Content, scriptData.Path, scriptData.Flags)
 		if err != nil {
-			log.Infof("Error while running script: %s", err.Error())
+			// exit if the script fails to run
+			log.Fatalf("Error while running script: %s", err.Error())
 		}
-
+		scriptData.AddtlFiles = srunner.FindScriptAddtlFiles(scriptData.AddtlFilesPatterns)
 		if len(scriptData.Output) > 0 {
 			// Print script output to screen
 			output.PrintScriptOutput(string(scriptData.Output))
@@ -145,12 +146,13 @@ func main() {
 		// creates the output file
 		output.WriteOutputFile(outputResults, scriptData)
 
+
 		// copy our output file(s) to the zip file
 		output.CopyOutputToZip(zipfile)
 		if scriptData != nil {
-			err := output.CopyScriptOutputToZip(scriptData.OutputPath, zipfile)
+			err := output.CopyScriptOutputsToZip(scriptData, zipfile)
 			if err != nil {
-				log.Infof("Failed to copy script output to zip: %s\n", err.Error())
+				log.Infof("Failed to copy script outputs to zip: %s\n", err.Error())
 			}
 		}
 

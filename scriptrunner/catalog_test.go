@@ -24,9 +24,10 @@ func TestCatalog_GetCatalog(t *testing.T) {
 				{
 					Name:        "test",
 					Filename:    "test.sh",
-					Description: "test",
+					Description: "test\ntest\ntest",
 					Type:        "bash",
 					OS:          "darwin",
+					OutputFiles: []string{"file*.log", "*file.log"},
 				},
 			},
 			wantErr: false,

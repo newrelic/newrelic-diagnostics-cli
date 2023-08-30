@@ -33,7 +33,7 @@ type scriptResultsOutput struct {
 	Name            string
 	Description     string
 	Output          string
-	OutputPath      string
+	OutputFiles     []string
 	OutputTruncated bool
 }
 
@@ -65,12 +65,18 @@ func getResultsJSON(data []registration.TaskResult, scriptResults *scriptrunner.
 	var scriptOutput *scriptResultsOutput
 	if scriptResults != nil {
 		scriptOutputString, isTruncated := getTruncatedScriptOutputString(scriptResults.Output)
+		scriptOutputFiles := []string{getAbsPath(scriptResults.OutputPath)}
+		if len(scriptResults.AddtlFiles) > 0 {
+			for _, f := range scriptResults.AddtlFiles {
+				scriptOutputFiles = append(scriptOutputFiles, getAbsPath(f))
+			}
+		}
 		scriptOutput = &scriptResultsOutput{
 			Name:            scriptResults.Name,
 			Description:     scriptResults.Description,
 			Output:          scriptOutputString,
-			OutputPath:      getAbsPath(scriptResults.OutputPath),
 			OutputTruncated: isTruncated,
+			OutputFiles:     scriptOutputFiles,
 		}
 	}
 	outputData := resultsOutput{

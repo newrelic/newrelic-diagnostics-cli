@@ -276,7 +276,6 @@ func processScript(catalog *scriptrunner.Catalog) *scriptrunner.ScriptData {
 	}
 	scriptData.Name = config.Flags.Script
 	scriptData.Flags = config.Flags.ScriptFlags
-	scriptData.OutputPath = filepath.Join(config.Flags.OutputPath, scriptData.Name+".out")
 	idx := slices.IndexFunc(cat, func(c scriptrunner.CatalogItem) bool { return c.Name == scriptData.Name })
 	if idx < 0 {
 		log.Fatalf("Script does not exist in catalog")
@@ -289,7 +288,16 @@ func processScript(catalog *scriptrunner.Catalog) *scriptrunner.ScriptData {
 		log.Fatalf("Error while downloading script: %s", err.Error())
 	}
 	scriptData.Content = scriptContent
+	if len(scriptCatalogItem.OutputFiles) > 0 {
+		for _, of := range scriptCatalogItem.OutputFiles {
+			scriptData.AddtlFilesPatterns = append(
+				scriptData.AddtlFilesPatterns,
+				filepath.Join(config.Flags.OutputPath, of),
+			)
+		}
 
+	}
+	scriptData.OutputPath = filepath.Join(config.Flags.OutputPath, scriptData.Name+".out")
 	return scriptData
 }
 
@@ -314,6 +322,10 @@ func printScriptList(catalogRepo *scriptrunner.Catalog) {
 			log.Info(s.Type)
 			log.Infof(color.ColorString(color.White, "OS: "))
 			log.Info(s.OS)
+			if len(s.OutputFiles) > 0 {
+				log.Infof(color.ColorString(color.White, "Output files: "))
+				log.Info("\n  -", strings.Join(s.OutputFiles, "\n  - "))
+			}
 			log.Info()
 		}
 	}
