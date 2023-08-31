@@ -235,7 +235,7 @@ func determineFilesDate(logFilePaths []string, lastModifiedDate time.Time) ([]st
 	var oldLogFilePaths []string
 	profilerRgx := regexp.MustCompile(profilerLogName)
 	for _, logFilePath := range logFilePaths {
-		//overwrite lastModifiedDate for .NET profiler logs because it produces too many files. We'll only collect profiler logs produced in the last 4 days instead of 7.
+		//overwrite lastModifiedDate for .NET profiler logs because it produces too many files. We'll only collect profiler logs produced in the last 1 day instead of 7.
 		if profilerRgx.MatchString(logFilePath) {
 			lastModifiedDate = time.Now().AddDate(0, 0, -profilerMaxNumDays)
 		}

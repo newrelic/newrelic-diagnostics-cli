@@ -111,7 +111,7 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		paths = append(paths, sysProgramFiles+`\New Relic\newrelic-infra\newrelic-infra.log`) //Windows, agent version 1.0.752 or lower
 		paths = append(paths, sysProgramData+`\New Relic\newrelic-infra\newrelic-infra.log`)  //Windows, agent version 1.0.944 or higher
 
-		//new infra logs (added if statment becasue I am unsure if the envvar will always point to the Roaming folder and not local or localLow )
+		//new infra logs (added if statment because I am unsure if the envvar will always point to the Roaming folder and not local or localLow )
 		//Windows, agent version 1.0.775 to 1.0.944
 		if strings.HasSuffix(sysAppData, "Roaming") {
 			paths = append(paths, sysAppData+`\New Relic\newrelic-infra`)
@@ -140,13 +140,13 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 	}
 	/*
 		Collect log file paths in this order
-		1.Non-new relic log files, such as docker and syslog, by looking in the standard, expected locations
-		2.New Relic log files by looking at the path customized by the user using any of the following configuration options:
+		1. Non-new relic log files, such as docker and syslog, by looking in the standard, expected locations
+		2. New Relic log files by looking at the path customized by the user using any of the following configuration options:
 		env vars
 		system properties
 		settings defined in new relic config files
-		3.New Relic log files by looking at standard locations
-		4.Dedupe if there any repeats of the same path
+		3. New Relic log files by looking at standard locations
+		4. Dedupe if there any repeats of the same path
 	*/
 
 	var logFilesFound []LogElement
