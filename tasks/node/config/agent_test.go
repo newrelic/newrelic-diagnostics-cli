@@ -41,13 +41,13 @@ var _ = Describe("Node/Config/Agent", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_APP_NAME": "luces-app",
 						},
 					},
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -60,7 +60,7 @@ var _ = Describe("Node/Config/Agent", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "app_name",
 											Path:     "",
 											RawValue: "luces-app",

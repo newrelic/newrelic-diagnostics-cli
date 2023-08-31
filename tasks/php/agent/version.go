@@ -13,7 +13,7 @@ type PHPAgentVersion struct {
 	returnLastMatchInFile func(search string, filepath string) ([]string, error)
 }
 
-//PHPAgentVersionPayload - a small struct to store the payload
+// PHPAgentVersionPayload - a small struct to store the payload
 type PHPAgentVersionPayload struct {
 	Version  string
 	Major    int

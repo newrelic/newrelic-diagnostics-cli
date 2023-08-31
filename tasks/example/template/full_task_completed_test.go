@@ -59,7 +59,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status:  tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
@@ -83,7 +83,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status:  tasks.Warning,
 						Payload: "I should be a slice of validate elements, but I'm not",
 					},
@@ -106,7 +106,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -136,7 +136,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -166,7 +166,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -196,7 +196,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{

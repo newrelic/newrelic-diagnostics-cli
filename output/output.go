@@ -145,6 +145,10 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 		log.Debug("Copying files from result: ", result.Task.Identifier().String())
 
 		for _, envelope := range result.Result.FilesToCopy {
+			if !tasks.FileExists(envelope.Path) {
+				log.Debugf("File does not exist: '%s'. Skipping.\n", envelope.Path)
+				continue
+			}
 			// check for duplicate file paths
 			if envelope.Stream == nil && mapContains(pathList, envelope.Path) {
 				log.Debugf("Already added '%s' to the file list. Skipping.\n", envelope.Path)

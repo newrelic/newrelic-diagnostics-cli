@@ -19,34 +19,34 @@ type IntegrationFilePair struct {
 	Definition    config.ValidateElement
 }
 
-//MatchedIntegrationFiles - This struct represents the payload for the task
+// MatchedIntegrationFiles - This struct represents the payload for the task
 type MatchedIntegrationFiles struct {
 	IntegrationFilePairs map[string]*IntegrationFilePair
 	Errors               []IntegrationMatchError
 }
 
-//IntegrationMatchError - This struct represents any validation errors encountered in the task
+// IntegrationMatchError - This struct represents any validation errors encountered in the task
 type IntegrationMatchError struct {
 	IntegrationFile config.ValidateElement
 	Reason          string
 }
 
-//These variables represent the expected filename patterns for the configuration and definition integration files
+// These variables represent the expected filename patterns for the configuration and definition integration files
 var (
 	configFileRegex     = regexp.MustCompile(`(.+)\-(config)\.(yaml|yml)`)
 	definitionFileRegex = regexp.MustCompile(`(.+)\-(definition)\.(yaml|yml)`)
 )
 
-//IntegrationFileType - Establishes enum type for integration file categorical types "config" and "definition"
+// IntegrationFileType - Establishes enum type for integration file categorical types "config" and "definition"
 type IntegrationFileType string
 
-//Implementation of IntegrationFileType enums for integration file categorical types "config" and "definition"
+// Implementation of IntegrationFileType enums for integration file categorical types "config" and "definition"
 const (
 	CONFIG     IntegrationFileType = "config"
 	DEFINITION IntegrationFileType = "definition"
 )
 
-//These constants are the expected filepaths for the integration file types
+// These constants are the expected filepaths for the integration file types
 var (
 	definitionFilepathsLinux     = []string{"/var/db/newrelic-infra/custom-integrations/", "/var/db/newrelic-infra/newrelic-integrations/"}
 	definitionFilepathsWindows   = []string{"C:\\Program Files\\New Relic\\newrelic-infra\\custom-integrations\\", "C:\\Program Files\\New Relic\\newrelic-infra\\newrelic-integrations\\"}
@@ -158,9 +158,9 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 
 }
 
-//This method identifies Integration files from ValidateElements that are config or definition files by pattern match
-//Validates found Integration file to expected filepath, if invalid validate element is put in IntegrationMatchError struct
-//Adds validate element to map in a IntegrationFilePair struct where keys are integration name derived from filename
+// This method identifies Integration files from ValidateElements that are config or definition files by pattern match
+// Validates found Integration file to expected filepath, if invalid validate element is put in IntegrationMatchError struct
+// Adds validate element to map in a IntegrationFilePair struct where keys are integration name derived from filename
 func (p InfraConfigIntegrationsMatch) matchFilePairs(integrationFiles []config.ValidateElement) (map[string]*IntegrationFilePair, []IntegrationMatchError) {
 	filePairs := make(map[string]*IntegrationFilePair)
 	matchErrors := []IntegrationMatchError{}
@@ -217,7 +217,7 @@ func (p InfraConfigIntegrationsMatch) matchFilePairs(integrationFiles []config.V
 	return filePairs, matchErrors
 }
 
-//Validates that ValidateElement filepath matches expected filepath for the provided IntegrationFileType
+// Validates that ValidateElement filepath matches expected filepath for the provided IntegrationFileType
 func (p InfraConfigIntegrationsMatch) isValidIntegrationFilePath(integrationFile config.ValidateElement, fileType IntegrationFileType) (bool, IntegrationMatchError) {
 	var isValidPath bool
 	matchError := IntegrationMatchError{}
@@ -257,9 +257,9 @@ func (p InfraConfigIntegrationsMatch) isValidIntegrationFilePath(integrationFile
 	return isValidPath, matchError
 }
 
-//Validates that a map of IntegrationFilePair actually have defined Configuration and Definition files.
-//If IntegrationFilePair only has one file, it is removed from the map and captured as an IntegrationMatchError
-//If IntegrationFilePair has two files, this will validate that their integration names as parsed from the yaml match
+// Validates that a map of IntegrationFilePair actually have defined Configuration and Definition files.
+// If IntegrationFilePair only has one file, it is removed from the map and captured as an IntegrationMatchError
+// If IntegrationFilePair has two files, this will validate that their integration names as parsed from the yaml match
 func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewerVersion bool) (map[string]*IntegrationFilePair, []IntegrationMatchError) {
 	matchErrors := []IntegrationMatchError{}
 
@@ -326,7 +326,7 @@ func checkInfraVersion(upstream map[string]tasks.Result) (bool, string) {
 	return isRecentVersion, ""
 }
 
-//Validates that IntegrationPair ValidateElements have matching integration names parsed from their yamls
+// Validates that IntegrationPair ValidateElements have matching integration names parsed from their yamls
 func validateConfigPairNames(filePair *IntegrationFilePair) (bool, []IntegrationMatchError) {
 	var (
 		definitionName string
@@ -374,7 +374,7 @@ func validateConfigPairNames(filePair *IntegrationFilePair) (bool, []Integration
 	return false, errorsEncountered
 }
 
-//Builds string of all provided IntegrationMatchError reasons separated by /n
+// Builds string of all provided IntegrationMatchError reasons separated by /n
 func buildMatchErrorSummary(matchErrors []IntegrationMatchError) string {
 	var errorSummary string
 

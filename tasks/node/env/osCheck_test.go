@@ -59,7 +59,7 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -79,9 +79,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "OS only",
 						Payload: baseEnv.HostInfo{
@@ -109,9 +109,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "OS only",
 						Payload: baseEnv.HostInfo{
@@ -139,9 +139,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "OS only",
 						Payload: baseEnv.HostInfo{
@@ -181,9 +181,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -211,9 +211,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -241,9 +241,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -271,9 +271,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -301,9 +301,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -331,9 +331,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -361,9 +361,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{
@@ -391,9 +391,9 @@ var _ = Describe("Node/Env/OsCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
-					}, "Base/Env/HostInfo": tasks.Result{
+					}, "Base/Env/HostInfo": {
 						Status:  tasks.Info,
 						Summary: "frank",
 						Payload: baseEnv.HostInfo{

@@ -56,7 +56,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				p.fileReader = os.Open
 				yamlLocations = []config.ConfigElement{
-					config.ConfigElement{
+					{
 						FileName: "newrelic-infra.yml",
 						FilePath: "fixtures/invalid_infra_config/",
 					},
@@ -64,7 +64,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			})
 			It("should return the expected validation error", func() {
 				expectedResult := []validationError{
-					validationError{
+					{
 						fileLocation: "fixtures/invalid_infra_config/newrelic-infra.yml",
 						errorText:    "Unable to parse yaml: yaml: line 14: did not find expected key.\nThis can mean that you either have incorrect spacing/indentation around this line or that you have a syntax error, such as a missing/invalid character",
 					},
@@ -84,7 +84,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 					return nil, errors.New("read error!")
 				}
 				yamlLocations = []config.ConfigElement{
-					config.ConfigElement{
+					{
 						FileName: "config.yml",
 						FilePath: "fake/path/",
 					},
@@ -92,7 +92,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			})
 			It("should return the expected validation error", func() {
 				expectedResult := []validationError{
-					validationError{
+					{
 						fileLocation: "fake/path/config.yml",
 						errorText:    "Unable to read yaml: read error!",
 					},
@@ -110,7 +110,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				p.fileReader = os.Open
 				yamlLocations = []config.ConfigElement{
-					config.ConfigElement{
+					{
 						FileName: "correct.yml",
 						FilePath: "fixtures/test_yml/",
 					},
@@ -129,12 +129,12 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "group1",
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "key",
 											Path:     "/group1",
 											RawValue: "value",
@@ -172,7 +172,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsCollect": tasks.Result{
+					"Infra/Config/IntegrationsCollect": {
 						Status: tasks.None,
 					},
 				}
@@ -192,7 +192,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsCollect": tasks.Result{
+					"Infra/Config/IntegrationsCollect": {
 						Status:  tasks.Success,
 						Payload: "I should be a []config.ConfigElement",
 					},
@@ -213,7 +213,7 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsCollect": tasks.Result{
+					"Infra/Config/IntegrationsCollect": {
 						Status:  tasks.Success,
 						Payload: []config.ConfigElement{},
 					},
@@ -232,10 +232,10 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsCollect": tasks.Result{
+					"Infra/Config/IntegrationsCollect": {
 						Status: tasks.Success,
 						Payload: []config.ConfigElement{
-							config.ConfigElement{
+							{
 								FileName: "correct.yml",
 								FilePath: "fixtures/test_yml/",
 							},
@@ -256,10 +256,10 @@ var _ = Describe("Infra/Config/IntegrationsValidate", func() {
 			BeforeEach(func() {
 				p.fileReader = os.Open
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsCollect": tasks.Result{
+					"Infra/Config/IntegrationsCollect": {
 						Status: tasks.Success,
 						Payload: []config.ConfigElement{
-							config.ConfigElement{
+							{
 								FileName: "newrelic-infra.yml",
 								FilePath: "fixtures/invalid_infra_config/",
 							},

@@ -497,7 +497,7 @@ func iterateMap(parent string, input interface{}) []tasks.ValidateBlob {
 		b.Key = key
 		b.Path = parent
 
-		log.Debug("value type is ", reflect.TypeOf(value))
+		//log.Debug("value type is ", reflect.TypeOf(value))
 
 		//Add Children if value is a map or slice
 		switch castValue := value.(type) {

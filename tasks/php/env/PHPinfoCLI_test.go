@@ -87,12 +87,12 @@ func TestPHPEnvPHPinfoCLI_Execute(t *testing.T) {
 		upstream map[string]tasks.Result
 	}
 	emptyUpstream := map[string]tasks.Result{
-		"PHP/Config/Agent": tasks.Result{
+		"PHP/Config/Agent": {
 			Status: tasks.None,
 		},
 	}
 	successfulUpstream := map[string]tasks.Result{
-		"PHP/Config/Agent": tasks.Result{
+		"PHP/Config/Agent": {
 			Status: tasks.Success,
 		},
 	}

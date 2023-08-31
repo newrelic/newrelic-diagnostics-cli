@@ -6,7 +6,7 @@ import (
 
 type Color string
 
-//Color constants for output. Just copy pasted from internet, we can reduce options to only what's used.
+// Color constants for output. Just copy pasted from internet, we can reduce options to only what's used.
 const (
 	Reset             Color = "\x1b[0m"
 	Italics           Color = "\x1b[3m"
@@ -54,7 +54,7 @@ type Colorer interface {
 	GetColor() Color
 }
 
-//ColorString wraps a string in the colorization ascii
+// ColorString wraps a string in the colorization ascii
 func ColorString(c Colorer, s string) string {
 	if runtime.GOOS == "windows" {
 		return s //If windows no color support so let's just return clean code

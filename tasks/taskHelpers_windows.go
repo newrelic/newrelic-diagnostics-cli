@@ -51,8 +51,8 @@ var (
 // Usage: GetFileVersion(file)
 // Args: file- String with the full path of the file. i.e. "C:\Program Files\New Relic\.NET Agent\NewRelic.Agent.Core.dll".
 // Returns: string - value of full internal version number.
-//          error  - any error message encountered. `nil` if none.
 //
+//	error  - any error message encountered. `nil` if none.
 type GetFileVersionFunc func(string) (string, error)
 
 func GetFileVersion(file string) (string, error) {
@@ -147,9 +147,9 @@ func queryInfoValue(block []byte) (FILEINFO, bool) {
 
 type GetProcessorArchFunc func() (string, error)
 
-//Checks the Windows machine's Processor Architecture. Will return x86 for 32 bit systems and AMD64 for 64 bit systems.
-//Can return other types or undefined for some types of non-x86 and non-x64 processors
-//best practice is to explicitly check for x86 or AMD64
+// Checks the Windows machine's Processor Architecture. Will return x86 for 32 bit systems and AMD64 for 64 bit systems.
+// Can return other types or undefined for some types of non-x86 and non-x64 processors
+// best practice is to explicitly check for x86 or AMD64
 func GetProcessorArch() (procType string, errorReg error) {
 
 	var procTypeRegLoc = `SYSTEM\CurrentControlSet\Control\Session Manager\Environment`

@@ -6,7 +6,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-//func CmdExecutor from tasks/taskHelpers.go is of type CmdExecFunc(name string, arg ...string) ([]byte, error)
+// func CmdExecutor from tasks/taskHelpers.go is of type CmdExecFunc(name string, arg ...string) ([]byte, error)
 type NodeEnvVersion struct {
 	cmdExec tasks.CmdExecFunc
 }

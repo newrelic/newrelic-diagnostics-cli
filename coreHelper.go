@@ -59,7 +59,7 @@ func ProxyParseNSet() (set bool) {
 
 }
 
-//similar to tasks - This takes the input string as the query to the end users and waits for a response
+// similar to tasks - This takes the input string as the query to the end users and waits for a response
 func promptUser(msg string) bool {
 	if config.Flags.YesToAll {
 		return true

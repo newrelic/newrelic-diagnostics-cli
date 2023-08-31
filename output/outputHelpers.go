@@ -158,20 +158,20 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			stat, err := os.Stat(envelope.Path)
 			if err != nil {
 				log.Info("Error adding file to Diagnostics CLI zip file: ", err)
-				return
+				continue
 			}
 			// open file handle
 			fileHandle, err := os.Open(envelope.Path)
 			if err != nil {
 				log.Info("Error opening file handle", err)
-				return
+				continue
 			}
 			defer fileHandle.Close()
 
 			header, err := zip.FileInfoHeader(stat)
 			if err != nil {
 				log.Info("Error copying file", err)
-				return
+				continue
 			}
 			// Setting filename to deduplicated file name
 			header.Name = envelope.StoreName()
@@ -187,7 +187,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 			if err != nil {
 				log.Info("Error writing results to zip file: ", err)
-				return
+				continue
 			}
 
 			_, err = io.Copy(writer, fileHandle)

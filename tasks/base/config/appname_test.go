@@ -44,7 +44,7 @@ var _ = Describe("Base/Config/AppName", func() {
 			It("Should return expected result", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{},
 						Status:  tasks.None,
 					},
@@ -63,7 +63,7 @@ var _ = Describe("Base/Config/AppName", func() {
 			It("Should return expected result", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []string{"test", "another one"},
 						Status:  tasks.Success,
 					},
@@ -81,7 +81,7 @@ var _ = Describe("Base/Config/AppName", func() {
 			It("Should return a payload with a formatted message and Warning status", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{
 							{
 								Config: ConfigElement{
@@ -112,16 +112,16 @@ var _ = Describe("Base/Config/AppName", func() {
 			It("Should return a payload with a formatted message and success status", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_LICENSE_KEY": "my-license-key",
 						},
 					},
-					"Base/Env/CollectSysProps": tasks.Result{
+					"Base/Env/CollectSysProps": {
 						Status: tasks.Info,
 						Payload: []tasks.ProcIDSysProps{
-							tasks.ProcIDSysProps{
+							{
 								ProcID: 40149,
 								SysPropsKeyToVal: map[string]string{
 									"-Dnewrelic.config.appserver_dispatcher": "Apache Tomcat",
@@ -129,7 +129,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							},
 						},
 					},
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{
 							{
 								Config: ConfigElement{
@@ -165,7 +165,7 @@ var _ = Describe("Base/Config/AppName", func() {
 			It("Should return a payload with a formatted message and success status", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{
 							{
 								Config: ConfigElement{
@@ -219,13 +219,13 @@ var _ = Describe("Base/Config/AppName", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
 
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_APP_NAME": "mysolid-appname",
 						},
 					},
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{
 							{
 								Config: ConfigElement{
@@ -262,16 +262,16 @@ var _ = Describe("Base/Config/AppName", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
 
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status: tasks.Info,
 						Payload: map[string]string{
 							"NEW_RELIC_LICENSE_KEY": "my-license-key",
 						},
 					},
-					"Base/Env/CollectSysProps": tasks.Result{
+					"Base/Env/CollectSysProps": {
 						Status: tasks.Info,
 						Payload: []tasks.ProcIDSysProps{
-							tasks.ProcIDSysProps{
+							{
 								ProcID: 40149,
 								SysPropsKeyToVal: map[string]string{
 									"-Dnewrelic.config.app_name": "my-appname",
@@ -279,7 +279,7 @@ var _ = Describe("Base/Config/AppName", func() {
 							},
 						},
 					},
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{
 							{
 								Config: ConfigElement{
@@ -315,7 +315,7 @@ var _ = Describe("Base/Config/AppName", func() {
 			It("Should return a payload with a formatted message and Warning status", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Payload: []ValidateElement{
 							{
 								Config: ConfigElement{

@@ -19,9 +19,9 @@ type DockerInfo struct {
 	NCPU          int
 }
 
-//DockerContainer is a truncated struct of the docker inspect blob
-//Since we can write the full blob to a file, the purpose of this struct is to limit ourselves
-//only to values we are interested in for validation in our tasks.
+// DockerContainer is a truncated struct of the docker inspect blob
+// Since we can write the full blob to a file, the purpose of this struct is to limit ourselves
+// only to values we are interested in for validation in our tasks.
 type DockerContainer struct {
 	Id       string
 	Created  string
@@ -82,15 +82,15 @@ func NewDockerInfoFromBytes(dockerInfoBytes []byte) (DockerInfo, error) {
 	return dockerInfo, parseErr
 }
 
-//Example of the command we want to construct:
-//docker ps -q --last 4 --filter label=name=synthetics-minion --filter status=running
-//list all the last 4 containers filtered to the label 'name' with value 'synthetics-minion' format output with container id and filtered to status running
-//https://docs.docker.com/engine/reference/commandline/ps/
-//@label = expected docker image label key used by the container eg. "name"
-//@value = value of the label eg. "synthetics-minion"
-//@numberOf = max number of containers ids to return
-//@includeExited = include both active and exited containers
-//@cmdExec =  command line executor dependency
+// Example of the command we want to construct:
+// docker ps -q --last 4 --filter label=name=synthetics-minion --filter status=running
+// list all the last 4 containers filtered to the label 'name' with value 'synthetics-minion' format output with container id and filtered to status running
+// https://docs.docker.com/engine/reference/commandline/ps/
+// @label = expected docker image label key used by the container eg. "name"
+// @value = value of the label eg. "synthetics-minion"
+// @numberOf = max number of containers ids to return
+// @includeExited = include both active and exited containers
+// @cmdExec =  command line executor dependency
 func GetContainerIdsByLabel(label string, value string, numberOf int, includeExited bool, cmdExec CmdExecFunc) ([]string, error) {
 
 	var foundContainerIds []string
@@ -120,8 +120,8 @@ func GetContainerIdsByLabel(label string, value string, numberOf int, includeExi
 	return foundContainerIds, nil
 }
 
-//Get inspect blobs of containers from slice of ids. Docker client will take several ids as arguments
-//and return blobs for each.
+// Get inspect blobs of containers from slice of ids. Docker client will take several ids as arguments
+// and return blobs for each.
 func InspectContainersById(containerIds []string, cmdExec CmdExecFunc) ([]byte, error) {
 	//docker inspect can take multiple object id arguments in single command
 	// will output objects a JSON array
@@ -138,7 +138,7 @@ func InspectContainersById(containerIds []string, cmdExec CmdExecFunc) ([]byte, 
 	return cmdOutBytes, nil
 }
 
-//Redact values of unwhitelisted environment variables.
+// Redact values of unwhitelisted environment variables.
 func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 	//expect a JSON array, so we unmarshal into a slice of interfaces
 	parsedContainers := []interface{}{}

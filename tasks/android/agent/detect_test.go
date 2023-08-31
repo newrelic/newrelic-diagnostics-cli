@@ -88,7 +88,7 @@ func TestAndroidAgentDetect_Execute(t *testing.T) {
 	successfulUpstream["Base/Config/Collect"] = tasks.Result{
 		Status: tasks.Success,
 		Payload: []config.ConfigElement{
-			config.ConfigElement{
+			{
 				FileName: "AndroidManifest.xml",
 				FilePath: "testpath",
 			},
@@ -105,7 +105,7 @@ func TestAndroidAgentDetect_Execute(t *testing.T) {
 	failedUpstream["Base/Config/Collect"] = tasks.Result{
 		Status: tasks.Failure,
 		Payload: []config.ConfigElement{
-			config.ConfigElement{
+			{
 				FileName: "",
 			},
 		},

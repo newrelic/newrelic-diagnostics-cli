@@ -11,16 +11,16 @@ import (
 func TestBaseCollectorConnectEU_prepareEarlyResult(t *testing.T) {
 
 	payloadregionDetectUSEU := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01", "eu01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01", "eu01"}},
 	}
 	payloadregionDetectEmpty := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{}},
+		"Base/Config/RegionDetect": {Payload: []string{}},
 	}
 	payloadregionDetectUS := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01"}},
 	}
 	payloadregionDetectEU := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"eu01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"eu01"}},
 	}
 
 	type fields struct {
@@ -203,15 +203,15 @@ func TestBaseCollectorConnectEU_prepareResult(t *testing.T) {
 func TestBaseCollectorConnectEU_Execute(t *testing.T) {
 
 	payloadregionDetectUSEU := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01", "eu01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01", "eu01"}},
 	}
 
 	payloadregionDetectUS := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01"}},
 	}
 
 	payloadregionDetectEmpty := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{}},
+		"Base/Config/RegionDetect": {Payload: []string{}},
 	}
 	type fields struct {
 		upstream   map[string]tasks.Result

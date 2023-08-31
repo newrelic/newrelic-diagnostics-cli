@@ -36,7 +36,7 @@ var _ = Describe("JavaEnvProcess", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -50,7 +50,7 @@ var _ = Describe("JavaEnvProcess", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status:  tasks.Success,
 						Summary: "Java agent identified as present on system",
 						Payload: []config.ValidateElement{
@@ -62,7 +62,7 @@ var _ = Describe("JavaEnvProcess", func() {
 							},
 						},
 					},
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Success,
 						Payload: map[string]string{},
 					},
@@ -87,7 +87,7 @@ var _ = Describe("JavaEnvProcess", func() {
 						"PATH": "/usr/local/opt/ruby/bin:/Users/shuayhuaca/.nvm/versions/node/v8.16.0/bin:/opt/apache-maven/bin/:/opt/apache-maven/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/scripts:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/projects/nand2tetris/tools:/usr/local/go/bin:/Users/shuayhuaca/go/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/shuayhuaca/.rvm/bin",
 					}
 					upstream = map[string]tasks.Result{
-						"Java/Config/Agent": tasks.Result{
+						"Java/Config/Agent": {
 							Status:  tasks.Success,
 							Summary: "Java agent identified as present on system",
 							Payload: []config.ValidateElement{
@@ -99,13 +99,13 @@ var _ = Describe("JavaEnvProcess", func() {
 								},
 							},
 						},
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Success,
 							Payload: envVarsPayload,
 						},
 					}
 					javaProcesses := []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}
@@ -140,7 +140,7 @@ var _ = Describe("JavaEnvProcess", func() {
 						"PATH": "/usr/local/opt/ruby/bin:/Users/shuayhuaca/.nvm/versions/node/v8.16.0/bin:/opt/apache-maven/bin/:/opt/apache-maven/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/scripts:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/projects/nand2tetris/tools:/usr/local/go/bin:/Users/shuayhuaca/go/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/shuayhuaca/.rvm/bin",
 					}
 					upstream = map[string]tasks.Result{
-						"Java/Config/Agent": tasks.Result{
+						"Java/Config/Agent": {
 							Status:  tasks.Success,
 							Summary: "Java agent identified as present on system",
 							Payload: []config.ValidateElement{
@@ -152,13 +152,13 @@ var _ = Describe("JavaEnvProcess", func() {
 								},
 							},
 						},
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Success,
 							Payload: envVarsPayload,
 						},
 					}
 					javaProcesses := []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}

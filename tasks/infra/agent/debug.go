@@ -10,10 +10,10 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-//Time we wait for debug log collection in minutes
+// Time we wait for debug log collection in minutes
 var debugLoggingTimeoutMin = 3
 
-//https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/new-relic-infrastructure-agent-140
+// https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/new-relic-infrastructure-agent-140
 var ctlVerRequirementLinux tasks.Ver = tasks.Ver{
 	Major: 1,
 	Minor: 4,
@@ -21,7 +21,7 @@ var ctlVerRequirementLinux tasks.Ver = tasks.Ver{
 	Build: 0,
 }
 
-//https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/new-relic-infrastructure-agent-170-0
+// https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/new-relic-infrastructure-agent-170-0
 var ctlVerRequirementWindows tasks.Ver = tasks.Ver{
 	Major: 1,
 	Minor: 7,

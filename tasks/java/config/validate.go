@@ -26,7 +26,7 @@ type JavaValidatedConfig struct {
 	CurrentWorkingDir string
 }
 
-//MarshalJSON - custom JSON marshaling for this task, in this case we ignore the ParsedResult
+// MarshalJSON - custom JSON marshaling for this task, in this case we ignore the ParsedResult
 func (el JavaValidatedConfig) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Proc              process.Process

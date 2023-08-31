@@ -28,7 +28,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Failure,
 					},
 				}
@@ -47,7 +47,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -70,7 +70,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -96,7 +96,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -127,7 +127,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -158,7 +158,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -195,7 +195,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -229,7 +229,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -263,7 +263,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -295,7 +295,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -327,7 +327,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -359,7 +359,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}

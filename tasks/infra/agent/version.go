@@ -122,7 +122,7 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 	if err != nil {
 		urlUpdateTask := tasks.Result{
 			URL:     "https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/update-infrastructure-agent",
-			Summary: fmt.Sprintf("%s", err.Error()),
+			Summary: err.Error(),
 			Status:  tasks.Error,
 		}
 

@@ -83,7 +83,7 @@ var _ = Describe("Synthetics/Minion/CollectLogs", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Synthetics/Minion/DetectCPM": tasks.Result{
+					"Synthetics/Minion/DetectCPM": {
 						Status:  tasks.None,
 						Summary: "No Containerized Private Minions found",
 						Payload: nil,

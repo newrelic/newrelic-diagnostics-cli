@@ -12,8 +12,8 @@ import (
 type ExampleTemplateFullTask struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
 }
 
-//ExamplePayload - a small struct to store the payload, can be used to hook custom marshaling up as well - optional
-//Set to simplistic names (Key, Value) for this example.
+// ExamplePayload - a small struct to store the payload, can be used to hook custom marshaling up as well - optional
+// Set to simplistic names (Key, Value) for this example.
 type ExamplePayload struct {
 	Key         string
 	Value       string

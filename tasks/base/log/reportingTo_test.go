@@ -32,7 +32,7 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
@@ -61,7 +61,7 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
@@ -90,7 +90,7 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
@@ -118,7 +118,7 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{
@@ -151,7 +151,7 @@ var _ = Describe("Base/Log/ReportingTo", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 						Payload: []LogElement{
 							{

@@ -62,7 +62,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status: tasks.Failure,
 					},
 				}
@@ -82,7 +82,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status:  tasks.Success,
 						Payload: "This should be of type []LogElement, but it's a string instead",
 					},
@@ -103,7 +103,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status: tasks.Info,
 						Payload: []log.LogElement{
 							{
@@ -129,7 +129,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status:  tasks.Info,
 						Payload: []log.LogElement{},
 					},

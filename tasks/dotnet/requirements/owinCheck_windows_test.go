@@ -54,7 +54,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -74,7 +74,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -97,7 +97,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -120,7 +120,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -143,7 +143,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}

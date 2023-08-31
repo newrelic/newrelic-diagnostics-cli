@@ -57,7 +57,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 			It("Should return expected result", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Status: tasks.Failure,
 					},
 				}
@@ -75,7 +75,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 			It("Should return expected result", func() {
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []string{"test", "another one"},
 						Status:  tasks.Success,
 					},
@@ -95,7 +95,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "linux"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -107,7 +107,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.banana",
@@ -125,7 +125,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.kafka",
@@ -143,7 +143,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -165,7 +165,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				}
 
 				expectedErrors := []IntegrationMatchError{
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "banana-config.yml",
@@ -176,7 +176,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "integration_name",
 										Path:     "",
 										RawValue: "com.banana.banana",
@@ -187,7 +187,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Reason: "Configuration file '/etc/newrelic-infra/integrations.d/banana-config.yml' does not have matching Definition file (banana-definition.yml)",
 					},
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "kafka-definition.yml",
@@ -198,7 +198,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "name",
 										Path:     "",
 										RawValue: "com.banana.kafka",
@@ -209,7 +209,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Reason: "Definition file '/var/db/newrelic-infra/custom-integrations/kafka-definition.yml' does not have matching Configuration file (kafka-config.yml)",
 					},
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "apache-definition.yml",
@@ -220,7 +220,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "name",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -260,7 +260,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "linux"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -272,7 +272,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -290,7 +290,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.banana",
@@ -308,7 +308,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -326,7 +326,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.kafka",
@@ -344,7 +344,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.kafka",
@@ -367,7 +367,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
 				expectedErrors := []IntegrationMatchError{
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "banana-definition.yml",
@@ -378,7 +378,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "name",
 										Path:     "",
 										RawValue: "com.banana.banana",
@@ -402,7 +402,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "integration_name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -421,7 +421,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -443,7 +443,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "integration_name",
 									Path:     "",
 									RawValue: "com.banana.kafka",
@@ -462,7 +462,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "name",
 									Path:     "",
 									RawValue: "com.banana.kafka",
@@ -494,7 +494,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "windows"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -506,7 +506,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -524,7 +524,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -559,7 +559,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "integration_name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -578,7 +578,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -607,7 +607,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "linux"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -619,7 +619,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -637,7 +637,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -672,7 +672,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "integration_name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -691,7 +691,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -720,7 +720,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "linux"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -732,7 +732,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -750,7 +750,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -785,7 +785,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "integration_name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -804,7 +804,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 							Path:     "",
 							RawValue: nil,
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "name",
 									Path:     "",
 									RawValue: "com.banana.apache",
@@ -834,7 +834,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "linux"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -846,7 +846,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -864,7 +864,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -887,7 +887,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
 				expectedErrors := []IntegrationMatchError{
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "apache-definition.yml",
@@ -898,7 +898,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "name",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -909,7 +909,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 						},
 						Reason: "Filepath '/etc/newrelic-infra/integrations.d/' not a valid location for this Integration file 'apache-definition.yml'",
 					},
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "apache-config.yml",
@@ -920,7 +920,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "integration_name",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -954,7 +954,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				p.runtimeOS = "linux"
 				executeOptions := tasks.Options{}
 				executeUpstream := map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Payload: []config.ValidateElement{
 							{
 								Config: config.ConfigElement{
@@ -966,7 +966,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -984,7 +984,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: nil,
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "integration_name",
 											Path:     "",
 											RawValue: "com.banana.apache-integration",
@@ -1007,7 +1007,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 
 				expectedMatchedPairs := make(map[string]*IntegrationFilePair)
 				expectedErrors := []IntegrationMatchError{
-					IntegrationMatchError{
+					{
 						IntegrationFile: config.ValidateElement{
 							Config: config.ConfigElement{
 								FileName: "apache-config.yml",
@@ -1018,7 +1018,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "integration_name",
 										Path:     "",
 										RawValue: "com.banana.apache-integration",
@@ -1054,7 +1054,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 			p.runtimeOS = "linux"
 			executeOptions := tasks.Options{}
 			executeUpstream := map[string]tasks.Result{
-				"Infra/Config/IntegrationsValidate": tasks.Result{
+				"Infra/Config/IntegrationsValidate": {
 					Payload: []config.ValidateElement{
 						{
 							Config: config.ConfigElement{
@@ -1066,7 +1066,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "name",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -1084,7 +1084,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "inteRgration_name",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -1113,7 +1113,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				Payload: MatchedIntegrationFiles{
 					IntegrationFilePairs: map[string]*IntegrationFilePair{},
 					Errors: []IntegrationMatchError{
-						IntegrationMatchError{
+						{
 							IntegrationFile: config.ValidateElement{
 								Config: config.ConfigElement{
 									FileName: "apache-config.yml",
@@ -1125,7 +1125,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: interface{}(nil),
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "inteRgration_name",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -1150,7 +1150,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 			p.runtimeOS = "linux"
 			executeOptions := tasks.Options{}
 			executeUpstream := map[string]tasks.Result{
-				"Infra/Config/IntegrationsValidate": tasks.Result{
+				"Infra/Config/IntegrationsValidate": {
 					Payload: []config.ValidateElement{
 						{
 							Config: config.ConfigElement{
@@ -1162,7 +1162,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "naRme",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -1180,7 +1180,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "integration_name",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -1209,7 +1209,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 				Payload: MatchedIntegrationFiles{
 					IntegrationFilePairs: map[string]*IntegrationFilePair{},
 					Errors: []IntegrationMatchError{
-						IntegrationMatchError{
+						{
 							IntegrationFile: config.ValidateElement{
 								Config: config.ConfigElement{
 									FileName: "apache-definition.yml",
@@ -1221,7 +1221,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 									Path:     "",
 									RawValue: interface{}(nil),
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "naRme",
 											Path:     "",
 											RawValue: "com.banana.apache",
@@ -1246,7 +1246,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 			p = InfraConfigIntegrationsMatch{runtimeOS: "linux"}
 			executeOptions := tasks.Options{}
 			executeUpstream := map[string]tasks.Result{
-				"Infra/Config/IntegrationsValidate": tasks.Result{
+				"Infra/Config/IntegrationsValidate": {
 					Payload: []config.ValidateElement{
 						{
 							Config: config.ConfigElement{
@@ -1258,7 +1258,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "naRme",
 										Path:     "",
 										RawValue: "com.banana.apache",
@@ -1276,7 +1276,7 @@ var _ = Describe("Infra/Config/IntegrationMatch", func() {
 								Path:     "",
 								RawValue: nil,
 								Children: []tasks.ValidateBlob{
-									tasks.ValidateBlob{
+									{
 										Key:      "inteRgration_name",
 										Path:     "",
 										RawValue: "com.banana.apache",

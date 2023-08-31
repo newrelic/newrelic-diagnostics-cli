@@ -124,7 +124,7 @@ func (v Ver) IsLessThanEq(max Ver) bool {
 	return false
 }
 
-//String() returns string representation of version struct: Maj.Min.P.B
+// String() returns string representation of version struct: Maj.Min.P.B
 func (v Ver) String() string {
 	return fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Build)
 }

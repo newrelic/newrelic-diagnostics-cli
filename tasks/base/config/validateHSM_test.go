@@ -54,10 +54,10 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []ValidateElement{
-							ValidateElement{
+							{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "high_security",
 									RawValue: "true",
@@ -67,7 +67,7 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 									FilePath: "/etc/",
 								},
 							},
-							ValidateElement{
+							{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "high_security",
 									RawValue: "true",
@@ -79,7 +79,7 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 							},
 						},
 					},
-					"Base/Config/ValidateLicenseKey": tasks.Result{
+					"Base/Config/ValidateLicenseKey": {
 						Status: tasks.Success,
 						Payload: map[string][]string{
 							"Banana": {"/etc/newrelic.yml"},
@@ -108,14 +108,14 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 				Status:  tasks.Success,
 				Summary: "High Security Mode setting for accounts associated with found license keys match local configuration.",
 				Payload: []HSMvalidation{
-					HSMvalidation{
+					{
 						LicenseKey: "Banana",
 						AccountHSM: true,
 						LocalHSM: map[string]bool{
 							"/etc/newrelic.yml": true,
 						},
 					},
-					HSMvalidation{
+					{
 						LicenseKey: "Peel",
 						AccountHSM: true,
 						LocalHSM: map[string]bool{
@@ -142,10 +142,10 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []ValidateElement{
-							ValidateElement{
+							{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "high_security",
 									RawValue: "false",
@@ -155,7 +155,7 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 									FilePath: "/etc/",
 								},
 							},
-							ValidateElement{
+							{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "high_security",
 									RawValue: "true",
@@ -167,7 +167,7 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 							},
 						},
 					},
-					"Base/Config/ValidateLicenseKey": tasks.Result{
+					"Base/Config/ValidateLicenseKey": {
 						Status: tasks.Success,
 						Payload: map[string][]string{
 							"Banana": {"/etc/newrelic.yml"},
@@ -196,14 +196,14 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 				Status:  tasks.Failure,
 				Summary: "High Security Mode setting (true) for account with license key:\n\nBanana\n\nmismatches configuration in:\n/etc/newrelic.yml\n\n",
 				Payload: []HSMvalidation{
-					HSMvalidation{
+					{
 						LicenseKey: "Banana",
 						AccountHSM: true,
 						LocalHSM: map[string]bool{
 							"/etc/newrelic.yml": false,
 						},
 					},
-					HSMvalidation{
+					{
 						LicenseKey: "Peel",
 						AccountHSM: true,
 						LocalHSM: map[string]bool{
@@ -230,10 +230,10 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []ValidateElement{
-							ValidateElement{
+							{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "high_security",
 									RawValue: "false",
@@ -243,7 +243,7 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 									FilePath: "/etc/",
 								},
 							},
-							ValidateElement{
+							{
 								ParsedResult: tasks.ValidateBlob{
 									Key:      "high_security",
 									RawValue: "true",
@@ -255,13 +255,13 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 							},
 						},
 					},
-					"Base/Config/ValidateLicenseKey": tasks.Result{
+					"Base/Config/ValidateLicenseKey": {
 						Status: tasks.Success,
 						Payload: map[string][]string{
 							"Banana": {"/etc/newrelic.yml", "/app/newrelic.js", "NEW_RELIC_LICENSE_KEY"},
 						},
 					},
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status: tasks.Success,
 						Payload: map[string]string{
 							"NEW_RELIC_HIGH_SECURITY": "true",
@@ -289,7 +289,7 @@ var _ = Describe("Base/Config/ValidateHSM", func() {
 				Status:  tasks.Failure,
 				Summary: "High Security Mode setting (false) for account with license key:\n\nBanana\n\nmismatches configuration in:\n/app/newrelic.js\nNEW_RELIC_HIGH_SECURITY\n\n",
 				Payload: []HSMvalidation{
-					HSMvalidation{
+					{
 						LicenseKey: "Banana",
 						AccountHSM: false,
 						LocalHSM: map[string]bool{

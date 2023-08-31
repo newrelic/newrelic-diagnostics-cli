@@ -62,7 +62,7 @@ var _ = Describe("iOS/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"iOS/Env/Detect": tasks.Result{
+					"iOS/Env/Detect": {
 						Status: tasks.Failure,
 					},
 				}
@@ -82,11 +82,11 @@ var _ = Describe("iOS/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Collect": tasks.Result{
+					"Base/Config/Collect": {
 						Status:  tasks.Success,
 						Payload: "This should be of type []config.ConfigElement, but it's a string instead",
 					},
-					"iOS/Env/Detect": tasks.Result{
+					"iOS/Env/Detect": {
 						Status: tasks.Info,
 					},
 				}

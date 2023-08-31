@@ -54,7 +54,7 @@ var _ = Describe("Python/Requirements/Webframework", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Python/Env/Dependencies": tasks.Result{
+					"Python/Env/Dependencies": {
 						Status: tasks.Failure,
 					},
 				}
@@ -74,7 +74,7 @@ var _ = Describe("Python/Requirements/Webframework", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Python/Env/Dependencies": tasks.Result{
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Payload: []int{1, 2, 3},
 					},

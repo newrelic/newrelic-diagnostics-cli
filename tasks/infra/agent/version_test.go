@@ -62,11 +62,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.None,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -86,11 +86,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: "I should be a map[string]string{}, but I'm a string",
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -110,11 +110,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -134,11 +134,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -169,11 +169,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -204,11 +204,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -233,11 +233,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -261,11 +261,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 				BeforeEach(func() {
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Info,
 							Payload: map[string]string{},
 						},
-						"Infra/Config/Agent": tasks.Result{
+						"Infra/Config/Agent": {
 							Status: tasks.Success,
 						},
 					}
@@ -289,11 +289,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 				BeforeEach(func() {
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Info,
 							Payload: map[string]string{},
 						},
-						"Infra/Config/Agent": tasks.Result{
+						"Infra/Config/Agent": {
 							Status: tasks.Success,
 						},
 					}

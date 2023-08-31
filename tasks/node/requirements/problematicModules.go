@@ -10,10 +10,10 @@ import (
 )
 
 var modules = map[string][]string{
-	"supported":   []string{"express", "hapi", "restify", "connect", "koa"},
-	"unsupported": []string{"mongoose", "typescript", "@types/node", "@babel/core", "@babel/node", "@babel/generator", "webpack", "graphql-server-express", "apollo-server", "graphql", "webpack-node-externals"},
-	"optional":    []string{"@newrelic/native-metrics"},
-	"frontend":    []string{"react", "react-dom", "angular", "@angular/core", "@angular/common"},
+	"supported":   {"express", "hapi", "restify", "connect", "koa"},
+	"unsupported": {"mongoose", "typescript", "@types/node", "@babel/core", "@babel/node", "@babel/generator", "webpack", "graphql-server-express", "apollo-server", "graphql", "webpack-node-externals"},
+	"optional":    {"@newrelic/native-metrics"},
+	"frontend":    {"react", "react-dom", "angular", "@angular/core", "@angular/common"},
 }
 
 type NodeRequirementsProblematicModules struct {

@@ -54,7 +54,7 @@ func (p NodeEnvDependencies) Execute(option tasks.Options, upstream map[string]t
 	//start go routine
 	go streamSource(modulesList, stream)
 
-	filesToCopy := []tasks.FileCopyEnvelope{tasks.FileCopyEnvelope{Path: "npm_ls_output.txt", Stream: stream}}
+	filesToCopy := []tasks.FileCopyEnvelope{{Path: "npm_ls_output.txt", Stream: stream}}
 	//The npm error exit status 1 should be an expected error
 	//if npm throws the famous npm ERR!, those messages are long. I rather not concatenate that output in the Summary, but still collect the output in a txt file to study the error
 	if npmErr != nil && (npmErr.Error() != "exit status 1") {

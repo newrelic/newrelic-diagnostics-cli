@@ -91,7 +91,7 @@ var _ = Describe("Java/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -104,7 +104,7 @@ var _ = Describe("Java/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -122,7 +122,7 @@ var _ = Describe("Java/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}

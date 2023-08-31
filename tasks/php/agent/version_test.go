@@ -31,7 +31,7 @@ var _ = Describe("Php/Agent/Version", func() {
 		Context("When upstream['PHP/Config/Agent'].Payload.([]config.ValidateElement) returns  Ok == false 0", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status:  tasks.Success,
 						Payload: []string{},
 					},
@@ -47,7 +47,7 @@ var _ = Describe("Php/Agent/Version", func() {
 		Context("When upstream['PHP/Config/Agent'].Payload.([]config.ValidateElement) returns  len(validations) ==  0", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status:  tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
@@ -69,7 +69,7 @@ var _ = Describe("Php/Agent/Version", func() {
 			}
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElementNoAgent,
@@ -93,7 +93,7 @@ var _ = Describe("Php/Agent/Version", func() {
 			}
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElementOneAgentFile,
@@ -135,7 +135,7 @@ var _ = Describe("Php/Agent/Version", func() {
 			}
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElementVersionErrors,
@@ -171,7 +171,7 @@ var _ = Describe("Php/Agent/Version", func() {
 			}
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							mockValidateElementOneAgentFile,

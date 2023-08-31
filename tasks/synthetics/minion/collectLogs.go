@@ -61,8 +61,8 @@ func (p SyntheticsMinionCollectLogs) Execute(options tasks.Options, upstream map
 	}
 }
 
-//Initializes streams for the output the `docker logs` command (executed by StreamContainerLogsById) for each container provided,
-//Each stream initialized is then added to a new fileCopyEnvelope which are collected into a slice and returned
+// Initializes streams for the output the `docker logs` command (executed by StreamContainerLogsById) for each container provided,
+// Each stream initialized is then added to a new fileCopyEnvelope which are collected into a slice and returned
 func initStreamsForFileCopy(containers []tasks.DockerContainer, taskIdentifier string, bufferedCommandExec tasks.BufferedCommandExecFunc) ([]tasks.FileCopyEnvelope, []error) {
 	fileCopyEnvelopes := []tasks.FileCopyEnvelope{}
 	cmdErrors := []error{}

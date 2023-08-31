@@ -124,7 +124,7 @@ func TestClientDefaults(t *testing.T) {
 
 }
 
-//Insert key generation
+// Insert key generation
 func Test_generateInsertKey(t *testing.T) {
 	tests := []struct {
 		runID string

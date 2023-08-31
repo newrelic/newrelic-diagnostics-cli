@@ -50,10 +50,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -70,10 +70,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.None,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -89,10 +89,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -111,10 +111,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -135,10 +135,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -205,15 +205,15 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			modulesVersions []NodeModuleVersion
 		)
 		dependencyInfo := []NodeModuleVersion{
-			NodeModuleVersion{
+			{
 				Module:  "express",
 				Version: "4.16.4",
 			},
-			NodeModuleVersion{
+			{
 				Module:  "mongoose",
 				Version: "5.4.0",
 			},
-			NodeModuleVersion{
+			{
 				Module:  "babel-jest",
 				Version: "23.6.0",
 			},

@@ -13,7 +13,7 @@ import (
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-//this mock is used for testing the listDir function to create a mock os.FileInfo object
+// this mock is used for testing the listDir function to create a mock os.FileInfo object
 type mockFileInfo struct {
 	name string
 }
@@ -94,7 +94,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 
 		Context("When Java/Config/Agent was not successful", func() {
 			BeforeEach(func() {
-				upstream = map[string]tasks.Result{"Java/Config/Agent": tasks.Result{Status: tasks.None}}
+				upstream = map[string]tasks.Result{"Java/Config/Agent": {Status: tasks.None}}
 			})
 			It("Should return none result", func() {
 				Expect(result.Status).To(Equal(tasks.None))
@@ -107,8 +107,8 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME ENV var set and version file doesn't exist", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent":       tasks.Result{Status: tasks.Success},
-					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"JBOSS_HOME": "/foo"}},
+					"Java/Config/Agent":       {Status: tasks.Success},
+					"Base/Env/CollectEnvVars": {Payload: map[string]string{"JBOSS_HOME": "/foo"}},
 				}
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
 					return []string{}, errors.New("version file didn't exist")
@@ -128,8 +128,8 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME ENV var set and error reading version file", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent":       tasks.Result{Status: tasks.Success},
-					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"JBOSS_HOME": "/foo"}},
+					"Java/Config/Agent":       {Status: tasks.Success},
+					"Base/Env/CollectEnvVars": {Payload: map[string]string{"JBOSS_HOME": "/foo"}},
 				}
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
 					return []string{}, errors.New("there they are all sitting in a row")
@@ -150,8 +150,8 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME ENV var set and version file exists", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent":       tasks.Result{Status: tasks.Success},
-					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"JBOSS_HOME": "/foo"}},
+					"Java/Config/Agent":       {Status: tasks.Success},
+					"Base/Env/CollectEnvVars": {Payload: map[string]string{"JBOSS_HOME": "/foo"}},
 				}
 				p.fileExists = func(string) bool {
 					return true
@@ -170,8 +170,8 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME ENV var not set and on windows with valid version", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent":       tasks.Result{Status: tasks.Success},
-					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"Program_files": filepath.FromSlash("fixtures/eapFiles")}},
+					"Java/Config/Agent":       {Status: tasks.Success},
+					"Base/Env/CollectEnvVars": {Payload: map[string]string{"Program_files": filepath.FromSlash("fixtures/eapFiles")}},
 				}
 				p.runtimeOs = "windows"
 				p.fileExists = func(string) bool {
@@ -199,7 +199,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME ENV var not set and on linux with valid version", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{Status: tasks.Success},
+					"Java/Config/Agent": {Status: tasks.Success},
 				}
 				p.runtimeOs = "linux"
 				p.fileExists = func(string) bool {
@@ -224,7 +224,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME ENV var not set and on unrecognized OS", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{Status: tasks.Success},
+					"Java/Config/Agent": {Status: tasks.Success},
 				}
 				p.runtimeOs = "chocolate"
 			})
@@ -238,7 +238,7 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME is not set and error getting version file", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{Status: tasks.Success},
+					"Java/Config/Agent": {Status: tasks.Success},
 				}
 				p.runtimeOs = "linux"
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
@@ -266,8 +266,8 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME is not set and version file doesn't exist", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent":       tasks.Result{Status: tasks.Success},
-					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"Program_files": "foo/eapFiles"}},
+					"Java/Config/Agent":       {Status: tasks.Success},
+					"Base/Env/CollectEnvVars": {Payload: map[string]string{"Program_files": "foo/eapFiles"}},
 				}
 				p.runtimeOs = "windows"
 				p.returnSubstringInFile = func(string, string) ([]string, error) {
@@ -291,8 +291,8 @@ var _ = Describe("JavaAppserverJbossEapCheck", func() {
 		Context("When JBOSS_HOME is not set and error reading version file", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent":       tasks.Result{Status: tasks.Success},
-					"Base/Env/CollectEnvVars": tasks.Result{Payload: map[string]string{"Program_files": filepath.FromSlash("foo/eapFiles")}},
+					"Java/Config/Agent":       {Status: tasks.Success},
+					"Base/Env/CollectEnvVars": {Payload: map[string]string{"Program_files": filepath.FromSlash("foo/eapFiles")}},
 				}
 				p.runtimeOs = "windows"
 				p.returnSubstringInFile = func(string, string) ([]string, error) {

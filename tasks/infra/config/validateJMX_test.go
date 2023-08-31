@@ -72,7 +72,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status: tasks.None,
 					},
 				}
@@ -88,7 +88,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: "I am a string, I should be a MatchedIntegrationFiles{}",
 					},
@@ -109,7 +109,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status: tasks.Success,
 						Payload: MatchedIntegrationFiles{
 							IntegrationFilePairs: map[string]*IntegrationFilePair{},
@@ -132,12 +132,12 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status: tasks.Success,
 						Payload: MatchedIntegrationFiles{
 							Errors: []IntegrationMatchError{},
 							IntegrationFilePairs: map[string]*IntegrationFilePair{
-								"apache": &IntegrationFilePair{
+								"apache": {
 									Configuration: config.ValidateElement{
 										Config: config.ConfigElement{
 											FileName: "apache-config.yml",
@@ -172,7 +172,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/emptyJMX.yml", "fixtures/validateJMX/emptyJMX.yml"),
 					},
@@ -196,7 +196,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-config.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -231,7 +231,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-partial.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -254,7 +254,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-duplicate-keys.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -279,7 +279,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-partial.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -311,7 +311,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-default-parms.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -341,7 +341,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-no-parms.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -478,7 +478,7 @@ func matchedIntegrationFilesFromFiles(confFile, defFile string) MatchedIntegrati
 
 	return MatchedIntegrationFiles{
 		IntegrationFilePairs: map[string]*IntegrationFilePair{
-			"jmx": &IntegrationFilePair{
+			"jmx": {
 				Configuration: config.ValidateElement{
 					Config: config.ConfigElement{
 						FileName: "jmx-config.yml",

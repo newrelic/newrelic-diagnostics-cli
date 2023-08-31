@@ -73,7 +73,7 @@ func TestRubyEnvVersion_Execute(t *testing.T) {
 			args: args{
 				options: tasks.Options{},
 				upstream: map[string]tasks.Result{
-					"Ruby/Config/Agent": tasks.Result{
+					"Ruby/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				},

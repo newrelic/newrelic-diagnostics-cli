@@ -12,14 +12,14 @@ import (
 )
 
 // EOLVersions prior to: Node 1.14.1, Java 3.6.0 (except 2.21.7), .NET 5.1, PHP 5.0.0.115, Python 2.42.0, Ruby 3.9.6
-//To satisfy these requirements, here we're specifying the last version released prior the versions listed above
+// To satisfy these requirements, here we're specifying the last version released prior the versions listed above
 var EOLVersions = map[string][]string{
-	"Node":   []string{"1.0.0-1.14.0"},
-	"Java":   []string{"1.3.0-2.21.4", "3.0.0-3.5.1"},
-	"Python": []string{"1.0.2.130-2.40.0.34"},
-	"Ruby":   []string{"3.0.0-3.9.5.251"},
-	"PHP":    []string{"2.0.2.65-4.23.4.113"},
-	"DotNet": []string{"2.0.6-5.0.136.0"},
+	"Node":   {"1.0.0-1.14.0"},
+	"Java":   {"1.3.0-2.21.4", "3.0.0-3.5.1"},
+	"Python": {"1.0.2.130-2.40.0.34"},
+	"Ruby":   {"3.0.0-3.9.5.251"},
+	"PHP":    {"2.0.2.65-4.23.4.113"},
+	"DotNet": {"2.0.6-5.0.136.0"},
 }
 
 type agentVersion struct {
@@ -42,9 +42,9 @@ func (p BaseAgentEOL) Explain() string {
 	return "Detect end of life (EOL) New Relic agents"
 }
 
-//Dependencies - As this task is a "Base" task, we wanted it to run on every suite. But we didn't want it to
-//kick off tasks for agents unrelated to the selected suite (e.g. You run --suites java but you see results for Node/Agent/Version)
-//This is our current solution due to time constraints
+// Dependencies - As this task is a "Base" task, we wanted it to run on every suite. But we didn't want it to
+// kick off tasks for agents unrelated to the selected suite (e.g. You run --suites java but you see results for Node/Agent/Version)
+// This is our current solution due to time constraints
 func (p BaseAgentEOL) Dependencies() []string {
 
 	defaultDependencies := []string{
@@ -146,7 +146,7 @@ func isItEOL(version string, agentName string) (bool, error) {
 	return isItUnsupported, nil
 }
 
-//processDecisionQueue evaluates EOL status about accumulated agentVersions
+// processDecisionQueue evaluates EOL status about accumulated agentVersions
 func processDecisionQueue(agentVersionQueue []agentVersion) (successes, errors, failures []agentVersion) {
 
 	for _, currentAgent := range agentVersionQueue {

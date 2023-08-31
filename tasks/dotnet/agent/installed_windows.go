@@ -10,12 +10,12 @@ import (
 // agent installs are detected.
 var agentInstallPaths = []DotNetAgentInstall{
 	// DLL paths for .NET agent >= 8.19
-	DotNetAgentInstall{
+	{
 		AgentPath:    `C:\Program Files\New Relic\.NET Agent\netframework\NewRelic.Agent.Core.dll`,
 		ProfilerPath: `C:\Program Files\New Relic\.NET Agent\netframework\NewRelic.Profiler.dll`,
 	},
 	// DLL paths for .NET agent < 8.19
-	DotNetAgentInstall{
+	{
 		AgentPath:    `C:\Program Files\New Relic\.NET Agent\NewRelic.Agent.Core.dll`,
 		ProfilerPath: `C:\Program Files\New Relic\.NET Agent\NewRelic.Profiler.dll`,
 	},
