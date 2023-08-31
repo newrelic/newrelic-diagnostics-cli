@@ -997,7 +997,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 		Context("when there is an error getting Java processes", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{"Java/Agent/Version": tasks.Result{
+				upstream = map[string]tasks.Result{"Java/Agent/Version": {
 					Status:  tasks.Success,
 					Payload: "4.3",
 				}}
@@ -1017,7 +1017,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 		Context("when there are no Java processes running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{"Java/Agent/Version": tasks.Result{
+				upstream = map[string]tasks.Result{"Java/Agent/Version": {
 					Status:  tasks.Success,
 					Payload: "4.3",
 				}}
@@ -1040,10 +1040,10 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				p.runtimeGOOS = "linux" // IBM only compatible on Linux
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
-						process.Process{
+						{
 							Pid: 2,
 						},
 					}, nil
@@ -1098,10 +1098,10 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
-						process.Process{
+						{
 							Pid: 2,
 						},
 					}, nil
@@ -1144,7 +1144,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
@@ -1176,7 +1176,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
@@ -1208,7 +1208,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
@@ -1244,7 +1244,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil

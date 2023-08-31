@@ -10,7 +10,7 @@ import (
 
 type supportabilityStatus int
 
-//Constants for use by the supportabilityStatus enum
+// Constants for use by the supportabilityStatus enum
 const (
 	NotSupported supportabilityStatus = iota
 	Supported

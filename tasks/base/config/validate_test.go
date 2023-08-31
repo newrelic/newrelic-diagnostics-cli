@@ -44,7 +44,7 @@ var _ = Describe("Base/Config/Validate", func() {
 	Describe("Execute()", func() {
 		Context("When upstream not successful", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status: tasks.Failure,
 				},
 			}
@@ -57,7 +57,7 @@ var _ = Describe("Base/Config/Validate", func() {
 		})
 		Context("When upstream is successful but provides unexpected payload type", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status:  tasks.Success,
 					Payload: ConfigElement{},
 				},
@@ -71,7 +71,7 @@ var _ = Describe("Base/Config/Validate", func() {
 		})
 		Context("When upstream is successful but provides no config files", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status:  tasks.Success,
 					Payload: []ConfigElement{},
 				},
@@ -85,7 +85,7 @@ var _ = Describe("Base/Config/Validate", func() {
 		})
 		Context("When upstream returned unreadable file", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status: tasks.Success,
 					Payload: ConfigElement{
 						FileName: "blab",
@@ -103,10 +103,10 @@ var _ = Describe("Base/Config/Validate", func() {
 
 		Context("When parsing a standard XML .config file", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status: tasks.Success,
 					Payload: []ConfigElement{
-						ConfigElement{
+						{
 							FileName: "validate_basexml.config",
 							FilePath: "fixtures/",
 						},
@@ -130,14 +130,14 @@ var _ = Describe("Base/Config/Validate", func() {
 		})
 		Context("When parsing two files, one with errors", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status: tasks.Success,
 					Payload: []ConfigElement{
-						ConfigElement{
+						{
 							FileName: "validate_basexml.config",
 							FilePath: "fixtures/",
 						},
-						ConfigElement{
+						{
 							FileName: "blah",
 							FilePath: "fixtures/",
 						},
@@ -174,14 +174,14 @@ var _ = Describe("Base/Config/Validate", func() {
 		})
 		Context("When parsing two files, both failed", func() {
 			upstream := map[string]tasks.Result{
-				"Base/Config/Collect": tasks.Result{
+				"Base/Config/Collect": {
 					Status: tasks.Success,
 					Payload: []ConfigElement{
-						ConfigElement{
+						{
 							FileName: "validate_badxml.config",
 							FilePath: "fixtures/",
 						},
-						ConfigElement{
+						{
 							FileName: "blah",
 							FilePath: "fixtures/",
 						},
@@ -280,19 +280,19 @@ var _ = Describe("Base/Config/Validate", func() {
 			It("Should return expected nested array of ValidateBlob", func() {
 				expectedResult := tasks.ValidateBlob{
 					Children: []tasks.ValidateBlob{
-						tasks.ValidateBlob{
+						{
 							Key: "ignoreStatusCodes",
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:  "code",
 									Path: "/ignoreStatusCodes",
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "0",
 											Path:     "/ignoreStatusCodes/code",
 											RawValue: "401",
 										},
-										tasks.ValidateBlob{
+										{
 											Key:      "1",
 											Path:     "/ignoreStatusCodes/code",
 											RawValue: "404",
@@ -410,15 +410,15 @@ var _ = Describe("Base/Config/Validate", func() {
 			It("Should return matching array config", func() {
 				expectedResult := tasks.ValidateBlob{
 					Children: []tasks.ValidateBlob{
-						tasks.ValidateBlob{
+						{
 							Key: "app_name",
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "0",
 									Path:     "/app_name",
 									RawValue: "My Node App",
 								},
-								tasks.ValidateBlob{
+								{
 									Key:      "1",
 									Path:     "/app_name",
 									RawValue: "my appname 2",
@@ -508,7 +508,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			It("Should return matching key-value ValidateBlob", func() {
 				expectedResult := tasks.ValidateBlob{
 					Children: []tasks.ValidateBlob{
-						tasks.ValidateBlob{Key: "key", RawValue: "value"},
+						{Key: "key", RawValue: "value"},
 					},
 				}.String()
 				Expect(result.String()).To(Equal(expectedResult))
@@ -524,9 +524,9 @@ var _ = Describe("Base/Config/Validate", func() {
 			result.Sort()
 			It("Should return matching map[string]interface ValidateBlob", func() {
 				expectedResult := tasks.ValidateBlob{Children: []tasks.ValidateBlob{
-					tasks.ValidateBlob{Key: "key1", RawValue: "value1"},
-					tasks.ValidateBlob{Key: "key2", RawValue: "value2"},
-					tasks.ValidateBlob{Key: "key3", RawValue: "value3"},
+					{Key: "key1", RawValue: "value1"},
+					{Key: "key2", RawValue: "value2"},
+					{Key: "key3", RawValue: "value3"},
 				}}.String()
 				Expect(result.String()).To(Equal(expectedResult))
 			})
@@ -540,8 +540,8 @@ var _ = Describe("Base/Config/Validate", func() {
 				result.Sort()
 				It("Should skip the invalid map element and return matching nested map[interface{}]interface ValidateBlob", func() {
 					expectedResult := tasks.ValidateBlob{Children: []tasks.ValidateBlob{
-						tasks.ValidateBlob{Children: []tasks.ValidateBlob{
-							tasks.ValidateBlob{Key: "nestedkey", Path: "/", RawValue: "nestedvalue"},
+						{Children: []tasks.ValidateBlob{
+							{Key: "nestedkey", Path: "/", RawValue: "nestedvalue"},
 						}},
 					}}.String()
 					Expect(result.String()).To(Equal(expectedResult))
@@ -555,8 +555,8 @@ var _ = Describe("Base/Config/Validate", func() {
 				result.Sort()
 				It("Should return matching nested map[interface{}]interface ValidateBlob", func() {
 					expectedResult := tasks.ValidateBlob{Children: []tasks.ValidateBlob{
-						tasks.ValidateBlob{Children: []tasks.ValidateBlob{
-							tasks.ValidateBlob{Key: "nestedkey", Path: "/", RawValue: "nestedvalue"},
+						{Children: []tasks.ValidateBlob{
+							{Key: "nestedkey", Path: "/", RawValue: "nestedvalue"},
 						}},
 					}}.String()
 					Expect(result.String()).To(Equal(expectedResult))

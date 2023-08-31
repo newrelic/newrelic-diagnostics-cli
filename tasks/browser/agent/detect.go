@@ -122,7 +122,7 @@ func getBrowserKey(scripts []string) string {
 	return ""
 }
 
-//detects loader in use
+// detects loader in use
 func getBrowserLoader(scripts []string) string {
 	spa := regexp.MustCompile(`agent:"js-agent\.newrelic\.com/nr-spa-[0-9]*\.min\.js"`)
 	pro := regexp.MustCompile(`\(NREUM={}\)\).loader_config|window.onerror|UncaughtException`)

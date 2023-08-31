@@ -90,7 +90,7 @@ func (t BaseConfigAppName) Execute(options tasks.Options, upstream map[string]ta
 		return tasks.Result{
 			Status:  tasks.Success,
 			Summary: fmt.Sprintf("An application name was found through a New Relic system property: %s", appname),
-			Payload: []AppNameInfo{AppNameInfo{Name: appname, FilePath: appNameSysProp}},
+			Payload: []AppNameInfo{{Name: appname, FilePath: appNameSysProp}},
 		}
 	}
 

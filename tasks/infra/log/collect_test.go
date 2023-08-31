@@ -56,7 +56,7 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -73,10 +73,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Failure,
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -93,11 +93,11 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status:  tasks.Success,
 						Payload: "not []config.ValidateElement like it should be",
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -115,10 +115,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -130,13 +130,13 @@ var _ = Describe("Infra/Log/Collect", func() {
 							},
 						},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 				p.validatePaths = func([]string) []tasks.CollectFileStatus {
 					return []tasks.CollectFileStatus{
-						tasks.CollectFileStatus{
+						{
 							Path:     "/var/log/newrelic-infra/newrelic-infra.log",
 							IsValid:  true,
 							ErrorMsg: nil,
@@ -171,10 +171,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -186,13 +186,13 @@ var _ = Describe("Infra/Log/Collect", func() {
 							},
 						},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 				p.validatePaths = func([]string) []tasks.CollectFileStatus {
 					return []tasks.CollectFileStatus{
-						tasks.CollectFileStatus{
+						{
 							Path:     "/var/log/newrelic-infra/newrelic-infra.log",
 							IsValid:  false,
 							ErrorMsg: errors.New("stat /var/log/newrelic-infra/newrelic-infra.log: no such file or directory"),
@@ -215,10 +215,10 @@ If you are working with a support ticket, manually provide your New Relic log fi
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -226,7 +226,7 @@ If you are working with a support ticket, manually provide your New Relic log fi
 							},
 						},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -250,7 +250,7 @@ If you are working with a support ticket, manually provide your New Relic log fi
 		})
 		Context("When given a slice of validate elements containing log file entries", func() {
 			parsedConfigFiles = []config.ValidateElement{
-				config.ValidateElement{
+				{
 					Config: config.ConfigElement{
 						FileName: "newrelic-infra.yml",
 						FilePath: "/etc/",
@@ -278,7 +278,7 @@ If you are working with a support ticket, manually provide your New Relic log fi
 		})
 		Context("When given a slice of validate elements containing log file entries", func() {
 			parsedConfigFiles = []config.ValidateElement{
-				config.ValidateElement{
+				{
 					Config: config.ConfigElement{
 						FileName: "newrelic-infra.yml",
 						FilePath: "/etc/",

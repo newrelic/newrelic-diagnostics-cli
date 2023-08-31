@@ -63,13 +63,13 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed":                            tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/NetTargetAgentVersionValidate": tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/OS":                            tasks.Result{Status: tasks.Success},
-					"Dotnet/Requirements/OwinCheck":                     tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/ProcessorType":                 tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/Datastores":                    tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/MessagingServicesCheck":        tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed":                            {Status: tasks.Success},
+					"DotNet/Requirements/NetTargetAgentVersionValidate": {Status: tasks.Success},
+					"DotNet/Requirements/OS":                            {Status: tasks.Success},
+					"Dotnet/Requirements/OwinCheck":                     {Status: tasks.Success},
+					"DotNet/Requirements/ProcessorType":                 {Status: tasks.Success},
+					"DotNet/Requirements/Datastores":                    {Status: tasks.Success},
+					"DotNet/Requirements/MessagingServicesCheck":        {Status: tasks.Success},
 				}
 			})
 			It("Should return Success status", func() {
@@ -84,13 +84,13 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed":                            tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/NetTargetAgentVersionValidate": tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/OS":                            tasks.Result{Status: tasks.Success},
-					"Dotnet/Requirements/OwinCheck":                     tasks.Result{Status: tasks.None},
-					"DotNet/Requirements/ProcessorType":                 tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/Datastores":                    tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/MessagingServicesCheck":        tasks.Result{Status: tasks.None},
+					"DotNet/Agent/Installed":                            {Status: tasks.Success},
+					"DotNet/Requirements/NetTargetAgentVersionValidate": {Status: tasks.Success},
+					"DotNet/Requirements/OS":                            {Status: tasks.Success},
+					"Dotnet/Requirements/OwinCheck":                     {Status: tasks.None},
+					"DotNet/Requirements/ProcessorType":                 {Status: tasks.Success},
+					"DotNet/Requirements/Datastores":                    {Status: tasks.Success},
+					"DotNet/Requirements/MessagingServicesCheck":        {Status: tasks.None},
 				}
 			})
 			It("Should return Success status", func() {
@@ -105,13 +105,13 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed":                            tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/NetTargetAgentVersionValidate": tasks.Result{Status: tasks.Failure},
-					"DotNet/Requirements/OS":                            tasks.Result{Status: tasks.Failure},
-					"Dotnet/Requirements/OwinCheck":                     tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/ProcessorType":                 tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/Datastores":                    tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/MessagingServicesCheck":        tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed":                            {Status: tasks.Success},
+					"DotNet/Requirements/NetTargetAgentVersionValidate": {Status: tasks.Failure},
+					"DotNet/Requirements/OS":                            {Status: tasks.Failure},
+					"Dotnet/Requirements/OwinCheck":                     {Status: tasks.Success},
+					"DotNet/Requirements/ProcessorType":                 {Status: tasks.Success},
+					"DotNet/Requirements/Datastores":                    {Status: tasks.Success},
+					"DotNet/Requirements/MessagingServicesCheck":        {Status: tasks.Success},
 				}
 			})
 			It("Should return Success status", func() {
@@ -126,11 +126,11 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed":                     tasks.Result{Status: tasks.Success},
-					"Dotnet/Requirements/OwinCheck":              tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/ProcessorType":          tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/Datastores":             tasks.Result{Status: tasks.Success},
-					"DotNet/Requirements/MessagingServicesCheck": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed":                     {Status: tasks.Success},
+					"Dotnet/Requirements/OwinCheck":              {Status: tasks.Success},
+					"DotNet/Requirements/ProcessorType":          {Status: tasks.Success},
+					"DotNet/Requirements/Datastores":             {Status: tasks.Success},
+					"DotNet/Requirements/MessagingServicesCheck": {Status: tasks.Success},
 				}
 			})
 			It("Should return Failure status", func() {

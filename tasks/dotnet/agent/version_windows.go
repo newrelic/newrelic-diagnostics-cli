@@ -54,7 +54,7 @@ func (t DotNetAgentVersion) Execute(options tasks.Options, upstream map[string]t
 	return getVersion(agentInstall)
 }
 
-//Does the work of getting the version of the Agent.Core.dll, version of this dll should always == published version of the .Net Agent
+// Does the work of getting the version of the Agent.Core.dll, version of this dll should always == published version of the .Net Agent
 func getVersion(agentInstall DotNetAgentInstall) (result tasks.Result) {
 
 	agentVersion, err := tasks.GetFileVersion(agentInstall.AgentPath)

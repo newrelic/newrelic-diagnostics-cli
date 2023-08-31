@@ -109,7 +109,7 @@ func (p SyntheticsMinionDetectCPM) Execute(options tasks.Options, upstream map[s
 	go streamContainers(redactedContainersBytes, stream)
 
 	result.FilesToCopy = []tasks.FileCopyEnvelope{
-		tasks.FileCopyEnvelope{
+		{
 			Path:       "inspected-CPMs.json",
 			Stream:     stream,
 			Identifier: p.Identifier().String(),

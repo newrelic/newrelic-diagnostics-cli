@@ -53,7 +53,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 		Context("when Node/Env/Dependencies did not return an Info status", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.None,
 					},
 				}
@@ -68,7 +68,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 		Context("when using React, Babel and Next framework", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.Info,
 						Payload: []dependencies.NodeModuleVersion{
 							{
@@ -109,7 +109,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 		Context("when we do not find a supported framework among their node modules and their are using problematic modules as well", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.Info,
 						Payload: []dependencies.NodeModuleVersion{
 							{

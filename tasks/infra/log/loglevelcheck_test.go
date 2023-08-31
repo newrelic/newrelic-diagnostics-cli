@@ -48,7 +48,7 @@ var _ = Describe("Infra/Log/LevelCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -65,10 +65,10 @@ var _ = Describe("Infra/Log/LevelCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -96,10 +96,10 @@ var _ = Describe("Infra/Log/LevelCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -127,10 +127,10 @@ var _ = Describe("Infra/Log/LevelCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",

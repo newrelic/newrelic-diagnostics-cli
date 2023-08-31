@@ -71,7 +71,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 					},
 				}
@@ -94,7 +94,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 					},
 				}
@@ -117,7 +117,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 					},
 				}

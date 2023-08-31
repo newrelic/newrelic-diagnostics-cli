@@ -53,10 +53,10 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.None,
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "6.0.0.0",
 					},
@@ -77,7 +77,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 10,
@@ -86,7 +86,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -106,11 +106,11 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status:  tasks.Info,
 						Payload: "10.6.7.456",
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "6.0.0.0",
 					},
@@ -130,7 +130,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 10,
@@ -139,7 +139,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 456,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 6,
@@ -164,7 +164,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 11,
@@ -173,7 +173,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "6.0.0.0",
 					},
@@ -194,7 +194,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 8,
@@ -203,7 +203,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "6.0.0.0",
 					},
@@ -224,7 +224,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 10,
@@ -233,7 +233,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "potato",
 					},
@@ -254,7 +254,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 12,
@@ -263,7 +263,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "4.6.0.0",
 					},
@@ -284,7 +284,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 12,
@@ -293,7 +293,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "6.0.0.0",
 					},
@@ -310,7 +310,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 10,
@@ -319,7 +319,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "7.0.0.0",
 					},
@@ -340,7 +340,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 10,
@@ -349,7 +349,7 @@ var _ = Describe("Node/Env/VersionCompatibility", func() {
 							Build: 0,
 						},
 					},
-					"Node/Agent/Version": tasks.Result{
+					"Node/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "8.0.0.0",
 					},

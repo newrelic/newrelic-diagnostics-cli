@@ -18,7 +18,7 @@ type FilteredWiFiAuthPayload struct {
 	Passphrase string //this seems like something we shouldn't output, but we still need... see below
 }
 
-//MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
+// MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
 func (payload FilteredWiFiAuthPayload) MarshalJSON() ([]byte, error) {
 	//note: this technique can be used to return anything you want, including modified values or nothing at all.
 	//anything that gets returned here ends up in the output json file

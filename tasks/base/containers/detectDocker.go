@@ -47,7 +47,7 @@ func (t BaseContainersDetectDocker) Execute(options tasks.Options, upstream map[
 	go streamDockerInfo(prettyJSONBytes, stream)
 
 	filesToCopy := []tasks.FileCopyEnvelope{
-		tasks.FileCopyEnvelope{
+		{
 			Path:       "docker-info.json",
 			Stream:     stream,
 			Identifier: t.Identifier().String(),

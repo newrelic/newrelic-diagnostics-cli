@@ -58,7 +58,7 @@ var _ = Describe("Python/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Python/Config/Agent": tasks.Result{
+					"Python/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}

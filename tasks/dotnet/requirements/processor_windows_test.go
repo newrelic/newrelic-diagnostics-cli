@@ -55,7 +55,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getProcessorArch = func() (string, error) {
 					return "", errors.New("i am a banana")
@@ -72,7 +72,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getProcessorArch = func() (string, error) {
 					return "x86", nil
@@ -89,7 +89,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getProcessorArch = func() (string, error) {
 					return "AMD64", nil
@@ -107,7 +107,7 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getProcessorArch = func() (string, error) {
 					return "banana", nil

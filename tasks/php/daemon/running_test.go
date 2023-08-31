@@ -27,22 +27,22 @@ func mockProcessFinderZeroDaemon(name string) ([]process.Process, error) {
 
 func mockProcessFinderOneDaemon(name string) ([]process.Process, error) {
 	return []process.Process{
-		process.Process{Pid: 1},
+		{Pid: 1},
 	}, nil
 }
 
 func mockProcessFinderTwoDaemon(name string) ([]process.Process, error) {
 	return []process.Process{
-		process.Process{Pid: 1},
-		process.Process{Pid: 2},
+		{Pid: 1},
+		{Pid: 2},
 	}, nil
 }
 
 func mockProcessFinderThreeDaemon(name string) ([]process.Process, error) {
 	return []process.Process{
-		process.Process{Pid: 1},
-		process.Process{Pid: 2},
-		process.Process{Pid: 3},
+		{Pid: 1},
+		{Pid: 2},
+		{Pid: 3},
 	}, nil
 }
 
@@ -73,7 +73,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -289,7 +289,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -314,7 +314,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Warning,
 					},
 				}
@@ -339,7 +339,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Error,
 					},
 				}
@@ -364,7 +364,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.None,
 					},
 				}

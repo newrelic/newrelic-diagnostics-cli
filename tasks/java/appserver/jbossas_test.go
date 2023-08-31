@@ -67,8 +67,8 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return []string{}, errors.New("blargs")
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
@@ -86,11 +86,11 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return "jboss.home.dir=/jboss-5.4.0/server"
 				}
 				p.findProcessByName = func(string) ([]process.Process, error) {
-					return []process.Process{process.Process{Pid: 1}}, nil
+					return []process.Process{{Pid: 1}}, nil
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
@@ -111,7 +111,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return `jboss.home.dir=C:\appserver\jboss`
 				}
 				p.findProcessByName = func(string) ([]process.Process, error) {
-					return []process.Process{process.Process{Pid: 1}}, nil
+					return []process.Process{{Pid: 1}}, nil
 				}
 				p.findFiles = func([]string, []string) []string {
 					return []string{"README.txt"}
@@ -149,8 +149,8 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return []process.Process{}, errors.New("i like sandwiches")
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
@@ -166,8 +166,8 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return []process.Process{}, nil
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}

@@ -36,12 +36,12 @@ type jsonValidationError struct {
 }
 
 var yamlKeyMap = map[string][]string{
-	"rabbitmq-config.yml":   []string{"queues", "queues_regexes", "exchanges", "exchanges_regexes", "vhosts", "vhosts_regexes"},
-	"redis-config.yml":      []string{"keys"},
-	"f5-config.yml":         []string{"partition_filter"},
-	"mongodb-config.yml":    []string{"filters"},
-	"kafka-config.yml":      []string{"zookeeper_hosts"},
-	"postgresql-config.yml": []string{"collection_list"},
+	"rabbitmq-config.yml":   {"queues", "queues_regexes", "exchanges", "exchanges_regexes", "vhosts", "vhosts_regexes"},
+	"redis-config.yml":      {"keys"},
+	"f5-config.yml":         {"partition_filter"},
+	"mongodb-config.yml":    {"filters"},
+	"kafka-config.yml":      {"zookeeper_hosts"},
+	"postgresql-config.yml": {"collection_list"},
 }
 
 // Execute - Retrieve all yaml files from definition and config directories for
@@ -123,7 +123,7 @@ func (p InfraConfigIntegrationsValidateJson) Execute(options tasks.Options, upst
 
 }
 
-//Helper function to validate raw JSON value
+// Helper function to validate raw JSON value
 func isValidJson(rawJson string) bool {
 	return json.Valid([]byte(rawJson))
 }

@@ -87,10 +87,15 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 	}
 
 	if len(logs) > 0 {
+		var logsPayload []LogElement
 		result.Status = tasks.Success
 		// format the output of the result to return the files found and their content
 
 		for _, log := range logs {
+			if !tasks.FileExists(log.Source.FullPath) {
+				continue
+			}
+			logsPayload = append(logsPayload, log)
 			dir, fileName := filepath.Split(log.Source.FullPath)
 			log.FileName = fileName
 			log.FilePath = dir
@@ -100,10 +105,10 @@ func (p BaseLogCollect) Execute(options tasks.Options, upstream map[string]tasks
 
 		}
 		// now add the results into a single json string
-		log.Debug("all logs found", logs)
+		log.Debug("all logs found", logsPayload)
 
-		result.Payload = logs
-		result.Summary = fmt.Sprintf("There were %d file(s) found", len(logs))
+		result.Payload = logsPayload
+		result.Summary = fmt.Sprintf("There were %d file(s) found", len(logsPayload))
 		result.FilesToCopy = filesToCopy
 
 	} else {

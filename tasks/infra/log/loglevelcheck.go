@@ -77,7 +77,7 @@ func logLevelCheck(configs []config.ValidateElement) string {
 	return ""
 }
 
-//verboseEnabled checks if log level is higher than info or old verbose value is set to debug/trace
+// verboseEnabled checks if log level is higher than info or old verbose value is set to debug/trace
 func verboseEnabled(level string) bool {
 	switch level {
 	//"1" => debug

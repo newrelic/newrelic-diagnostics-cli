@@ -48,7 +48,7 @@ var patterns = []string{
 	"NewRelic[.]h",
 }
 
-//This list will prompt the end user asking for permission to include each file
+// This list will prompt the end user asking for permission to include each file
 var secureFilePatterns = []string{
 	"AppDelegate[.]m",
 	"AppDelegate[.]swift",
@@ -122,7 +122,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		return tasks.Result{
 			Status:      tasks.Success,
 			Summary:     "1 file found",
-			Payload:     []ConfigElement{ConfigElement{filepath.Base(configOverride), filepath.Dir(configOverride) + "/"}},
+			Payload:     []ConfigElement{{filepath.Base(configOverride), filepath.Dir(configOverride) + "/"}},
 			FilesToCopy: []tasks.FileCopyEnvelope{envelope},
 		}
 	}

@@ -1,11 +1,11 @@
 package minion
 
-//Expected ENV variables should be uppercase
-//Leave out expected ENV variables that have sensitive values:
-//"MINION_VSE_PASSPHRASE"
-//"MINION_API_PROXY_AUTH"
-//"MINION_PRIVATE_LOCATION_KEY"
-//"MINION_USER_DEFINED_ENV_VARIABLES"
+// Expected ENV variables should be uppercase
+// Leave out expected ENV variables that have sensitive values:
+// "MINION_VSE_PASSPHRASE"
+// "MINION_API_PROXY_AUTH"
+// "MINION_PRIVATE_LOCATION_KEY"
+// "MINION_USER_DEFINED_ENV_VARIABLES"
 var CPMenvWhitelist = []string{
 	//Variables default to the CPM docker image
 	"PATH",

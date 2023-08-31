@@ -35,7 +35,7 @@ var _ = Describe("Infra/Env/NrjmxMbeans", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/ValidateJMX": tasks.Result{
+					"Infra/Config/ValidateJMX": {
 						Status: tasks.Success,
 						Payload: infraConfig.JmxConfig{
 							Host:            "localhost",
@@ -78,7 +78,7 @@ var _ = Describe("Infra/Env/NrjmxMbeans", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/ValidateJMX": tasks.Result{
+					"Infra/Config/ValidateJMX": {
 						Status: tasks.Success,
 						Payload: infraConfig.JmxConfig{
 							Host:            "localhost",

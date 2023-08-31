@@ -20,7 +20,7 @@ type MinionSettings struct {
 	ProxyAcceptSelfSigned bool   //Proxy accepts self signed certificate
 }
 
-//Expected keys (case sensitive) in private minion settings.json
+// Expected keys (case sensitive) in private minion settings.json
 var expectedKeys = []string{"key", "hsm", "hsmPwd", "proxy", "proxyAuth", "proxyAcceptSelfSigned"}
 
 // MarshalJSON overrides any marshal to json calls for a MinionSettings struct returning a sanitized json payload with sensitive info stripped out.

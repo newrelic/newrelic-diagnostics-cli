@@ -8,10 +8,10 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
-//app.config/web.config files can contain custom paths to New Relic .NET Agent config files, that we need to collect in this task.
-//We use these regexs to tease out these files for early parsing (i.e. in this task, before Base/Config/Validate)
-//so we can get the specified .NET agent config paths, if they're set.
-//See: https://docs.newrelic.com/docs/agents/net-agent/configuration/net-agent-configuration#app-cfg-location
+// app.config/web.config files can contain custom paths to New Relic .NET Agent config files, that we need to collect in this task.
+// We use these regexs to tease out these files for early parsing (i.e. in this task, before Base/Config/Validate)
+// so we can get the specified .NET agent config paths, if they're set.
+// See: https://docs.newrelic.com/docs/agents/net-agent/configuration/net-agent-configuration#app-cfg-location
 var filesWithNETAgentConfigPaths = []*regexp.Regexp{
 	regexp.MustCompile("^(?i)(web|app)[.]config$"),
 	regexp.MustCompile("(?i).+[.]exe[.]config$"),

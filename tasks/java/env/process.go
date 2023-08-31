@@ -121,7 +121,7 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 	}
 }
 
-//getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
+// getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
 func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }

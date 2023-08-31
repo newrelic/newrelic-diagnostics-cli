@@ -64,7 +64,7 @@ var _ = Describe("PHP/Config/Agent", func() {
 							Key:      "newrelic.enabled",
 							RawValue: "trueskis",
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "newrelic.license",
 									RawValue: "trueskis",
 								},

@@ -29,7 +29,7 @@ func Test_checkValidation(t *testing.T) {
 	validationFromMinimalYML := validateElementFromFile("fixtures/minimal_infra_config/newrelic-infra.yml")
 	file, _ := os.Open("fixtures/java_config/newrelic.yml")
 	parsedFromJavaConfigYML, _ := config.ParseYaml(file)
-	validationFromJavaConfigYML := []config.ValidateElement{config.ValidateElement{
+	validationFromJavaConfigYML := []config.ValidateElement{{
 		Config: config.ConfigElement{FileName: "newrelic.yml", FilePath: ""}, Status: tasks.Success, ParsedResult: parsedFromJavaConfigYML}}
 
 	type want struct {

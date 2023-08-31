@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-//Defines the struct for holding host name and OS information
+// Defines the struct for holding host name and OS information
 type HostInfo struct {
 	Hostname             string
 	OS                   string

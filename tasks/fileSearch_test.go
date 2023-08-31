@@ -83,9 +83,9 @@ var _ = Describe("file search Task helpers", func() {
 
 			It("should return expected string matching search string ", func() {
 				expectedMatches := [][]string{
-					[]string{"us-west-2.compute.internal"},
-					[]string{"us-west-2.compute.internal"},
-					[]string{"us-west-2.compute.internal"},
+					{"us-west-2.compute.internal"},
+					{"us-west-2.compute.internal"},
+					{"us-west-2.compute.internal"},
 				}
 				Expect(match).To(Equal(expectedMatches))
 			})
@@ -102,9 +102,9 @@ var _ = Describe("file search Task helpers", func() {
 
 			It("should return expected string matching search regex ", func() {
 				expectedMatches := [][]string{
-					[]string{"Relic 1.2.4.200", "1.2.4.200"},
-					[]string{"Relic 2.3.4.500", "2.3.4.500"},
-					[]string{"Relic 7.5.0.199", "7.5.0.199"},
+					{"Relic 1.2.4.200", "1.2.4.200"},
+					{"Relic 2.3.4.500", "2.3.4.500"},
+					{"Relic 7.5.0.199", "7.5.0.199"},
 				}
 				Expect(match).To(Equal(expectedMatches))
 			})

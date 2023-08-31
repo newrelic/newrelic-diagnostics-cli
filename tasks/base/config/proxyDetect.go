@@ -11,7 +11,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-//ProxyConfig represents an specific proxy server settings/configuration. The processID field mostly serves a purpose for agents like the Java Agent
+// ProxyConfig represents an specific proxy server settings/configuration. The processID field mostly serves a purpose for agents like the Java Agent
 type ProxyConfig struct {
 	proxyHost     string
 	proxyPort     string

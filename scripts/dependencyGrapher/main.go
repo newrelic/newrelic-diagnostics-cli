@@ -41,7 +41,7 @@ func main() {
 
 }
 
-//parseTasks takes in slice of filepaths for the Diagnostics CLI tasks. It reads each file and parses out task identifier and dependencies
+// parseTasks takes in slice of filepaths for the Diagnostics CLI tasks. It reads each file and parses out task identifier and dependencies
 func parseTasks(goFiles []string) (map[string]map[string]bool, error) {
 	foundTasks := map[string]map[string]bool{}
 	for _, file := range goFiles {
@@ -143,7 +143,7 @@ func parseIdentifier(fileContent string) string {
 	return ""
 }
 
-//check file line by line and return true if all task interface method signatures are found
+// check file line by line and return true if all task interface method signatures are found
 func isTaskFile(filePath string) bool {
 	foundInterfaceMethods := 0
 	file, err := os.Open(filePath)
@@ -173,7 +173,7 @@ func isTaskFile(filePath string) bool {
 	return false
 }
 
-//recursively find all .go files in working directory/sub directories
+// recursively find all .go files in working directory/sub directories
 func getGoFiles(expath string) ([]string, error) {
 	foundFiles := []string{}
 	err := filepath.Walk(expath, func(path string, f os.FileInfo, err error) error {
@@ -190,7 +190,7 @@ func getGoFiles(expath string) ([]string, error) {
 	return foundFiles, err
 }
 
-//get working directory of process
+// get working directory of process
 func getWorkingDir() (string, error) {
 	exPath, err := os.Executable()
 	if err != nil {

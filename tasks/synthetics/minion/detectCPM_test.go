@@ -75,7 +75,7 @@ var _ = Describe("Synthetics/Minion/DetectCPM", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Containers/DetectDocker": tasks.Result{
+					"Base/Containers/DetectDocker": {
 						Status: tasks.None,
 						Payload: tasks.DockerInfo{
 							ServerVersion: "",

@@ -133,7 +133,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Failure,
 					},
 				}
@@ -150,7 +150,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -171,7 +171,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -195,7 +195,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -233,7 +233,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -266,7 +266,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 
 				p.getWorkingDirectories = func() []string {
@@ -300,7 +300,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 
 				p.getWorkingDirectories = func() []string {

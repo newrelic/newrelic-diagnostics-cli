@@ -146,7 +146,6 @@ func main() {
 		// creates the output file
 		output.WriteOutputFile(outputResults, scriptData)
 
-
 		// copy our output file(s) to the zip file
 		output.CopyOutputToZip(zipfile)
 		if scriptData != nil {

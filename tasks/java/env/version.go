@@ -51,7 +51,7 @@ func (p JavaEnvVersion) Execute(options tasks.Options, upstream map[string]tasks
 
 }
 
-//Execute command to the JRE. return the output as a string; if we throw an error return the error
+// Execute command to the JRE. return the output as a string; if we throw an error return the error
 func getJREVersion() (string, error) {
 
 	cmdBuild := exec.Command("java", "-version")

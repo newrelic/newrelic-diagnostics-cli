@@ -19,9 +19,9 @@ type osFunc func() (string, error)
 
 type getListDllsFunc func() ([]string, error)
 
-//This data type will store and track info on the different Messaging Services
-//This allows for the logic to be agnostic to the requirements of the
-//individual Messaging Service requirements, only the structs for a Messaging Service should need to change if requirements change
+// This data type will store and track info on the different Messaging Services
+// This allows for the logic to be agnostic to the requirements of the
+// individual Messaging Service requirements, only the structs for a Messaging Service should need to change if requirements change
 type messagingService struct {
 	name        string
 	version     string
@@ -29,7 +29,7 @@ type messagingService struct {
 	versionGood bool
 }
 
-//Names of dlls to check.
+// Names of dlls to check.
 var msmqName = "System.Messaging.dll"        //no version
 var nServiceBusName = "NServiceBus.Core.dll" //get version
 var nServiceBusVersion = []string{"5.0-5.*"}

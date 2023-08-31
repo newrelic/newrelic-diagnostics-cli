@@ -19,13 +19,13 @@ func (s Status) GetColor() color.Color {
 	}
 }
 
-//StatusToString takes in integer, returns relevant Status statusEnum in a human readable string.
+// StatusToString takes in integer, returns relevant Status statusEnum in a human readable string.
 func (s Status) StatusToString() string {
 	statuses := []string{"None", "Success", "Warning", "Failure", "Error", "Info"}
 	return statuses[s]
 }
 
-//StatusToString returns the status for a result, used primarily for visual output
+// StatusToString returns the status for a result, used primarily for visual output
 func (r Result) StatusToString() string {
 	return r.Status.StatusToString()
 }

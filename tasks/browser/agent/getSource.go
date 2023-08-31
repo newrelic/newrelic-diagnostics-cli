@@ -82,7 +82,7 @@ func (t BrowserAgentGetSource) Execute(options tasks.Options, upstream map[strin
 			Summary: fmt.Sprintf("Failed to connect to %s. Please check your URL and verify connectivity: %s", url, errReadingBody.Error()),
 		}
 	}
-	resultFilesToCopy := []tasks.FileCopyEnvelope{tasks.FileCopyEnvelope{Path: "nrdiag-output/source.html",
+	resultFilesToCopy := []tasks.FileCopyEnvelope{{Path: "nrdiag-output/source.html",
 		Stream:     stream,
 		Identifier: t.Identifier().String(),
 	}}

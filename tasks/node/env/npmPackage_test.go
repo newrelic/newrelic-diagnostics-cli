@@ -54,10 +54,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.None,
 					},
 				}
@@ -73,10 +73,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -98,10 +98,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -123,10 +123,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -147,10 +147,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}

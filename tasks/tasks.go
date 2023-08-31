@@ -20,7 +20,7 @@ type Result struct {
 // Status statusEnum listing of valid values for status
 type Status int
 
-//Constants for use by the status property above
+// Constants for use by the status property above
 const (
 	//None - this task does not apply to this system and has no meaningful data to report.
 	None Status = iota
@@ -65,7 +65,7 @@ func (r Result) HasPayload() bool {
 	return r.Status != None && r.Status != Error && r.Status != Failure
 }
 
-//MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
+// MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
 func (s Status) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.StatusToString())
 }
@@ -78,7 +78,7 @@ type Task interface {
 	Execute(Options, map[string]Result) Result
 }
 
-//ByIdentifier is a sort helper to sort an array of tasks by their identifiers
+// ByIdentifier is a sort helper to sort an array of tasks by their identifiers
 type ByIdentifier []Task
 
 func (t ByIdentifier) Len() int {

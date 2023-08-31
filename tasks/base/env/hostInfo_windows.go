@@ -15,7 +15,7 @@ type BaseEnvHostInfo struct {
 	HostInfoProviderWithContext HostInfoProviderWithContextFunc
 }
 
-//On Windows, you can specify a timeout with '-o Base/Env/HostInfo.timeout=N', where N is a number between 1 and 60. The default timeout is 3 seconds.
+// On Windows, you can specify a timeout with '-o Base/Env/HostInfo.timeout=N', where N is a number between 1 and 60. The default timeout is 3 seconds.
 // set some consts for max, min and default timeout
 const TimeoutMax = 60
 const TimeoutMin = 1

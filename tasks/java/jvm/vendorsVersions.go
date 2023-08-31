@@ -13,7 +13,7 @@ import (
 
 type supportabilityStatus int
 
-//Constants for use by the supportabilityStatus enum
+// Constants for use by the supportabilityStatus enum
 const (
 	NotSupported supportabilityStatus = iota
 	LegacySupported
@@ -143,7 +143,7 @@ func (p JavaJVMVendorsVersions) Execute(options tasks.Options, upstream map[stri
 
 }
 
-//getSupportabilityCounts takes a slice of []PIDInfos and returns the total counts present
+// getSupportabilityCounts takes a slice of []PIDInfos and returns the total counts present
 // in the slice for each possible SupportabilityStatus
 func getSupportabilityCounts(javaPIDInfos []PIDInfo) map[supportabilityStatus]int {
 	counts := map[supportabilityStatus]int{
@@ -159,8 +159,8 @@ func getSupportabilityCounts(javaPIDInfos []PIDInfo) map[supportabilityStatus]in
 	return counts
 }
 
-//determineSummaryStatusResult determines the task status and corresponding summary by
-//examining the detected JVM vendor/versions. If any JVMs are found that
+// determineSummaryStatusResult determines the task status and corresponding summary by
+// examining the detected JVM vendor/versions. If any JVMs are found that
 // are not supported by a modern or legacy agent, it will return a tasks.Failure.
 // If all JVMs are supported, but a least one JVM requiring a legacy agent is found,
 // it will return a tasks.Warning status.
@@ -219,7 +219,7 @@ func trimQuotes(src string) string {
 	return src
 }
 
-//parseJavaExecutable takes in command line arguments and returns first argument that is determined to be
+// parseJavaExecutable takes in command line arguments and returns first argument that is determined to be
 // the java executable.
 func parseJavaExecutable(cmdLineArgs string) string {
 	//first pass, splitting on ' -'
@@ -248,13 +248,13 @@ func parseJavaExecutable(cmdLineArgs string) string {
 	return ""
 }
 
-//getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
+// getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
 func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }
 
-//parseVendorDetailsByArgs parses vendor and version directly from java process arguments list
-//used as a fallback if java -version fails.
+// parseVendorDetailsByArgs parses vendor and version directly from java process arguments list
+// used as a fallback if java -version fails.
 func parseVendorDetailsByArgs(cmdLineArgs string) (string, string, bool) {
 	vendor := extractVendorFromArgs(cmdLineArgs)
 	if vendor == "" {
@@ -270,8 +270,8 @@ func parseVendorDetailsByArgs(cmdLineArgs string) (string, string, bool) {
 
 }
 
-//parseVendorDetailsByExe takes in a java executable path (e.g. /foo/bar/bin/java) and
-//attempts to parse the vendor and version by running: /foo/bar/bin/java -version
+// parseVendorDetailsByExe takes in a java executable path (e.g. /foo/bar/bin/java) and
+// attempts to parse the vendor and version by running: /foo/bar/bin/java -version
 func (p JavaJVMVendorsVersions) parseVendorDetailsByExe(javaExecutable string) (string, string, bool) {
 	execOutputRaw, err := p.cmdExec(javaExecutable, "-version")
 	if err != nil {
@@ -529,7 +529,6 @@ func (p JavaJVMVendorsVersions) isLegacySupported(vendor string, version string)
 	if requirements != nil {
 		return isItCompatible(version, requirements)
 	}
-
 
 	return false
 }

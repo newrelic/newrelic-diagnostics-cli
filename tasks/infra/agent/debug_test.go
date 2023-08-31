@@ -58,10 +58,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status: tasks.Info,
 					},
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.None,
 					},
 				}
@@ -81,10 +81,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 					},
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -104,10 +104,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 					},
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: []string{"a", "b", "c"},
 					},
@@ -128,7 +128,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 1,
@@ -137,7 +137,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 							Build: 0,
 						},
 					},
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 					},
 				}
@@ -162,10 +162,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 					},
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -184,10 +184,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 					},
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 1,
@@ -214,10 +214,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 				BeforeEach(func() {
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
-						"Base/Log/Copy": tasks.Result{
+						"Base/Log/Copy": {
 							Status: tasks.Success,
 						},
-						"Infra/Agent/Version": tasks.Result{
+						"Infra/Agent/Version": {
 							Status: tasks.Info,
 							Payload: tasks.Ver{
 								Major: 1,
@@ -226,7 +226,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 								Build: 0,
 							},
 						},
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status: tasks.None,
 						},
 					}
@@ -245,10 +245,10 @@ var _ = Describe("Infra/Agent/Debug", func() {
 
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
-						"Base/Log/Copy": tasks.Result{
+						"Base/Log/Copy": {
 							Status: tasks.Success,
 						},
-						"Infra/Agent/Version": tasks.Result{
+						"Infra/Agent/Version": {
 							Status: tasks.Info,
 							Payload: tasks.Ver{
 								Major: 1,
@@ -257,7 +257,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 								Build: 0,
 							},
 						},
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status: tasks.Info,
 							Payload: map[string]string{
 								"ProgramFiles": `C:\Program Files`,
@@ -283,7 +283,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Agent/Version": tasks.Result{
+					"Infra/Agent/Version": {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 1,
@@ -292,7 +292,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 							Build: 0,
 						},
 					},
-					"Base/Log/Copy": tasks.Result{
+					"Base/Log/Copy": {
 						Status: tasks.Success,
 					},
 				}

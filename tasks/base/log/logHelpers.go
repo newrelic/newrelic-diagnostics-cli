@@ -49,17 +49,17 @@ var logEnvVars = []string{
 }
 
 var keysInConfigFile = map[string][]string{
-	"fullpaths": []string{
+	"fullpaths": {
 		"log_file",                //Python: "tmp/newrelic-python-agent.log" and Infra: /var/log/newrelic-infra/newrelic-infra.log (Linux: If not defined, it logs only in the standard output.)
 		"newrelic.daemon.logfile", //PHP daemon default val: "/var/log/newrelic/newrelic-daemon.log"
 		"newrelic.logfile",        //PHP: "/var/log/newrelic/newrelic-daemon.log",
 		"logging.filepath",        // Node: "node/app/newrelic_agent.log"
 	},
-	"filenames": []string{
+	"filenames": {
 		"log_file_name", //Java and Ruby: "newrelic_agent.log"
 		"-fileName",     //.NET: "FILENAME.log"
 	},
-	"directories": []string{
+	"directories": {
 		"log_file_path", //Java, ruby: "/Users/shuayhuaca/Desktop/"
 		"-directory",    //.NET "PATH\TO\LOG\DIRECTORY"
 	},
@@ -136,7 +136,7 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		paths = append(paths, "/var/log")                                 //For Syn Minion and Infra
 		paths = append(paths, "/var/log/newrelic")                        // For PHP agent and daemon log
 		paths = append(paths, "/usr/local/newrelic-netcore20-agent/logs") // for dotnetcore up to v10
-		paths = append(paths, "/usr/local/newrelic-dotnet-agent/logs") // for dotnetcore v10+
+		paths = append(paths, "/usr/local/newrelic-dotnet-agent/logs")    // for dotnetcore v10+
 	}
 	/*
 		Collect log file paths in this order
@@ -502,7 +502,7 @@ func getLogPathsFromConfigFile(configElements []baseConfig.ValidateElement, unma
 	return logElements
 }
 
-//Similar to tasks.FindFiles except that it does not traverse through sub-directories to find those filenames provided
+// Similar to tasks.FindFiles except that it does not traverse through sub-directories to find those filenames provided
 func findLogFiles(patterns []string, dir string) []string {
 	pathsToFiles := getFilesFromDir(dir)
 	// map to automatically dedupe file matches

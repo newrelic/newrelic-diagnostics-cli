@@ -55,7 +55,7 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Status: tasks.None,
 					},
 				}
@@ -75,7 +75,7 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Status:  tasks.Success,
 						Payload: "I should be a []config.ValidateElement",
 					},
@@ -95,10 +95,10 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "redis-config.yml",
 									FilePath: "/etc/newrelic-infra/integrations.d/",
@@ -109,7 +109,7 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 									Path:     "",
 									RawValue: interface{}(nil),
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "keys",
 											Path:     "",
 											RawValue: `{"key":}`,
@@ -136,10 +136,10 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "redis-config.yml",
 									FilePath: "/etc/newrelic-infra/integrations.d/",
@@ -150,7 +150,7 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 									Path:     "",
 									RawValue: interface{}(nil),
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "keys",
 											Path:     "",
 											RawValue: `{"key": "value"}`,
@@ -177,10 +177,10 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsValidate": tasks.Result{
+					"Infra/Config/IntegrationsValidate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "redis.yml",
 									FilePath: "/etc/newrelic-infra/integrations.d/",
@@ -191,7 +191,7 @@ var _ = Describe("Infra/Config/IntegrationsValidateJson", func() {
 									Path:     "",
 									RawValue: interface{}(nil),
 									Children: []tasks.ValidateBlob{
-										tasks.ValidateBlob{
+										{
 											Key:      "keys",
 											Path:     "",
 											RawValue: `{"true"}`,

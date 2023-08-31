@@ -78,7 +78,7 @@ func (p DotnetRequirementsRequirementCheck) Execute(options tasks.Options, upstr
 	}
 }
 
-//Some checks are okay if the status is none or success
+// Some checks are okay if the status is none or success
 func checkTaskStatus(task string, status tasks.Status) bool {
 
 	//map of tasks where a None status is acceptable

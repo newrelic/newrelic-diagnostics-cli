@@ -95,7 +95,7 @@ func (p NodeEnvNpmPackage) Execute(options tasks.Options, upstream map[string]ta
 	}
 }
 
-//Recursively find package*.json files, skipping those in node_modules
+// Recursively find package*.json files, skipping those in node_modules
 func (p NodeEnvNpmPackage) findPackageFiles() ([]string, error) {
 	var packageFiles []string
 
