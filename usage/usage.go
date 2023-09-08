@@ -107,7 +107,6 @@ func genInsertKey(runID string) string {
 
 // SendUsageData generates and POSTS NRdiag usage data to the Haberdasher service
 func SendUsageData(results []registration.TaskResult, runID string) {
-
 	preparedResults := prepareResults(results)
 	preparedConfig := config.Flags.UsagePayload()
 	preparedMeta := prepareMeta(results, runID)
@@ -242,9 +241,14 @@ func genRequestHeaders(m metaData) map[string]string {
 // and the passed string as the request body.
 func (u *usageAPI) postData(data string, headers map[string]string) (usageResponse, error) {
 	var response httpResponse
-	if len(u.URL) == 0 {
+
+	if len(config.UsageEndpoint) == 0 {
+
 		// u.URL is assigned by build script. If not present, fall back to default
+
 		u.URL = defaultUsageEndpoint
+	} else {
+		u.URL = config.UsageEndpoint
 	}
 	wrapper := httpHelper.RequestWrapper{
 		Method:         "POST",
