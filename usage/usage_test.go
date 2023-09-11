@@ -135,6 +135,7 @@ func Test_usageAPI_postData(t *testing.T) {
 			u := &usageAPI{
 				serviceEndpoint: tt.fields.serviceEndpoint,
 			}
+			config.UsageEndpoint = apiStubReflectBody.URL
 			got, err := u.postData(tt.args.data, tt.args.headers)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("usageAPI.postData() error = %v, wantErr %v", err, tt.wantErr)

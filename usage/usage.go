@@ -71,12 +71,6 @@ type serviceEndpoint struct {
 	URL string
 }
 
-var usageEndpoint = usageAPI{
-	serviceEndpoint{
-		URL: config.UsageEndpoint,
-	},
-}
-
 func getUnixTime() int64 {
 	return time.Now().Unix()
 }
@@ -107,7 +101,12 @@ func genInsertKey(runID string) string {
 
 // SendUsageData generates and POSTS NRdiag usage data to the Haberdasher service
 func SendUsageData(results []registration.TaskResult, runID string) {
-
+	usageEndpoint := usageAPI{
+		serviceEndpoint{
+			URL: config.UsageEndpoint,
+		},
+	}
+	log.Debug("Sending usage data to", config.UsageEndpoint)
 	preparedResults := prepareResults(results)
 	preparedConfig := config.Flags.UsagePayload()
 	preparedMeta := prepareMeta(results, runID)
