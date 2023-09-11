@@ -1,4 +1,4 @@
-majorMinor=3.1
+majorMinor=3.2
 buildNumber=0
-currentReleaseVersion=3.1.0
-prevReleaseVersion=3.0.0
+currentReleaseVersion=3.2.0
+prevReleaseVersion=3.1.0
