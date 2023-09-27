@@ -85,7 +85,7 @@ func (p BaseEnvCheckWindowsAdmin) Execute(options tasks.Options, upstream map[st
 			result.Summary += "\n - " + e.Error()
 		}
 	}
-	result.URL = "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/new-relic-diagnostics#windows-run"
+	result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/solve-common-issues/diagnostics-cli-nrdiag/run-diagnostics-cli-nrdiag/#windows-run"
 	return result
 }
 

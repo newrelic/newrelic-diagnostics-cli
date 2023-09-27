@@ -25,7 +25,6 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	registrationFunc(InfraAgentDebug{
 		blockWithProgressbar: blockWithProgressbar,
 		cmdExecutor:          tasks.CmdExecutor,
-		runtimeOS:            runtime.GOOS,
 	}, false)
 	registrationFunc(InfraAgentConnect{
 		httpGetter: httpHelper.MakeHTTPRequest,

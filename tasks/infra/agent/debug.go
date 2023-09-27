@@ -1,7 +1,11 @@
 package agent
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -10,30 +14,13 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-// Time we wait for debug log collection in minutes
-var debugLoggingTimeoutMin = 3
-
-// https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/new-relic-infrastructure-agent-140
-var ctlVerRequirementLinux tasks.Ver = tasks.Ver{
-	Major: 1,
-	Minor: 4,
-	Patch: 0,
-	Build: 0,
-}
-
-// https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/new-relic-infrastructure-agent-170-0
-var ctlVerRequirementWindows tasks.Ver = tasks.Ver{
-	Major: 1,
-	Minor: 7,
-	Patch: 0,
-	Build: 0,
-}
+var debugLoggingTimeoutMin = 5
+var infraLogConfigDocLink = "https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/configuration/infrastructure-agent-configuration-settings/#log"
 
 // InfraAgentDebug - This struct defines the Infrastructure agent version task
 type InfraAgentDebug struct {
-	blockWithProgressbar func(int)
+	blockWithProgressbar func(int) (bool, int)
 	cmdExecutor          func(string, ...string) ([]byte, error)
-	runtimeOS            string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -49,7 +36,7 @@ func (p InfraAgentDebug) Explain() string {
 // Dependencies - Returns the dependencies for ech task. When executed by name each dependency will be executed as well and the results from that dependency passed in to the downstream task
 func (p InfraAgentDebug) Dependencies() []string {
 	return []string{
-		"Base/Log/Copy",
+		"Infra/Log/Collect",
 		"Infra/Agent/Version",
 		"Base/Env/CollectEnvVars",
 	}
@@ -57,14 +44,35 @@ func (p InfraAgentDebug) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
+	if upstream["Infra/Log/Collect"].Status == tasks.Error || upstream["Infra/Log/Collect"].Status == tasks.Failure {
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: "Failed to collect New Relic Infrastructure log files. Review the output of the Infra/Log/Collect task for more information.",
+			URL:     infraLogConfigDocLink,
+		}
+	}
 
-	// Because this task doesn't run by default and customers will need deliberately request it be run, we don't want this task
-	// to fail silently (None result) when there is an upstream dependency issue.
-	if upstream["Base/Log/Copy"].Status != tasks.Success {
+	if upstream["Infra/Log/Collect"].Status == tasks.None || !upstream["Infra/Log/Collect"].HasPayload() {
 		return tasks.Result{
 			Status:  tasks.Failure,
 			Summary: "No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run the " + tasks.ThisProgramFullName + " after setting the NRIA_LOG_FILE environment variable.",
-			URL:     "https://docs.newrelic.com/docs/infrastructure/install-configure-manage-infrastructure/configuration/infrastructure-configuration-settings#log-file",
+			URL:     infraLogConfigDocLink,
+		}
+	}
+
+	infraLogs, ok := upstream["Infra/Log/Collect"].Payload.([]string)
+	if !ok {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: tasks.AssertionErrorSummary,
+		}
+	}
+
+	if len(infraLogs) < 1 {
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: "No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run the " + tasks.ThisProgramFullName + " after setting the NRIA_LOG_FILE environment variable.",
+			URL:     infraLogConfigDocLink,
 		}
 	}
 
@@ -83,50 +91,28 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 		}
 	}
 
-	var targetInfraVersion tasks.Ver
-	if p.runtimeOS == "windows" {
-		targetInfraVersion = ctlVerRequirementWindows
-	} else {
-		targetInfraVersion = ctlVerRequirementLinux
-	}
-
-	ctlSupported := infraVersion.IsGreaterThanEq(targetInfraVersion)
+	ctlSupported := infraVersion.IsGreaterThanEq(InfraCtlVerRequirement)
 	if !ctlSupported {
 		return tasks.Result{
 			Status:  tasks.Failure,
-			Summary: fmt.Sprintf("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(%s). Minimum required Infrastructure Agent version is: %s", infraVersion.String(), targetInfraVersion.String()),
-			URL:     "https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes",
+			Summary: fmt.Sprintf("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(%s). Minimum required Infrastructure Agent version is: %s", infraVersion.String(), InfraCtlVerRequirement.String()),
+			URL:     "https://docs.newrelic.com/docs/release-notes/infrastructure-release-notes/infrastructure-agent-release-notes/",
 		}
 	}
 
-	infraCtlCmd := "newrelic-infra-ctl"
-
-	//For windows we have determine exact location of binary, using environment variables
-	if p.runtimeOS == "windows" {
-		if upstream["Base/Env/CollectEnvVars"].Status != tasks.Info {
-			return tasks.Result{
-				Status:  tasks.Failure,
-				Summary: "Unable to determine path of New Relic Infrastructure CTL binary via environment variables: upstream dependency failure",
-			}
-		}
-
-		envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
-		if !ok {
+	infraCtlCmd, err := GetInfraCtlCmd(upstream)
+	if err != nil {
+		if err.Error() == tasks.AssertionErrorSummary {
 			return tasks.Result{
 				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
-
-		programFilesPath, ok := envVars["ProgramFiles"]
-		if !ok {
-			return tasks.Result{
-				Status:  tasks.Failure,
-				Summary: "Unable to determine path of New Relic Infrastructure CTL binary via environment variables: ProgramFiles environment variable not",
-			}
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: fmt.Sprintf("Unable to determine path of New Relic Infrastructure CTL binary via environment variables: %s", err.Error()),
 		}
 
-		infraCtlCmd = programFilesPath + `\New Relic\newrelic-infra\newrelic-infra-ctl.exe`
 	}
 
 	// Sleep here to give stdout priority to go func handling task output to avoid printing the following line
@@ -142,15 +128,23 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: fmt.Sprintf("Error executing newrelic-infra-ctl: %s\n\t%s", err.Error(), string(cmdOutBytes)),
-			URL:     "https://docs.newrelic.com/docs/infrastructure/install-configure-manage-infrastructure/manage-your-agent/troubleshoot-running-agent",
+			URL:     "https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/manage-your-agent/troubleshoot-running-infrastructure-agent/",
 		}
 	}
 
 	log.Debugf("newrelic-infra-ctl output: %s", string(cmdOutBytes))
 
-	log.Infof("Debug logging enabled. Collecting logs for %d minutes...\n", debugLoggingTimeoutMin)
+	log.Infof("Debug logging enabled. Collecting logs for %d minutes... (Ctrl-C to end early)\n", debugLoggingTimeoutMin)
 
-	p.blockWithProgressbar(debugLoggingTimeoutMin)
+	interrupted, interruptedSeconds := p.blockWithProgressbar(debugLoggingTimeoutMin)
+
+	if interrupted {
+		log.Info("Log collection interrupted.\n")
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: fmt.Sprintf("Successfully enabled New Relic Infrastructure debug logging with newrelic-infra-ctl, however the collection was interrupted after %s", time.Duration(interruptedSeconds*int(time.Second))),
+		}
+	}
 
 	log.Info("Done!\n")
 
@@ -160,7 +154,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 	}
 }
 
-func blockWithProgressbar(minutes int) {
+func blockWithProgressbar(minutes int) (bool, int) {
 	seconds := minutes * 60
 	bar := pb.New(seconds)
 	bar.ShowTimeLeft = false
@@ -171,14 +165,23 @@ func blockWithProgressbar(minutes int) {
 	bar.Width = 60
 
 	bar.Start()
-
 	defer bar.Finish()
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 
 	for i := 0; i < seconds; i++ {
-		<-ticker.C
-		bar.Increment()
+		select {
+		case <-ticker.C:
+			bar.Increment()
+		case <-ctx.Done():
+			stop()
+			ticker.Stop()
+			return true, i
+		}
 	}
-	ticker.Stop()
+	return false, 0
 }

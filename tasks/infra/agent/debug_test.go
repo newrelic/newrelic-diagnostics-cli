@@ -1,9 +1,9 @@
 package agent
 
-// Tests for Infra/Config/IntegrationsCollect
-
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -37,7 +37,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 
 	Describe("Dependencies()", func() {
 		It("Should return an expected slice of dependencies", func() {
-			expectedDependencies := []string{"Base/Log/Copy", "Infra/Agent/Version", "Base/Env/CollectEnvVars"}
+			expectedDependencies := []string{"Infra/Log/Collect", "Infra/Agent/Version", "Base/Env/CollectEnvVars"}
 			Expect(p.Dependencies()).To(Equal(expectedDependencies))
 		})
 	})
@@ -54,7 +54,6 @@ var _ = Describe("Infra/Agent/Debug", func() {
 		})
 
 		Context("upstream dependency for log collection failed", func() {
-
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
@@ -77,12 +76,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 		})
 
 		Context("upstream dependency for infra agent detection failed", func() {
-
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": {
-						Status: tasks.Success,
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
 					},
 					"Infra/Agent/Version": {
 						Status: tasks.None,
@@ -100,12 +99,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 		})
 
 		Context("Upstream Infra agent version returned unexpected type", func() {
-
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": {
-						Status: tasks.Success,
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
 					},
 					"Infra/Agent/Version": {
 						Status:  tasks.Info,
@@ -124,7 +123,6 @@ var _ = Describe("Infra/Agent/Debug", func() {
 		})
 
 		Context("when there is an error executing newrelic-infra-ctl", func() {
-
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
@@ -137,15 +135,15 @@ var _ = Describe("Infra/Agent/Debug", func() {
 							Build: 0,
 						},
 					},
-					"Base/Log/Copy": {
-						Status: tasks.Success,
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
 					},
 				}
 				p = InfraAgentDebug{
 					cmdExecutor: func(a string, b ...string) ([]byte, error) {
 						return []byte("Additional error details"), errors.New("newrelic-infra-ctl not found in $PATH")
 					},
-					runtimeOS: "linux",
 				}
 			})
 
@@ -158,12 +156,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			})
 		})
 		Context("upstream dependency for infra agent detection failed", func() {
-
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": {
-						Status: tasks.Success,
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
 					},
 					"Infra/Agent/Version": {
 						Status: tasks.None,
@@ -180,12 +178,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			})
 		})
 		Context("Detected infra agent version is too old to feature infra-ctl app", func() {
-
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Copy": {
-						Status: tasks.Success,
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
 					},
 					"Infra/Agent/Version": {
 						Status: tasks.Info,
@@ -206,80 +204,45 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			It("should return an expected result summary", func() {
 				Expect(result.Summary).To(Equal("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(1.2.0.0). Minimum required Infrastructure Agent version is: 1.4.0.0"))
 			})
-
 		})
 
-		Context("When Running on Windows", func() {
-			Describe("and the infra version is not supported", func() {
-				BeforeEach(func() {
-					options = tasks.Options{}
-					upstream = map[string]tasks.Result{
-						"Base/Log/Copy": {
-							Status: tasks.Success,
+		Context("Detected infra agent version is supported for infra-ctl app", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
+					},
+					"Infra/Agent/Version": {
+						Status: tasks.Info,
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 1,
+							Build: 0,
 						},
-						"Infra/Agent/Version": {
-							Status: tasks.Info,
-							Payload: tasks.Ver{
-								Major: 1,
-								Minor: 5,
-								Patch: 0,
-								Build: 0,
-							},
+					},
+					"Base/Env/CollectEnvVars": {
+						Status: tasks.Info,
+						Payload: map[string]string{
+							"ProgramFiles": `C:\Program Files`,
 						},
-						"Base/Env/CollectEnvVars": {
-							Status: tasks.None,
-						},
-					}
-					p.runtimeOS = "windows"
-				})
-				It("should return an expected result status", func() {
-					Expect(result.Status).To(Equal(tasks.Failure))
-				})
-
-				It("should return an expected result summary", func() {
-					Expect(result.Summary).To(Equal("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(1.5.0.0). Minimum required Infrastructure Agent version is: 1.7.0.0"))
-				})
+					},
+				}
+				p.blockWithProgressbar = func(int) (bool, int) { return false, 0 }
+				p.cmdExecutor = func(string, ...string) ([]byte, error) { return []byte{}, nil }
 			})
-			Describe("and the infra version is supported", func() {
-				BeforeEach(func() {
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Success))
+			})
 
-					options = tasks.Options{}
-					upstream = map[string]tasks.Result{
-						"Base/Log/Copy": {
-							Status: tasks.Success,
-						},
-						"Infra/Agent/Version": {
-							Status: tasks.Info,
-							Payload: tasks.Ver{
-								Major: 1,
-								Minor: 7,
-								Patch: 1,
-								Build: 0,
-							},
-						},
-						"Base/Env/CollectEnvVars": {
-							Status: tasks.Info,
-							Payload: map[string]string{
-								"ProgramFiles": `C:\Program Files`,
-							},
-						},
-					}
-					p.runtimeOS = "windows"
-					p.blockWithProgressbar = func(int) {}
-					p.cmdExecutor = func(string, ...string) ([]byte, error) { return []byte{}, nil }
-				})
-				It("should return an expected result status", func() {
-					Expect(result.Status).To(Equal(tasks.Success))
-				})
-
-				It("should return an expected result summary", func() {
-					Expect(result.Summary).To(Equal("Successfully enabled New Relic Infrastructure debug logging with newrelic-infra-ctl"))
-				})
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal("Successfully enabled New Relic Infrastructure debug logging with newrelic-infra-ctl"))
 			})
 		})
 
-		Context("when debug logs are enabled and the wait is completed", func() {
-
+		Context("when there are no logs", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
@@ -287,20 +250,50 @@ var _ = Describe("Infra/Agent/Debug", func() {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 1,
-							Minor: 4,
-							Patch: 0,
+							Minor: 7,
+							Patch: 1,
 							Build: 0,
 						},
 					},
-					"Base/Log/Copy": {
-						Status: tasks.Success,
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{},
+					},
+				}
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal("No New Relic Infrastructure log files detected. If your log files are in a custom location, re-run the " + tasks.ThisProgramFullName + " after setting the NRIA_LOG_FILE environment variable."))
+			})
+		})
+
+		Context("when debug logs are enabled and the wait is completed", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Infra/Agent/Version": {
+						Status: tasks.Info,
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 1,
+							Build: 0,
+						},
+					},
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
 					},
 				}
 				p = InfraAgentDebug{
 					cmdExecutor: func(a string, b ...string) ([]byte, error) {
 						return []byte("Debug logging enabled"), nil
 					},
-					blockWithProgressbar: func(a int) {},
+					blockWithProgressbar: func(int) (bool, int) { return false, 0 },
 				}
 			})
 
@@ -310,6 +303,41 @@ var _ = Describe("Infra/Agent/Debug", func() {
 
 			It("should return an expected none result summary", func() {
 				Expect(result.Summary).To(Equal("Successfully enabled New Relic Infrastructure debug logging with newrelic-infra-ctl"))
+			})
+		})
+
+		Context("when debug logs are enabled but the wait is interrupted", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Infra/Agent/Version": {
+						Status: tasks.Info,
+						Payload: tasks.Ver{
+							Major: 1,
+							Minor: 7,
+							Patch: 1,
+							Build: 0,
+						},
+					},
+					"Infra/Log/Collect": {
+						Status:  tasks.Success,
+						Payload: []string{"test"},
+					},
+				}
+				p = InfraAgentDebug{
+					cmdExecutor: func(a string, b ...string) ([]byte, error) {
+						return []byte("Debug logging enabled"), nil
+					},
+					blockWithProgressbar: func(int) (bool, int) { return true, 60 },
+				}
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Warning))
+			})
+
+			It("should return an expected none result summary", func() {
+				Expect(result.Summary).To(Equal(fmt.Sprintf("Successfully enabled New Relic Infrastructure debug logging with newrelic-infra-ctl, however the collection was interrupted after %s", time.Duration(60*time.Second))))
 			})
 		})
 

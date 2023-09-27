@@ -1,4 +1,4 @@
-package env
+package jvm
 
 import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -7,14 +7,7 @@ import (
 
 // RegisterLinuxWith - will register any plugins in this package
 func RegisterLinuxWith(registrationFunc func(tasks.Task, bool)) {
-	log.Debug("Registering Base/Env/*")
+	log.Debug("Registering Java/JVM/*_nix")
 
-	registrationFunc(BaseEnvCheckSELinux{
-		cmdExec: tasks.CmdExecutor,
-	}, true)
-	registrationFunc(BaseEnvRootUser{
-		isUserRoot: tasks.IsUserRoot,
-	}, true)
+	registrationFunc(JavaJVMPermissions{}, true)
 }
-
-

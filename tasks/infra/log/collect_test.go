@@ -38,7 +38,7 @@ var _ = Describe("Infra/Log/Collect", func() {
 
 	Describe("Dependencies()", func() {
 		It("Should return expected dependencies", func() {
-			Expect(p.Dependencies()).To(Equal([]string{"Infra/Config/Agent", "Base/Config/Validate"}))
+			Expect(p.Dependencies()).To(Equal([]string{"Infra/Config/Agent", "Base/Config/Validate", "Base/Env/CollectEnvVars"}))
 		})
 	})
 
@@ -85,7 +85,7 @@ var _ = Describe("Infra/Log/Collect", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return the correct summary", func() {
-				Expect(result.Summary).To(Equal("Not executing task. Infra config file not found."))
+				Expect(result.Summary).To(Equal("New Relic Infrastructure agent log file path not found in the configuration file or environment variables."))
 			})
 		})
 
@@ -104,10 +104,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			})
 
 			It("Should return a none result", func() {
-				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return the correct summary", func() {
-				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
+				Expect(result.Summary).To(Equal("New Relic Infrastructure agent log file path not found in the configuration file or environment variables."))
 			})
 		})
 
@@ -202,8 +202,8 @@ var _ = Describe("Infra/Log/Collect", func() {
 			})
 
 			It("Should return a warning status and message", func() {
-				expectedSummary := `The log file path found in the New Relic config file ("/var/log/newrelic-infra/newrelic-infra.log") did not provide a file that was accessible to us:
-"stat /var/log/newrelic-infra/newrelic-infra.log: no such file or directory"
+				expectedSummary := `The log file path found (/var/log/newrelic-infra/newrelic-infra.log) did not provide a file that was accessible to us:
+stat /var/log/newrelic-infra/newrelic-infra.log: no such file or directory
 If you are working with a support ticket, manually provide your New Relic log file for further troubleshooting`
 				Expect(result.Status).To(Equal(tasks.Warning))
 				Expect(result.Summary).To(Equal(expectedSummary))
@@ -235,7 +235,7 @@ If you are working with a support ticket, manually provide your New Relic log fi
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("New Relic Infrastructure configuration file did not specify log file path"))
+				Expect(result.Summary).To(Equal("New Relic Infrastructure agent log file path not found in the configuration file or environment variables."))
 			})
 
 		})
@@ -244,9 +244,10 @@ If you are working with a support ticket, manually provide your New Relic log fi
 		var (
 			result            []string
 			parsedConfigFiles []config.ValidateElement
+			envVars           map[string]string
 		)
 		JustBeforeEach(func() {
-			result = p.getLogFilePaths(parsedConfigFiles)
+			result = p.getLogFilePaths(parsedConfigFiles, envVars)
 		})
 		Context("When given a slice of validate elements containing log file entries", func() {
 			parsedConfigFiles = []config.ValidateElement{
@@ -272,9 +273,10 @@ If you are working with a support ticket, manually provide your New Relic log fi
 		var (
 			result            []string
 			parsedConfigFiles []config.ValidateElement
+			envVars           map[string]string
 		)
 		JustBeforeEach(func() {
-			result = p.getLogFilePaths(parsedConfigFiles)
+			result = p.getLogFilePaths(parsedConfigFiles, envVars)
 		})
 		Context("When given a slice of validate elements containing log file entries", func() {
 			parsedConfigFiles = []config.ValidateElement{
