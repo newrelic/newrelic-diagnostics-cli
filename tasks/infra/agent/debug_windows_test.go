@@ -78,7 +78,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 							},
 						},
 					}
-					p.blockWithProgressbar = func(int) {}
+					p.blockWithProgressbar = func(int) (bool, int) { return false, 0}
 					p.cmdExecutor = func(string, ...string) ([]byte, error) { return []byte{}, nil }
 				})
 				It("should return an expected result status", func() {

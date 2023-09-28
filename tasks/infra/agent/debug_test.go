@@ -3,6 +3,7 @@ package agent
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -130,7 +131,7 @@ var _ = Describe("Infra/Agent/Debug", func() {
 						Status: tasks.Info,
 						Payload: tasks.Ver{
 							Major: 1,
-							Minor: 4,
+							Minor: 8,
 							Patch: 0,
 							Build: 0,
 						},
@@ -138,6 +139,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 					"Infra/Log/Collect": {
 						Status:  tasks.Success,
 						Payload: []string{"test"},
+					},
+					"Base/Env/CollectEnvVars": {
+						Status: tasks.Info,
+						Payload: map[string]string{
+							"ProgramFiles": `C:\Program Files`,
+						},
 					},
 				}
 				p = InfraAgentDebug{
@@ -202,7 +209,11 @@ var _ = Describe("Infra/Agent/Debug", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(1.2.0.0). Minimum required Infrastructure Agent version is: 1.4.0.0"))
+				if runtime.GOOS == "windows" {
+					Expect(result.Summary).To(Equal("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(1.2.0.0). Minimum required Infrastructure Agent version is: 1.7.0.0"))
+				} else {
+					Expect(result.Summary).To(Equal("Infrastructure debug CTL binary not available in detected version of Infrastructure Agent(1.2.0.0). Minimum required Infrastructure Agent version is: 1.4.0.0"))
+				}
 			})
 		})
 
@@ -288,6 +299,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 						Status:  tasks.Success,
 						Payload: []string{"test"},
 					},
+					"Base/Env/CollectEnvVars": {
+						Status: tasks.Info,
+						Payload: map[string]string{
+							"ProgramFiles": `C:\Program Files`,
+						},
+					},
 				}
 				p = InfraAgentDebug{
 					cmdExecutor: func(a string, b ...string) ([]byte, error) {
@@ -322,6 +339,12 @@ var _ = Describe("Infra/Agent/Debug", func() {
 					"Infra/Log/Collect": {
 						Status:  tasks.Success,
 						Payload: []string{"test"},
+					},
+					"Base/Env/CollectEnvVars": {
+						Status: tasks.Info,
+						Payload: map[string]string{
+							"ProgramFiles": `C:\Program Files`,
+						},
 					},
 				}
 				p = InfraAgentDebug{

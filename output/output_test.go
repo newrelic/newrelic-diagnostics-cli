@@ -41,7 +41,7 @@ func Test_GetResultsJSON(t *testing.T) {
 	// - inspect new-output.json to make sure it looks like what you expect
 	// - replace test-output.json with new-output.json
 	// - comment the line and run the test again
-	//os.WriteFile("fixtures/new-output.json", []byte(observed), 0644)
+	os.WriteFile("fixtures/new-output.json", []byte(observed), 0644)
 
 	if expected != observed {
 		t.Error("Expected:", expected, "Observed:", observed)
@@ -88,7 +88,7 @@ func Test_StreamDataOutput(t *testing.T) {
 	// - inspect new-output.json to make sure it looks like what you expect
 	// - replace test-stream-output.json with new-stream-output.json
 	// - comment the line and run the test again
-	//os.WriteFile("fixtures/new-stream-output.json", []byte(observed), 0644)
+	os.WriteFile("fixtures/new-stream-output.json", []byte(observed), 0644)
 
 	if expected != observed {
 		t.Error("Expected:", expected, "Observed:", observed)
