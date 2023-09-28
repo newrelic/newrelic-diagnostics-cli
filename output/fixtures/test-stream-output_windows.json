@@ -53,7 +53,7 @@
 		"Description": "this is a test",
 		"Output": "test",
 		"OutputFiles": [
-			"C:\\home\\test.out"
+			"D:\\home\\test.out"
 		],
 		"OutputTruncated": false
 	}
