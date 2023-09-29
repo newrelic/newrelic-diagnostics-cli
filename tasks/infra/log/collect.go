@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -30,6 +31,7 @@ func (p InfraLogCollect) Dependencies() []string {
 	return []string{
 		"Infra/Config/Agent",
 		"Base/Config/Validate",
+		"Base/Env/CollectEnvVars",
 	}
 }
 
@@ -42,27 +44,28 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 		}
 	}
 
-	if !upstream["Base/Config/Validate"].HasPayload() {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "Not executing task. Infra config file not found.",
+	configElements := []config.ValidateElement{}
+	if upstream["Base/Config/Validate"].HasPayload() {
+		getConfigElements, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
+		if ok {
+			configElements = getConfigElements
 		}
 	}
 
-	configElements, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
-	if !ok {
-		return tasks.Result{
-			Status:  tasks.Error,
-			Summary: tasks.AssertionErrorSummary,
+	envVars := make(map[string]string)
+	if upstream["Base/Env/CollectEnvVars"].Status == tasks.Info && upstream["Base/Env/CollectEnvVars"].HasPayload() {
+		getEnvVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+		if ok {
+			envVars = getEnvVars
 		}
 	}
 
-	logFilePaths := p.getLogFilePaths(configElements)
+	logFilePaths := p.getLogFilePaths(configElements, envVars)
 
 	if len(logFilePaths) < 1 {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "New Relic Infrastructure configuration file did not specify log file path",
+			Summary: "New Relic Infrastructure agent log file path not found in the configuration file or environment variables.",
 		}
 	}
 
@@ -76,11 +79,11 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 	for _, file := range fileStatuses {
 		if !file.IsValid {
 			invalidFilePaths = append(invalidFilePaths, file.Path)
-			resultSummary += fmt.Sprintf("The log file path found in the New Relic config file (%q) did not provide a file that was accessible to us:\n%q\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting", file.Path, (file.ErrorMsg).Error())
+			resultSummary += fmt.Sprintf("The log file path found (%s) did not provide a file that was accessible to us:\n%s\nIf you are working with a support ticket, manually provide your New Relic log file for further troubleshooting", file.Path, file.ErrorMsg.Error())
 			continue
 		}
 		validFilePaths = append(validFilePaths, file.Path)
-		resultSummary += fmt.Sprintf("Success, logs found! We were able to access the following New Relic log file through the path provided in your New Relic config file:%s\n", file.Path)
+		resultSummary += fmt.Sprintf("Success, logs found! We were able to access the following New Relic Infrastructure agent log file:%s\n", file.Path)
 	}
 
 	if len(invalidFilePaths) == 0 {
@@ -109,8 +112,26 @@ func (p InfraLogCollect) Execute(options tasks.Options, upstream map[string]task
 }
 
 // getLogFilePaths - Retrieves log files paths from a slice of config validate elements
-func (p InfraLogCollect) getLogFilePaths(configElements []config.ValidateElement) []string {
+func (p InfraLogCollect) getLogFilePaths(configElements []config.ValidateElement, envVars map[string]string) []string {
 	filePaths := []string{}
+	if len(configElements) < 1 && len(envVars) < 1 {
+		return filePaths
+	}
+
+	// By default, windows creates a log in ProgramData
+	if runtime.GOOS == "windows" {
+		sysProgramData, ok := envVars["ProgramData"]
+		if ok && sysProgramData != "" {
+			filePaths = append(filePaths, sysProgramData+`\New Relic\newrelic-infra\newrelic-infra.log`) //Windows, agent version 1.0.944 or higher
+		}
+	}
+
+	// Make sure to check the env variable too
+	nriaLogFile, ok := envVars["NRIA_LOG_FILE"]
+	if ok && nriaLogFile != "" {
+		filePaths = append(filePaths, nriaLogFile)
+	}
+
 	//Loop over parsed config elements
 	for _, configFile := range configElements {
 

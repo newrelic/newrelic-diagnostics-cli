@@ -341,7 +341,7 @@ func getLogPathsFromStandardLocations(paths []string, options tasks.Options) []L
 			}
 			logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 		}
-	} else {
+	} else if len(oldLogFiles) > 0 {
 		mostRecentOldLog := selectMostRecentOldLogs(oldLogFiles)
 		dir, fileName := filepath.Split(mostRecentOldLog)
 		logSourceData := LogSourceData{

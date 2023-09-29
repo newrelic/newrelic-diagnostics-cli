@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -106,7 +106,7 @@ func FindProcessByName(name string) ([]process.Process, error) {
 
 // ReadFile - reads file from path to string
 func ReadFile(file string) string {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		log.Debug("error reading file", err)
 		return ""
@@ -684,7 +684,7 @@ func GetProcessEnvVars(pid int32) (envVars EnvironmentVariables, retErr error) {
 	case "linux":
 		pidString := strconv.FormatInt(int64(pid), 10)
 		path := filepath.Join("/proc", pidString, "environ")
-		environFile, err := ioutil.ReadFile(path)
+		environFile, err := os.ReadFile(path)
 		if err != nil {
 			errorString := "Error reading process env variables: " + err.Error()
 			log.Debug(errorString)
@@ -1047,4 +1047,10 @@ func ValidatePath(path string) CollectFileStatus {
 
 	file.Close()
 	return CollectFileStatus{path, true, nil}
+}
+
+// IsUserRoot - checks if the user is root
+func IsUserRoot() (bool, error) {
+	currentUser, err := user.Current()
+	return currentUser.Username == "root", err
 }
