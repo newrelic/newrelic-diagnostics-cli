@@ -44,8 +44,10 @@ var (
 
 var logEnvVars = []string{
 	"NRIA_LOG_FILE",                   // Infra agent
-	"NEW_RELIC_LOG",                   //.NET, Java, Node and python agent paths
-	"NEWRELIC_PROFILER_LOG_DIRECTORY", //.NET path\to\agent\directory (not configurable via config file)
+	"NEW_RELIC_LOG",                   // .NET, Java, Node and python agent paths
+	"NEWRELIC_PROFILER_LOG_DIRECTORY", // .NET path\to\agent\directory (not configurable via config file)
+	"NEW_RELIC_LOG_FILE_PATH",         // Ruby agent log path
+	"NEW_RELIC_LOG_FILE_NAME",         // Ruby agent log filename
 }
 
 var keysInConfigFile = map[string][]string{
