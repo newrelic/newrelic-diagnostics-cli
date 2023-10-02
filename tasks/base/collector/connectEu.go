@@ -40,7 +40,7 @@ func (p BaseCollectorConnectEU) Dependencies() []string {
 func (p BaseCollectorConnectEU) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	p.upstream = upstream
 
-	url := "https://collector.eu.newrelic.com/jserrors/ping"
+	url := "https://collector.eu.newrelic.com/status/mongrel"
 
 	// Was the task not explicitly provided on -t ?
 	if !config.Flags.IsForcedTask(p.Identifier().String()) {
@@ -99,7 +99,7 @@ func (p BaseCollectorConnectEU) prepareCollectorErrorResult(e error) tasks.Resul
 		return result
 	}
 	result.Status = tasks.Failure
-	result.Summary = "There was an error connecting to collector.newrelic.com (EU Region)"
+	result.Summary = "There was an error connecting to collector.eu.newrelic.com (EU Region)"
 	result.Summary += "\nPlease check network and proxy settings and try again or see -help for more options."
 	result.Summary += "\nError = " + e.Error()
 	result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks"
@@ -127,12 +127,12 @@ func (p BaseCollectorConnectEU) prepareResult(body, statusCode string) tasks.Res
 	if statusCode == "200" {
 		log.Debug("Successfully connected")
 		result.Status = tasks.Success
-		result.Summary = "Status Code = " + statusCode + " Body = " + body
+		result.Summary = "Status Code = " + statusCode
 	} else {
 		log.Debug("Non-200 response received from collector.newrelic.com:", statusCode)
 		log.Debug("Body:", body)
 		result.Status = tasks.Warning
-		result.Summary = "collector.newrelic.com (EU Region) returned a non-200 STATUS CODE: " + statusCode
+		result.Summary = "collector.eu.newrelic.com (EU Region) returned a non-200 STATUS CODE: " + statusCode
 		result.Summary += "\nPlease check network and proxy settings and try again or see -help for more options."
 		result.Summary += "\nResponse Body: " + body
 		result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks"
