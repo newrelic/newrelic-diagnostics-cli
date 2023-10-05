@@ -113,7 +113,7 @@ func (p BaseCollectorConnectEU) prepareResponseErrorResult(e error, statusCode s
 		return result
 	}
 	result.Status = tasks.Warning
-	result.Summary = "Status = " + statusCode + ". When connecting to the EU Region collector, there was an issue reading the body. "
+	result.Summary = "There was an issue reading the body while connecting to the EU Region collector."
 	result.Summary += "\nPlease check network and proxy settings and try again or see -help for more options."
 	result.Summary += "Error = " + e.Error()
 	result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks"
@@ -124,15 +124,15 @@ func (p BaseCollectorConnectEU) prepareResponseErrorResult(e error, statusCode s
 func (p BaseCollectorConnectEU) prepareResult(body, statusCode string) tasks.Result {
 	var result tasks.Result
 
-	if statusCode == "200" {
+	if statusCode == "404" && body == "{}" {
 		log.Debug("Successfully connected")
 		result.Status = tasks.Success
-		result.Summary = "Status Code = " + statusCode
+		result.Summary = "Successfully connected to collector.eu.newrelic.com (EU Region)"
 	} else {
-		log.Debug("Non-200 response received from collector.newrelic.com:", statusCode)
+		log.Debug("Unsuccessful response received from collector.eu.newrelic.com.")
 		log.Debug("Body:", body)
 		result.Status = tasks.Warning
-		result.Summary = "collector.eu.newrelic.com (EU Region) returned a non-200 STATUS CODE: " + statusCode
+		result.Summary = "The connection to collector.eu.newrelic.com (EU Region) was not successful."
 		result.Summary += "\nPlease check network and proxy settings and try again or see -help for more options."
 		result.Summary += "\nResponse Body: " + body
 		result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks"

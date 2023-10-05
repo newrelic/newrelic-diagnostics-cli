@@ -169,16 +169,16 @@ func TestBaseCollectorConnectEU_prepareResult(t *testing.T) {
 		want   tasks.Status
 	}{
 		{
-			name: "should return a Success result given '200' status code",
+			name: "should return a Success result given '404' status code",
 			args: args{
-				body:       "mongrel ==> up (true)",
-				statusCode: "200",
+				body:       "{}",
+				statusCode: "404",
 			},
 			fields: fields{},
 			want:   tasks.Success,
 		},
 		{
-			name: "should return a Warning result given a non '200' status code",
+			name: "should return a Warning result given a non '404' status code",
 			args: args{
 				body:       "Document has moved permanently",
 				statusCode: "301",
