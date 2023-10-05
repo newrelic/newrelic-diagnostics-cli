@@ -171,8 +171,8 @@ func TestBaseCollectorConnectUS_prepareResult(t *testing.T) {
 		{
 			name: "should return a Success result given '200' status code",
 			args: args{
-				body:       "mongrel ==> up (true)",
-				statusCode: "200",
+				body:       "{}",
+				statusCode: "404",
 			},
 			fields: fields{},
 			want:   tasks.Success,
