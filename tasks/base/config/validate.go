@@ -286,14 +286,33 @@ func ParseJSONarray(reader io.Reader) (result []tasks.ValidateBlob, err error) {
 // formatJs - Outputs the newrelic.js file into a more parsable format with comments and other non-essential items removed
 func formatJs(jsString string) ([]string, error) {
 	// remove comments that start with //
-	slashCommentRe, err := regexp.Compile("(?m)[/][/].*$")
+	// have to be careful not to remove proxy configs
+	slashCommentRe, err := regexp.Compile(`(?m)(^.*)([/][/].*)$`)
 	if err != nil {
 		return nil, err
 	}
-	removeSlashComments := slashCommentRe.ReplaceAllString(jsString, "")
-
+	singleQuoteRe, err := regexp.Compile(`[']`)
+	if err != nil {
+		return nil, err
+	}
+	removeSlashComments := slashCommentRe.ReplaceAllFunc([]byte(jsString), func(b []byte) []byte {
+		s := string(b)
+		checkForComment := strings.Split(s, "//")
+		// nothing on the left of the //, whole line is a comment, just remove it
+		if checkForComment[0] == "" {
+			return nil
+		}
+		// check to see if the // is within quotes like 'http://...'
+		quoteCount := len(singleQuoteRe.FindAllStringIndex(checkForComment[0], -1))
+		if quoteCount == 0 || quoteCount%2 == 0 {
+			// not in quotes
+			return []byte(checkForComment[0])
+		}
+		// keep the //, it was in quotes
+		return b
+	})
 	// remove \n and \r
-	removeLineBreaks := strings.ReplaceAll(removeSlashComments, "\n", "")
+	removeLineBreaks := strings.ReplaceAll(string(removeSlashComments), "\n", "")
 	removeCarriageReturn := strings.ReplaceAll(removeLineBreaks, "\r", "")
 
 	// remove everything before exports.config =
@@ -346,6 +365,7 @@ func parseJs(rawFile io.Reader) (result tasks.ValidateBlob, err error) {
 	if err != nil {
 		return
 	}
+	log.Debug("Formatted js: ", strings.Join(jsonString, "\n"))
 	tempMap := make(map[string]interface{})
 
 	location := ""
@@ -354,6 +374,7 @@ func parseJs(rawFile io.Reader) (result tasks.ValidateBlob, err error) {
 
 loop:
 	for lineNum, keyValue := range jsonString {
+		log.Debugf("keyValue: `%s`", keyValue)
 		switch keyValue {
 		case "{": //do nothing here
 		case "}", "},":

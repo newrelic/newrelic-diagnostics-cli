@@ -65,7 +65,7 @@
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectNode
     dockerfile_lines:
-     - COPY tasks/fixtures/integration/proxyDetect/newrelicnode /app/newrelic.js
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicnode.js /app/newrelic.js
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
      - http://user:pass@10.0.0.1:8000
