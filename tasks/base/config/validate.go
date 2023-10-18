@@ -291,7 +291,7 @@ func formatJs(jsString string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	singleQuoteRe, err := regexp.Compile(`[']`)
+	quoteRe, err := regexp.Compile("['`\"]")
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func formatJs(jsString string) ([]string, error) {
 			return nil
 		}
 		// check to see if the // is within quotes like 'http://...'
-		quoteCount := len(singleQuoteRe.FindAllStringIndex(checkForComment[0], -1))
+		quoteCount := len(quoteRe.FindAllStringIndex(checkForComment[0], -1))
 		if quoteCount == 0 || quoteCount%2 == 0 {
 			// not in quotes
 			return []byte(checkForComment[0])
