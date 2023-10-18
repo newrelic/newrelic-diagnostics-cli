@@ -22,7 +22,7 @@ var suiteDefinitions = []Suite{
 	{
 		Identifier:  "infra:debug",
 		DisplayName: "Infrastructure Agent (Debug)",
-		Description: "Infrastructure Agent installation with 3 minutes of debug log collection",
+		Description: "Infrastructure Agent installation with 5 minutes of debug log collection",
 		Tasks: []string{
 			"Base/*",
 			"Infra/*",

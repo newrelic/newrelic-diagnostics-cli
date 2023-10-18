@@ -3,7 +3,6 @@ package config
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -384,7 +383,7 @@ var _ = Describe("Base/Config/Validate", func() {
 			})
 		})
 		Context("When parsing js config with arrays", func() {
-			file, _ := os.Open("../../fixtures/node/newrelicWithArrays.js")
+			file, _ := os.Open("./fixtures/validate_testdata_js_with_array.js")
 			defer file.Close()
 			result, _ := parseJs(file)
 			result.Sort()
@@ -674,7 +673,7 @@ var _ = Describe("Base/Config/Validate", func() {
 })
 
 func readFile(file string) string {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		log.Info("error reading file", err)
 	}

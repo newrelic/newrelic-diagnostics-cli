@@ -283,51 +283,90 @@ func ParseJSONarray(reader io.Reader) (result []tasks.ValidateBlob, err error) {
 	return validateBlobs, nil
 }
 
-func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
-	tempMap := make(map[string]interface{})
-	//So this function basically reads the newrelic.js and re-constructs the exported json config from the `exports.config=` beyond
-
-	var jsonString []string
-	var isComment bool
-
-	scanner := bufio.NewScanner(reader)
-	scanner.Split(bufio.ScanLines)
-	startComment, _ := regexp.Compile("^[/][*].*$")         // looks for /* at the beginning of lines in the config file to remove lines with comments
-	endComment, _ := regexp.Compile("^.*[*][/]$")           // looks for */ at the end of lines to assist in removal of comments
-	oneLineComment, _ := regexp.Compile("^[/][*].*[*][/]$") // looks for single line comments /* like this */
-	slashComment, _ := regexp.Compile("^[/][/].*$")         // this looks for comments // like this
-
-	for scanner.Scan() {
-		scannerText := strings.TrimSpace(scanner.Text()) // trim leading and trailing whitespace
-		if oneLineComment.MatchString(scannerText) || slashComment.MatchString(scannerText) {
-			// check for one liners first since startComment and endComment both match one liners as well and will mess up the logic below
-			continue
-		}
-		if startComment.MatchString(scannerText) {
-			isComment = true // starts a comment block this and the following lines are ignored until we see */
-			continue
-		}
-		if endComment.MatchString(scannerText) {
-			isComment = false // ends the comment block
-			continue
-		}
-
-		if !isComment {
-			if strings.Contains(scannerText, "use strict") {
-				continue
-			}
-
-			if strings.Contains(scannerText, "=") {
-				t := strings.Split(scannerText, "=")
-				jsonString = append(jsonString, strings.TrimSpace(t[1]))
-				continue
-
-			}
-
-			jsonString = append(jsonString, scannerText)
-
-		}
+// formatJs - Outputs the newrelic.js file into a more parsable format with comments and other non-essential items removed
+func formatJs(jsString string) ([]string, error) {
+	// remove comments that start with //
+	// have to be careful not to remove proxy configs
+	slashCommentRe, err := regexp.Compile(`(?m)(^.*)([/][/].*)$`)
+	if err != nil {
+		return nil, err
 	}
+	quoteRe, err := regexp.Compile("['`\"]")
+	if err != nil {
+		return nil, err
+	}
+	removeSlashComments := slashCommentRe.ReplaceAllFunc([]byte(jsString), func(b []byte) []byte {
+		s := string(b)
+		checkForComment := strings.Split(s, "//")
+		// nothing on the left of the //, whole line is a comment, just remove it
+		if checkForComment[0] == "" {
+			return nil
+		}
+		// check to see if the // is within quotes like 'http://...'
+		quoteCount := len(quoteRe.FindAllStringIndex(checkForComment[0], -1))
+		if quoteCount == 0 || quoteCount%2 == 0 {
+			// not in quotes
+			return []byte(checkForComment[0])
+		}
+		// keep the //, it was in quotes
+		return b
+	})
+	// remove \n and \r
+	removeLineBreaks := strings.ReplaceAll(string(removeSlashComments), "\n", "")
+	removeCarriageReturn := strings.ReplaceAll(removeLineBreaks, "\r", "")
+
+	// remove everything before exports.config =
+	exportObj := strings.Split(removeCarriageReturn, "exports.config =")[1]
+
+	// remove /* this type of comment */
+	commentRe, err := regexp.Compile("[/][*].*?[*][/]")
+	if err != nil {
+		return nil, err
+	}
+	removeComments := commentRe.ReplaceAllString(exportObj, "")
+
+	// find start curlies ({) and add a linebreak after it
+	startCurliesRe, err := regexp.Compile("(^{|[^$]{)")
+	if err != nil {
+		return nil, err
+	}
+	fixStartCurlies := startCurliesRe.ReplaceAllString(removeComments, "{\n")
+
+	// fix formatting for arrays, make them multi-line
+	fixStartArrays := strings.ReplaceAll(fixStartCurlies, "[", "[\n")
+	fixEndArrays := strings.ReplaceAll(fixStartArrays, "]", "\n]")
+
+	// add a linebreak after commas
+	fixCommas := strings.ReplaceAll(fixEndArrays, ",", ",\n")
+
+	// create the array and trim whitespace
+	var jsonString []string
+	for _, s := range strings.Split(fixCommas, "\n") {
+		// fix end curlies - only add a line break if { isn't also on the line
+		if strings.Contains(s, "}") && !strings.Contains(s, "{") {
+			fixEndCurlies := strings.ReplaceAll(s, "}", "\n}")
+			splitAgain := strings.Split(fixEndCurlies, "\n")
+			for _, ss := range splitAgain {
+				jsonString = append(jsonString, strings.TrimSpace(ss))
+			}
+			continue
+		}
+		jsonString = append(jsonString, strings.TrimSpace(s))
+	}
+	return jsonString, nil
+}
+
+func parseJs(rawFile io.Reader) (result tasks.ValidateBlob, err error) {
+	jsBytes, err := io.ReadAll(rawFile)
+	if err != nil {
+		return
+	}
+	jsonString, err := formatJs(string(jsBytes))
+	if err != nil {
+		return
+	}
+	log.Debug("Formatted js: ", strings.Join(jsonString, "\n"))
+	tempMap := make(map[string]interface{})
 
 	location := ""
 	arrayLocation := ""
@@ -335,7 +374,7 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 
 loop:
 	for lineNum, keyValue := range jsonString {
-		log.Debug("keyvalue", keyValue)
+		log.Debugf("keyValue: `%s`", keyValue)
 		switch keyValue {
 		case "{": //do nothing here
 		case "}", "},":
@@ -357,14 +396,15 @@ loop:
 
 		default:
 			if arrayLocation != "" {
-				log.Debug("creating multi-line array", strings.Replace(keyValue, ",", "", 1))
-				buildarray = append(buildarray, strings.Replace(keyValue, ",", "", 1))
+				log.Debug("creating multi-line array", sanitizeValue(keyValue))
+				buildarray = append(buildarray, sanitizeValue(keyValue))
 				continue // we are in an array, go to next line
 			}
 
 			keyMap := strings.SplitN(keyValue, ":", 2)
-			if len(keyMap) != 2 {
-				log.Debug("Couldn't parse line", lineNum)
+
+			if len(keyMap) != 2 || keyMap[1] == "" {
+				log.Debugf("Couldn't parse line number %d, line text: %v\n", lineNum, keyMap)
 				break
 			}
 
@@ -391,10 +431,8 @@ loop:
 					finalSlice = append(finalSlice, sanitizeValue(value))
 				}
 				tempMap[location+keyMap[0]] = finalSlice
-
 			} else {
 				tempMap[location+keyMap[0]] = sanitizeValue(keyMap[1])
-
 			}
 
 			if strings.TrimSpace(keyMap[1]) == "{" {
@@ -404,7 +442,7 @@ loop:
 
 		}
 	}
-	//log.Dump(tempMap)
+
 	return convertToValidateBlob(tempMap), nil
 }
 
@@ -496,8 +534,6 @@ func iterateMap(parent string, input interface{}) []tasks.ValidateBlob {
 		var b tasks.ValidateBlob
 		b.Key = key
 		b.Path = parent
-
-		//log.Debug("value type is ", reflect.TypeOf(value))
 
 		//Add Children if value is a map or slice
 		switch castValue := value.(type) {
