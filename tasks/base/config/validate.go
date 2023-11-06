@@ -316,6 +316,10 @@ func formatJs(jsString string) ([]string, error) {
 	removeCarriageReturn := strings.ReplaceAll(removeLineBreaks, "\r", "")
 
 	// remove everything before exports.config =
+	exportObjSplit := strings.Split(removeCarriageReturn, "exports.config =")
+	if len(exportObjSplit) < 2 {
+		return nil, errors.New("failed to parse 'exports.config ='")
+	}
 	exportObj := strings.Split(removeCarriageReturn, "exports.config =")[1]
 
 	// remove /* this type of comment */
