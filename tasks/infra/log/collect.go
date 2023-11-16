@@ -143,7 +143,7 @@ func (p InfraLogCollect) getLogFilePaths(configElements []config.ValidateElement
 			//New log configuration allows log rotation with custom timestamp on log filename
 			if logFile != "" {
 				// search for log, rotated and gz files (filename is made with the base name of the logfile)
-				searchPattern := []string{"^" + strings.TrimSuffix(filepath.Base(logFile), filepath.Ext(logFile)) + ".+" + `(\.gz|\.zip|\` + filepath.Ext(logFile) + ")"}
+				searchPattern := []string{"^" + strings.TrimSuffix(filepath.Base(logFile), filepath.Ext(logFile)) + ".*" + `(\.gz|\.zip|\` + filepath.Ext(logFile) + ")"}
 				// Gather all files
 				filePaths = append(filePaths, p.findFiles(searchPattern, []string{filepath.Dir(logFile)})...)
 			} else {
