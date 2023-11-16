@@ -9,4 +9,5 @@ func (e FileCopyEnvelope) IsExecutable() (bool, error) {
 	if strings.HasSuffix(e.Path, ".exe") {
 		return true, nil
 	}
+	return false, nil
 }
