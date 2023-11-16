@@ -139,13 +139,13 @@ func (p InfraLogCollect) getLogFilePaths(configElements []config.ValidateElement
 		if configFile.Config.FileName == "newrelic-infra.yml" {
 
 			//Check desired config element for log/file new key configuration option
-			logFile := configFile.ParsedResult.FindKeyByPath("/log/file")
+			logFile := configFile.ParsedResult.FindKeyByPath("/log/file").Value()
 			//New log configuration allows log rotation with custom timestamp on log filename
-			if logFile.Value() != "" {
+			if logFile != "" {
 				// search for log, rotated and gz files (filename is made with the base name of the logfile)
-				searchPattern := []string{"^" + strings.TrimSuffix(filepath.Base(logFile.Value()), filepath.Ext(logFile.Value())) + "*"}
+				searchPattern := []string{"^" + strings.TrimSuffix(filepath.Base(logFile), filepath.Ext(logFile)) + ".*" + `(\.gz|\.zip|\` + filepath.Ext(logFile) + ")"}
 				// Gather all files
-				filePaths = append(filePaths, p.findFiles(searchPattern, []string{filepath.Dir(logFile.Value())})...)
+				filePaths = append(filePaths, p.findFiles(searchPattern, []string{filepath.Dir(logFile)})...)
 			} else {
 				//Check desired config element for log_file old key configuration option
 				foundKeys := configFile.ParsedResult.FindKey("log_file")
