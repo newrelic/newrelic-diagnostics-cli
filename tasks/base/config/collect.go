@@ -149,6 +149,8 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		paths = append(paths, "/opt/newrelic/synthetics/.newrelic/synthetics/minion/")
 		paths = append(paths, "/usr/local/newrelic-netcore20-agent/")
 		paths = append(paths, "/usr/local/newrelic-dotnet-agent/") // https://github.com/newrelic/newrelic-diagnostics-cli/issues/114
+		paths = append(paths, "/opt/homebrew/etc/newrelic-infra/") // newrelic-infra.yml on Mac x86
+		paths = append(paths, "/usr/local/etc/")                   // newrelic-infra.yml on Mac arm64
 	}
 
 	//Find insecure paths
