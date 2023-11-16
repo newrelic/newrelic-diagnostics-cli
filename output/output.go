@@ -146,7 +146,16 @@ func ProcessFilesChannel(zipfile *zip.Writer, wg *sync.WaitGroup) {
 
 		for _, envelope := range result.Result.FilesToCopy {
 			if !tasks.FileExists(envelope.Path) {
-				log.Debugf("File does not exist: '%s'. Skipping.\n", envelope.Path)
+				log.Debugf("File does not exist, skipping: '%s'\n", envelope.Path)
+				continue
+			}
+			isExecutable, exeErr := envelope.IsExecutable()
+			if exeErr != nil {
+				log.Debugf("Unable to determine if file is executable, skipping: '%s'\n", envelope.Path)
+				continue
+			}
+			if isExecutable {
+				log.Debugf("Skipping executable file: '%s'\n", envelope.Path)
 				continue
 			}
 			// check for duplicate file paths
