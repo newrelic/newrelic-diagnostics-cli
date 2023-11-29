@@ -301,7 +301,6 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "attachmentEndpoint", Value: boolifyFlag(f.AttachmentEndpoint)},
 		{Name: "suites", Value: f.Suites},
 		{Name: "include", Value: f.Include},
-		{Name: "apiKey", Value: f.APIKey},
 		{Name: "region", Value: f.Region},
 		{Name: "script", Value: f.Script},
 	}
