@@ -13,6 +13,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 	l "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/example/template"
 )
@@ -310,6 +311,42 @@ func Test_getRPMdetails(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getRPMdetails(tt.args.r); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getReportingToDetails() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getHostname(t *testing.T) {
+	type args struct {
+		h env.HostInfo
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Successful getHostname",
+			args: args{
+				h: env.HostInfo{
+					Hostname: "hostname",
+				},
+			},
+			want: "hostname",
+		},
+		{
+			name: "Successful getHostname with empty struct",
+			args: args{
+				h: env.HostInfo{},
+			},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getHostname(tt.args.h); got != tt.want {
+				t.Errorf("getHostname() = %v, want %v", got, tt.want)
 			}
 		})
 	}

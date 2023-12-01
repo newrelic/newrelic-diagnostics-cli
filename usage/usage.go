@@ -15,6 +15,7 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 	l "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
@@ -44,6 +45,7 @@ type metaData struct {
 	NRDiagVersion string   `json:"nrdiagVersion"`
 	RunID         string   `json:"runId"`
 	RpmApps       []rpmApp `json:"rpmApps"`
+	Hostname      string   `json:"hostname"`
 }
 
 type taskResult struct {
@@ -192,6 +194,10 @@ func getRPMdetails(r tasks.Result) []rpmApp {
 	return result
 }
 
+func getHostname(h env.HostInfo) string {
+	return h.Hostname
+}
+
 // gather and package metadata - currently a passthrough
 func prepareMeta(results []registration.TaskResult, runID string) metaData {
 	var runTimeMetaData = metaData{
@@ -199,11 +205,14 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 		NRDiagVersion: config.Version,
 		RunID:         runID,
 		RpmApps:       []rpmApp{},
+		Hostname:      "",
 	}
 
 	for _, result := range results {
 		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
 			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
+		} else if result.Task.Identifier().String() == "Base/Env/HostInfo" && result.Result.Status == tasks.Info && result.Result.Payload != nil {
+			runTimeMetaData.Hostname = getHostname(result.Result.Payload.(env.HostInfo))
 		}
 	}
 	return runTimeMetaData
