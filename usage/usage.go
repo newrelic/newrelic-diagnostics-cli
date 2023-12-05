@@ -46,6 +46,7 @@ type metaData struct {
 	RunID         string   `json:"runId"`
 	RpmApps       []rpmApp `json:"rpmApps"`
 	Hostname      string   `json:"hostname"`
+	LicenseKeys   []string `json:"licenseKeys"`
 }
 
 type taskResult struct {
@@ -206,12 +207,29 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 		RunID:         runID,
 		RpmApps:       []rpmApp{},
 		Hostname:      "",
+		LicenseKeys:   []string{},
 	}
 
 	for _, result := range results {
+		if result.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && result.Result.Status == tasks.Success {
+			licenseKeyToSources, ok := result.Result.Payload.(map[string][]string)
+			//We do not need the value of sources(if lk is env var or comes from config file, etc) for this operation
+			reducedLicenseKeys := []string{}
+
+			for lk := range licenseKeyToSources {
+				reducedLicenseKeys = append(reducedLicenseKeys, lk)
+			}
+
+			if ok {
+				runTimeMetaData.LicenseKeys = reducedLicenseKeys
+			} else {
+				log.Info("Unable to send licenseKeys metadata for Haberdasher because of a Type Assertion error")
+			}
+		}
 		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
 			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
-		} else if result.Task.Identifier().String() == "Base/Env/HostInfo" && result.Result.Status == tasks.Info && result.Result.Payload != nil {
+		}
+		if result.Task.Identifier().String() == "Base/Env/HostInfo" && result.Result.Status == tasks.Info && result.Result.Payload != nil {
 			runTimeMetaData.Hostname = getHostname(result.Result.Payload.(env.HostInfo))
 		}
 	}
