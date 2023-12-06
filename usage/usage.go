@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -229,9 +230,13 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
 			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
 		}
-		if result.Task.Identifier().String() == "Base/Env/HostInfo" && result.Result.Status == tasks.Info && result.Result.Payload != nil {
-			runTimeMetaData.Hostname = getHostname(result.Result.Payload.(env.HostInfo))
-		}
+
+	}
+	hostName, err := os.Hostname()
+	if err != nil {
+		log.Debugf("error getting hostname: %s\n", err.Error())
+	} else {
+		runTimeMetaData.Hostname = hostName
 	}
 	return runTimeMetaData
 }
