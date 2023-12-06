@@ -16,7 +16,6 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
 	l "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
 )
 
@@ -194,10 +193,6 @@ func getRPMdetails(r tasks.Result) []rpmApp {
 	}
 
 	return result
-}
-
-func getHostname(h env.HostInfo) string {
-	return h.Hostname
 }
 
 // gather and package metadata - currently a passthrough
