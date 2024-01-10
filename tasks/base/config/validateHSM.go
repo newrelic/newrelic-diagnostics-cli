@@ -1,10 +1,8 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -22,6 +20,10 @@ var HSM_ENV_VAR = "NEW_RELIC_HIGH_SECURITY" //Ruby, Node, Python
 type HSMvalidation struct {
 	LicenseKey string
 	AccountHSM bool
+	LocalHSM   map[string]bool
+}
+type HSMLocalValidation struct {
+	LicenseKey string
 	LocalHSM   map[string]bool
 }
 
@@ -71,141 +73,43 @@ func (t BaseConfigValidateHSM) Dependencies() []string {
 func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
 	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
-
 	if !ok {
 		log.Debug("Could not check env vars for HSM validation")
 	} else {
 		t.envVars = envVars
 	}
 
-	validLKtoSources, ok := upstream["Base/Config/ValidateLicenseKey"].Payload.(map[string][]string)
-
-	if !ok || (len(validLKtoSources) == 0) {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: "No validated license keys to check high security mode against. Task did not run.",
-		}
-	}
-
 	t.configElements, ok = upstream["Base/Config/Validate"].Payload.([]ValidateElement)
-
 	if !ok || (len(t.configElements) == 0) {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "No New Relic configuration files to check high security mode against. Task did not run.",
+			Summary: "No New Relic configuration files to check high security mode against. Task did not run.\n",
 		}
 	}
 
-	licenseKeys := validLKtoSourcesMapToSlice(validLKtoSources)
+	hsmValidations := t.createHSMLocalValidation()
 
-	lkToHSM, accountHSMerr := t.getAccountHighSecurity(licenseKeys)
+	localHSMSummary := ""
+	localHSMSummaryPattern := "Local High Security Mode setting (%v) for configuration filepath:\n\n%s\n\n"
 
-	if accountHSMerr != nil {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: fmt.Sprintf("Error reaching New Relic to check high security mode status on accounts: %s", accountHSMerr.Error()),
-		}
+	for k, v := range hsmValidations {
+		localHSMSummary += fmt.Sprintf(localHSMSummaryPattern, v, k)
 	}
-
-	hsmValidations := t.createHSMValidations(lkToHSM, validLKtoSources)
-
-	taskErrorSummary := ""
-	taskErrorSummaryPattern := "High Security Mode setting (%v) for account with license key:\n\n%s\n\nmismatches configuration in:\n%s\n\n"
-
-	for _, hsmValidation := range hsmValidations {
-		isValid, misMatchedSources := hsmValidation.Validate()
-		if !isValid {
-			taskErrorSummary = taskErrorSummary + fmt.Sprintf(taskErrorSummaryPattern, hsmValidation.AccountHSM, hsmValidation.LicenseKey, strings.Join(misMatchedSources, "\n"))
-		}
-	}
-
-	if len(taskErrorSummary) > 0 {
-		return tasks.Result{
-			Status:  tasks.Failure,
-			Summary: taskErrorSummary,
-			Payload: hsmValidations,
-		}
-	}
-
 	return tasks.Result{
-		Status:  tasks.Success,
-		Summary: "High Security Mode setting for accounts associated with found license keys match local configuration.",
+		Status:  tasks.Info,
+		Summary: localHSMSummary,
 		Payload: hsmValidations,
 	}
 
 }
 
-func (t BaseConfigValidateHSM) getAccountHighSecurity(licenseKeys []string) (map[string]bool, error) {
-	licenseKeyHSM := make(map[string]bool)
-
-	hsmResults, _, err := t.hsmService(licenseKeys)
-
-	if err != nil {
-		return licenseKeyHSM, err
-	}
-
-	for _, hsmResult := range hsmResults {
-		licenseKeyHSM[hsmResult.LicenseKey] = hsmResult.IsEnabled
-	}
-
-	return licenseKeyHSM, nil
-}
-
-func (t BaseConfigValidateHSM) createHSMValidations(lkToHSM map[string]bool, validLKtoSources map[string][]string) []HSMvalidation {
-	hsmValidations := []HSMvalidation{}
-
-	for lk, accountHSM := range lkToHSM {
-
-		sources := validLKtoSources[lk]
-
-		sourceConfigElements := t.matchSourcesToConfigElement(sources)
-
-		configSourcesToHSM := t.getHSMConfigurations(sourceConfigElements)
-
-		hsmValidation := HSMvalidation{
-			LicenseKey: lk,
-			AccountHSM: accountHSM,
-			LocalHSM:   configSourcesToHSM,
-		}
-
-		hsmValidations = append(hsmValidations, hsmValidation)
-	}
-
-	return hsmValidations
-}
-
-func (t BaseConfigValidateHSM) matchSourcesToConfigElement(sources []string) []ValidateElement {
-	configElements := []ValidateElement{}
-
-	for _, source := range sources {
-
-		if tasks.PosString(licenseKeyEnvVars, source) > -1 {
-			continue
-		}
-
-		configElement, err := t.matchSourceToConfigElement(source)
-
-		if err != nil {
-			continue
-		}
-		configElements = append(configElements, configElement)
-	}
-
-	return configElements
-}
-
-func (t BaseConfigValidateHSM) matchSourceToConfigElement(source string) (ValidateElement, error) {
-	for _, configElement := range t.configElements {
-		fullPath := configElement.Config.FilePath + configElement.Config.FileName
-		if fullPath == source {
-			return configElement, nil
-		}
-	}
-
-	return ValidateElement{}, errors.New("no ConfigElement matches source filepath")
+func (t BaseConfigValidateHSM) createHSMLocalValidation() map[string]bool {
+	elementsToPass := t.configElements
+	return t.getHSMConfigurations(elementsToPass)
 }
 
 func (t BaseConfigValidateHSM) getHSMConfigurations(configElements []ValidateElement) map[string]bool {
+
 	configSourcesToHSM := make(map[string]bool)
 
 	hsmEnv, ok := t.envVars[HSM_ENV_VAR]
@@ -219,12 +123,12 @@ func (t BaseConfigValidateHSM) getHSMConfigurations(configElements []ValidateEle
 	}
 
 	for _, configElement := range configElements {
+
 		fullPath := configElement.Config.FilePath + configElement.Config.FileName
 		isHSM := t.getHSMConfiguration(configElement)
 
 		configSourcesToHSM[fullPath] = isHSM
 	}
-
 	return configSourcesToHSM
 }
 
@@ -247,14 +151,4 @@ func (t BaseConfigValidateHSM) getHSMConfiguration(configElement ValidateElement
 	}
 
 	return false //If no HSM field found then implicit false
-}
-
-func validLKtoSourcesMapToSlice(validLKtoSourcesMap map[string][]string) []string {
-	licenseKeys := []string{}
-
-	for k := range validLKtoSourcesMap {
-		licenseKeys = append(licenseKeys, k)
-	}
-
-	return licenseKeys
 }
