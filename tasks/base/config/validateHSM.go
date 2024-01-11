@@ -17,37 +17,21 @@ var HSM_CONFIG_NAMES = []string{
 
 var HSM_ENV_VAR = "NEW_RELIC_HIGH_SECURITY" //Ruby, Node, Python
 
-type HSMvalidation struct {
-	LicenseKey string
-	AccountHSM bool
-	LocalHSM   map[string]bool
-}
 type HSMLocalValidation struct {
 	LicenseKey string
 	LocalHSM   map[string]bool
 }
 
-func (h HSMvalidation) Validate() (bool, []string) {
-	misMatchedSources := []string{}
-	isValid := true
-
-	for source, sourceHSM := range h.LocalHSM {
-		if sourceHSM != h.AccountHSM {
-			misMatchedSources = append(misMatchedSources, source)
-			isValid = false
-		}
-	}
-
-	return isValid, misMatchedSources
-}
-
 type HSMservice func([]string) ([]haberdasher.HSMresult, *haberdasher.Response, error)
+type CreateHSMLocalValidation func([]ValidateElement, BaseConfigValidateHSM) map[string]bool
+type GetHSMConfiguration func(ValidateElement) bool
 
 // BaseConfigLicenseKey - Struct for task definition
 type BaseConfigValidateHSM struct {
-	configElements []ValidateElement
-	hsmService     HSMservice
-	envVars        map[string]string
+	configElements           []ValidateElement
+	createHSMLocalValidation CreateHSMLocalValidation
+	getHSMConfiguration      GetHSMConfiguration
+	envVars                  map[string]string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -63,7 +47,6 @@ func (t BaseConfigValidateHSM) Explain() string {
 // Dependencies - Returns the dependencies for each task.
 func (t BaseConfigValidateHSM) Dependencies() []string {
 	return []string{
-		"Base/Config/ValidateLicenseKey",
 		"Base/Config/Validate",
 		"Base/Env/CollectEnvVars",
 	}
@@ -87,7 +70,7 @@ func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[strin
 		}
 	}
 
-	hsmValidations := t.createHSMLocalValidation()
+	hsmValidations := t.createHSMLocalValidation(t.configElements, t)
 
 	localHSMSummary := ""
 	localHSMSummaryPattern := "Local High Security Mode setting (%v) for configuration filepath:\n\n%s\n\n"
@@ -103,12 +86,7 @@ func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[strin
 
 }
 
-func (t BaseConfigValidateHSM) createHSMLocalValidation() map[string]bool {
-	elementsToPass := t.configElements
-	return t.getHSMConfigurations(elementsToPass)
-}
-
-func (t BaseConfigValidateHSM) getHSMConfigurations(configElements []ValidateElement) map[string]bool {
+func (t BaseConfigValidateHSM) GetHSMConfigurations(configElements []ValidateElement) map[string]bool {
 
 	configSourcesToHSM := make(map[string]bool)
 
@@ -130,25 +108,4 @@ func (t BaseConfigValidateHSM) getHSMConfigurations(configElements []ValidateEle
 		configSourcesToHSM[fullPath] = isHSM
 	}
 	return configSourcesToHSM
-}
-
-func (t BaseConfigValidateHSM) getHSMConfiguration(configElement ValidateElement) bool {
-	for _, hsmName := range HSM_CONFIG_NAMES {
-		foundKeys := configElement.ParsedResult.FindKey(hsmName)
-
-		if len(foundKeys) == 0 {
-			continue
-		}
-
-		hsmStatus, ok := strconv.ParseBool(foundKeys[0].Value())
-
-		//If found field is set to something other than a bool value - implicit false
-		if ok != nil {
-			return false
-		}
-
-		return hsmStatus
-	}
-
-	return false //If no HSM field found then implicit false
 }
