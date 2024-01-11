@@ -63,17 +63,21 @@ func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[strin
 	}
 
 	t.configElements, ok = upstream["Base/Config/Validate"].Payload.([]ValidateElement)
-	if !ok || (len(t.configElements) == 0) {
+	if !ok {
+		log.Debug("Could not check configuration files for HSM validation")
+	}
+
+	if len(t.configElements) == 0 && len(t.envVars) == 0 {
 		return tasks.Result{
 			Status:  tasks.None,
-			Summary: "No New Relic configuration files to check high security mode against. Task did not run.\n",
+			Summary: "No New Relic configuration files or environment variables to check high security mode against. Task did not run.\n",
 		}
 	}
 
 	hsmValidations := t.createHSMLocalValidation(t.configElements, t)
 
 	localHSMSummary := ""
-	localHSMSummaryPattern := "Local High Security Mode setting (%v) for configuration filepath:\n\n%s\n\n"
+	localHSMSummaryPattern := "Local High Security Mode setting (%v) for configuration:\n\n\t%s\n\n"
 
 	for k, v := range hsmValidations {
 		localHSMSummary += fmt.Sprintf(localHSMSummaryPattern, v, k)
@@ -87,7 +91,6 @@ func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[strin
 }
 
 func (t BaseConfigValidateHSM) GetHSMConfigurations(configElements []ValidateElement) map[string]bool {
-
 	configSourcesToHSM := make(map[string]bool)
 
 	hsmEnv, ok := t.envVars[HSM_ENV_VAR]
@@ -96,6 +99,7 @@ func (t BaseConfigValidateHSM) GetHSMConfigurations(configElements []ValidateEle
 
 		if parseErr == nil {
 			configSourcesToHSM[HSM_ENV_VAR] = hsmEnvBool
+
 		}
 
 	}

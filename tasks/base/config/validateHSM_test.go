@@ -117,7 +117,7 @@ func TestBaseConfigValidateHSM_Execute(t *testing.T) {
 			},
 			want: tasks.Result{
 				Status:  tasks.Info,
-				Summary: "Local High Security Mode setting (true) for configuration filepath:\n\nnewrelic.yml\n\n" + "Local High Security Mode setting (false) for configuration filepath:\n\nnewrelic.js\n\n",
+				Summary: "Local High Security Mode setting (true) for configuration:\n\nnewrelic.yml\n\n" + "Local High Security Mode setting (false) for configuration:\n\nnewrelic.js\n\n",
 				Payload: map[string]bool{
 					"newrelic.yml": true,
 					"newrelic.js":  false,
@@ -129,7 +129,7 @@ func TestBaseConfigValidateHSM_Execute(t *testing.T) {
 			},
 		},
 		{
-			name: "No config elements to validate",
+			name: "No config elements or env vars to validate",
 			fields: fields{
 				configElements: []ValidateElement{},
 				envVars:        map[string]string{},
@@ -145,8 +145,34 @@ func TestBaseConfigValidateHSM_Execute(t *testing.T) {
 			},
 			want: tasks.Result{
 				Status:  tasks.None,
-				Summary: "No New Relic configuration files to check high security mode against. Task did not run.\n",
+				Summary: "No New Relic configuration files or environment variables to check high security mode against. Task did not run.\n",
 			},
+		},
+		{
+			name: "No config elements to validate but env vars exist",
+			fields: fields{
+				configElements: []ValidateElement{},
+				envVars: map[string]string{
+					"NEW_RELIC_HIGH_SECURITY": "false",
+				},
+			},
+			args: args{
+				options: tasks.Options{},
+				upstream: map[string]tasks.Result{
+					"Base/Config/Validate": {
+						Status:  tasks.Success,
+						Payload: []ValidateElement{},
+					},
+				},
+			},
+			want: tasks.Result{
+				Status:  tasks.Info,
+				Summary: "Local High Security Mode setting (false) for configuration:\n\nNEW_RELIC_HIGH_SECURITY\n\n",
+				Payload: map[string]bool{
+					"NEW_RELIC_HIGH_SECURITY": true,
+				},
+			},
+			retVal: map[string]bool{"NEW_RELIC_HIGH_SECURITY": true},
 		},
 	}
 	for _, tt := range tests {
@@ -156,6 +182,7 @@ func TestBaseConfigValidateHSM_Execute(t *testing.T) {
 			}
 			tr := BaseConfigValidateHSM{
 				createHSMLocalValidation: createHSMLocalValTest,
+				envVars:                  tt.fields.envVars,
 			}
 			got := tr.Execute(tt.args.options, tt.args.upstream)
 			if !reflect.DeepEqual(got.Status, tt.want.Status) {
