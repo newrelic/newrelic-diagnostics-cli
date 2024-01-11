@@ -272,10 +272,16 @@ func WriteLineResults() []registration.TaskResult {
 	var filtered [6]int
 
 	var outputResults []registration.TaskResult
+	hsmResult := tasks.Result{}
+	hsmPayload := make(map[string]bool)
 
 	for result := range registration.Work.ResultsChannel {
 		if filteredResult(result.Result.StatusToString()) {
 			payload := ""
+			if result.Task.Identifier().String() == "Base/Config/ValidateHSM" && result.Result.Payload != nil {
+				hsmPayload = result.Result.Payload.(map[string]bool)
+				hsmResult = result.Result
+			}
 			if result.Result.Status == tasks.Info {
 				truncated := ""
 				newlineRegexp := regexp.MustCompile(`\n`)
@@ -311,6 +317,15 @@ func WriteLineResults() []registration.TaskResult {
 
 		filteredOutput := color.ColorString(color.Gray, strconv.Itoa(filteredCounter)+partialMessage+filteredToString(filtered))
 		log.Info(filteredOutput)
+	}
+	if len(hsmPayload) > 0 {
+		log.Infof(hsmResult.Summary)
+		if config.Flags.AutoAttach || config.Flags.APIKey != "" {
+			log.Info("See your uploaded results to validate High Security Mode settings.\n")
+		} else {
+			log.Info("To upload results and validate High Security Mode settings, run the Diagnostics CLI with the -a or -api-key flag.\n")
+
+		}
 	}
 	if len(outputResults) > 0 {
 		log.Info("See nrdiag-output.json for full results.")
