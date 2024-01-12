@@ -82,6 +82,12 @@ func (t BaseConfigValidateHSM) Execute(options tasks.Options, upstream map[strin
 	for k, v := range hsmValidations {
 		localHSMSummary += fmt.Sprintf(localHSMSummaryPattern, v, k)
 	}
+	if localHSMSummary == "" && len(hsmValidations) == 0 {
+		return tasks.Result{
+			Status:  tasks.None,
+			Summary: "No configurations for high security mode found.\n",
+		}
+	}
 	return tasks.Result{
 		Status:  tasks.Info,
 		Summary: localHSMSummary,

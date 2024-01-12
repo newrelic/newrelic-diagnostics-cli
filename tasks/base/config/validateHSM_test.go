@@ -174,6 +174,29 @@ func TestBaseConfigValidateHSM_Execute(t *testing.T) {
 			},
 			retVal: map[string]bool{"NEW_RELIC_HIGH_SECURITY": true},
 		},
+		{
+			name: "No config elements to validate but env vars exist but none contain hsm",
+			fields: fields{
+				configElements: []ValidateElement{},
+				envVars: map[string]string{
+					"NOTSECURITYMODE": "false",
+				},
+			},
+			args: args{
+				options: tasks.Options{},
+				upstream: map[string]tasks.Result{
+					"Base/Config/Validate": {
+						Status:  tasks.Success,
+						Payload: []ValidateElement{},
+					},
+				},
+			},
+			want: tasks.Result{
+				Status:  tasks.None,
+				Summary: "No configurations for high security mode found.\n",
+			},
+			retVal: map[string]bool{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
