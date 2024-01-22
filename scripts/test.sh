@@ -6,7 +6,7 @@ EXENAME=newrelic-diagnostics-cli
 
 go get -t ./...
 go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@v2.12.1
-go get github.com/onsi/ginkgo/v2
+go get github.com/onsi/ginkgo/v2/ginkgo@v2.12.1
 go mod tidy
 go build
 
