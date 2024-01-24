@@ -77,18 +77,23 @@ var NodeSupportedVersions = map[string][]string{
 
 // https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
 // .NET framework as keys and .NET agent as values
+// https://learn.microsoft.com/en-us/dotnet/framework/migration-guide/versions-and-dependencies show the versions of Dotnet Framework
 var DotnetFrameworkSupportedVersions = map[string][]string{
-	"4.8": {"7.0.0+"},
-	"4.7": {"7.0.0+"},
-	"4.6": {"7.0.0+"}, //should be inclusive of version such as 4.6.1
-	"4.5": {"7.0.0+"},
+	"4.8.1": {"7.0.0+"},
+	"4.8":   {"7.0.0+"},
+	"4.7.2": {"7.0.0+"},
+	"4.7.1": {"7.0.0+"},
+	"4.7":   {"7.0.0+"},
+	"4.6.2": {"7.0.0+"},
+	"4.5.1": {"7.*-9.*"},
 }
 
 var DotnetFrameworkOldVersions = map[string][]string{
 	//To instrument applications running on .NET Framework version 4.0 and lower, you must run a version of the New Relic .NET agent earlier than 7.0
-	"4.0": {"5.1.*-6.*"}, //5.0 and lower are EOL versions
+	"4.0": {"5.1.*-6.*"},
 	"3.5": {"5.1.*-6.*"},
-	//Doc says .NET Framework 3.0 and 2.0 are no longer supported as September 2020:https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework
+	"3.0": {"3.5", "4.*-6.*"},
+	"2.0": {"3.5", "4.*-6.*"},
 }
 
 //.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
