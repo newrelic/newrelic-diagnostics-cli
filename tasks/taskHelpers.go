@@ -313,9 +313,8 @@ func (v ValidateBlob) PathAndKeyContains(searchKey string) bool {
 // FindKey - returns one or more ValidateBlobs within a given ValidateBlob that has the desired key
 // can return multiple nodes as it will return everything that matched path/key
 func (v ValidateBlob) FindKey(searchKey string) (results []ValidateBlob) {
-
 	//check current node for matching
-	if v.Key == searchKey {
+	if strings.EqualFold(v.Key, searchKey) {
 		log.Debug("found match, adding key", v.Key)
 		results = append(results, v)
 	}
@@ -323,12 +322,12 @@ func (v ValidateBlob) FindKey(searchKey string) (results []ValidateBlob) {
 	if !v.IsLeaf() {
 		results = append(results, v.searchChildren(searchKey)...)
 	}
+	
 	return
 }
 
 // FindKeyByPath - returns a single ValidateBlob that matches the exact full path of the Key in question. This means the searchPath parameter MUST begin with a / character
 func (v ValidateBlob) FindKeyByPath(searchPath string) ValidateBlob {
-
 	var results []ValidateBlob
 	//check current node for matching
 	if v.PathAndKey() == searchPath {
@@ -362,10 +361,8 @@ func (v ValidateBlob) FindKeyByPath(searchPath string) ValidateBlob {
 }
 
 func (v ValidateBlob) searchChildren(searchKey string) (results []ValidateBlob) {
-
 	for _, child := range v.Children {
-
-		if child.Key == searchKey {
+		if strings.EqualFold(child.Key, searchKey) {
 			log.Debug("adding", child.PathAndKey(), "to list of results")
 			results = append(results, child)
 		}
@@ -373,14 +370,13 @@ func (v ValidateBlob) searchChildren(searchKey string) (results []ValidateBlob) 
 		if !child.IsLeaf() {
 			results = append(results, child.searchChildren(searchKey)...)
 		}
-
 	}
+
 	return
 }
 
 // UpdateKey - This requires an exact path to the key in question to update and returns the original blob with just the one key value updated
 func (v ValidateBlob) UpdateKey(searchKey string, replacementValue interface{}) ValidateBlob {
-
 	log.Debug("Updating key", searchKey, "with new value", replacementValue)
 	//we're going to walk the tree, adding nodes as we find them to the new returned object and just create a new entry if and only if it's the one we want
 
