@@ -23,3 +23,5 @@ hog.out
 .go-version
 #coverage file
 coverage.out
+# local history 
+.history

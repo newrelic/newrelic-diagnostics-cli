@@ -74,8 +74,6 @@ func (p InfraConfigIntegrationsMatch) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-
-	// Check if upstream dependency task status was unsuccessful and bail out if so:
 	if upstream["Infra/Config/IntegrationsValidate"].Status != tasks.Success {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -83,10 +81,7 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 		}
 	}
 
-	// Grab parsed config files and perform type assertion
 	integrationFiles, ok := upstream["Infra/Config/IntegrationsValidate"].Payload.([]config.ValidateElement)
-
-	// If type assertion failed, bail out
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
@@ -97,9 +92,6 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 	//Sort files from upstream into a map of integration names (key) with pairs of found config and definition files (IntegrationFilePair)
 	//matchFilePairs will also validate filepath of the integration file. Filepath errors get collected in matchErrors
 	filePairs, matchErrors := p.matchFilePairs(integrationFiles)
-
-	//In December 2019, Infrastructure agent version 1.8.0 began supporting a newer configuration format that makes use of a single configuration file. Most integrations may still install a definition file though their usage is optional and the file can be removed. The docker-config.yml does not install a definition file at all.
-
 	isNewerInfraVersion, errMessage := checkInfraVersion(upstream)
 
 	if errMessage != "" {
@@ -145,7 +137,6 @@ func (p InfraConfigIntegrationsMatch) Execute(options tasks.Options, upstream ma
 		}
 	}
 
-	//implicit case: (len(configPairs) == 0 && len(matchErrors) >= 0
 	return tasks.Result{
 		Status:  tasks.Failure,
 		Summary: "No matching integration files found" + matchErrorSummary,
@@ -178,7 +169,6 @@ func (p InfraConfigIntegrationsMatch) matchFilePairs(integrationFiles []config.V
 				continue
 			}
 
-			//set first capture group, all characters before '-' as integration name
 			integrationName = configRes[0][1]
 			val, ok := filePairs[integrationName]
 			if ok {
@@ -200,7 +190,6 @@ func (p InfraConfigIntegrationsMatch) matchFilePairs(integrationFiles []config.V
 				continue
 			}
 
-			//set first capture group, all characters before '-' as integration name
 			integrationName = definitionRes[0][1]
 
 			val, ok := filePairs[integrationName]
@@ -258,13 +247,12 @@ func (p InfraConfigIntegrationsMatch) isValidIntegrationFilePath(integrationFile
 }
 
 // Validates that a map of IntegrationFilePair actually have defined Configuration and Definition files.
-// If IntegrationFilePair only has one file, it is removed from the map and captured as an IntegrationMatchError
+// If IntegrationFilePair only has one file (and is not v4), it is removed from the map and captured as an IntegrationMatchError
 // If IntegrationFilePair has two files, this will validate that their integration names as parsed from the yaml match
 func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewerVersion bool) (map[string]*IntegrationFilePair, []IntegrationMatchError) {
 	matchErrors := []IntegrationMatchError{}
 
 	for integration, pair := range filePairs {
-		// if pair is missing configuration
 		if pair.Configuration.Config == (config.ValidateElement{}.Config) {
 			matchErrors = append(matchErrors, IntegrationMatchError{
 				IntegrationFile: pair.Definition,
@@ -272,7 +260,6 @@ func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewer
 			})
 			delete(filePairs, integration)
 			continue
-			// if pair is missing definition
 		} else if pair.Definition.Config == (config.ValidateElement{}.Config) {
 			if isNewerVersion && isConfigFileV4(pair.Configuration) { //version 1.8.0 and higher do not require a definition file as long as user has updated the config file to the format v4
 				continue
@@ -286,7 +273,6 @@ func validateIntegrationPairs(filePairs map[string]*IntegrationFilePair, isNewer
 			}
 		}
 
-		// Both files(config and definition) exist, do their names match?
 		isMatchedPair, nameMatchError := validateConfigPairNames(pair)
 		if !isMatchedPair {
 			matchErrors = append(matchErrors, nameMatchError...)
@@ -303,11 +289,8 @@ func isConfigFileV4(configElement config.ValidateElement) bool {
 		https://docs.newrelic.com/docs/create-integrations/infrastructure-integrations-sdk/specifications/host-integrations-newer-configuration-format#update
 	*/
 	integrationsKeys := configElement.ParsedResult.FindKey("integrations")
-	/* Expect to find at least one. Example:
-	/integrations/0/name: nri-docker
-	/integrations/0/when/feature: docker_enabled */
 	instancesKeys := configElement.ParsedResult.FindKey("instances")
-	// Expect to find none
+
 	if len(integrationsKeys) > 0 && len(instancesKeys) == 0 {
 		return true
 	}
@@ -334,15 +317,17 @@ func validateConfigPairNames(filePair *IntegrationFilePair) (bool, []Integration
 	)
 	errorsEncountered := []IntegrationMatchError{}
 
-	configKeys := filePair.Configuration.ParsedResult.FindKey("integration_name")
+	if !isConfigFileV4(filePair.Configuration) { // integration_name is optional for v4
+		configKeys := filePair.Configuration.ParsedResult.FindKey("integration_name")
 
-	if len(configKeys) > 0 {
-		configName = configKeys[0].Value()
-	} else {
-		errorsEncountered = append(errorsEncountered, IntegrationMatchError{
-			IntegrationFile: filePair.Configuration,
-			Reason:          fmt.Sprintf("Integration Configuration File '%s%s' is missing key 'integration_name'", filePair.Configuration.Config.FilePath, filePair.Configuration.Config.FileName),
-		})
+		if len(configKeys) > 0 {
+			configName = configKeys[0].Value()
+		} else {
+			errorsEncountered = append(errorsEncountered, IntegrationMatchError{
+				IntegrationFile: filePair.Configuration,
+				Reason:          fmt.Sprintf("Integration Configuration File '%s%s' is missing key 'integration_name'", filePair.Configuration.Config.FilePath, filePair.Configuration.Config.FileName),
+			})
+		}
 	}
 	defKeys := filePair.Definition.ParsedResult.FindKey("name")
 
@@ -354,7 +339,7 @@ func validateConfigPairNames(filePair *IntegrationFilePair) (bool, []Integration
 			Reason:          fmt.Sprintf("Integration Definition File '%s%s' is missing key 'name'", filePair.Definition.Config.FilePath, filePair.Definition.Config.FileName),
 		})
 	}
-	// no need to check a match if one of these is empty
+
 	if definitionName != "" && configName != "" {
 		if definitionName != configName {
 			errorsEncountered = append(errorsEncountered, IntegrationMatchError{
@@ -364,7 +349,6 @@ func validateConfigPairNames(filePair *IntegrationFilePair) (bool, []Integration
 					filePair.Definition.Config.FilePath, filePair.Definition.Config.FileName, definitionName),
 			})
 		}
-
 	}
 
 	if len(errorsEncountered) == 0 {
