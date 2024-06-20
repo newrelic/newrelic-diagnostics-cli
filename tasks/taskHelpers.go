@@ -48,7 +48,11 @@ func FindFiles(patterns []string, paths []string) []string {
 			if !fileInfo.IsDir() {
 				// loop through pattern list and add files that match to our string array
 				for _, pattern := range patterns {
-					var validID = regexp.MustCompile(pattern)
+					validID, rerr := regexp.Compile(pattern)
+					if rerr != nil {
+						log.Debugf("Error parsing regex pattern '%s': %s", pattern, rerr.Error())
+						continue
+					}
 					match := validID.MatchString(fileInfo.Name())
 					if match {
 						foundFiles[pathInfo] = struct{}{} // empty struct is smallest memory footprint
@@ -87,9 +91,9 @@ func FindProcessByName(name string) ([]process.Process, error) {
 		processName, err := processID.Name()
 
 		if err != nil {
+			// If we can't get the process name, log it to debug logging then keep going through the slice
 			log.Debug("error getting process name", PID)
-			return processList, err
-
+			continue
 		}
 
 		if filepath.Ext(name) != ".exe" { //exact match if searching for process with .exe, otherwise strip the .exe before comparing
@@ -322,7 +326,7 @@ func (v ValidateBlob) FindKey(searchKey string) (results []ValidateBlob) {
 	if !v.IsLeaf() {
 		results = append(results, v.searchChildren(searchKey)...)
 	}
-	
+
 	return
 }
 
