@@ -76,7 +76,7 @@ func (p InfraAgentDebug) Execute(options tasks.Options, upstream map[string]task
 		}
 	}
 
-	if upstream["Infra/Agent/Version"].Status != tasks.Info {
+	if upstream["Infra/Agent/Version"].Status != tasks.Info && upstream["Infra/Agent/Version"].Status != tasks.Warning {
 		return tasks.Result{
 			Status:  tasks.Failure,
 			Summary: "New Relic Infrastructure agent not detected on system. Please ensure the Infrastructure agent is installed and running.",
