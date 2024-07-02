@@ -123,16 +123,11 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 		urlUpdateTask := tasks.Result{
 			URL:     "https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/update-infrastructure-agent",
 			Summary: err.Error(),
-			Status:  tasks.Error,
+			Status:  tasks.Warning,
 		}
-
-		// change task status depending on error
 		if errors.Is(err, errUnsupportedVersion) {
 			urlUpdateTask.Status = tasks.Failure
-		} else if errors.Is(err, errRecommendedUpgrade) {
-			urlUpdateTask.Status = tasks.Warning
 		}
-
 		return urlUpdateTask
 	}
 
