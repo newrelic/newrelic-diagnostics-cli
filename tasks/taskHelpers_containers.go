@@ -1,27 +1,27 @@
 package tasks
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os/exec"
 	"sort"
 	"strings"
-	"os/exec"
-	"bytes"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
 type DockerInfo struct {
-	Driver string
+	Driver        string
 	ServerVersion string
-	MemTotal int64
-	NCPU int
+	MemTotal      int64
+	NCPU          int
 }
 
-//DockerContainer is a truncated struct of the docker inspect blob
-//Since we can write the full blob to a file, the purpose of this struct is to limit ourselves
-//only to values we are interested in for validation in our tasks.
+// DockerContainer is a truncated struct of the docker inspect blob
+// Since we can write the full blob to a file, the purpose of this struct is to limit ourselves
+// only to values we are interested in for validation in our tasks.
 type DockerContainer struct {
 	Id       string
 	Created  string
@@ -56,7 +56,7 @@ type ContainerConfig struct {
 	Env  []string
 }
 
-func GetDockerInfoCLIBytes(cmdExec CmdExecFunc)([]byte, error){
+func GetDockerInfoCLIBytes(cmdExec CmdExecFunc) ([]byte, error) {
 
 	cmdOutBytes, err := cmdExec("docker", "info", "--format", "'{{json .}}'")
 
@@ -67,31 +67,30 @@ func GetDockerInfoCLIBytes(cmdExec CmdExecFunc)([]byte, error){
 		}
 		return nil, err
 	}
-	
+
 	trimmedBytes := bytes.TrimSpace(cmdOutBytes)
 	trimmedBytes = bytes.Trim(trimmedBytes, "'")
 
 	return trimmedBytes, nil
 }
 
-func NewDockerInfoFromBytes(dockerInfoBytes []byte)(DockerInfo, error){
+func NewDockerInfoFromBytes(dockerInfoBytes []byte) (DockerInfo, error) {
 	dockerInfo := DockerInfo{}
 
 	parseErr := json.Unmarshal(dockerInfoBytes, &dockerInfo)
-	
+
 	return dockerInfo, parseErr
 }
 
-
-//Example of the command we want to construct:
-//docker ps -q --last 4 --filter label=name=synthetics-minion --filter status=running
-//list all the last 4 containers filtered to the label 'name' with value 'synthetics-minion' format output with container id and filtered to status running
-//https://docs.docker.com/engine/reference/commandline/ps/
-//@label = expected docker image label key used by the container eg. "name"
-//@value = value of the label eg. "synthetics-minion"
-//@numberOf = max number of containers ids to return
-//@includeExited = include both active and exited containers
-//@cmdExec =  command line executor dependency
+// Example of the command we want to construct:
+// docker ps -q --last 4 --filter label=name=synthetics-minion --filter status=running
+// list all the last 4 containers filtered to the label 'name' with value 'synthetics-minion' format output with container id and filtered to status running
+// https://docs.docker.com/engine/reference/commandline/ps/
+// @label = expected docker image label key used by the container eg. "name"
+// @value = value of the label eg. "synthetics-minion"
+// @numberOf = max number of containers ids to return
+// @includeExited = include both active and exited containers
+// @cmdExec =  command line executor dependency
 func GetContainerIdsByLabel(label string, value string, numberOf int, includeExited bool, cmdExec CmdExecFunc) ([]string, error) {
 
 	var foundContainerIds []string
@@ -108,7 +107,7 @@ func GetContainerIdsByLabel(label string, value string, numberOf int, includeExi
 	cmdOutBytes, err := cmdExec("docker", queryArgsArray...)
 
 	if err != nil {
-		return nil, errors.New("Error querying for container: " + err.Error() + ": " + string(cmdOutBytes))
+		return nil, errors.New("error querying for container: " + err.Error() + ": " + string(cmdOutBytes))
 	}
 
 	cmdOutString := string(cmdOutBytes)
@@ -121,8 +120,8 @@ func GetContainerIdsByLabel(label string, value string, numberOf int, includeExi
 	return foundContainerIds, nil
 }
 
-//Get inspect blobs of containers from slice of ids. Docker client will take several ids as arguments
-//and return blobs for each.
+// Get inspect blobs of containers from slice of ids. Docker client will take several ids as arguments
+// and return blobs for each.
 func InspectContainersById(containerIds []string, cmdExec CmdExecFunc) ([]byte, error) {
 	//docker inspect can take multiple object id arguments in single command
 	// will output objects a JSON array
@@ -139,7 +138,7 @@ func InspectContainersById(containerIds []string, cmdExec CmdExecFunc) ([]byte, 
 	return cmdOutBytes, nil
 }
 
-//Redact values of unwhitelisted environment variables.
+// Redact values of unwhitelisted environment variables.
 func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 	//expect a JSON array, so we unmarshal into a slice of interfaces
 	parsedContainers := []interface{}{}
@@ -171,7 +170,7 @@ func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 		}
 
 		if env == nil {
-			return []byte{}, errors.New("Could not find Env variables in container inspect blob")
+			return []byte{}, errors.New("could not find Env variables in container inspect blob")
 		}
 
 		//for every env variable of a container
@@ -209,7 +208,7 @@ func RedactContainerEnv(containers []byte, whitelist []string) ([]byte, error) {
 }
 
 //StreamContainerLogsById will perform a buffered stream of `docker logs` command for a containerId.
-//We perform a buffered read since logging can be quite large and we dont want to put it all in memory.
+//We perform a buffered read since logging can be quite large and we don't want to put it all in memory.
 //@containerId - the containerId to collect logs from
 //@bufferedCmdExec - the buffered command exec to use, which should return a scanner.
 //@sw - StreamWrapper that has the channel to send log output to and the channel to send errors through
@@ -236,6 +235,4 @@ func StreamContainerLogsById(containerId string, bufferedCmdExec BufferedCommand
 	for cmdOutScanner.Scan() {
 		sw.Stream <- cmdOutScanner.Text() + "\n"
 	}
-
-	return
 }

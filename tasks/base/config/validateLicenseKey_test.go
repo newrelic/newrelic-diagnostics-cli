@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -28,7 +28,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status:  tasks.Success,
 						Payload: []LicenseKey{},
 					},
@@ -45,10 +45,10 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `"REPLACE_WITH_REAL_KEY"`,
 								Source: "/usr/local/etc/php/conf.d/newrelic.ini",
 							},
@@ -68,10 +68,10 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `"08a2ad66c637a29c3982469a3fe8d1982d00NRAL"`,
 								Source: "/data/www/myappname-production/releases/20191009171653/config/newrelic.yml",
 							},
@@ -97,10 +97,10 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `"08a2ad66c637a29c3982469a3fe8d1982d00NRAL"`,
 								Source: "/app/myappname/newrelic.ini",
 							},
@@ -124,14 +124,14 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `"eu01xx66c637a29c3982469a3fe8d1982d00NRAL"`,
 								Source: `C:\ProgramData\New Relic\.NET Agent\newrelic.config`,
 							},
-							LicenseKey{
+							{
 								Value:  `"eu01xx66c637a29c3982469a3fe8d1982d00NRAL"`,
 								Source: `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml`,
 							},
@@ -147,7 +147,7 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 
 			It("Should return a None status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
-				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in C:\ProgramData\New Relic\.NET Agent\newrelic.config,` + "\n " + `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml` + " did not match the one assigned to your account:\neu01xx66c637a29c3982469a3fe8d1982d00NRAL\nIf you are using an 'ingest key', ignore this warning. Ingest keys are secondary license keys manage by their own users that we do not validate for. Read more about ingest keys - https://docs.newrelic.com/docs/apis/nerdgraph/examples/use-nerdgraph-manage-license-keys-user-keys\n\n"))
+				Expect(result.Summary).To(Equal(`We validated 1 license key(s):` + "\n" + `The license key found in C:\ProgramData\New Relic\.NET Agent\newrelic.config,` + "\n " + `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml` + " did not match the one assigned to your account:\neu01xx66c637a29c3982469a3fe8d1982d00NRAL\nIf you are not using the account's original license key, you can ignore this warning. The Diagnostics CLI only validates the account's original license key. Read more about license keys - https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key\n\n"))
 
 			})
 		})
@@ -156,14 +156,14 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  "08a2ad66c637a29c3982469a3fe8d1982d002c4a",
 								Source: "/newrelic/newrelic.yml",
 							},
-							LicenseKey{
+							{
 								Value:  "08a2ad66c637a29c3982469a3fe8d1982d002c4",
 								Source: `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml`,
 							},
@@ -187,14 +187,14 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `"08a2ad66c637a29c3982469a3fe8d1982d002c4a"`,
 								Source: "NEW_RELIC_LICENSE_KEY",
 							},
-							LicenseKey{
+							{
 								Value:  `"<%=license_key%>"`,
 								Source: "/newrelic/newrelic.yml",
 							},
@@ -214,22 +214,22 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `08a2ad66c637a29c3982469a3fe8d1982d002c4f`,
 								Source: "NEW_RELIC_LICENSE_KEY",
 							},
-							LicenseKey{
+							{
 								Value:  `08a2ad66c637a29c3982469a3fe8d1982d002c4f`,
 								Source: "NRIA_LICENSE_KEY",
 							},
-							LicenseKey{
+							{
 								Value:  `"<%=license_key%>"`,
 								Source: "/newrelic/newrelic.yml",
 							},
-							LicenseKey{
+							{
 								Value:  "your_license_key",
 								Source: `/var/log/newrelic-infra.yml`,
 							},
@@ -254,10 +254,10 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `"aaaaaa1a1a11a111111aa1111a11aa1a11aa111aaaa1a11"`,
 								Source: "mynodeapp/newrelic.js",
 							},
@@ -277,10 +277,10 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `'<%=c8f8ff84ed677d5791eeefb672a69447fb788486 %>'`,
 								Source: "newrelic/newrelic.yml",
 							},
@@ -300,10 +300,10 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 
 								Value:  `5306276ad40fb0c3caccba85f869dcadc018e54`,
 								Source: `C:\Program Files\New Relic\newrelic-infra\newrelic-infra.yml`,
@@ -325,15 +325,15 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 
 								Value:  `'<%=license_key%>'`,
 								Source: "newrelic/newrelic.yml",
 							},
-							LicenseKey{
+							{
 								Value:  `eu01xx66c637a29c3982469a3fe8d1982d00NRAL`,
 								Source: "NEW_RELIC_LICENSE_KEY",
 							},
@@ -357,14 +357,14 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 								Value:  `eu01xx66c637a29c3982469a3fe8d1982d00NRAL`,
 								Source: "NRIA_LICENSE_KEY",
 							},
-							LicenseKey{
+							{
 								Value:  "your_license_key",
 								Source: `/var/log/newrelic-infra.yml`,
 							},
@@ -389,15 +389,15 @@ var _ = Describe("BaseConfigValidateLicenseKey", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/LicenseKey": tasks.Result{
+					"Base/Config/LicenseKey": {
 						Status: tasks.Success,
 						Payload: []LicenseKey{
-							LicenseKey{
+							{
 
 								Value:  `x692c6460dc93f7c586a1bd1a6a98f030cdaf4498785150`,
 								Source: "NEW_RELIC_LICENSE_KEY",
 							},
-							LicenseKey{
+							{
 								Value:  "",
 								Source: `myapp/newrelic.js`,
 							},

@@ -136,7 +136,7 @@ func checkLinux(osPlatform string, osVersion string) (result tasks.Result) {
 	default:
 		log.Debug("Unknown Linux Platform '" + osPlatform + "'")
 		result.Status = tasks.Warning
-		result.Summary = "Unknown Linux Platform '" + osPlatform + "'. Unable to check compatability."
+		result.Summary = "Unknown Linux Platform '" + osPlatform + "'. Unable to check compatibility."
 		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
 		return
 	}

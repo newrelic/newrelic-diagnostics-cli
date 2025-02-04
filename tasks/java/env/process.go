@@ -8,7 +8,7 @@ import (
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 /* structure to contain a process and its corresponding command line args */
@@ -21,7 +21,6 @@ type ProcIdAndArgs struct {
 }
 
 type JavaEnvProcess struct {
-	name           string
 	findProcByName tasks.FindProcessByNameFunc
 	getCmdLineArgs func(process.Process) (string, error)
 	getCwd         func(process.Process) (string, error)
@@ -122,7 +121,7 @@ func (p JavaEnvProcess) Execute(options tasks.Options, upstream map[string]tasks
 	}
 }
 
-//getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
+// getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
 func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }

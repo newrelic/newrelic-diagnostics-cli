@@ -11,7 +11,6 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 
 	registrationFunc(PythonRequirementsPythonVersion{}, true)
 	registrationFunc(PythonRequirementsWebframework{}, true)
-	registrationFunc(PythonRequirementsPythonVersion{
-	}, true)
+	registrationFunc(PythonRequirementsPythonVersion{}, true)
 
 }

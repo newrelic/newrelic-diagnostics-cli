@@ -62,7 +62,7 @@ func TestAndroidAgentDetect_Explain(t *testing.T) {
 		p    AndroidAgentDetect
 		want string
 	}{
-		{name: "Should say -  Detects Android Environemnt",
+		{name: "Should say -  Detects Android Environment",
 			p:    AndroidAgentDetect{},
 			want: "Detect if running in Android environment"},
 	}
@@ -88,7 +88,7 @@ func TestAndroidAgentDetect_Execute(t *testing.T) {
 	successfulUpstream["Base/Config/Collect"] = tasks.Result{
 		Status: tasks.Success,
 		Payload: []config.ConfigElement{
-			config.ConfigElement{
+			{
 				FileName: "AndroidManifest.xml",
 				FilePath: "testpath",
 			},
@@ -105,7 +105,7 @@ func TestAndroidAgentDetect_Execute(t *testing.T) {
 	failedUpstream["Base/Config/Collect"] = tasks.Result{
 		Status: tasks.Failure,
 		Payload: []config.ConfigElement{
-			config.ConfigElement{
+			{
 				FileName: "",
 			},
 		},

@@ -5,7 +5,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	BrowserFixtures "github.com/newrelic/newrelic-diagnostics-cli/tasks/fixtures/Browser"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -61,7 +61,7 @@ var _ = Describe("Browser/Agent/Detect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Browser/Agent/GetSource": tasks.Result{
+					"Browser/Agent/GetSource": {
 						Status: tasks.Success,
 						Payload: BrowserAgentSourcePayload{
 							URL:    "https://www.testingmctestface.com",

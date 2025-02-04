@@ -48,7 +48,7 @@ var patterns = []string{
 	"NewRelic[.]h",
 }
 
-//This list will prompt the end user asking for permission to include each file
+// This list will prompt the end user asking for permission to include each file
 var secureFilePatterns = []string{
 	"AppDelegate[.]m",
 	"AppDelegate[.]swift",
@@ -122,7 +122,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		return tasks.Result{
 			Status:      tasks.Success,
 			Summary:     "1 file found",
-			Payload:     []ConfigElement{ConfigElement{filepath.Base(configOverride), filepath.Dir(configOverride) + "/"}},
+			Payload:     []ConfigElement{{filepath.Base(configOverride), filepath.Dir(configOverride) + "/"}},
 			FilesToCopy: []tasks.FileCopyEnvelope{envelope},
 		}
 	}
@@ -148,6 +148,9 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		paths = append(paths, "/etc/")
 		paths = append(paths, "/opt/newrelic/synthetics/.newrelic/synthetics/minion/")
 		paths = append(paths, "/usr/local/newrelic-netcore20-agent/")
+		paths = append(paths, "/usr/local/newrelic-dotnet-agent/") // https://github.com/newrelic/newrelic-diagnostics-cli/issues/114
+		paths = append(paths, "/opt/homebrew/etc/newrelic-infra/") // newrelic-infra.yml on Mac arm64
+		paths = append(paths, "/usr/local/etc/")                   // newrelic-infra.yml on Mac x86
 	}
 
 	//Find insecure paths
@@ -162,7 +165,7 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 	//Find insecure paths
 	foundSecureConfigs := tasks.FindFiles(secureFilePatterns, paths)
 
-	var invalidConfigFiles, cannotCollectConfigFiles []string//will represent the secure files that the user reject nrdiag to collect at the prompt
+	var invalidConfigFiles, cannotCollectConfigFiles []string //will represent the secure files that the user reject nrdiag to collect at the prompt
 	var warningSummaryOnInvalidFiles string
 
 	for _, secureConfig := range foundSecureConfigs {
@@ -198,14 +201,14 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 	}
 	warningSummaryCannotCollect := ""
 	if len(cannotCollectConfigFiles) > 0 {
-		warningSummaryCannotCollect += "\nThe following files were not collected because the user opted out from including them in the nrdiag-output.zip: "+ strings.Join(cannotCollectConfigFiles, ", ")
+		warningSummaryCannotCollect += "\nThe following files were not collected because the user opted out from including them in the nrdiag-output.zip: " + strings.Join(cannotCollectConfigFiles, ", ")
 	}
 
 	//search for config file in New Relic System Property
 	if upstream["Base/Env/CollectSysProps"].Status == tasks.Info {
-		proccesses, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
+		processes, ok := upstream["Base/Env/CollectSysProps"].Payload.([]tasks.ProcIDSysProps)
 		if ok {
-			for _, process := range proccesses {
+			for _, process := range processes {
 				configPath, isPresent := process.SysPropsKeyToVal[configSysProp]
 				if isPresent {
 					//Example path: -Dnewrelic.config.file=/usr/local/newrelic/newrelic.yml
@@ -235,8 +238,8 @@ func (p BaseConfigCollect) Execute(options tasks.Options, upstream map[string]ta
 		noConfigFileVal, envVarIsPresent := envVars[noConfigEnvVar]
 		if envVarIsPresent {
 			return tasks.Result{
-				Status: tasks.Warning,
-				Summary: tasks.ThisProgramFullName+ " was unable to collect a New Relic config file because the "+ noConfigEnvVar+ " env var was set to " + noConfigFileVal + "." + warningSummaryCannotCollect,
+				Status:  tasks.Warning,
+				Summary: tasks.ThisProgramFullName + " was unable to collect a New Relic config file because the " + noConfigEnvVar + " env var was set to " + noConfigFileVal + "." + warningSummaryCannotCollect,
 			}
 		}
 		return tasks.Result{

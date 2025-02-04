@@ -8,17 +8,15 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/compatibilityVars"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 type supportabilityStatus int
 
-//Constants for use by the supportabilityStatus enum
+// Constants for use by the supportabilityStatus enum
 const (
 	NotSupported supportabilityStatus = iota
-
 	LegacySupported
-
 	FullySupported
 )
 
@@ -54,7 +52,6 @@ func (p JavaJVMVendorsVersions) Dependencies() []string {
 
 /* Execute - iterates through list of running java processes and returns their respective supportability */
 func (p JavaJVMVendorsVersions) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-
 	/* obtain currently running Java procs as a slice of PIDInfo structs */
 	log.Debug(p.Identifier(), "- Checking for running Java processes on this host")
 	javaProcesses, err := p.findProcessByName("java")
@@ -146,7 +143,7 @@ func (p JavaJVMVendorsVersions) Execute(options tasks.Options, upstream map[stri
 
 }
 
-//getSupportabilityCounts takes a slice of []PIDInfos and returns the total counts present
+// getSupportabilityCounts takes a slice of []PIDInfos and returns the total counts present
 // in the slice for each possible SupportabilityStatus
 func getSupportabilityCounts(javaPIDInfos []PIDInfo) map[supportabilityStatus]int {
 	counts := map[supportabilityStatus]int{
@@ -162,12 +159,11 @@ func getSupportabilityCounts(javaPIDInfos []PIDInfo) map[supportabilityStatus]in
 	return counts
 }
 
-//determineSummaryStatusResult determines the task status and corresponding summary by
-//examining the detected JVM vendor/versions. If any JVMs are found that
+// determineSummaryStatusResult determines the task status and corresponding summary by
+// examining the detected JVM vendor/versions. If any JVMs are found that
 // are not supported by a modern or legacy agent, it will return a tasks.Failure.
 // If all JVMs are supported, but a least one JVM requiring a legacy agent is found,
 // it will return a tasks.Warning status.
-
 func determineSummaryStatus(counts map[supportabilityStatus]int) (tasks.Status, string) {
 
 	total := counts[NotSupported] + counts[LegacySupported] + counts[FullySupported]
@@ -223,17 +219,17 @@ func trimQuotes(src string) string {
 	return src
 }
 
-//parseJavaExecutable takes in command line arguments and returns first argument that is determined to be
+// parseJavaExecutable takes in command line arguments and returns first argument that is determined to be
 // the java executable.
 func parseJavaExecutable(cmdLineArgs string) string {
-
 	//first pass, splitting on ' -'
 	argsSplitByDash := strings.Split(cmdLineArgs, " -")
+	r, _ := regexp.Compile(".*java.exe$|.*java$")
 	for _, cmdLineArg := range argsSplitByDash {
 		sanitizedCmdLineArg := sanitizeCmdLineArg(cmdLineArg)
 
 		/* does the arg string end in java or java.exe(windows) */
-		match, _ := regexp.MatchString(".*java.exe$|.*java$", sanitizedCmdLineArg)
+		match := r.MatchString(sanitizedCmdLineArg)
 		if match {
 			return sanitizedCmdLineArg
 		}
@@ -241,8 +237,9 @@ func parseJavaExecutable(cmdLineArgs string) string {
 
 	//second pass, splitting on ' '
 	argsSplitBySpace := strings.Split(cmdLineArgs, " ")
+	r2, _ := regexp.Compile(".*java$")
 	for _, cmdLineArg := range argsSplitBySpace {
-		match, _ := regexp.MatchString(".*java$", cmdLineArg)
+		match := r2.MatchString(cmdLineArg)
 		if match {
 			return cmdLineArg
 		}
@@ -251,15 +248,14 @@ func parseJavaExecutable(cmdLineArgs string) string {
 	return ""
 }
 
-//getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
+// getCmdLineArgs is a wrapper for dependency injecting proc.Cmdline in testing
 func getCmdLineArgs(proc process.Process) (string, error) {
 	return proc.Cmdline()
 }
 
-//parseVendorDetailsByArgs parses vendor and version directly from java process arguments list
-//used as a fallback if java -version fails.
+// parseVendorDetailsByArgs parses vendor and version directly from java process arguments list
+// used as a fallback if java -version fails.
 func parseVendorDetailsByArgs(cmdLineArgs string) (string, string, bool) {
-
 	vendor := extractVendorFromArgs(cmdLineArgs)
 	if vendor == "" {
 		return "", "", false
@@ -274,8 +270,8 @@ func parseVendorDetailsByArgs(cmdLineArgs string) (string, string, bool) {
 
 }
 
-//parseVendorDetailsByExe takes in a java executable path (e.g. /foo/bar/bin/java) and
-//attempts to parse the vendor and version by running: /foo/bar/bin/java -version
+// parseVendorDetailsByExe takes in a java executable path (e.g. /foo/bar/bin/java) and
+// attempts to parse the vendor and version by running: /foo/bar/bin/java -version
 func (p JavaJVMVendorsVersions) parseVendorDetailsByExe(javaExecutable string) (string, string, bool) {
 	execOutputRaw, err := p.cmdExec(javaExecutable, "-version")
 	if err != nil {
@@ -354,7 +350,7 @@ func extractVendorFromJavaExecutable(execOutput string) (vendor string) {
 		uniqueVendors[v] = struct{}{}
 	}
 
-	for v := range compatibilityVars.SupportedForJavaAgent4 {
+	for v := range compatibilityVars.SupportedForJavaAgentLegacy {
 		uniqueVendors[v] = struct{}{}
 	}
 
@@ -422,9 +418,7 @@ func extractVersionFromArgs(cmdLineArgs string) (version string) {
 
 /* check a java proc's command line arguments for the JRE vendor and/or distribution */
 func extractVendorFromArgs(cmdLineArgs string) (vendor string) {
-
 	//splitting on just space here would break when: Djava.vm.name=Java HotSpot(TM)
-
 	sliceCmdLineArgs := strings.Split(cmdLineArgs, " -")
 	for _, cmdLineArg := range sliceCmdLineArgs {
 		if strings.Contains(cmdLineArg, "java.vm.name") {
@@ -505,7 +499,6 @@ func isItCompatible(version string, supportedVersion []string) (supported bool) 
 
 /* This should be kept up-to-date with our public-facing documentation */
 func (p JavaJVMVendorsVersions) isFullySupported(vendor string, version string) bool {
-
 	// We only support IBM in Linux environment
 	if (vendor == "IBM") && (p.runtimeGOOS != "linux") {
 		return false
@@ -522,7 +515,6 @@ func (p JavaJVMVendorsVersions) isFullySupported(vendor string, version string) 
 }
 
 func (p JavaJVMVendorsVersions) isLegacySupported(vendor string, version string) bool {
-
 	//We only support Apple hotspot in OS X environment
 	if (vendor == "Apple") && (p.runtimeGOOS != "darwin") {
 		return false
@@ -533,8 +525,7 @@ func (p JavaJVMVendorsVersions) isLegacySupported(vendor string, version string)
 		return false
 	}
 
-	requirements := compatibilityVars.SupportedForJavaAgent4[vendor]
-
+	requirements := compatibilityVars.SupportedForJavaAgentLegacy[vendor]
 	if requirements != nil {
 		return isItCompatible(version, requirements)
 	}

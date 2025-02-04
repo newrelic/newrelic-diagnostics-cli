@@ -1,9 +1,10 @@
+//go:build windows
 // +build windows
 
 package requirements
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -60,8 +61,8 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed":   tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{Status: tasks.Failure},
+					"DotNet/Agent/Installed":   {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {Status: tasks.Failure},
 				}
 			})
 			It("Should return None status", func() {
@@ -75,9 +76,9 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed":   tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{Status: tasks.Info},
-					"DotNet/Agent/Version":     tasks.Result{Status: tasks.Failure},
+					"DotNet/Agent/Installed":   {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {Status: tasks.Info},
+					"DotNet/Agent/Version":     {Status: tasks.Failure},
 				}
 			})
 			It("Should return None status", func() {
@@ -91,12 +92,12 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
 						Status:  tasks.Info,
 						Payload: []string{"3.0"},
 					},
-					"DotNet/Agent/Version": tasks.Result{
+					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "8.3.360.0",
 					},
@@ -114,12 +115,12 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
 						Status:  tasks.Info,
 						Payload: []string{"4.5", "4.0"},
 					},
-					"DotNet/Agent/Version": tasks.Result{
+					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "7.0.2.0",
 					},
@@ -136,12 +137,12 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
 						Status:  tasks.Info,
 						Payload: []string{"4.5", "4.6"},
 					},
-					"DotNet/Agent/Version": tasks.Result{
+					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "7.0.2.0",
 					},
@@ -159,12 +160,12 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"DotNet/Env/TargetVersion": tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
 						Status:  tasks.Info,
 						Payload: []string{"3.5", "4.0"},
 					},
-					"DotNet/Agent/Version": tasks.Result{
+					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
 						Payload: "7.0.2.0",
 					},

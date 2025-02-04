@@ -3,9 +3,9 @@ package agent
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	logtask "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestPythonAgentVersion(t *testing.T) {
@@ -13,7 +13,7 @@ func TestPythonAgentVersion(t *testing.T) {
 	RunSpecs(t, "Python/Agent test suite")
 }
 
-var _ = Describe("Python/Agent/Verson", func() {
+var _ = Describe("Python/Agent/Version", func() {
 
 	Describe("searchLogs", func() {
 		var (
@@ -81,7 +81,7 @@ var _ = Describe("Python/Agent/Verson", func() {
 		Context("When given a logElement containing a Python Agent version", func() {
 			BeforeEach(func() {
 				incomingLogs = []logtask.LogElement{
-					logtask.LogElement{
+					{
 						FileName: "newrelic-python-agent.log",
 						FilePath: "../../fixtures/python/root/tmp/",
 					},
@@ -89,7 +89,7 @@ var _ = Describe("Python/Agent/Verson", func() {
 			})
 			It("Should return the expected agent version, log file location, and true", func() {
 				expectedReturn := []LogPythonAgentVersion{
-					LogPythonAgentVersion{
+					{
 						Logfile:      "../../fixtures/python/root/tmp/newrelic-python-agent.log",
 						AgentVersion: "2.86.3.70",
 						MatchFound:   true,
@@ -102,7 +102,7 @@ var _ = Describe("Python/Agent/Verson", func() {
 		Context("When given a logElement which does not contain a Python Agent Version", func() {
 			BeforeEach(func() {
 				incomingLogs = []logtask.LogElement{
-					logtask.LogElement{
+					{
 						FileName: "newrelic_agent.log",
 						FilePath: "../../fixtures/node/",
 					},
@@ -110,7 +110,7 @@ var _ = Describe("Python/Agent/Verson", func() {
 			})
 			It("Should return an empty Python agent version, the log file location, and false", func() {
 				expectedReturn := []LogPythonAgentVersion{
-					LogPythonAgentVersion{
+					{
 						Logfile:      "../../fixtures/node/newrelic_agent.log",
 						AgentVersion: "",
 						MatchFound:   false,
@@ -123,7 +123,7 @@ var _ = Describe("Python/Agent/Verson", func() {
 		Context("When given a logElement with a malformed filepath", func() {
 			BeforeEach(func() {
 				incomingLogs = []logtask.LogElement{
-					logtask.LogElement{
+					{
 						FileName: "newrelic_agent.BADFILE.log",
 						FilePath: "../../fixtures/python/",
 					},
@@ -131,7 +131,7 @@ var _ = Describe("Python/Agent/Verson", func() {
 			})
 			It("Should return an empty agent version, log file location, and false", func() {
 				expectedReturn := []LogPythonAgentVersion{
-					LogPythonAgentVersion{
+					{
 						Logfile:      "../../fixtures/python/newrelic_agent.BADFILE.log",
 						AgentVersion: "",
 						MatchFound:   false,

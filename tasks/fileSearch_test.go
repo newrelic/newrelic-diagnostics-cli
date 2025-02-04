@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -83,9 +83,9 @@ var _ = Describe("file search Task helpers", func() {
 
 			It("should return expected string matching search string ", func() {
 				expectedMatches := [][]string{
-					[]string{"us-west-2.compute.internal"},
-					[]string{"us-west-2.compute.internal"},
-					[]string{"us-west-2.compute.internal"},
+					{"us-west-2.compute.internal"},
+					{"us-west-2.compute.internal"},
+					{"us-west-2.compute.internal"},
 				}
 				Expect(match).To(Equal(expectedMatches))
 			})
@@ -102,9 +102,9 @@ var _ = Describe("file search Task helpers", func() {
 
 			It("should return expected string matching search regex ", func() {
 				expectedMatches := [][]string{
-					[]string{"Relic 1.2.4.200", "1.2.4.200"},
-					[]string{"Relic 2.3.4.500", "2.3.4.500"},
-					[]string{"Relic 7.5.0.199", "7.5.0.199"},
+					{"Relic 1.2.4.200", "1.2.4.200"},
+					{"Relic 2.3.4.500", "2.3.4.500"},
+					{"Relic 7.5.0.199", "7.5.0.199"},
 				}
 				Expect(match).To(Equal(expectedMatches))
 			})
@@ -146,11 +146,11 @@ var _ = Describe("file search Task helpers", func() {
 				search = ""
 				filepath = "brokenfile"
 				osOpen = func(string) (*os.File, error) {
-					return nil, errors.New("Error opening file")
+					return nil, errors.New("error opening file")
 				}
 			})
 			It("should err that is not nil", func() {
-				Expect(err.Error()).To(Equal("Error opening file"))
+				Expect(err.Error()).To(Equal("error opening file"))
 			})
 		})
 	})
@@ -261,8 +261,8 @@ var _ = Describe("file search Task helpers", func() {
 			})
 
 			It("should return only last result", func() {
-				expecteVersionMatch := "7.5.0.199"
-				Expect(matches[1]).To(Equal(expecteVersionMatch))
+				expectedVersionMatch := "7.5.0.199"
+				Expect(matches[1]).To(Equal(expectedVersionMatch))
 			})
 			It("should return a nil error", func() {
 				Expect(err).To(BeNil())

@@ -29,7 +29,7 @@ func Test_checkValidation(t *testing.T) {
 	validationFromMinimalYML := validateElementFromFile("fixtures/minimal_infra_config/newrelic-infra.yml")
 	file, _ := os.Open("fixtures/java_config/newrelic.yml")
 	parsedFromJavaConfigYML, _ := config.ParseYaml(file)
-	validationFromJavaConfigYML := []config.ValidateElement{config.ValidateElement{
+	validationFromJavaConfigYML := []config.ValidateElement{{
 		Config: config.ConfigElement{FileName: "newrelic.yml", FilePath: ""}, Status: tasks.Success, ParsedResult: parsedFromJavaConfigYML}}
 
 	type want struct {
@@ -123,10 +123,10 @@ func createFile(t *testing.T, create bool) {
 	if create {
 		log.Debug("create File")
 		file, err := os.Create("newrelic-infra") // For read access.
-		defer file.Close()
 		if err != nil {
 			log.Debug("Error creating file", err)
 		}
+		defer file.Close()
 	} else {
 		log.Debug("delete file")
 		err := os.Remove("newrelic-infra")
@@ -136,10 +136,6 @@ func createFile(t *testing.T, create bool) {
 
 	}
 
-}
-
-func checkPayload(payload interface{}, expected interface{}) bool {
-	return true
 }
 
 func TestInfraConfigAgent_Execute(t *testing.T) {

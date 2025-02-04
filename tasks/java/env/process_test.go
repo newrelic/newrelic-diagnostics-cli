@@ -9,9 +9,9 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func TestJavaEnvProcess(t *testing.T) {
@@ -36,7 +36,7 @@ var _ = Describe("JavaEnvProcess", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -50,7 +50,7 @@ var _ = Describe("JavaEnvProcess", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Java/Config/Agent": tasks.Result{
+					"Java/Config/Agent": {
 						Status:  tasks.Success,
 						Summary: "Java agent identified as present on system",
 						Payload: []config.ValidateElement{
@@ -62,7 +62,7 @@ var _ = Describe("JavaEnvProcess", func() {
 							},
 						},
 					},
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Success,
 						Payload: map[string]string{},
 					},
@@ -87,7 +87,7 @@ var _ = Describe("JavaEnvProcess", func() {
 						"PATH": "/usr/local/opt/ruby/bin:/Users/shuayhuaca/.nvm/versions/node/v8.16.0/bin:/opt/apache-maven/bin/:/opt/apache-maven/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/scripts:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/projects/nand2tetris/tools:/usr/local/go/bin:/Users/shuayhuaca/go/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/shuayhuaca/.rvm/bin",
 					}
 					upstream = map[string]tasks.Result{
-						"Java/Config/Agent": tasks.Result{
+						"Java/Config/Agent": {
 							Status:  tasks.Success,
 							Summary: "Java agent identified as present on system",
 							Payload: []config.ValidateElement{
@@ -99,13 +99,13 @@ var _ = Describe("JavaEnvProcess", func() {
 								},
 							},
 						},
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Success,
 							Payload: envVarsPayload,
 						},
 					}
 					javaProcesses := []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}
@@ -140,7 +140,7 @@ var _ = Describe("JavaEnvProcess", func() {
 						"PATH": "/usr/local/opt/ruby/bin:/Users/shuayhuaca/.nvm/versions/node/v8.16.0/bin:/opt/apache-maven/bin/:/opt/apache-maven/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/scripts:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Users/shuayhuaca/desktop/projects/nand2tetris/tools:/usr/local/go/bin:/Users/shuayhuaca/go/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/shuayhuaca/.rvm/bin",
 					}
 					upstream = map[string]tasks.Result{
-						"Java/Config/Agent": tasks.Result{
+						"Java/Config/Agent": {
 							Status:  tasks.Success,
 							Summary: "Java agent identified as present on system",
 							Payload: []config.ValidateElement{
@@ -152,13 +152,13 @@ var _ = Describe("JavaEnvProcess", func() {
 								},
 							},
 						},
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Success,
 							Payload: envVarsPayload,
 						},
 					}
 					javaProcesses := []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}
@@ -242,27 +242,27 @@ var _ = Describe("JavaEnvProcess", func() {
 					path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
 					javaAgent := "newrelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-			
+
 			Context("When given a cmdLineArgsStr that contains a path and an agent name of newrelic-1.8.3.jar", func() {
 				It("should return the path and no error", func() {
 					path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
 					javaAgent := "newrelic-1.8.3.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-	
+
 			Context("When cmdLineArgsStr content contains things other than the javaagent argument", func() {
 				It("should return the path and no error", func() {
 					otherBefore := "/usr/bin/java -Dnewrelic.logfile=/Users/shuayhuaca/Desktop/newrelic_agent.log -jar "
@@ -270,32 +270,32 @@ var _ = Describe("JavaEnvProcess", func() {
 					javaAgent := "newrelic-1.8.3.jar"
 					otherAfter := " build/libs/lucessqs-1.0-SNAPSHOT.jar"
 					commandLineArgsStr := otherBefore + command + path + javaAgent + otherAfter
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-	
+
 			Context("When given a cmdLineArgsStr that does not contain a path, but has a valid agent name", func() {
 				It("should return ./ as the path and no error", func() {
 					javaAgent := "newrelic-1.8.3.jar"
 					commandLineArgsStr := command + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal("./"))
 					Expect(resultFilename).To(Equal(javaAgent))
 					Expect(err).To(BeNil())
 				})
 			})
-	
+
 			Context("When given a cmdLineArgsStr with an invalid agent name", func() {
 				It("should return the path and an error", func() {
 					path := "/Users/shuayhuaca/Desktop/projects/java/luces/"
 					javaAgent := "bluerelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
@@ -310,7 +310,7 @@ var _ = Describe("JavaEnvProcess", func() {
 					path := `\newrelic\`
 					javaAgent := "newrelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
@@ -323,7 +323,7 @@ var _ = Describe("JavaEnvProcess", func() {
 					path := `C:\projects\myapp\newrelic\`
 					javaAgent := "bluerelic.jar"
 					commandLineArgsStr := command + path + javaAgent
-	
+
 					resultPath, resultFilename, err := getJarInfoFromCmdLineArgs(commandLineArgsStr)
 					Expect(resultPath).To(Equal(path))
 					Expect(resultFilename).To(Equal(javaAgent))
@@ -331,6 +331,6 @@ var _ = Describe("JavaEnvProcess", func() {
 				})
 			})
 		}
-		
+
 	})
 })

@@ -1,10 +1,10 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"regexp"
-	"errors"
 	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
@@ -14,7 +14,6 @@ import (
 
 // JavaConfigAgent - This struct defined the sample plugin which can be used as a starting point
 type JavaConfigAgent struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
-	name string
 }
 
 // JavaConfig - defines the payload returned by this task
@@ -227,7 +226,7 @@ func checkForJar() bool {
 
 		if jarRgx.MatchString(info.Name()) {
 			foundJar = true
-			return errors.New("Found jar")
+			return errors.New("found jar")
 		}
 
 		return nil

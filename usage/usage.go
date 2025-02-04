@@ -5,7 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -20,29 +21,6 @@ import (
 
 const defaultProtocolVersion = "1.0"
 const defaultUsageEndpoint = "http://localhost:3000/usage"
-
-/*
-dotnet: licenseKey
-dotnetcore: -licenseKey
-go: config not parsed
-infra: license_key
-java: license_key
-node: licenseKey
-php: newrelic.license
-python: license_key
-Ruby: license_key
-*/
-
-var licenseKeyConfigNames = []string{
-	"license_key",
-	"licenseKey",
-	"-licenseKey",
-	"newrelic.license",
-}
-
-// type Survey struct {
-// 	URI string `json:"uri"`
-// }
 
 type usageResponse struct {
 	Survey struct {
@@ -67,6 +45,7 @@ type metaData struct {
 	NRDiagVersion string   `json:"nrdiagVersion"`
 	RunID         string   `json:"runId"`
 	RpmApps       []rpmApp `json:"rpmApps"`
+	Hostname      string   `json:"hostname"`
 	LicenseKeys   []string `json:"licenseKeys"`
 }
 
@@ -92,12 +71,6 @@ type usageAPI struct {
 
 type serviceEndpoint struct {
 	URL string
-}
-
-var usageEndpoint = usageAPI{
-	serviceEndpoint{
-		URL: config.UsageEndpoint,
-	},
 }
 
 func getUnixTime() int64 {
@@ -130,7 +103,12 @@ func genInsertKey(runID string) string {
 
 // SendUsageData generates and POSTS NRdiag usage data to the Haberdasher service
 func SendUsageData(results []registration.TaskResult, runID string) {
-
+	usageEndpoint := usageAPI{
+		serviceEndpoint{
+			URL: config.UsageEndpoint,
+		},
+	}
+	log.Debug("Sending usage data to", config.UsageEndpoint)
 	preparedResults := prepareResults(results)
 	preparedConfig := config.Flags.UsagePayload()
 	preparedMeta := prepareMeta(results, runID)
@@ -224,14 +202,11 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 		NRDiagVersion: config.Version,
 		RunID:         runID,
 		RpmApps:       []rpmApp{},
+		Hostname:      "",
 		LicenseKeys:   []string{},
 	}
 
 	for _, result := range results {
-		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
-			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
-		}
-
 		if result.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && result.Result.Status == tasks.Success {
 			licenseKeyToSources, ok := result.Result.Payload.(map[string][]string)
 			//We do not need the value of sources(if lk is env var or comes from config file, etc) for this operation
@@ -247,6 +222,16 @@ func prepareMeta(results []registration.TaskResult, runID string) metaData {
 				log.Info("Unable to send licenseKeys metadata for Haberdasher because of a Type Assertion error")
 			}
 		}
+		if result.Task.Identifier().String() == "Base/Log/ReportingTo" && result.Result.Status == tasks.Success {
+			runTimeMetaData.RpmApps = getRPMdetails(result.Result)
+		}
+
+	}
+	hostName, err := os.Hostname()
+	if err != nil {
+		log.Debugf("error getting hostname: %s\n", err.Error())
+	} else {
+		runTimeMetaData.Hostname = hostName
 	}
 	return runTimeMetaData
 }
@@ -284,7 +269,7 @@ func (u *usageAPI) postData(data string, headers map[string]string) (usageRespon
 		return usageResponse{}, err
 	}
 
-	bodyBytes, _ := ioutil.ReadAll(res.Body)
+	bodyBytes, _ := io.ReadAll(res.Body)
 	bodyString := string(bodyBytes)
 
 	response.statusCode = res.StatusCode
@@ -293,7 +278,7 @@ func (u *usageAPI) postData(data string, headers map[string]string) (usageRespon
 	// Check the response
 	if response.statusCode != 200 {
 		log.Debug("Unexpected status code from usage endpoint:", response.statusCode)
-		return usageResponse{}, errors.New("Unexpected status code")
+		return usageResponse{}, errors.New("unexpected status code")
 	}
 
 	var responseData usageResponse

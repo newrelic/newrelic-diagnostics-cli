@@ -80,7 +80,7 @@ func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 	// no error means at least one file validated
 	return tasks.Result{
 		Status:  tasks.Success,
-		Summary: "Found" + strconv.FormatInt(int64(len(filesToAdd)), 10) + ".NET agent config files.",
+		Summary: "Found " + strconv.FormatInt(int64(len(filesToAdd)), 10) + " .NET agent config files.",
 		Payload: filesToAdd,
 	}
 }

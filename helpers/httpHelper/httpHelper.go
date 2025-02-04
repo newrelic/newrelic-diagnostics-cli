@@ -3,16 +3,17 @@ package httpHelper
 import (
 	"errors"
 	"io"
-	"net/http"
-	"time"
 	"net"
+	"net/http"
+	"net/url"
+	"time"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-//RequestWrapper is a basic wrapper to streamline the use of http requests within the project
+// RequestWrapper is a basic wrapper to streamline the use of http requests within the project
 type RequestWrapper struct {
 	Method         string
 	URL            string
@@ -20,37 +21,45 @@ type RequestWrapper struct {
 	Payload        io.Reader
 	Length         int64
 	TimeoutSeconds int16
-	BypassProxy bool
+	BypassProxy    bool
+	Params         url.Values
 }
 
-//NewHTTPRequestWrapper - returns a new request wrapper for creating an http request
+// NewHTTPRequestWrapper - returns a new request wrapper for creating an http request
 func NewHTTPRequestWrapper() RequestWrapper {
 	var wrapper RequestWrapper
 	wrapper.Method = "GET"
+	headers := make(map[string]string)
+	headers["User-Agent"] = "Nrdiag_/" + config.Version
+	wrapper.Headers = headers
+	wrapper.Params = url.Values{}
 	return wrapper
 }
 
-//Default request timeout of 30 seconds if no timeout value is passed to helper.
+// Default request timeout of 30 seconds if no timeout value is passed to helper.
 const defaultTimeoutSeconds = 30
 
-//MakeHTTPRequest -  takes the basics of a request and makes it
+// MakeHTTPRequest -  takes the basics of a request and makes it
 func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
-
 	if wrapper.URL == "" || wrapper.Method == "" {
 		log.Info("Error: URL or method are not set")
-		return nil, errors.New("Error: URL or method are not set")
+		return nil, errors.New("error: URL or method are not set")
 	}
 	reader := wrapper.Payload
 	// set up a progress bar if length is set
 	if wrapper.Length != 0 {
 		bar := pb.New(int(wrapper.Length)).SetUnits(pb.U_BYTES)
+		bar.ShowSpeed = true
 		bar.Start()
 		defer bar.Finish()
 		reader = bar.NewProxyReader(wrapper.Payload)
 	}
 
 	//Now create our request object
-	req, err := http.NewRequest(wrapper.Method, wrapper.URL, reader)
+	req, _ := http.NewRequest(wrapper.Method, wrapper.URL, reader)
+
+	// Add the params to the query string
+	req.URL.RawQuery = wrapper.Params.Encode()
 
 	// Setting the content length header if supplied
 	if wrapper.Length != 0 {
@@ -68,8 +77,8 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 	}
 
 	var transport http.RoundTripper
-	
-	//All HTTP requests use the same http transport. 
+
+	//All HTTP requests use the same http transport.
 	//However, when bypassing the detected system proxy, the request will be using its own unique http transport.
 	if wrapper.BypassProxy {
 		//These are the http.DefaultTransport values minus the Proxy
@@ -86,14 +95,12 @@ func MakeHTTPRequest(wrapper RequestWrapper) (*http.Response, error) {
 		}
 	} else {
 		transport = http.DefaultTransport
-	}	
+	}
 
 	client := &http.Client{
 		Transport: transport,
 		Timeout:   time.Duration(wrapper.TimeoutSeconds) * time.Second,
 	}
-
-	req.Header.Set("User-Agent", "Nrdiag_/"+config.Version)
 
 	resp, err := client.Do(req)
 	if err != nil {

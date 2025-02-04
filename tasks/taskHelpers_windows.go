@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package tasks
@@ -50,33 +51,33 @@ var (
 // Usage: GetFileVersion(file)
 // Args: file- String with the full path of the file. i.e. "C:\Program Files\New Relic\.NET Agent\NewRelic.Agent.Core.dll".
 // Returns: string - value of full internal version number.
-//          error  - any error message encountered. `nil` if none.
 //
+//	error  - any error message encountered. `nil` if none.
 type GetFileVersionFunc func(string) (string, error)
 
 func GetFileVersion(file string) (string, error) {
 	if !FileExists(file) {
-		return "", errors.New("File does not exist")
+		return "", errors.New("file does not exist")
 	}
 
 	size := fileVersionInfoSize(file)
 	if size == 0 {
-		return "", errors.New("No permissions or No version information found")
+		return "", errors.New("no permissions or No version information found")
 	}
 
 	info := make([]byte, size)
 	ok := fileVersionInfo(file, info)
 	if !ok {
-		return "", errors.New("GetFileVersionInfo failed")
+		return "", errors.New("getFileVersionInfo failed")
 	}
 
 	parameters, ok := queryInfoValue(info)
 	if !ok {
-		return "", errors.New("QueryInfoValue failed")
+		return "", errors.New("queryInfoValue failed")
 	}
 	version := parameters.fileVersion()
 
-	// Bitwise rotation to return each of the octects correctly
+	// Bitwise rotation to return each of the octets correctly
 	return fmt.Sprintf("%d.%d.%d.%d",
 		version&0xFFFF000000000000>>48,
 		version&0x0000FFFF00000000>>32,
@@ -85,7 +86,7 @@ func GetFileVersion(file string) (string, error) {
 	), nil
 }
 
-// FileVersion concatenates MostSignificantBits and LessSigfinicantBits to a uint64 value.
+// FileVersion concatenates MostSignificantBits and LessSignificantBits to a uint64 value.
 func (fv FILEINFO) fileVersion() uint64 {
 	return uint64(fv.MostSignificantBits)<<32 | uint64(fv.LessSignificantBits)
 }
@@ -105,7 +106,7 @@ func fileVersionInfo(path string, data []byte) bool {
 }
 
 // Calls the exported method GetFileVersionInfoSize of version.dll
-// Check the existance of Version Information on the file and returns the size in bytes of it
+// Check the existence of Version Information on the file and returns the size in bytes of it
 //
 // see https://msdn.microsoft.com/en-us/library/windows/desktop/ms647005(v=vs.85).aspx
 func fileVersionInfoSize(path string) uint32 {
@@ -146,9 +147,9 @@ func queryInfoValue(block []byte) (FILEINFO, bool) {
 
 type GetProcessorArchFunc func() (string, error)
 
-//Checks the Windows machine's Processor Architecture. Will return x86 for 32 bit systems and AMD64 for 64 bit systems.
-//Can return other types or undefined for some types of non-x86 and non-x64 precossors
-//best practice is to explicitly check for x86 or AMD64
+// Checks the Windows machine's Processor Architecture. Will return x86 for 32 bit systems and AMD64 for 64 bit systems.
+// Can return other types or undefined for some types of non-x86 and non-x64 processors
+// best practice is to explicitly check for x86 or AMD64
 func GetProcessorArch() (procType string, errorReg error) {
 
 	var procTypeRegLoc = `SYSTEM\CurrentControlSet\Control\Session Manager\Environment`
@@ -190,7 +191,7 @@ func GetProcInfoByPid(pid string) (ProcInfoStruct, error) {
 		procInfoStruct = append(procInfoStruct, blankInfo)
 	}
 	if err != nil {
-		err = errors.New("No matching process found ")
+		err = errors.New("no matching process found ")
 		return procInfoStruct[0], err
 	}
 	return procInfoStruct[0], err
@@ -202,7 +203,7 @@ func GetProcInfoByName(name string) ([]ProcInfoStruct, error) {
 	query := "SELECT Name,CommandLine,ExecutablePath,ProcessId FROM Win32_Process WHERE name LIKE \"" + name + "\""
 	err := wmi.Query(query, &procInfoStruct)
 	if err == nil && len(procInfoStruct) < 1 {
-		err = errors.New("No matching process found ")
+		err = errors.New("no matching process found ")
 		return procInfoStruct, err
 	}
 	return procInfoStruct, err
@@ -268,7 +269,7 @@ func isLocalUserAdmin(username string) (bool, error) {
 
 	if dataPointer == uintptr(0) {
 		log.Debug("Unable to determine local user.")
-		return false, errors.New("Unable to determine local user.")
+		return false, errors.New("unable to determine local user.")
 	}
 
 	var data = (*USER_INFO_1)(unsafe.Pointer(dataPointer))

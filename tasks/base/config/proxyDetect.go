@@ -11,7 +11,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-//ProxyConfig represents an specific proxy server settings/configuration. The processID field mostly serves a purpose for agents like the Java Agent
+// ProxyConfig represents an specific proxy server settings/configuration. The processID field mostly serves a purpose for agents like the Java Agent
 type ProxyConfig struct {
 	proxyHost     string
 	proxyPort     string
@@ -137,7 +137,7 @@ func (p BaseConfigProxyDetect) Execute(options tasks.Options, upstream map[strin
 			log.Debug(proxyConfig)
 			return tasks.Result{
 				Status:  tasks.Success,
-				Summary: fmt.Sprintf("We have succesfully detected a proxy URL set %s via New Relic proxy settings using %s\n", proxyURL, proxyConfig.proxySource),
+				Summary: fmt.Sprintf("We have successfully detected a proxy URL set %s via New Relic proxy settings using %s\n", proxyURL, proxyConfig.proxySource),
 				Payload: proxyConfig,
 			}
 		}
@@ -173,13 +173,13 @@ func getProxyConfig(validations []ValidateElement, options tasks.Options, upstre
 
 	for _, validation := range validations { // Go through each config file validation to see if the proxy is configured anywhere in there or to at least find out which agent are we dealing with based on the file extension
 		if filepath.Ext(validation.Config.FileName) != ".ini" && (proxyConfig != ProxyConfig{}) {
-			return proxyConfig, nil //early exit because env vars take precendence for all agents except python. PHP does not use env vars
+			return proxyConfig, nil //early exit because env vars take precedence for all agents except python. PHP does not use env vars
 		}
 		if filepath.Ext(validation.Config.FileName) == ".yml" && (validation.Config.FileName != "newrelic-infra.yml") {
 			//applicable only to Java not Ruby:
 			proxyConfig := findProxyValuesFromSysProps(upstream)
 			if (proxyConfig != ProxyConfig{}) {
-				return proxyConfig, nil //early exit because system properties take precendence over config file
+				return proxyConfig, nil //early exit because system properties take precedence over config file
 			}
 			//Check for proxy values in yml file, applicable to both Java and Ruby
 			proxyConfig = findProxyValuesFromYmlFile(validation, options)
@@ -206,7 +206,7 @@ func getProxyConfig(validations []ValidateElement, options tasks.Options, upstre
 }
 
 func setProxyURL(proxy ProxyConfig) string {
-	//this single setting is only available for a couple of agents and they ovewrite other proxy settings
+	//this single setting is only available for a couple of agents and they overwrite other proxy settings
 	if proxy.proxyURL != "" {
 		return proxy.proxyURL
 	}
@@ -226,7 +226,7 @@ func setProxyURL(proxy ProxyConfig) string {
 	if proxy.proxyPort != "" {
 		proxyURL += ":" + proxy.proxyPort
 	}
-	//Some customers will preprend a protocol to their host configuration. So want to avoid building a url such as this one: http://https://myuser:mypassword@myproxy.mycompany.com:8080
+	//Some customers will prepend a protocol to their host configuration. So want to avoid building a url such as this one: http://https://myuser:mypassword@myproxy.mycompany.com:8080
 	if strings.Contains(proxyURL, "http") {
 		return proxyURL
 	}
@@ -295,7 +295,7 @@ func findProxyValuesFromSysProps(upstream map[string]tasks.Result) ProxyConfig {
 						}
 					}
 				}
-				if (proxyConfig != ProxyConfig{}) { // we want at least one of the proxyConfig fiels to be populated
+				if (proxyConfig != ProxyConfig{}) { // we want at least one of the proxyConfig fields to be populated
 					proxyConfig.processID = process.ProcID
 					proxyConfig.proxySource = "system properties"
 					return proxyConfig //early exit, we got the proxyConfig info that we needed

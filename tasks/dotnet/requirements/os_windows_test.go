@@ -1,11 +1,12 @@
-// +build  !darwin !linux
+//go:build !darwin || !linux
+// +build !darwin !linux
 
 package requirements
 
 import (
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/env"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -55,12 +56,12 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 				Expect(result.Summary).To(Equal(tasks.NoAgentUpstreamSummary + "DotNet/Agent/Installed"))
 			})
 		})
-		Context("With invalid payload from hostinfo task", func() {
+		Context("With invalid payload from HostInfo task", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo":      tasks.Result{Payload: "string"},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo":      {Payload: "string"},
 				}
 			})
 			It("Should return Error status", func() {
@@ -74,8 +75,8 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo":      tasks.Result{Payload: env.HostInfo{PlatformVersion: ""}},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo":      {Payload: env.HostInfo{PlatformVersion: ""}},
 				}
 			})
 			It("Should return Warning status", func() {
@@ -89,8 +90,8 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo":      tasks.Result{Payload: env.HostInfo{PlatformVersion: ""}},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo":      {Payload: env.HostInfo{PlatformVersion: ""}},
 				}
 			})
 			It("Should return Warning status", func() {
@@ -104,8 +105,8 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo":      tasks.Result{Payload: env.HostInfo{PlatformVersion: "10.0.14393 Build 14393"}},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo":      {Payload: env.HostInfo{PlatformVersion: "10.0.14393 Build 14393"}},
 				}
 			})
 			It("Should return Success status", func() {
@@ -119,8 +120,8 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo": tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo": {
 						Payload: env.HostInfo{
 							PlatformVersion: "5.2.111 Build 111",
 							PlatformFamily:  "Server",
@@ -139,8 +140,8 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo":      tasks.Result{Payload: env.HostInfo{PlatformVersion: "the.black.knight"}},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo":      {Payload: env.HostInfo{PlatformVersion: "the.black.knight"}},
 				}
 			})
 			It("Should return Error status", func() {
@@ -154,8 +155,8 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
-					"Base/Env/HostInfo":      tasks.Result{Payload: env.HostInfo{PlatformVersion: "3.1"}},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"Base/Env/HostInfo":      {Payload: env.HostInfo{PlatformVersion: "3.1"}},
 				}
 			})
 			It("Should return Failure status", func() {

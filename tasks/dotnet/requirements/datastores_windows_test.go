@@ -5,7 +5,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -133,7 +133,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Failure,
 					},
 				}
@@ -146,11 +146,11 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 		})
 
-		Context("When no ddls are found", func() {
+		Context("When no dlls are found", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -171,7 +171,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -195,7 +195,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -210,7 +210,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 						return "2.2", nil
 					}
 					// Fall through, mock received unexpected input. (Shouldn't happen)
-					return "", errors.New("Red Alert, Red Alert")
+					return "", errors.New("red Alert, Red Alert")
 				}
 			})
 			It("Should return Success status", func() {
@@ -233,7 +233,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{"/foo"}
@@ -248,7 +248,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 						return "1.0", nil
 					}
 					// Fall through, mock received unexpected input. (Shouldn't happen)
-					return "", errors.New("Danger Danger Will Robinson")
+					return "", errors.New("danger Danger Will Robinson")
 				}
 			})
 			It("Should return Failure status", func() {
@@ -266,7 +266,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 
 				p.getWorkingDirectories = func() []string {
@@ -282,7 +282,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 						return "2.2", nil
 					}
 					// Fall through, mock received unexpected input. (Shouldn't happen)
-					return "", errors.New("What are you doing, Dave?")
+					return "", errors.New("what are you doing, Dave?")
 
 				}
 			})
@@ -300,7 +300,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 
 				p.getWorkingDirectories = func() []string {
@@ -310,7 +310,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 					return []string{"/foo/MongoDB.Driver.dll"}
 				}
 				p.getFileVersion = func(input string) (string, error) {
-					return "", errors.New("Unable to determine version")
+					return "", errors.New("unable to determine version")
 				}
 			})
 			It("Should return Warning status", func() {

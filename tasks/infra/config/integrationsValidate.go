@@ -85,7 +85,7 @@ func (p InfraConfigIntegrationsValidate) Execute(options tasks.Options, upstream
 
 }
 
-//validateYamls open, lint and parse Yaml files, return slice of errors and slice of successfully parsed Yamls
+// validateYamls open, lint and parse Yaml files, return slice of errors and slice of successfully parsed Yamls
 func (p InfraConfigIntegrationsValidate) validateYamls(yamlLocations []config.ConfigElement) ([]config.ValidateElement, []validationError) {
 	validationErrors := []validationError{}
 	validatedYamls := []config.ValidateElement{}

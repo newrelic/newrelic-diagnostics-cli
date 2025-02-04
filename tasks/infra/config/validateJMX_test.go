@@ -13,7 +13,7 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 )
@@ -72,7 +72,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status: tasks.None,
 					},
 				}
@@ -88,7 +88,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: "I am a string, I should be a MatchedIntegrationFiles{}",
 					},
@@ -109,7 +109,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status: tasks.Success,
 						Payload: MatchedIntegrationFiles{
 							IntegrationFilePairs: map[string]*IntegrationFilePair{},
@@ -132,12 +132,12 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status: tasks.Success,
 						Payload: MatchedIntegrationFiles{
 							Errors: []IntegrationMatchError{},
 							IntegrationFilePairs: map[string]*IntegrationFilePair{
-								"apache": &IntegrationFilePair{
+								"apache": {
 									Configuration: config.ValidateElement{
 										Config: config.ConfigElement{
 											FileName: "apache-config.yml",
@@ -172,7 +172,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/emptyJMX.yml", "fixtures/validateJMX/emptyJMX.yml"),
 					},
@@ -184,7 +184,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected failure result summary", func() {
-				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: Invalid configuration found: collection_files not set"))
+				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: invalid configuration found: collection_files not set"))
 			})
 			It("should return help URL", func() {
 				Expect(result.URL).To(Equal("https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/jmx-monitoring-integration#host-connection"))
@@ -196,7 +196,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-config.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -231,7 +231,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-partial.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -254,7 +254,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-duplicate-keys.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -270,7 +270,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected Failure result summary", func() {
-				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: Multiple key jmx_host found"))
+				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: multiple key jmx_host found"))
 			})
 		})
 		Context("Valid partial JXM configuration present in upstream payload but JMX server connection failed", func() {
@@ -279,7 +279,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-partial.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -311,7 +311,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-default-parms.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -341,7 +341,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/IntegrationsMatch": tasks.Result{
+					"Infra/Config/IntegrationsMatch": {
 						Status:  tasks.Success,
 						Payload: matchedIntegrationFilesFromFiles("fixtures/validateJMX/jmx-no-parms.yml", "fixtures/validateJMX/jmx-definition.yml"),
 					},
@@ -356,7 +356,7 @@ var _ = Describe("Infra/Config/ValidateJMX", func() {
 			})
 
 			It("should return an expected Failure result summary", func() {
-				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: Invalid configuration found: collection_files not set"))
+				Expect(result.Summary).To(Equal("Unexpected results for jmx-config.yml: invalid configuration found: collection_files not set"))
 			})
 		})
 
@@ -478,7 +478,7 @@ func matchedIntegrationFilesFromFiles(confFile, defFile string) MatchedIntegrati
 
 	return MatchedIntegrationFiles{
 		IntegrationFilePairs: map[string]*IntegrationFilePair{
-			"jmx": &IntegrationFilePair{
+			"jmx": {
 				Configuration: config.ValidateElement{
 					Config: config.ConfigElement{
 						FileName: "jmx-config.yml",

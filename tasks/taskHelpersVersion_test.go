@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -883,7 +883,7 @@ func Test_ParseVersion(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Abitrary chars in version throws error and returns zeroed version",
+			name: "Arbitrary chars in version throws error and returns zeroed version",
 			args: args{
 				version: "4.0b1",
 			},
@@ -1091,7 +1091,7 @@ func TestVer_CheckCompatibility(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "Two component version passes three-component specification with plus on lefthand side",
+			name: "Two component version passes three-component specification with plus on left hand side",
 			fields: fields{
 				Major: 2,
 				Minor: 0,

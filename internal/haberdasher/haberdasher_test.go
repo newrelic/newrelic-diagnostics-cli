@@ -65,7 +65,7 @@ func TestBadResponseCode(t *testing.T) {
 		t.Error("Expected an error, but we didn't get one")
 	}
 
-	testErrorMsg(t, err, "Expected StatusCode < 300 got 404: Not found")
+	testErrorMsg(t, err, "expected StatusCode < 300 got 404: Not found")
 
 }
 
@@ -124,7 +124,7 @@ func TestClientDefaults(t *testing.T) {
 
 }
 
-//Insert key generation
+// Insert key generation
 func Test_generateInsertKey(t *testing.T) {
 	tests := []struct {
 		runID string

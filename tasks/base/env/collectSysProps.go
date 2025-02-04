@@ -30,7 +30,7 @@ func (t BaseEnvCollectSysProps) Execute(options tasks.Options, upstream map[stri
 	if len(systemProps) > 0 {
 		return tasks.Result{
 			Status:  tasks.Info,
-			Summary: "Succesfully collected some new relic system properties",
+			Summary: "Successfully collected some new relic system properties",
 			Payload: systemProps, //[]ProcIDSysProps
 		}
 	}

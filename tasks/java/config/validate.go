@@ -12,7 +12,7 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 // JavaConfigValidate - This struct defined the sample plugin which can be used as a starting point
@@ -26,7 +26,7 @@ type JavaValidatedConfig struct {
 	CurrentWorkingDir string
 }
 
-//MarshalJSON - custom JSON marshaling for this task, in this case we ignore the ParsedResult
+// MarshalJSON - custom JSON marshaling for this task, in this case we ignore the ParsedResult
 func (el JavaValidatedConfig) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Proc              process.Process
@@ -165,7 +165,6 @@ func matchConfigFile(processWorkingDir string, validations []config.ValidateElem
 		for _, validation := range validations {
 			if validation.Config.FilePath+validation.Config.FileName == configPath {
 				parsedResult = validation.ParsedResult
-			} else {
 			}
 		}
 	}
@@ -190,7 +189,7 @@ func matchConfigFile(processWorkingDir string, validations []config.ValidateElem
 	}
 
 	// now check for a parsed result and parse the file if we don't have one
-	if configPath != "" && parsedResult.IsLeaf() == true {
+	if configPath != "" && parsedResult.IsLeaf() {
 		//Now we need to create a new validated blob
 		log.Debug("Configpath is", configPath)
 		file, err := os.Open(configPath)

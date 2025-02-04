@@ -6,11 +6,7 @@ import (
 	"testing"
 )
 
-var (
-	fakeUSkey1 = "08a2ad66c637a29c3982469a3fe8d1982d002c4a"
-	fakeEUKey1 = "eu01xx66c637a29c3982469a3fe8d1982d00NRAL"
-	fakeEUKey2 = "eu01xx66c637a29c3982469a3fe8d1982d002c4a"
-)
+var fakeEUKey1 = "eu01xx000000000000000000000000000000NRAL"
 
 func Test_detectRegions(t *testing.T) {
 	type args struct {
@@ -25,7 +21,7 @@ func Test_detectRegions(t *testing.T) {
 			name: "it should parse US data center",
 			args: args{
 				licenseKeyToSources: map[string][]string{
-          "08a2ad66c637a29c3982469a3fe8d1982d002c4a": []string{"myapp/newrelic/newrelic.yml"},
+					"0000000000000000000000000000000000000000": {"myapp/newrelic/newrelic.yml"},
 				},
 			},
 			want: []string{"us01"},
@@ -34,8 +30,8 @@ func Test_detectRegions(t *testing.T) {
 			name: "it should parse other data centers",
 			args: args{
 				licenseKeyToSources: map[string][]string{
-          "08a2ad66c637a29c3982469a3fe8d1982d002c4a": []string{"Nowherce"},
-					"eu01xx66c637a29c3982469a3fe8d1982d002c4a": []string{"Nowherce"},
+					"0000000000000000000000000000000000000000": {"Nowherce"},
+					"eu01xx0000000000000000000000000000000000": {"Nowherce"},
 				},
 			},
 			want: []string{"eu01", "us01"},
@@ -44,7 +40,7 @@ func Test_detectRegions(t *testing.T) {
 			name: "it should only parse first instance of regex pattern",
 			args: args{
 				licenseKeyToSources: map[string][]string{
-          "eu01xx66c637a29c3982469a3fe8d1982d002c4a": []string{"Nowherce"},
+					"eu01xx0000000000000000000000000000000000": {"Nowherce"},
 				},
 			},
 			want: []string{"eu01"},
@@ -53,7 +49,7 @@ func Test_detectRegions(t *testing.T) {
 			name: "it should parse EU data center",
 			args: args{
 				licenseKeyToSources: map[string][]string{
-					"eu01xx66c637a29c3982469a3fe8d1982d002c4a": []string{"Nowherce"},
+					"eu01xx0000000000000000000000000000000000": {"Nowherce"},
 				},
 			},
 			want: []string{"eu01"},
@@ -62,8 +58,8 @@ func Test_detectRegions(t *testing.T) {
 			name: "it should only return unique regions",
 			args: args{
 				licenseKeyToSources: map[string][]string{
-					"eu01xx66c637a29c3982469a3fe8d1982d002c4a": []string{"Nowherce"},
-          "eu01xx66c637a29c3982469a3fe8d1982d00NRAL": []string{"somewhereelse"},
+					"eu01xx0000000000000000000000000000000000": {"Nowherce"},
+					"eu01xx000000000000000000000000000000NRAL": {"somewhereelse"},
 				},
 			},
 			want: []string{"eu01"},

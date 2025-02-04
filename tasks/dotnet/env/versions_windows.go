@@ -57,12 +57,12 @@ func (t DotNetEnvVersions) Execute(options tasks.Options, upstream map[string]ta
 	}
 }
 
-//Queries the registry for .Net version and translates that to a more friendly form
+// Queries the registry for .Net version and translates that to a more friendly form
 func checkNetVersions() (versions []string) {
 	v4OrAbove := false
 	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, netVersionBaseLoc, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 	if err != nil {
-		//log.Debug("error opening .Net regestry key")
+		//log.Debug("error opening .Net registry key")
 		log.Debug(err)
 		versions = nil
 		return versions
@@ -96,7 +96,7 @@ func checkNetVersions() (versions []string) {
 	return versions
 }
 
-//Queries the regestry for .Net versions above 4.0 and translates that to a more friendly form
+// Queries the registry for .Net versions above 4.0 and translates that to a more friendly form
 func checkNetAbove4() string {
 
 	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, netAbove4Loc, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)

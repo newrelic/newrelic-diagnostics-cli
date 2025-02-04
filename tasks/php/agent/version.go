@@ -2,6 +2,7 @@ package agent
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
@@ -12,7 +13,7 @@ type PHPAgentVersion struct {
 	returnLastMatchInFile func(search string, filepath string) ([]string, error)
 }
 
-//PHPAgentVersionPayload - a small struct to store the payload
+// PHPAgentVersionPayload - a small struct to store the payload
 type PHPAgentVersionPayload struct {
 	Version  string
 	Major    int
@@ -47,9 +48,9 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 	  the structure of and can now work with. In this case, I'm casting it back
 	to the []validateElements{} I know it should return */
 
-	if upstream["PHP/Config/Agent"].Status != tasks.Success{
+	if upstream["PHP/Config/Agent"].Status != tasks.Success {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: "No validations detect from PHP/Config/Agent. This task did not run",
 		}
 	}
@@ -78,7 +79,7 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 		if len(logFile) == 0 {
 			continue // didn't find a log file in this one - move on
 		}
-		// If you made it this far, :youhavephp (congrats)
+		// If you made it this far, you have php (congrats)
 		for _, value := range logFile {
 			// get the filename from this ValidateBlob - and strip " and ' chars
 			fileLocation := tasks.TrimQuotes(value.Value())
@@ -114,6 +115,7 @@ func (p PHPAgentVersion) Execute(options tasks.Options, upstream map[string]task
 	// Other result - multiple agent versions found
 	return tasks.Result{
 		Status:  tasks.Warning,
-		Summary: fmt.Sprintf("Expected 1, but found %d versions of the PHP Agent", len(agentVersions)),
+		Summary: fmt.Sprintf("Expected 1, but found %d versions of the PHP Agent: %s", len(agentVersions), strings.Join(agentVersions, ", ")),
+		URL:     "https://discuss.newrelic.com/t/relic-solution-php-agent-not-reporting-web-data/53291",
 	}
 }

@@ -50,9 +50,9 @@ func (t DotNetCoreLogLevelCollect) Execute(options tasks.Options, upstream map[s
 	if !ok || len(configFiles) == 0 {
 		result.Status = tasks.None
 		result.Summary = ".NET Core Agent newrelic.config files not present, skipping this task."
-		return 
+		return
 	}
-	
+
 	result = logLevelCollect(configFiles)
 
 	return
@@ -70,7 +70,7 @@ func logLevelCollect(configs []config.ValidateElement) (result tasks.Result) {
 		if !alreadyChecked && strings.EqualFold(config.Config.FileName, "newrelic.config") {
 			numConfigs++
 			configsChecked[configFullPath] = struct{}{}
-			levelFound := config.ParsedResult.FindKeyByPath("/configuration/log/-level").Value() 
+			levelFound := config.ParsedResult.FindKeyByPath("/configuration/log/-level").Value()
 			levelsFound[configFullPath] = levelFound
 		}
 	}

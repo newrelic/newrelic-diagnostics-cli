@@ -16,6 +16,7 @@ import (
 
 // DotNetCoreEnvVersions - This struct defined the sample plugin which can be used as a starting point
 type DotNetCoreEnvVersions struct {
+	cmdExec tasks.CmdExecFunc
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -35,9 +36,16 @@ func (t DotNetCoreEnvVersions) Dependencies() []string {
 	}
 }
 
+type dotnetCoreVersionSource int
+
+const (
+	dotnetInfo dotnetCoreVersionSource = iota
+	dotnetVersion
+	dotnetDir
+)
+
 // Execute - The core work within each task
 func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-
 	if upstream["Base/Env/CollectEnvVars"].Status != tasks.Info {
 		return tasks.Result{
 			Status:  tasks.None,
@@ -46,16 +54,19 @@ func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[strin
 	}
 
 	// Gather env variables from upstream
-	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the map[string]string I know it should return
+	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
 	if !ok {
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: tasks.AssertionErrorSummary,
 		}
 	}
-	versions, errorMessage := checkVersions(envVars)
+
+	versions, err := t.checkVersions(envVars)
 
 	if len(versions) < 1 {
+		errorMessage := "Unable to complete this health check because we ran into some unexpected errors when attempting to collect this application's .NET Core version:\n"
+		errorMessage += err
 		return tasks.Result{
 			Status:  tasks.Error,
 			Summary: errorMessage,
@@ -68,22 +79,98 @@ func (t DotNetCoreEnvVersions) Execute(options tasks.Options, upstream map[strin
 	}
 }
 
-func checkVersions(envVars map[string]string) ([]string, string) {
-	errorMessage := "Unable to complete this health check because we ran into some unexpected errors when attempting to collect this application's .NET Core SDK version:\n"
-	versions := []string{}
-	// first check if version is accesible through the cmdline
-	//dotnet --version will Display .NET Core SDK version https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet. Ex: 5.0.101
-	version, err := tasks.CmdExecutor("dotnet", "--version")
-
-	if err != nil {
-		errorMessage += fmt.Sprint("Unable to run 'dotnet --version':\n%w\n", err)
-	} else {
-		versions = append(versions, string(version))
-		return versions, errorMessage
+func (t DotNetCoreEnvVersions) checkVersions(envVars map[string]string) ([]string, string) {
+	var errMessage, errorMessages string
+	var versions []string
+	keepGoing := true
+	source := 0
+	for keepGoing {
+		versions, errMessage, keepGoing = t.checkVersionWithSource(envVars, source)
+		errorMessages += errMessage
+		source++
 	}
 
+	return versions, errorMessages
+}
+
+func (t DotNetCoreEnvVersions) checkVersionWithSource(envVars map[string]string, source int) ([]string, string, bool) {
+	switch dotnetCoreVersionSource(source) {
+	case dotnetInfo:
+		infoOutput, err := t.cmdExec("dotnet", "--info")
+		if err != nil {
+			return []string{}, fmt.Sprint("Unable to run 'dotnet --info':\n%w\n", err), true
+		}
+
+		versions, parseErr := t.parseDotnetInfoOutput(string(infoOutput))
+
+		return versions, parseErr, len(versions) < 1
+
+	case dotnetVersion:
+		version, err := t.cmdExec("dotnet", "--version")
+		if err != nil {
+			return []string{}, fmt.Sprint("Unable to run 'dotnet --version':\n%w\n", err), true
+		}
+
+		stringVersion := string(version)
+
+		if strings.TrimSpace(stringVersion) == "" {
+			return []string{}, "Unable to determine version with `dotnet --version`\n", true
+		}
+
+		return []string{stringVersion}, "", false
+
+	case dotnetDir:
+		versions, err := t.getVerFromDir(envVars)
+		if err != "" {
+			return []string{}, err, true
+		}
+
+		return versions, "", false
+
+	default:
+		return []string{}, "Unable to determine .NET core version using any method\n", false
+	}
+}
+
+func (t DotNetCoreEnvVersions) parseDotnetInfoOutput(output string) ([]string, string) {
+	versions := []string{}
+	uniqueChecker := make(map[string]struct{})
+	r, _ := regexp.Compile(`\d+\.\d+\.\d+\.?\d?`)
+	sections := []string{".NET SDKs installed:", ".NET runtimes installed:"}
+	outputSplit := strings.Split(output, "\n")
+	if len(outputSplit) < 1 {
+		return versions, "Unable to determine installed .NET core versions using `dotnet --info` output"
+	}
+	inSection := false
+
+	for n := 0; n < len(sections); n++ {
+		section := sections[n]
+		for i := 0; i < len(outputSplit); i++ {
+			line := outputSplit[i]
+			if strings.TrimSpace(line) == "" {
+				inSection = false
+			}
+			if inSection {
+				version := strings.TrimSpace(r.FindString(line))
+				if _, dupe := uniqueChecker[version]; !dupe {
+					versions = append(versions, version)
+					uniqueChecker[version] = struct{}{}
+				}
+			}
+			if strings.EqualFold(strings.TrimSpace(line), strings.TrimSpace(section)) {
+				inSection = true
+			}
+		}
+	}
+
+	return versions, ""
+}
+
+func (t DotNetCoreEnvVersions) getVerFromDir(envVars map[string]string) ([]string, string) {
+	errorMessage := ""
+	versions := []string{}
 	// check dirs
-	dirsToRead, errRead := buildDirsToRead(envVars)
+	dirsToRead, errRead := t.buildDirsToRead(envVars)
 
 	if errRead != nil {
 		errorMessage += fmt.Sprint("Unable to find version in dotnet sdk path:\n%w\n", errRead)
@@ -105,9 +192,10 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 			continue // go to the next directory
 		}
 
+		r, _ := regexp.Compile(`^\d+[.]\d+[.]\d+$`)
 		for _, dir := range subDirs {
 			dirName := dir.Name()
-			versionMatch, _ := regexp.MatchString(`^\d+[.]\d+[.]\d+$`, dirName) // ensure we just have the version dirs and not nuget's
+			versionMatch := r.MatchString(dirName) // ensure we just have the version dirs and not nuget's
 			//logger.Debug(dirName)
 			if versionMatch { // filter out NuGet's dirs
 				versions = append(versions, dirName)
@@ -118,11 +206,13 @@ func checkVersions(envVars map[string]string) ([]string, string) {
 	return versions, errorMessage
 }
 
-func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr error) {
-	pathVarSplit := []string{}
-	var searchString string
-	netCoreLocWin := []string{`C:\Program Files\dotnet\sdk`}
-	netCoreLocLinux := []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
+func (t DotNetCoreEnvVersions) buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr error) {
+	var (
+		searchString    string
+		pathVarSplit    []string
+		netCoreLocWin   = []string{`C:\Program Files\dotnet\sdk`}
+		netCoreLocLinux = []string{`/usr/share/dotnet/sdk`, `/usr/local/share/dotnet/sdk`}
+	)
 
 	switch os := runtime.GOOS; os {
 	case "windows":
@@ -139,13 +229,13 @@ func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr err
 		searchString = `/dotnet`
 	default:
 		logger.Debug("DotNetCoreVersions error, Unknown OS: ", os)
-		return nil, errors.New("DotNetCoreVersions task encountered unknown OS: " + os)
+		return nil, errors.New("task DotNetCoreVersions encountered unknown OS: " + os)
 	}
 	if envVars["DOTNET_INSTALL_PATH"] != "" {
 		dirsToRead = appendIfUnique(dirsToRead, filepath.Join(envVars["DOTNET_INSTALL_PATH"], "sdk"))
 	}
 
-	fromPathVar := checkPathVarForDotnet(pathVarSplit, searchString)
+	fromPathVar := t.checkPathVarForDotnet(pathVarSplit, searchString)
 	if fromPathVar != "" {
 		dirsToRead = appendIfUnique(dirsToRead, filepath.Join(fromPathVar, "/sdk"))
 	}
@@ -153,8 +243,8 @@ func buildDirsToRead(envVars map[string]string) (dirsToRead []string, retErr err
 	return dirsToRead, nil
 }
 
-func checkPathVarForDotnet(paths []string, searchString string) string {
-	if paths != nil {
+func (t DotNetCoreEnvVersions) checkPathVarForDotnet(paths []string, searchString string) string {
+	if len(paths) > 0 {
 		for _, path := range paths {
 			if strings.Contains(path, searchString) {
 				logger.Debug("DotNetCoreVersions - Found dotnet core dir in path var: ", path)

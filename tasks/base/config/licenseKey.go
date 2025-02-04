@@ -54,11 +54,12 @@ func (t BaseConfigLicenseKey) Dependencies() []string {
 
 // Execute - The core work within each task
 func (t BaseConfigLicenseKey) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-
-	licenseKeys := []LicenseKey{}
-	licenseKeysFromConfig := []LicenseKey{}
-	licenseKeysFromEnv := []LicenseKey{}
-	licenseKeyFromSysProp := LicenseKey{} //there can only be one system property for a license key
+	var (
+		licenseKeys           []LicenseKey
+		licenseKeysFromConfig []LicenseKey
+		licenseKeysFromEnv    []LicenseKey
+		licenseKeyFromSysProp LicenseKey //there can only be one system property for a license key
+	)
 
 	configElements, ok := upstream["Base/Config/Validate"].Payload.([]ValidateElement)
 	if ok {
@@ -173,7 +174,7 @@ func getLicenseKeysFromConfig(configElements []ValidateElement, configKeys []str
 			for _, key := range foundKeys {
 				// We only want to create unique licenseKey instances from a single config file
 				// This helps avoid the same license key being reported multiple times from same source
-				// Due to environment (prod/staging/developement etc) configuration
+				// Due to environment (prod/staging/development etc) configuration
 				if _, ok := keyDedupe[key.Value()]; ok {
 					continue
 				}
@@ -229,10 +230,10 @@ func retrieveEnvLicenseKey(keyEnvReference string, readEnv EnvReader) (string, e
 		if envVal != "" {
 			return envVal, nil
 		} else {
-			return "", errors.New("LicenseKey var " + keyEnvReference + " not found in environment")
+			return "", errors.New("licenseKey var " + keyEnvReference + " not found in environment")
 		}
 	}
-	return "", errors.New("Unable to parse key from provided input")
+	return "", errors.New("unable to parse key from provided input")
 }
 
 func summarizeLicenseKeySources(licenseKeys []LicenseKey) string {
@@ -268,14 +269,4 @@ func dedupeLicenseKeySlice(licenseKeys []LicenseKey) []LicenseKey {
 		deDuped = append(deDuped, v)
 	}
 	return deDuped
-}
-
-func reduceLicenseKeySlice(licenseKeys []LicenseKey) []string {
-	reducedLicenseKeys := []string{}
-
-	for _, licenseKey := range licenseKeys {
-		reducedLicenseKeys = append(reducedLicenseKeys, licenseKey.Value)
-	}
-
-	return reducedLicenseKeys
 }

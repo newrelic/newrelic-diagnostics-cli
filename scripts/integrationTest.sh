@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
-echo "Running go get -t"
+echo "Running go get -t and go mod tidy"
 go get -t
+go mod tidy
 
 
 # Individual tests can be run by name by running   ./integrationTest.sh 'JavaVersionPresent,RunningPHPDaemon'
@@ -13,8 +14,8 @@ USAGE_ENDPOINT="${STAGING_USAGE_ENDPOINT}"
 ATTACHMENT_ENDPOINT="${STAGING_ATTACHMENT_ENDPOINT}"
 CONFIG_PATH="github.com/newrelic/newrelic-diagnostics-cli/config"
 
-echo "Building linux x86"
-GOOS=linux GOARCH=386 go build -o "$EXENAME" -ldflags "-X ${CONFIG_PATH}.Version=INTEGRATION -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.UsageEndpoint=${USAGE_ENDPOINT} -X ${CONFIG_PATH}.AttachmentEndpoint=${ATTACHMENT_ENDPOINT}"
+echo "Building linux x64"
+GOOS=linux GOARCH=amd64 go build -o "$EXENAME" -ldflags "-X ${CONFIG_PATH}.Version=INTEGRATION -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.UsageEndpoint=${USAGE_ENDPOINT} -X ${CONFIG_PATH}.AttachmentEndpoint=${ATTACHMENT_ENDPOINT}"
 mkdir -p bin/linux
 $(mv "$EXENAME" "bin/linux/$EXENAME")
 echo "Running integration tests"

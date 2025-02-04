@@ -18,7 +18,6 @@ func mockRubyVExecuteFailure(name string, arg ...string) ([]byte, error) {
 
 func TestRubyEnvVersion_checkRubyVersion(t *testing.T) {
 	type fields struct {
-		cmdExecutor tasks.CmdExecFunc
 	}
 	tests := []struct {
 		name        string
@@ -27,7 +26,7 @@ func TestRubyEnvVersion_checkRubyVersion(t *testing.T) {
 		cmdExecutor tasks.CmdExecFunc
 	}{
 
-		{name: "should parse ouput from a successfully executed ruby -v", wantResult: tasks.Result{
+		{name: "should parse output from a successfully executed ruby -v", wantResult: tasks.Result{
 			Status:  tasks.Info,
 			Summary: "ruby 0.0.0p0 (fake version for testing)",
 			URL:     "",
@@ -69,12 +68,12 @@ func TestRubyEnvVersion_Execute(t *testing.T) {
 		args   args
 		want   tasks.Result
 	}{
-		{name: "should return None result if upstream dependancy failed",
+		{name: "should return None result if upstream dependency failed",
 			fields: fields{},
 			args: args{
 				options: tasks.Options{},
 				upstream: map[string]tasks.Result{
-					"Ruby/Config/Agent": tasks.Result{
+					"Ruby/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				},

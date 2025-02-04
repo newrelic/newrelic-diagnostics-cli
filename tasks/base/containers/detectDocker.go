@@ -47,7 +47,7 @@ func (t BaseContainersDetectDocker) Execute(options tasks.Options, upstream map[
 	go streamDockerInfo(prettyJSONBytes, stream)
 
 	filesToCopy := []tasks.FileCopyEnvelope{
-		tasks.FileCopyEnvelope{
+		{
 			Path:       "docker-info.json",
 			Stream:     stream,
 			Identifier: t.Identifier().String(),
@@ -58,7 +58,7 @@ func (t BaseContainersDetectDocker) Execute(options tasks.Options, upstream map[
 
 	if parseErr != nil {
 		return tasks.Result{
-			Status:       tasks.None,
+			Status:      tasks.None,
 			Summary:     "Error parsing JSON docker info " + parseErr.Error(),
 			Payload:     dockerInfo,
 			FilesToCopy: filesToCopy,
@@ -67,7 +67,7 @@ func (t BaseContainersDetectDocker) Execute(options tasks.Options, upstream map[
 
 	if dockerInfo.ServerVersion != "" {
 		return tasks.Result{
-			Status:       tasks.Info,
+			Status:      tasks.Info,
 			Summary:     "Docker Daemon is Running",
 			Payload:     dockerInfo,
 			FilesToCopy: filesToCopy,
@@ -83,7 +83,6 @@ func (t BaseContainersDetectDocker) Execute(options tasks.Options, upstream map[
 
 }
 
-
 func streamDockerInfo(dockerInfo []byte, ch chan string) {
 	defer close(ch)
 
@@ -93,4 +92,3 @@ func streamDockerInfo(dockerInfo []byte, ch chan string) {
 		ch <- scanner.Text() + "\n"
 	}
 }
-

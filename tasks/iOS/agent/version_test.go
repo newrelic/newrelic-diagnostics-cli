@@ -3,9 +3,9 @@ package agent
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestIOSAgentVersion(t *testing.T) {
@@ -31,8 +31,8 @@ var _ = Describe("iOS/Agent/Version", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanation string", func() {
-			expectedExaplanation := "Determine New Relic iOS agent version"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Determine New Relic iOS agent version"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -62,7 +62,7 @@ var _ = Describe("iOS/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"iOS/Env/Detect": tasks.Result{
+					"iOS/Env/Detect": {
 						Status: tasks.Failure,
 					},
 				}
@@ -82,11 +82,11 @@ var _ = Describe("iOS/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Collect": tasks.Result{
+					"Base/Config/Collect": {
 						Status:  tasks.Success,
 						Payload: "This should be of type []config.ConfigElement, but it's a string instead",
 					},
-					"iOS/Env/Detect": tasks.Result{
+					"iOS/Env/Detect": {
 						Status: tasks.Info,
 					},
 				}

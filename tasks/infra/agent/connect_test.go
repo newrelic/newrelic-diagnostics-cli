@@ -8,20 +8,20 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 type mockReader struct{}
 
 func (p mockReader) Read([]byte) (int, error) {
-	return 0, errors.New("Banana")
+	return 0, errors.New("banana")
 }
 
 func (p mockReader) Close() error {
-	return errors.New("Banana")
+	return errors.New("banana")
 }
 
 func TestInfraAgentConnect(t *testing.T) {
@@ -76,10 +76,10 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Failure,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Payload: []string{"us01"},
 					},
 				}
@@ -101,23 +101,23 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Payload: []string{"us01"},
 					},
 				}
 
 				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-					return &http.Response{Body: mockReader{}}, errors.New("Failed request (timeout)")
+					return &http.Response{Body: mockReader{}}, errors.New("failed request (timeout)")
 				}
 			})
 			It("Should return a failed status", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should have a summary with network error message", func() {
-				Expect(result.Summary).To(ContainSubstring("Failed request (timeout)"))
+				Expect(result.Summary).To(ContainSubstring("failed request (timeout)"))
 			})
 		})
 
@@ -126,10 +126,10 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Payload: []string{"us01"},
 					},
 				}
@@ -146,7 +146,7 @@ var _ = Describe("Infra/Agent/Connect", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should have a summary with body read error message", func() {
-				Expect(result.Summary).To(ContainSubstring("Banana"))
+				Expect(result.Summary).To(ContainSubstring("banana"))
 			})
 		})
 
@@ -154,13 +154,13 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/ProxyDetect": tasks.Result{
+					"Base/Config/ProxyDetect": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Payload: []string{"us01"},
 					},
 				}
@@ -185,13 +185,13 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/ProxyDetect": tasks.Result{
+					"Base/Config/ProxyDetect": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Payload: []string{},
 					},
 				}
@@ -203,15 +203,25 @@ var _ = Describe("Infra/Agent/Connect", func() {
 					}, nil
 				}
 			})
-			It("Should have checked 2 region endpoints", func() {
-				payload, _ := result.Payload.(map[string]string)
-				Expect(len(payload)).To(Equal(2))
+			It("Should have checked all 10 endpoints", func() {
+				payload, _ := result.Payload.([]string)
+				Expect(len(payload)).To(Equal(10))
 			})
 			It("Should return a successful status", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
 			})
-			It("Should have a summary with success message for region us01", func() {
-				Expect(result.Summary).To(ContainSubstring("Successfully connected to us01 Infrastructure API endpoint."))
+			It("Should have a summary with success message", func() {
+				Expect(result.Summary).To(ContainSubstring("Successfully connected"))
+				Expect(result.Summary).To(ContainSubstring("https://infra-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infrastructure-command-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://identity-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://metric-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://log-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infra-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infrastructure-command-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://identity-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://metric-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://log-api.newrelic.com"))
 			})
 		})
 		Context("If multiple regions provided", func() {
@@ -219,13 +229,13 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/ProxyDetect": tasks.Result{
+					"Base/Config/ProxyDetect": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Status:  tasks.Success,
 						Payload: []string{"us01", "eu01"},
 					},
@@ -241,16 +251,24 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			It("Should return a successful status", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
 			})
-			It("Should have checked 2 region endpoints", func() {
-				payload, _ := result.Payload.(map[string]string)
-				Expect(len(payload)).To(Equal(2))
+			It("Should have checked all 10 endpoints", func() {
+				payload, _ := result.Payload.([]string)
+				Expect(len(payload)).To(Equal(10))
 			})
-			It("Should have a summary with success message for region us01", func() {
-				Expect(result.Summary).To(ContainSubstring("Successfully connected to us01 Infrastructure API endpoint."))
+			It("Should have a summary with success message", func() {
+				Expect(result.Summary).To(ContainSubstring("Successfully connected"))
+				Expect(result.Summary).To(ContainSubstring("https://infra-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infrastructure-command-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://identity-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://metric-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://log-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infra-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infrastructure-command-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://identity-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://metric-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://log-api.newrelic.com"))
 			})
-			It("Should have a summary with success message for region eu01", func() {
-				Expect(result.Summary).To(ContainSubstring("Successfully connected to eu01 Infrastructure API endpoint."))
-			})
+
 		})
 
 		Context("If one region was provided", func() {
@@ -258,13 +276,13 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/ProxyDetect": tasks.Result{
+					"Base/Config/ProxyDetect": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Status:  tasks.Success,
 						Payload: []string{"eu01"},
 					},
@@ -280,15 +298,17 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			It("Should return a successful status", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
 			})
-			It("Should have checked 2 region endpoints", func() {
-				payload, _ := result.Payload.(map[string]string)
-				Expect(len(payload)).To(Equal(1))
+			It("Should have checked 5 region endpoints", func() {
+				payload, _ := result.Payload.([]string)
+				Expect(len(payload)).To(Equal(5))
 			})
-			It("Should have a summary with success message for region us01", func() {
-				Expect(result.Summary).To(ContainSubstring("Successfully connected to eu01 Infrastructure API endpoint."))
-			})
-			It("Should have a summary with success message for region eu01", func() {
-				Expect(result.Summary).To(ContainSubstring("Successfully connected to eu01 Infrastructure API endpoint."))
+			It("Should have a summary with success message for 5 eu endpoints", func() {
+				Expect(result.Summary).To(ContainSubstring("Successfully connected"))
+				Expect(result.Summary).To(ContainSubstring("https://infra-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infrastructure-command-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://identity-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://metric-api.eu.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://log-api.eu.newrelic.com"))
 			})
 		})
 
@@ -297,13 +317,13 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Base/Config/ProxyDetect": tasks.Result{
+					"Base/Config/ProxyDetect": {
 						Status: tasks.Success,
 					},
-					"Base/Config/RegionDetect": tasks.Result{
+					"Base/Config/RegionDetect": {
 						Status:  tasks.Success,
 						Payload: []string{"us01"},
 					},
@@ -319,8 +339,13 @@ var _ = Describe("Infra/Agent/Connect", func() {
 			It("Should return a successful status", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
 			})
-			It("Should have a summary with success message for region us01", func() {
-				Expect(result.Summary).To(ContainSubstring("Successfully connected to us01 Infrastructure API endpoint."))
+			It("Should have a summary with success message for 5 us endpoints", func() {
+				Expect(result.Summary).To(ContainSubstring("Successfully connected"))
+				Expect(result.Summary).To(ContainSubstring("https://infra-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://infrastructure-command-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://identity-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://metric-api.newrelic.com"))
+				Expect(result.Summary).To(ContainSubstring("https://log-api.newrelic.com"))
 			})
 		})
 	})

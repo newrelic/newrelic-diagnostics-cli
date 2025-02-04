@@ -5,7 +5,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	NodeEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -81,7 +81,7 @@ var _ = Describe("Node/Agent/Version", func() {
 		Context("When given a Node Agent Module isn't found", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.Info,
 						Payload: []NodeEnv.NodeModuleVersion{
 							{
@@ -94,7 +94,7 @@ var _ = Describe("Node/Agent/Version", func() {
 							},
 						},
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -110,7 +110,7 @@ var _ = Describe("Node/Agent/Version", func() {
 		Context("When given a Node Agent Module is found", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.Info,
 						Payload: []NodeEnv.NodeModuleVersion{
 							{
@@ -127,7 +127,7 @@ var _ = Describe("Node/Agent/Version", func() {
 							},
 						},
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}

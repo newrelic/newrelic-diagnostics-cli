@@ -8,6 +8,8 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/usage"
 	"github.com/newrelic/newrelic-diagnostics-cli/version"
 )
@@ -20,11 +22,10 @@ func main() {
 	log.Debugf("Run ID: %s\n", runID)
 	log.Debug("nrdiag was run with options", os.Args)
 
-	_, err := processHTTPProxy()
-
 	//Error setting proxy and they specifically included one so let's break out of the program before we attempt any non-proxied calls.
+	_, err := processHTTPProxy()
 	if err != nil {
-		log.Debug("Proxy configuration found, but unable to use. \nError: " + err.Error() + "\nExiting program.")
+		log.Info("Proxy configuration found, but unable to use. \nError: " + err.Error() + "\nExiting program.")
 		os.Exit(3)
 	}
 
@@ -35,7 +36,7 @@ func main() {
 	haberdasher.DefaultClient.SetRunID(runID)
 	haberdasher.DefaultClient.SetUserAgent("Nrdiag_/" + config.Version)
 
-	if config.HaberdasherURL == "" {
+	if config.HaberdasherURL == "" && !config.Flags.Quiet {
 		log.Info("No Haberdasher base URL set. Defaulting to localhost")
 	} else {
 		haberdasher.DefaultClient.SetBaseURL(config.HaberdasherURL)
@@ -51,9 +52,51 @@ func main() {
 		}
 	}
 
+	// Set up script catalog
+	scriptCatalog := &scriptrunner.Catalog{
+		Deps: &scriptrunner.CatalogDependencies{},
+	}
+
+	// List available scripts
+	if config.Flags.ListScripts {
+		printScriptList(scriptCatalog)
+		os.Exit(0)
+	}
+
+	var scriptData *scriptrunner.ScriptData
+	if config.Flags.Script != "" {
+		scriptData = processScript(scriptCatalog)
+		// View script
+		if !config.Flags.Run {
+			log.Infof("%s\n", string(scriptData.Content))
+			os.Exit(0)
+		}
+
+		// Run script
+		log.Infof(color.ColorString(color.White, "\nRunning script: %s %s\n"), scriptData.Path, scriptData.Flags)
+		srunner := &scriptrunner.Runner{
+			Deps: &scriptrunner.RunnerDependencies{
+				CmdLineOptions: options,
+			},
+		}
+		scriptData.Output, err = srunner.Run(scriptData.Content, scriptData.Path, scriptData.Flags)
+		if err != nil {
+			// exit if the script fails to run
+			log.Fatalf("Error while running script: %s", err.Error())
+		}
+		scriptData.AddtlFiles = srunner.FindScriptAddtlFiles(scriptData.AddtlFilesPatterns)
+		if len(scriptData.Output) > 0 {
+			// Print script output to screen
+			output.PrintScriptOutput(string(scriptData.Output))
+			// Write script output to a file
+			output.WriteScriptOutputFile(scriptData.OutputPath, scriptData.Output, options)
+		}
+
+	}
+
 	go processTasksToRun()
 
-	// if statments for doing stuff with args
+	// if statements for doing stuff with args
 	if config.Flags.Help {
 		processHelp()
 	} else if config.Flags.Version {
@@ -66,11 +109,23 @@ func main() {
 		// ... the called function is responsible for decrementing when done
 		var wg sync.WaitGroup
 
-		wg.Add(1) // run the tasks in goroutine
-		go processTasks(options, overrides, &wg)
-
 		// zip file is passed around as a dependency for other functions
 		zipfile := output.CreateZip()
+
+		// create the filelist file, exit if it can't be created
+		flErr := output.CreateFileList()
+		if flErr != nil {
+			log.Info("Error creating filelist", err)
+			os.Exit(3)
+		}
+
+		// check if any files/directories should be included in the zip
+		if config.Flags.Include != "" {
+			output.HandleIncludeFlag(zipfile, config.Flags.Include)
+		}
+
+		wg.Add(1) // run the tasks in goroutine
+		go processTasks(options, overrides, &wg)
 
 		wg.Add(1) // collect files the tasks produce and add them to the zip file
 		go output.ProcessFilesChannel(zipfile, &wg)
@@ -85,13 +140,24 @@ func main() {
 		}
 
 		// block on wait group so program does not exit prematurely
+		log.Info(color.ColorString(color.White, "Creating nrdiag-output.zip"))
 		wg.Wait()
 
 		// creates the output file
-		output.WriteOutputFile(outputResults)
+		output.WriteOutputFile(outputResults, scriptData)
 
 		// copy our output file(s) to the zip file
 		output.CopyOutputToZip(zipfile)
+		if scriptData != nil {
+			err := output.CopyScriptOutputsToZip(scriptData, zipfile)
+			if err != nil {
+				log.Infof("Failed to copy script outputs to zip: %s\n", err.Error())
+			}
+		}
+
+		// copy the file list to the zip file last to ensure it's up to date
+		output.CopyFileListToZip(zipfile)
+
 		// ...and close it out
 		output.CloseZip(zipfile)
 

@@ -1,9 +1,9 @@
 package env
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Node/Env/NpmPackage", func() {
@@ -54,10 +54,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.None,
 					},
 				}
@@ -73,10 +73,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -98,10 +98,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -115,7 +115,7 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a success result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-				Expect(result.Summary).To(Equal("We have succesfully retrieved the following file(s):\npackage.json"))
+				Expect(result.Summary).To(Equal("We have successfully retrieved the following file(s):\npackage.json"))
 			})
 		})
 
@@ -123,10 +123,10 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -140,17 +140,17 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a success result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-				Expect(result.Summary).To(Equal("We have succesfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
+				Expect(result.Summary).To(Equal("We have successfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
 			})
 		})
 		Context("When 3 files are found, but one is in node_modules", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
 				}
@@ -164,7 +164,7 @@ var _ = Describe("Node/Env/NpmPackage", func() {
 
 			It("Should return a success result status and summary", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
-				Expect(result.Summary).To(Equal("We have succesfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
+				Expect(result.Summary).To(Equal("We have successfully retrieved the following file(s):\npackage.json\npackage-lock.json"))
 			})
 
 			It("Should should ignore files found in node_modules", func() {

@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package profiler
@@ -33,7 +34,7 @@ func (p DotNetProfilerInstrumentationPossible) Dependencies() []string {
 
 }
 
-//Uses results of wasRegKey,w3svcRegKey, and envVarKey tasks to determin if they are set in such a way that instrumentation is possible
+// Uses results of wasRegKey,w3svcRegKey, and envVarKey tasks to determine if they are set in such a way that instrumentation is possible
 func (p DotNetProfilerInstrumentationPossible) Execute(op tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result
 	// abort if it isn't installed

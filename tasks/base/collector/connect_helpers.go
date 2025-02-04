@@ -3,7 +3,7 @@ package collector
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
@@ -13,18 +13,18 @@ type requestFunc func(wrapper httpHelper.RequestWrapper) (*http.Response, error)
 
 func mockSuccessfulRequest200(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 	return &http.Response{
-		StatusCode: 200,
-		Body:       ioutil.NopCloser(bytes.NewReader([]byte("test body"))),
+		StatusCode: 404,
+		Body:       io.NopCloser(bytes.NewReader([]byte("{}"))),
 	}, nil
 }
 
 func mockUnsuccessfulRequest400(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 	return &http.Response{
 		StatusCode: 400,
-		Body:       ioutil.NopCloser(bytes.NewReader([]byte("test body"))),
+		Body:       io.NopCloser(bytes.NewReader([]byte("{}"))),
 	}, nil
 }
 
 func mockUnsuccessfulRequestError(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-	return &http.Response{}, errors.New("Failed request (timeout)")
+	return &http.Response{}, errors.New("failed request (timeout)")
 }

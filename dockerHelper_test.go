@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"runtime"
@@ -32,19 +31,18 @@ func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, d
 	return nil
 }
 
-//CreateDockerfile - This builds the raw Dockerfile from the slice of tests
+// CreateDockerfile - This builds the raw Dockerfile from the slice of tests
 func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, dockerfileLines []string) (string, error) {
-
-	f, err := ioutil.TempFile("temp", imageName)
+	f, _ := os.CreateTemp("temp", imageName)
 	//Build base Dockerfile
 
-	if _, err = f.WriteString("\r\n"); err != nil {
+	if _, err := f.WriteString("\r\n"); err != nil {
 		log.Info("Error writing output file", err)
 		return "", err
 	}
 
 	baseDockerFrom := []string{
-		"FROM ubuntu:16.04",
+		"FROM ubuntu:22.04",
 		"RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qqy unzip apt-transport-https ca-certificates",
 	}
 
@@ -103,7 +101,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 
 	for _, line := range dockerfile {
 		log.Debug(line)
-		if _, err = f.WriteString(line + "\r\n"); err != nil {
+		if _, err := f.WriteString(line + "\r\n"); err != nil {
 			log.Info("Error writing output file", err)
 			return "", err
 		}
@@ -111,7 +109,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	return f.Name(), nil
 }
 
-//RunDockerContainer - This runs the docker container from the image previously built
+// RunDockerContainer - This runs the docker container from the image previously built
 func RunDockerContainer(imageName string, hostsAdditions []string) (string, error) {
 	//Create docker container based on test name
 

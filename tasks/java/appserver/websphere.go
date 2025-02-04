@@ -16,9 +16,6 @@ var (
 	stringsToMatch = []string{"<version>([0-9.]*).*", ".*version=\"([0-9.]*).*", "Version:[ \t]*([0-9.]*)"}
 	// used for logging
 	websphereTaskName = "Java/Appserver/Websphere - "
-	websphereHomeDir  string
-	supported         = "Supported"
-	unsupported       = "Unsupported"
 	unknown           = "Unknown"
 )
 
@@ -51,7 +48,7 @@ func (p JavaAppServerWebSphere) Dependencies() []string {
 	return []string{}
 }
 
-// Execute - this function iterates through the working and nrdiag exeutable dirs, searches for key filenames
+// Execute - this function iterates through the working and nrdiag executable dirs, searches for key filenames
 // of files which should determine version information for websphere else it declares websphere not present
 func (p JavaAppServerWebSphere) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 
@@ -92,7 +89,7 @@ func (p JavaAppServerWebSphere) getDirs() ([]string, error) {
 		log.Debug(websphereTaskName + "Error encountered while determining the nrdiag executable directory. Error is " + getExeErr.Error())
 		if getWorkDirErr != nil {
 			// we can get neither directory - therefore we'll have no where to search for websphere files
-			return []string{}, errors.New("Obtained neither the current working directory nor the executable directory location")
+			return []string{}, errors.New("obtained neither the current working directory nor the executable directory location")
 		}
 	} else {
 		dirs = append(dirs, nrdiagExeDir)
@@ -147,7 +144,7 @@ Loop:
 			// vague file name, double check it's definitely Websphere 7's version.txt
 			if strings.Contains(file, "version.txt") {
 				// if this version.txt is not Websphere's, don't check for the version
-				if p.findStringInFile("WebSphere", file) == false {
+				if !p.findStringInFile("WebSphere", file) {
 					log.Debug(websphereTaskName + "Found a version.txt but it does not appear to be WebSphere's.")
 					continue
 				}

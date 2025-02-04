@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Node/Env/Dependencies", func() {
@@ -50,10 +50,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -70,10 +70,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.None,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -89,10 +89,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -104,17 +104,17 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return a Failure result summary", func() {
-				Expect(result.Summary).To(Equal("an error message: npm throwed an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
+				Expect(result.Summary).To(Equal("an error message: npm threw an error while running the command npm ls --depth=0 --parseable=true --long=true. Please verify that the " + tasks.ThisProgramFullName + " is running in your Node application directory. Possible causes for npm errors: https://docs.npmjs.com/common-errors. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
 			})
 		})
 		Context("When NodeModulesVersions length is zero", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -131,14 +131,14 @@ var _ = Describe("Node/Env/Dependencies", func() {
 				Expect(result.Summary).To(Equal("We failed to parse the output of npm ls, but have included it in nrdiag-output.zip. The output of 'npm ls' is used by Support Engineers to find out if your application is using unsupported technologies."))
 			})
 		})
-		Context("When getModulesList returns a succesful output that we pass to tasks.FileCopyEnvelope", func() {
+		Context("When getModulesList returns a successful output that we pass to tasks.FileCopyEnvelope", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/NpmVersion": tasks.Result{
+					"Node/Env/NpmVersion": {
 						Status: tasks.Info,
 					},
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -149,10 +149,10 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			It("Should return a Info result status", func() {
 				Expect(result.Status).To(Equal(tasks.Info))
 			})
-			It("Should return a Succesful result summary", func() {
+			It("Should return a Successful result summary", func() {
 				Expect(result.Summary).To(Equal("We have successfully retrieved a list of dependencies from your node_modules folder"))
 			})
-			It("Should return a Succesful result FilesToCopy", func() {
+			It("Should return a Successful result FilesToCopy", func() {
 				Expect(len(result.FilesToCopy)).To(Equal(1))
 				Expect(result.FilesToCopy[0].Path).To(Equal("npm_ls_output.txt"))
 			})
@@ -170,7 +170,7 @@ var _ = Describe("Node/Env/Dependencies", func() {
 		Context("When given a valid zero length channel and modulesList multiline string", func() {
 			BeforeEach(func() {
 				stream = make(chan string)
-				//to replicate the real ouput of getModulesListStr(a multiline string), init a slice of strings and join them with newline
+				//to replicate the real output of getModulesListStr(a multiline string), init a slice of strings and join them with newline
 				npmLsLines := []string{
 					"/Users/shuayhuaca/Desktop/projects/node/nannynow/server/node_modules/babel-jest:babel-jest@23.6.0:undefined",
 					"/Users/shuayhuaca/Desktop/projects/node/nannynow/server/node_modules/bcryptjs:bcryptjs@2.4.3:undefined",
@@ -205,15 +205,15 @@ var _ = Describe("Node/Env/Dependencies", func() {
 			modulesVersions []NodeModuleVersion
 		)
 		dependencyInfo := []NodeModuleVersion{
-			NodeModuleVersion{
+			{
 				Module:  "express",
 				Version: "4.16.4",
 			},
-			NodeModuleVersion{
+			{
 				Module:  "mongoose",
 				Version: "5.4.0",
 			},
-			NodeModuleVersion{
+			{
 				Module:  "babel-jest",
 				Version: "23.6.0",
 			},

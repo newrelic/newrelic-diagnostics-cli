@@ -5,10 +5,10 @@ package config
 import (
 	"runtime"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Infra/Config/IntegrationsCollect", func() {
@@ -29,8 +29,8 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Collect New Relic Infrastructure on-host integration configuration and definition files"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Collect New Relic Infrastructure on-host integration configuration and definition files"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -57,7 +57,7 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -77,7 +77,7 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -105,7 +105,7 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 						},
 					}
 					upstream = map[string]tasks.Result{
-						"Infra/Config/Agent": tasks.Result{
+						"Infra/Config/Agent": {
 							Status: tasks.Success,
 						},
 					}
@@ -124,8 +124,8 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 
 				It("should return an expected success result payload", func() {
 					expectedPayload := []config.ConfigElement{
-						config.ConfigElement{FileName: "config.yml", FilePath: "config/path/"},
-						config.ConfigElement{FileName: "definition.yml", FilePath: "definition/path/"},
+						{FileName: "config.yml", FilePath: "config/path/"},
+						{FileName: "definition.yml", FilePath: "definition/path/"},
 					}
 					Expect(result.Payload).To(Equal(expectedPayload))
 				})
@@ -133,8 +133,8 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 				It("should return an expected success result FilesToCopy", func() {
 
 					expectedFilesToCopy := []tasks.FileCopyEnvelope{
-						tasks.FileCopyEnvelope{Path: "config/path/config.yml"},
-						tasks.FileCopyEnvelope{Path: "definition/path/definition.yml"},
+						{Path: "config/path/config.yml"},
+						{Path: "definition/path/definition.yml"},
 					}
 					Expect(result.FilesToCopy).To(Equal(expectedFilesToCopy))
 				})
@@ -151,7 +151,7 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 						},
 					}
 					upstream = map[string]tasks.Result{
-						"Infra/Config/Agent": tasks.Result{
+						"Infra/Config/Agent": {
 							Status: tasks.Success,
 						},
 					}
@@ -170,8 +170,8 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 
 				It("should return an expected success result payload", func() {
 					expectedPayload := []config.ConfigElement{
-						config.ConfigElement{FileName: "config.yml", FilePath: `C:\Program Files\New Relic\newrelic-infra\integrations.d\`},
-						config.ConfigElement{FileName: "definition.yml", FilePath: `C:\Program Files\New Relic\newrelic-infra\custom-integrations\`},
+						{FileName: "config.yml", FilePath: `C:\Program Files\New Relic\newrelic-infra\integrations.d\`},
+						{FileName: "definition.yml", FilePath: `C:\Program Files\New Relic\newrelic-infra\custom-integrations\`},
 					}
 					Expect(result.Payload).To(Equal(expectedPayload))
 				})
@@ -179,8 +179,8 @@ var _ = Describe("Infra/Config/IntegrationsCollect", func() {
 				It("should return an expected success result FilesToCopy", func() {
 
 					expectedFilesToCopy := []tasks.FileCopyEnvelope{
-						tasks.FileCopyEnvelope{Path: `C:\Program Files\New Relic\newrelic-infra\integrations.d\config.yml`},
-						tasks.FileCopyEnvelope{Path: `C:\Program Files\New Relic\newrelic-infra\custom-integrations\definition.yml`},
+						{Path: `C:\Program Files\New Relic\newrelic-infra\integrations.d\config.yml`},
+						{Path: `C:\Program Files\New Relic\newrelic-infra\custom-integrations\definition.yml`},
 					}
 					Expect(result.FilesToCopy).To(Equal(expectedFilesToCopy))
 				})

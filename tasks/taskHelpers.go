@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -21,7 +21,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 // OsFunc - for dependency injecting osGetwd
@@ -39,7 +39,7 @@ func FindFiles(patterns []string, paths []string) []string {
 		if err == nil {
 			path = symPath
 		}
-		filepath.Walk(path, func(pathInfo string, fileInfo os.FileInfo, walkErr error) error {
+		_ = filepath.Walk(path, func(pathInfo string, fileInfo os.FileInfo, walkErr error) error {
 			if walkErr != nil {
 				// log the error and move on to next item to be walked
 				log.Debug("Error when walking filesystem:", walkErr)
@@ -48,7 +48,11 @@ func FindFiles(patterns []string, paths []string) []string {
 			if !fileInfo.IsDir() {
 				// loop through pattern list and add files that match to our string array
 				for _, pattern := range patterns {
-					var validID = regexp.MustCompile(pattern)
+					validID, rerr := regexp.Compile(pattern)
+					if rerr != nil {
+						log.Debugf("Error parsing regex pattern '%s': %s", pattern, rerr.Error())
+						continue
+					}
 					match := validID.MatchString(fileInfo.Name())
 					if match {
 						foundFiles[pathInfo] = struct{}{} // empty struct is smallest memory footprint
@@ -87,9 +91,9 @@ func FindProcessByName(name string) ([]process.Process, error) {
 		processName, err := processID.Name()
 
 		if err != nil {
+			// If we can't get the process name, log it to debug logging then keep going through the slice
 			log.Debug("error getting process name", PID)
-			return processList, err
-
+			continue
 		}
 
 		if filepath.Ext(name) != ".exe" { //exact match if searching for process with .exe, otherwise strip the .exe before comparing
@@ -104,9 +108,9 @@ func FindProcessByName(name string) ([]process.Process, error) {
 	return processList, nil
 }
 
-//ReadFile - reads file from path to string
+// ReadFile - reads file from path to string
 func ReadFile(file string) string {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		log.Debug("error reading file", err)
 		return ""
@@ -117,7 +121,7 @@ func ReadFile(file string) string {
 // FileExistsFunc - allows FileExists to be dependency injected
 type FileExistsFunc func(string) bool
 
-//FileExists - checks for existence of file
+// FileExists - checks for existence of file
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
@@ -127,7 +131,7 @@ func FileExists(name string) bool {
 	return true
 }
 
-//PromptUser - This takes the input string as the query to the end users and waits for a response
+// PromptUser - This takes the input string as the query to the end users and waits for a response
 func PromptUser(msg string, options Options) bool {
 	if options.Options["YesToAll"] == "true" {
 		return true
@@ -213,7 +217,7 @@ type ValidateBlob struct {
 	Children []ValidateBlob
 }
 
-//ByChild is a sort helper to sort an array of ValidateBlobs by their child nodes
+// ByChild is a sort helper to sort an array of ValidateBlobs by their child nodes
 type ByChild []ValidateBlob
 
 func (t ByChild) Len() int {
@@ -227,13 +231,10 @@ func (t ByChild) Less(i, j int) bool {
 	c2 := t[j].PathAndKey()
 	pathandkeys := []string{c1, c2}
 	sort.Strings(pathandkeys)
-	if pathandkeys[0] == c1 {
-		return true
-	}
-	return false
+	return pathandkeys[0] == c1
 }
 
-//Sort sorts an inplace object, organizing the children alphabetically
+// Sort sorts an in-place object, organizing the children alphabetically
 func (v ValidateBlob) Sort() {
 
 	if !v.IsLeaf() {
@@ -249,10 +250,7 @@ func (v ValidateBlob) Sort() {
 
 // IsLeaf - returns true if a ValidateBlob is a leaf, i.e. has a value, or false if it has children
 func (v ValidateBlob) IsLeaf() bool {
-	if v.Children == nil {
-		return true
-	}
-	return false
+	return v.Children == nil
 }
 
 // Value - returns the value as a string, if is a node
@@ -311,20 +309,16 @@ func (v ValidateBlob) PathAndKey() string {
 	return v.Path + "/" + v.Key
 }
 
-//PathAndKeyContains - Just a quick wrapper around strings.Contains to make it easier to call
+// PathAndKeyContains - Just a quick wrapper around strings.Contains to make it easier to call
 func (v ValidateBlob) PathAndKeyContains(searchKey string) bool {
-	if strings.Contains(v.PathAndKey(), searchKey) {
-		return true
-	}
-	return false
+	return strings.Contains(v.PathAndKey(), searchKey)
 }
 
 // FindKey - returns one or more ValidateBlobs within a given ValidateBlob that has the desired key
 // can return multiple nodes as it will return everything that matched path/key
 func (v ValidateBlob) FindKey(searchKey string) (results []ValidateBlob) {
-
 	//check current node for matching
-	if v.Key == searchKey {
+	if strings.EqualFold(v.Key, searchKey) {
 		log.Debug("found match, adding key", v.Key)
 		results = append(results, v)
 	}
@@ -332,12 +326,12 @@ func (v ValidateBlob) FindKey(searchKey string) (results []ValidateBlob) {
 	if !v.IsLeaf() {
 		results = append(results, v.searchChildren(searchKey)...)
 	}
+
 	return
 }
 
-//FindKeyByPath - returns a single ValidateBlob that matches the exact full path of the Key in question. This means the searchPath parameter MUST begin with a / character
+// FindKeyByPath - returns a single ValidateBlob that matches the exact full path of the Key in question. This means the searchPath parameter MUST begin with a / character
 func (v ValidateBlob) FindKeyByPath(searchPath string) ValidateBlob {
-
 	var results []ValidateBlob
 	//check current node for matching
 	if v.PathAndKey() == searchPath {
@@ -371,10 +365,8 @@ func (v ValidateBlob) FindKeyByPath(searchPath string) ValidateBlob {
 }
 
 func (v ValidateBlob) searchChildren(searchKey string) (results []ValidateBlob) {
-
 	for _, child := range v.Children {
-
-		if child.Key == searchKey {
+		if strings.EqualFold(child.Key, searchKey) {
 			log.Debug("adding", child.PathAndKey(), "to list of results")
 			results = append(results, child)
 		}
@@ -382,14 +374,13 @@ func (v ValidateBlob) searchChildren(searchKey string) (results []ValidateBlob) 
 		if !child.IsLeaf() {
 			results = append(results, child.searchChildren(searchKey)...)
 		}
-
 	}
+
 	return
 }
 
-//UpdateKey - This requires an exact path to the key in question to update and returns the original blob with just the one key value updated
+// UpdateKey - This requires an exact path to the key in question to update and returns the original blob with just the one key value updated
 func (v ValidateBlob) UpdateKey(searchKey string, replacementValue interface{}) ValidateBlob {
-
 	log.Debug("Updating key", searchKey, "with new value", replacementValue)
 	//we're going to walk the tree, adding nodes as we find them to the new returned object and just create a new entry if and only if it's the one we want
 
@@ -422,7 +413,7 @@ func (v ValidateBlob) updateChildren(searchKey string, replacementValue interfac
 	return
 }
 
-//InsertKey - This requires an exact path to the key in question to update and returns the original blob with just the one key value updated, the key inserted should NOT start with a / and infer the path due to nesting at the top level
+// InsertKey - This requires an exact path to the key in question to update and returns the original blob with just the one key value updated, the key inserted should NOT start with a / and infer the path due to nesting at the top level
 func (v ValidateBlob) InsertKey(insertKey string, value interface{}) ValidateBlob {
 
 	log.Debug("Inserting key", insertKey, "with value", value)
@@ -448,10 +439,10 @@ func (v ValidateBlob) insertChildKey(insertKey string, value interface{}) (outpu
 	depth := strings.Count(v.PathAndKey(), "/")
 
 	//split up the key to have the actual key
-	split := strings.Split(insertKey, "/") //Skip the first / here to ignore the preceeding / when calculating
+	split := strings.Split(insertKey, "/") //Skip the first / here to ignore the preceding / when calculating
 	key := split[len(split)-1]
 	if split[0] == "" {
-		split = split[1:] // drop first element to ignore the preceeding /
+		split = split[1:] // drop first element to ignore the preceding /
 	}
 	newSplit := split[:len(split)-1] // drop last element of the slice to build the path
 	path := ""
@@ -492,7 +483,7 @@ func (v ValidateBlob) insertChildKey(insertKey string, value interface{}) (outpu
 	return
 }
 
-//UpdateOrInsertKey - helper function to just update or insert without caring which one is used, key should NOT begin with /
+// UpdateOrInsertKey - helper function to just update or insert without caring which one is used, key should NOT begin with /
 func (v ValidateBlob) UpdateOrInsertKey(key string, value interface{}) ValidateBlob {
 
 	if key == "" {
@@ -529,7 +520,7 @@ func (v ValidateBlob) UpdateOrInsertKey(key string, value interface{}) ValidateB
 
 }
 
-//String - This dumps an entire ValidateBlob, including any/all children nodes to a string, with one line per ValidateBlob and nesting showing children
+// String - This dumps an entire ValidateBlob, including any/all children nodes to a string, with one line per ValidateBlob and nesting showing children
 func (v ValidateBlob) String() (output string) {
 
 	if v.IsLeaf() {
@@ -544,7 +535,7 @@ func (v ValidateBlob) String() (output string) {
 	return
 }
 
-//AsMap - This builds a map of key to value for all leaf nodes of the given blob
+// AsMap - This builds a map of key to value for all leaf nodes of the given blob
 func (v ValidateBlob) AsMap() map[string]interface{} {
 	output := make(map[string]interface{})
 
@@ -572,7 +563,7 @@ type EnvironmentVariables struct {
 // EnvVarScope - scope of the env variables - global, user, or process
 type EnvVarScope int
 
-//Constants for use by the status property above
+// Constants for use by the status property above
 const (
 	// Global - the env variables contained in the struct are global level
 	Global EnvVarScope = iota
@@ -672,7 +663,7 @@ func (e EnvironmentVariables) WithCustomFilter(customFilter []string, includeDef
 	return
 }
 
-// FindCaseInsensitive - searches for a specific variable case insenstive
+// FindCaseInsensitive - searches for a specific variable case insensitive
 func (e EnvironmentVariables) FindCaseInsensitive(envVar string) string {
 	r := regexp.MustCompile("(?i)" + envVar)
 	for key, value := range e.All {
@@ -693,7 +684,7 @@ func GetProcessEnvVars(pid int32) (envVars EnvironmentVariables, retErr error) {
 	case "linux":
 		pidString := strconv.FormatInt(int64(pid), 10)
 		path := filepath.Join("/proc", pidString, "environ")
-		environFile, err := ioutil.ReadFile(path)
+		environFile, err := os.ReadFile(path)
 		if err != nil {
 			errorString := "Error reading process env variables: " + err.Error()
 			log.Debug(errorString)
@@ -732,7 +723,7 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 
 	if len(envVars.All) == 0 {
 		log.Debug("Env vars slice is 0, assuming there was an error collecting them")
-		retErr = errors.New("Unable to gather any Environment Variables from the current shell")
+		retErr = errors.New("unable to gather any Environment Variables from the current shell")
 		return
 	}
 
@@ -754,7 +745,7 @@ type JavaProcArgs struct {
 func GetJavaProcArgs() []JavaProcArgs {
 	javaProcs, err := FindProcessByName("java")
 	if err != nil {
-		log.Info("We encountered an error while detecting all running Java processes: " + err.Error())
+		log.Debug("We encountered an error while detecting all running Java processes: " + err.Error())
 	}
 	if javaProcs == nil {
 		return []JavaProcArgs{}
@@ -763,7 +754,7 @@ func GetJavaProcArgs() []JavaProcArgs {
 	for _, proc := range javaProcs {
 		cmdLineArgsSlice, err := GetCmdLineArgs(proc)
 		if err != nil {
-			log.Info("Error getting command line options while running GetCmdLineArgs(proc)")
+			log.Debug("Error getting command line options while running GetCmdLineArgs(proc)")
 		}
 		javaProcArgs = append(javaProcArgs, JavaProcArgs{ProcID: proc.Pid, Args: cmdLineArgsSlice})
 	}
@@ -846,12 +837,12 @@ func GetVersionSplit(version string) (majorVer int, minorVer int, patchVer int, 
 	return
 }
 
-//MakeMapFromString parses a string `src` a string map.
-//param: `pairSeparator` is the string value that separates pairs of key values such as '\n',
-//param: `value separator` is the string value that separates keys from values, such as ':'.
-//It will also cleanup leading and trailing space for keys and values. This means nested values will be flattened.
-//As a string map keys will be indexed in alpha order and will not preserve original order of `src`.
-//("a:b\nc:d", "\n", ":") -> map[string]string{ "a":"b", "c":"d" }
+// MakeMapFromString parses a string `src` a string map.
+// param: `pairSeparator` is the string value that separates pairs of key values such as '\n',
+// param: `value separator` is the string value that separates keys from values, such as ':'.
+// It will also cleanup leading and trailing space for keys and values. This means nested values will be flattened.
+// As a string map keys will be indexed in alpha order and will not preserve original order of `src`.
+// ("a:b\nc:d", "\n", ":") -> map[string]string{ "a":"b", "c":"d" }
 func MakeMapFromString(src string, pairSeparator string, valueSeparator string) map[string]string {
 	valuePairsMap := make(map[string]string)
 	valuePairsSlice := strings.Split(src, pairSeparator)
@@ -869,9 +860,9 @@ func MakeMapFromString(src string, pairSeparator string, valueSeparator string) 
 	return valuePairsMap
 }
 
-//StreamWrapper provides a means to bundle a channel for publishing data,
+// StreamWrapper provides a means to bundle a channel for publishing data,
 // and a channel for publishing errors.
-//Each is paired with a waitgroup if needed
+// Each is paired with a WaitGroup if needed
 type StreamWrapper struct {
 	Stream      chan string
 	StreamWg    *sync.WaitGroup
@@ -879,17 +870,17 @@ type StreamWrapper struct {
 	ErrorWg     *sync.WaitGroup
 }
 
-//BufferedCommandExecFunc allows us to declare BufferedCommandExec as a dependency type
+// BufferedCommandExecFunc allows us to declare BufferedCommandExec as a dependency type
 type BufferedCommandExecFunc func(limit int64, cmd string, arg ...string) (*bufio.Scanner, error)
 
-//BufferedCommandExec provides buffered execution of a command.
-//@limit int64 of the max bytes to read. If 0, no limit is imposed.
-//@cmd - the command to run
-//@args - the args to run for the command
-//This command combines stdout and stderr and provides a Scanner for buffered read of the pipes
-//Or returns an error if encountered in creating the pipes or starting the command
-//Scanner has a default token size of the constant MaxScanTokenSize (64 * 1024)
-//Default buffer size is 4096: https://github.com/golang/go/blob/13cfb15cb18a8c0c31212c302175a4cb4c050155/src/bufio/scan.go#L76
+// BufferedCommandExec provides buffered execution of a command.
+// @limit int64 of the max bytes to read. If 0, no limit is imposed.
+// @cmd - the command to run
+// @args - the args to run for the command
+// This command combines stdout and stderr and provides a Scanner for buffered read of the pipes
+// Or returns an error if encountered in creating the pipes or starting the command
+// Scanner has a default token size of the constant MaxScanTokenSize (64 * 1024)
+// Default buffer size is 4096: https://github.com/golang/go/blob/13cfb15cb18a8c0c31212c302175a4cb4c050155/src/bufio/scan.go#L76
 func BufferedCommandExec(limit int64, cmd string, args ...string) (*bufio.Scanner, error) {
 	cmdBuild := exec.Command(cmd, args...)
 
@@ -928,7 +919,7 @@ func BytesToPrettyJSONBytes(bytes []byte) ([]byte, error) {
 	} else if firstByte == "{" {
 		unmarshaled = make(map[string]interface{})
 	} else {
-		return bytes, errors.New("Invalid JSON: First character is " + string(firstByte))
+		return bytes, errors.New("invalid JSON: First character is " + string(firstByte))
 	}
 
 	unMarshalError := json.Unmarshal(bytes, &unmarshaled)
@@ -957,8 +948,8 @@ func CmdExecutor(name string, arg ...string) ([]byte, error) {
 	return cmdBuild.CombinedOutput()
 }
 
-//cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
-//allowing for: cmd1 args | cmd2 args
+// cmdWrapper is used to specify commands & args to be passed to the multi-command executor (mCmdExecutor)
+// allowing for: cmd1 args | cmd2 args
 type CmdWrapper struct {
 	Cmd  string
 	Args []string
@@ -998,15 +989,13 @@ func HTTPRequester(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 	return httpHelper.MakeHTTPRequest(wrapper)
 }
 
-//GetWorkingDirectoriesFunc function type declaration for GetWorkingDirectories
+// GetWorkingDirectoriesFunc function type declaration for GetWorkingDirectories
 type GetWorkingDirectoriesFunc func() []string
-
-type osFunc func() (string, error)
 
 var osGetwd = os.Getwd
 var osExecutable = os.Executable
 
-//GetWorkingDirectories returns a slice of local directories. It purposefully ignores any errors and simply returns an empty slice if the function is unable to return the list of directories.
+// GetWorkingDirectories returns a slice of local directories. It purposefully ignores any errors and simply returns an empty slice if the function is unable to return the list of directories.
 func GetWorkingDirectories() []string {
 	var directories []string
 	localDir, errWd := osGetwd()
@@ -1024,14 +1013,14 @@ func GetWorkingDirectories() []string {
 	return directories
 }
 
-//CollectFileStatus returns a struct that provides information about the file we are going to collect from customer's environment: fullpath to the file, verifying if the path provided (by env var or config file) takes us to file that exists, and if doesn't we collect the error message to bubble up to the customer.
+// CollectFileStatus returns a struct that provides information about the file we are going to collect from customer's environment: fullpath to the file, verifying if the path provided (by env var or config file) takes us to file that exists, and if doesn't we collect the error message to bubble up to the customer.
 type CollectFileStatus struct {
 	Path     string
 	IsValid  bool
 	ErrorMsg error
 }
 
-//ValidatePaths takes an slice of strings to check if customer is providing us with paths(that come from either env var or config file) from which can collect a file. It returns a slice of FileToCollect which informs if a file is invalid and the error we found
+// ValidatePaths takes an slice of strings to check if customer is providing us with paths(that come from either env var or config file) from which can collect a file. It returns a slice of FileToCollect which informs if a file is invalid and the error we found
 func ValidatePaths(paths []string) []CollectFileStatus {
 	var filesToCollect []CollectFileStatus
 	for _, path := range paths {
@@ -1040,7 +1029,7 @@ func ValidatePaths(paths []string) []CollectFileStatus {
 	return filesToCollect
 }
 
-//ValidatePath takes a string to check if customer is providing us with paths(that come from either env var or config file) from which can collect a file. It returns a FileToCollect which informs if the file is invalid and the error we found
+// ValidatePath takes a string to check if customer is providing us with paths(that come from either env var or config file) from which can collect a file. It returns a FileToCollect which informs if the file is invalid and the error we found
 func ValidatePath(path string) CollectFileStatus {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
@@ -1048,7 +1037,7 @@ func ValidatePath(path string) CollectFileStatus {
 	}
 
 	if fileInfo.IsDir() {
-		return CollectFileStatus{path, false, errors.New("Is directory and not a path to a file")}
+		return CollectFileStatus{path, false, errors.New("is directory and not a path to a file")}
 	}
 
 	file, err := os.Open(path)
@@ -1058,4 +1047,10 @@ func ValidatePath(path string) CollectFileStatus {
 
 	file.Close()
 	return CollectFileStatus{path, true, nil}
+}
+
+// IsUserRoot - checks if the user is root
+func IsUserRoot() (bool, error) {
+	currentUser, err := user.Current()
+	return currentUser.Username == "root", err
 }

@@ -7,7 +7,6 @@ import (
 
 // BaseConfigLogLevel - This struct defined the sample plugin which can be used as a starting point
 type BaseConfigLogLevel struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
-	name string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task

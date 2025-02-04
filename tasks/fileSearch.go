@@ -8,14 +8,14 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
 
-//global var for mocking to ensure test coverage
+// global var for mocking to ensure test coverage
 var osOpen = os.Open
 
-//FindStringInFileFunc - function signature for FindStringInFile
+// FindStringInFileFunc - function signature for FindStringInFile
 type FindStringInFileFunc func(string, string) bool
 
-//FindStringInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relative or absolute path.
-//Returns a boolean if the desired regex is found in the file
+// FindStringInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relative or absolute path.
+// Returns a boolean if the desired regex is found in the file
 func FindStringInFile(search string, filepath string) bool {
 	regexKey, _ := regexp.Compile(search)
 	log.Debug("Opening " + filepath + "searching for " + search)
@@ -39,12 +39,12 @@ func FindStringInFile(search string, filepath string) bool {
 
 }
 
-//ReturnStringInFileFunc - function definition for ReturnStringInFile
+// ReturnStringInFileFunc - function definition for ReturnStringInFile
 type ReturnStringInFileFunc func(string, string) ([]string, error)
 
-//ReturnStringSubmatchInFileAllMatches Searches through an entire file, applying the supplied regex (search) term to each line individually
-//Returns a slice [] of []string matches, with each element being returned from regex.FindStringSubmatch()
-//Returns an error if the desired regex is not found in the file
+// ReturnStringSubmatchInFileAllMatches Searches through an entire file, applying the supplied regex (search) term to each line individually
+// Returns a slice [] of []string matches, with each element being returned from regex.FindStringSubmatch()
+// Returns an error if the desired regex is not found in the file
 func ReturnStringSubmatchInFileAllMatches(search string, filepath string) ([][]string, error) {
 	regexKey, err := regexp.Compile(search)
 	if err != nil {
@@ -74,8 +74,8 @@ func ReturnStringSubmatchInFileAllMatches(search string, filepath string) ([][]s
 	return [][]string{}, nil
 }
 
-// ReturnStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relavtive or absolute path.
-//Returns the first matching line if found.
+// ReturnStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relative or absolute path.
+// Returns the first matching line if found.
 func ReturnStringSubmatchInFile(search string, filepath string) ([]string, error) {
 	fullResult, err := ReturnStringSubmatchInFileAllMatches(search, filepath)
 	if err != nil {
@@ -87,8 +87,8 @@ func ReturnStringSubmatchInFile(search string, filepath string) ([]string, error
 	return fullResult[0], nil
 }
 
-// ReturnLastStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relavtive or absolute path.
-//Returns the last matching line if found.
+// ReturnLastStringSubmatchInFile - This takes in a regex string and searched line by line through the file indicated as a string to the path, can be relative or absolute path.
+// Returns the last matching line if found.
 func ReturnLastStringSubmatchInFile(search string, filepath string) ([]string, error) {
 	fullResult, err := ReturnStringSubmatchInFileAllMatches(search, filepath)
 	if err != nil {

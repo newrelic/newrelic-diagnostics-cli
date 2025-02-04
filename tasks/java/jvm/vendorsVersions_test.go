@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func TestJavaJVMVendorsVersion(t *testing.T) {
@@ -78,28 +78,28 @@ func TestCheckSupported(t *testing.T) {
 		{os: "windows", vendor: "Zulu", version: "1.7.0.152", result: false},
 
 		// IBM JVM versions 7 and 8 for Linux
-		{os: "linux", vendor: "IBM", version: "1.7.5", result: true},
+		{os: "linux", vendor: "IBM", version: "1.7.5", result: false},
 		{os: "linux", vendor: "IBM", version: "1.8.1", result: true},
 
 		{os: "windows", vendor: "IBM", version: "1.8.1", result: false},
 		{os: "darwin", vendor: "IBM", version: "1.8.1", result: false},
 
 		// OpenJDK JVM versions 7 to 13 for Linux, Windows, and OS X
-		{os: "linux", vendor: "OpenJDK", version: "1.7.0.152", result: true},
+		{os: "linux", vendor: "OpenJDK", version: "1.7.0.152", result: false},
 		{os: "linux", vendor: "OpenJDK", version: "1.8", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "9", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "10.0", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "12", result: true},
 
-		{os: "windows", vendor: "OpenJDK", version: "1.7.0.152", result: true},
+		{os: "windows", vendor: "OpenJDK", version: "1.7.0.152", result: false},
 		{os: "windows", vendor: "OpenJDK", version: "1.8", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "9", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "10.0", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "12", result: true},
 
-		{os: "darwin", vendor: "OpenJDK", version: "1.7.0.152", result: true},
+		{os: "darwin", vendor: "OpenJDK", version: "1.7.0.152", result: false},
 		{os: "darwin", vendor: "OpenJDK", version: "1.8", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "9", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "10.0", result: true},
@@ -113,27 +113,27 @@ func TestCheckSupported(t *testing.T) {
 		{os: "darwin", vendor: "OpenJDK", version: "3", result: false},
 
 		// Oracle HotSpot JVM versions 7 to 12 for Linux, Solaris, Windows, and OS X
-		{os: "linux", vendor: "HotSpot", version: "1.7.0.152", result: true},
+		{os: "linux", vendor: "HotSpot", version: "1.7.0.152", result: false},
 		{os: "linux", vendor: "HotSpot", version: "1.8", result: true},
-		{os: "linux", vendor: "HotSpot", version: "7", result: true},
+		{os: "linux", vendor: "HotSpot", version: "7", result: false},
 		{os: "linux", vendor: "HotSpot", version: "8", result: true},
 		{os: "linux", vendor: "HotSpot", version: "9", result: true},
 		{os: "linux", vendor: "HotSpot", version: "10.0", result: true},
 		{os: "linux", vendor: "HotSpot", version: "11.0.1", result: true},
 		{os: "linux", vendor: "HotSpot", version: "12", result: true},
 
-		{os: "windows", vendor: "HotSpot", version: "1.7.0.152", result: true},
+		{os: "windows", vendor: "HotSpot", version: "1.7.0.152", result: false},
 		{os: "windows", vendor: "HotSpot", version: "1.8", result: true},
-		{os: "windows", vendor: "HotSpot", version: "7", result: true},
+		{os: "windows", vendor: "HotSpot", version: "7", result: false},
 		{os: "windows", vendor: "HotSpot", version: "8", result: true},
 		{os: "windows", vendor: "HotSpot", version: "9", result: true},
 		{os: "windows", vendor: "HotSpot", version: "10.0", result: true},
 		{os: "windows", vendor: "HotSpot", version: "11.0.1", result: true},
 		{os: "windows", vendor: "HotSpot", version: "12", result: true},
 
-		{os: "darwin", vendor: "HotSpot", version: "1.7.0.152", result: true},
+		{os: "darwin", vendor: "HotSpot", version: "1.7.0.152", result: false},
 		{os: "darwin", vendor: "HotSpot", version: "1.8", result: true},
-		{os: "darwin", vendor: "HotSpot", version: "7", result: true},
+		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
 		{os: "darwin", vendor: "HotSpot", version: "8", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "9", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "10.0", result: true},
@@ -144,24 +144,24 @@ func TestCheckSupported(t *testing.T) {
 		{os: "linux", vendor: "Coretto", version: "1.7.0.152", result: false},
 		{os: "linux", vendor: "Coretto", version: "1.8", result: true},
 		{os: "linux", vendor: "Coretto", version: "8", result: true},
-		{os: "linux", vendor: "Coretto", version: "9", result: true},
-		{os: "linux", vendor: "Coretto", version: "10.0", result: true},
+		{os: "linux", vendor: "Coretto", version: "9", result: false},
+		{os: "linux", vendor: "Coretto", version: "10.0", result: false},
 		{os: "linux", vendor: "Coretto", version: "11.0.1", result: true},
 		{os: "linux", vendor: "Coretto", version: "12", result: false},
 
 		{os: "windows", vendor: "Coretto", version: "1.7.0.152", result: false},
 		{os: "windows", vendor: "Coretto", version: "1.8", result: true},
 		{os: "windows", vendor: "Coretto", version: "8", result: true},
-		{os: "windows", vendor: "Coretto", version: "9", result: true},
-		{os: "windows", vendor: "Coretto", version: "10.0", result: true},
+		{os: "windows", vendor: "Coretto", version: "9", result: false},
+		{os: "windows", vendor: "Coretto", version: "10.0", result: false},
 		{os: "windows", vendor: "Coretto", version: "11.0.1", result: true},
 		{os: "windows", vendor: "Coretto", version: "12", result: false},
 
 		{os: "darwin", vendor: "Coretto", version: "1.7.0.152", result: false},
 		{os: "darwin", vendor: "Coretto", version: "1.8", result: true},
 		{os: "darwin", vendor: "Coretto", version: "8", result: true},
-		{os: "darwin", vendor: "Coretto", version: "9", result: true},
-		{os: "darwin", vendor: "Coretto", version: "10.0", result: true},
+		{os: "darwin", vendor: "Coretto", version: "9", result: false},
+		{os: "darwin", vendor: "Coretto", version: "10.0", result: false},
 		{os: "darwin", vendor: "Coretto", version: "11.0.1", result: true},
 		{os: "darwin", vendor: "Coretto", version: "12", result: false},
 
@@ -193,8 +193,8 @@ func TestCheckSupported(t *testing.T) {
 		//Linux tests
 
 		//Only supported in linux
-		{os: "linux", vendor: "IBM", version: "1.7.0.152", result: true},
-		{os: "linux", vendor: "IBM", version: "7", result: true},
+		{os: "linux", vendor: "IBM", version: "1.7.0.152", result: false},
+		{os: "linux", vendor: "IBM", version: "7", result: false},
 		{os: "linux", vendor: "IBM", version: "1.8", result: true},
 		{os: "linux", vendor: "IBM", version: "8", result: true},
 		{os: "linux", vendor: "IBM", version: "9", result: false},
@@ -225,10 +225,10 @@ func TestCheckSupported(t *testing.T) {
 		{os: "linux", vendor: "OpenJDK", version: "1.8.0.152", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "linux", vendor: "OpenJDK", version: "1.6.0", result: false},
-		{os: "linux", vendor: "HotSpot", version: "1.7.0.16", result: true},
+		{os: "linux", vendor: "HotSpot", version: "1.7.0.16", result: false},
 		{os: "linux", vendor: "HotSpot", version: "1.8.0.161", result: true},
 		{os: "linux", vendor: "HotSpot", version: "Unknown", result: false},
-		{os: "linux", vendor: "JRockit", version: "1.6.0.49", result: true},
+		{os: "linux", vendor: "JRockit", version: "1.6.0.49", result: false},
 		{os: "linux", vendor: "JRockit", version: "1.6.0.101", result: false},
 		{os: "linux", vendor: "JRockit", version: "9.0.4", result: false},
 		{os: "linux", vendor: "Coretto", version: "1.8.1", result: true},
@@ -242,10 +242,10 @@ func TestCheckSupported(t *testing.T) {
 		{os: "windows", vendor: "OpenJDK", version: "1.8.0.152", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "windows", vendor: "OpenJDK", version: "1.6.0", result: false},
-		{os: "windows", vendor: "HotSpot", version: "1.7.0.16", result: true},
+		{os: "windows", vendor: "HotSpot", version: "1.7.0.16", result: false},
 		{os: "windows", vendor: "HotSpot", version: "1.8.0.161", result: true},
 		{os: "windows", vendor: "HotSpot", version: "Unknown", result: false},
-		{os: "windows", vendor: "JRockit", version: "1.6.0.49", result: true},
+		{os: "windows", vendor: "JRockit", version: "1.6.0.49", result: false},
 		{os: "windows", vendor: "JRockit", version: "1.6.0.101", result: false},
 		{os: "windows", vendor: "JRockit", version: "9.0.4", result: false},
 		{os: "windows", vendor: "Coretto", version: "1.8.1", result: true},
@@ -260,10 +260,10 @@ func TestCheckSupported(t *testing.T) {
 		{os: "darwin", vendor: "OpenJDK", version: "1.8.0.152", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "11.0.1", result: true},
 		{os: "darwin", vendor: "OpenJDK", version: "1.6.0", result: false},
-		{os: "darwin", vendor: "HotSpot", version: "1.7.0.16", result: true},
+		{os: "darwin", vendor: "HotSpot", version: "1.7.0.16", result: false},
 		{os: "darwin", vendor: "HotSpot", version: "1.8.0.161", result: true},
 		{os: "darwin", vendor: "HotSpot", version: "Unknown", result: false},
-		{os: "darwin", vendor: "JRockit", version: "1.6.0.49", result: true},
+		{os: "darwin", vendor: "JRockit", version: "1.6.0.49", result: false},
 		{os: "darwin", vendor: "JRockit", version: "1.6.0.101", result: false},
 		{os: "darwin", vendor: "JRockit", version: "9.0.4", result: false},
 		{os: "darwin", vendor: "Coretto", version: "1.8.1", result: true},
@@ -300,11 +300,9 @@ func TestCheckLegacySupported(t *testing.T) {
 		// Compatibility tests taken from:
 		// https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent
 
-		// Updated: 4/8/2019
-
-		// Apple Hotspot JVM version 6 for OS X
+		// Apple Hotspot JVM for OS X
 		{os: "darwin", vendor: "HotSpot", version: "6", result: true},
-		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
+		{os: "darwin", vendor: "HotSpot", version: "7", result: true},
 
 		{os: "darwin", vendor: "Apple", version: "6", result: true},
 		{os: "darwin", vendor: "Apple", version: "7", result: false},
@@ -312,21 +310,21 @@ func TestCheckLegacySupported(t *testing.T) {
 		{os: "windows", vendor: "Apple", version: "6", result: false},
 		{os: "linux", vendor: "Apple", version: "6", result: false},
 
-		// Oracle Hotspot JVM version 6.0 for Linux, Solaris, Windows, OS X
+		// Oracle Hotspot JVM for Linux, Solaris, Windows, OS X
 		{os: "linux", vendor: "HotSpot", version: "6", result: true},
-		{os: "linux", vendor: "HotSpot", version: "7", result: false},
+		{os: "linux", vendor: "HotSpot", version: "7", result: true},
 
 		{os: "windows", vendor: "HotSpot", version: "6", result: true},
-		{os: "windows", vendor: "HotSpot", version: "7", result: false},
+		{os: "windows", vendor: "HotSpot", version: "7", result: true},
 
 		{os: "darwin", vendor: "HotSpot", version: "6", result: true},
-		{os: "darwin", vendor: "HotSpot", version: "7", result: false},
+		{os: "darwin", vendor: "HotSpot", version: "7", result: true},
 
 		// No "os: solaris" tests because we don't compile the Diagnostics CLI for Solaris
 
-		// IBM JVM version 6 for Linux
+		// IBM JVM for Linux
 		{os: "linux", vendor: "IBM", version: "6", result: true},
-		{os: "linux", vendor: "IBM", version: "7", result: false},
+		{os: "linux", vendor: "IBM", version: "7", result: true},
 
 		{os: "darwin", vendor: "IBM", version: "6", result: false},
 		{os: "darwin", vendor: "IBM", version: "7", result: false},
@@ -334,7 +332,7 @@ func TestCheckLegacySupported(t *testing.T) {
 		{os: "windows", vendor: "IBM", version: "6", result: false},
 		{os: "windows", vendor: "IBM", version: "7", result: false},
 
-		{os: "windows", vendor: "HotSpot", version: "7", result: false},
+		{os: "windows", vendor: "HotSpot", version: "7", result: true},
 	}
 
 	for _, test := range matchFullySupportedTests {
@@ -482,7 +480,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 		Context("when IBM vendor is running on Linux", func() {
 			BeforeEach(func() {
 				vendor = "IBM"
-				version = "1.7"
+				version = "1.8"
 				p.runtimeGOOS = "linux"
 			})
 
@@ -658,7 +656,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			})
 		})
 
-		Context("When given valid command line arguments of recognized vendor and unparseable version", func() {
+		Context("When given valid command line arguments of recognized vendor and unparsable version", func() {
 			BeforeEach(func() {
 				cmdLineArgs = "-Djava.vm.name=Java HotSpot(TM) Client VM -Djava.util.logging.manager=com.ibm.ws.bootstrap.WsLogManager -Djava.runtime.version=invalid_version_string -Djavax.management.builder.initial=com.ibm.ws.management.PlatformMBeanServerBuilder"
 				//HotSpot 1.6
@@ -719,7 +717,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			BeforeEach(func() {
 				javaExecutable = ""
 				p.cmdExec = func(name string, arg ...string) ([]byte, error) {
-					return nil, errors.New("Unable to execute")
+					return nil, errors.New("unable to execute")
 				}
 			})
 
@@ -730,7 +728,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			})
 		})
 
-		Context("When given a valid executable that returns an unparseable version", func() {
+		Context("When given a valid executable that returns an unparsable version", func() {
 			BeforeEach(func() {
 				javaExecutable = "/path/to/java"
 				p.cmdExec = func(name string, arg ...string) ([]byte, error) {
@@ -748,7 +746,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			})
 		})
 
-		Context("When given a valid executable that returns a recognized vendor with an unparseable version", func() {
+		Context("When given a valid executable that returns a recognized vendor with an unparsable version", func() {
 			BeforeEach(func() {
 				javaExecutable = "/path/to/java"
 				p.cmdExec = func(name string, arg ...string) ([]byte, error) {
@@ -849,7 +847,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 			})
 		})
 
-		Context("When provided counts where only fullysupported > 0", func() {
+		Context("When provided counts where only FullySupported > 0", func() {
 			BeforeEach(func() {
 
 				counts = map[supportabilityStatus]int{
@@ -999,7 +997,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 		Context("when there is an error getting Java processes", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{"Java/Agent/Version": tasks.Result{
+				upstream = map[string]tasks.Result{"Java/Agent/Version": {
 					Status:  tasks.Success,
 					Payload: "4.3",
 				}}
@@ -1019,7 +1017,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 		Context("when there are no Java processes running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
-				upstream = map[string]tasks.Result{"Java/Agent/Version": tasks.Result{
+				upstream = map[string]tasks.Result{"Java/Agent/Version": {
 					Status:  tasks.Success,
 					Payload: "4.3",
 				}}
@@ -1042,10 +1040,10 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				p.runtimeGOOS = "linux" // IBM only compatible on Linux
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
-						process.Process{
+						{
 							Pid: 2,
 						},
 					}, nil
@@ -1100,10 +1098,10 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
-						process.Process{
+						{
 							Pid: 2,
 						},
 					}, nil
@@ -1117,7 +1115,7 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				p.getCmdLineArgs = func(proc process.Process) (string, error) {
 					// Generate an error for one process
 					if proc.Pid == 1 {
-						return "", errors.New("Couldn't do that! Error")
+						return "", errors.New("couldn't do that! Error")
 					} else {
 						// All other processes are valid
 						return "/usr/local/bin/javarooski/java", nil
@@ -1146,14 +1144,14 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
 				}
 
 				p.getCmdLineArgs = func(process.Process) (string, error) {
-					// unparseable java executable, but valid cmdlineArgs for HotSpot and Java 1.8
+					// unparsable java executable, but valid cmdlineArgs for HotSpot and Java 1.8
 					return `/home/duke/jeva -Xmx700m -Djava.vm.name=Java HotSpot™ 64-Bit Server VM -Djava.version=1.8 -Djava.awt.headless=true -Djava.endorsed.dirs="" -Djdt.compiler.useSingleThread=true -Dpreload.project.path=/Users/jmcgrath/code/samsa -Dpreload.config.path=/Users/jmcgrath/Library/Preferences/IdeaIC2018.3/options -Dexternal.project.config=/Users/jmcgrath/Library/Caches/IdeaIC2018.3/external_build_system/samsa.48129cba -Dcompile.parallel=false -Drebuild.on.dependency.change=true -Djava.net.preferIPv4Stack=true -Dio.netty.initialSeedUniquifier=-768099212347918098 -Dfile.encoding=UTF-8 -Duser.language=en -Duser.country=US -Didea.paths.selector=IdeaIC2018.3 -Didea.home.path=/Applications/IntelliJ IDEA CE.app/Contents -Didea.config.path=/Users/jmcgrath/Library/Preferences/IdeaIC2018.3 -Didea.plugins.path=/Users/jmcgrath/Library/Application Support/IdeaIC2018.3 -Djps.log.dir=/Users/jmcgrath/Library/Logs/IdeaIC2018.3/build-log -Djps.fallback.jdk.home=/Applications/IntelliJ IDEA CE.app/Contents/jdk/Contents/Home/jre -Djps.fallback.jdk.version=1.8.0_152-release -Dio.netty.noUnsafe=true -Djava.io.tmpdir=/Users/jmcgrath/Library/Caches/IdeaIC2018.3/compile-server/samsa_80e1e690/_temp_ -Djps.backward.ref.index.builder=true -Dkotlin.incremental.compilation=true -Dkotlin.daemon.enabled -Dkotlin.daemon.client.alive.path="/var/folders/8t/zvmxntvd4w7_j6flmkcj4jmr0000gn/T/kotlin-idea-3860326101882290058-is-running" -classpath /Applications/IntelliJ IDEA CE.app/Contents/lib/jps-launcher.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/lib/tools.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/optimizedFileManager.jar org.jetbrains.jps.cmdline.Launcher /Applications/IntelliJ IDEA CE.app/Contents/lib/util.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/jna-platform.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/maven-aether-provider-3.3.9.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/maven-builder-support-3.3.9.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-util-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/log4j.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/lz4-1.3.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/maven-model-builder-3.3.9.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/asm-all-7.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/commons-codec-1.10.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/nanoxml-2.2.3.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/maven-repository-metadata-3.3.9.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-transport-file-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/trove4j.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/plexus-utils-3.0.22.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/httpcore-4.4.10.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/netty-codec-4.1.30.Final.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/jps-builders.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/jna.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/netty-buffer-4.1.30.Final.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/plexus-component-annotations-1.6.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-dependency-resolver.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/guava-25.1-jre.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/maven-artifact-3.3.9.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-api-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/commons-lang3-3.4.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/maven-model-3.3.9.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-impl-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/httpclient-4.5.6.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/idea_rt.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/resources_en.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/netty-resolver-4.1.30.Final.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/plexus-interpolation-1.21.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/oro-2.0.8.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/protobuf-java-3.4.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/jps-model.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-transport-http-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-connector-basic-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/platform-api.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/forms-1.1-preview.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/slf4j-api-1.7.25.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/jps-builders-6.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/jdom.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/netty-transport-4.1.30.Final.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/aether-spi-1.1.0.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/annotations.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/commons-logging-1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/javac2.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/netty-common-4.1.30.Final.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/gradle/lib/gradle-api-4.10.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/gradle/lib/gradle-api-impldep-4.10.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/ant/lib/ant.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/groovy-all-2.4.15.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/gson-2.8.5.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/slf4j-api-1.7.25.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/slf4j-log4j12-1.7.25.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/gson-2.8.5.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/jarutils.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/guava-25.1-jre.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/common-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/manifest-merger-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/sdk-common-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/builder-model-3.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/builder-test-api-3.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/ddmlib-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/repository-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/gradle/lib/gradle-api-4.10.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/gson-2.8.5.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/jarutils.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/guava-25.1-jre.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/common-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/manifest-merger-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/sdk-common-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/builder-model-3.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/builder-test-api-3.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/ddmlib-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/repository-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/gradle/lib/gradle-api-4.10.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/ant/lib/ant-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/uiDesigner/lib/jps/ui-designer-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/IntelliLang/lib/intellilang-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Groovy/lib/groovy-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Groovy/lib/groovy-rt-constants.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/eclipse/lib/eclipse-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/eclipse/lib/common-eclipse-util.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/maven/lib/maven-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/gradle/lib/gradle-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/devkit/lib/devkit-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/jps/android-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/android-common.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/build-common.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/android-rt.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/sdklib.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/common-26.1.2.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/jarutils.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/android/lib/layoutlib-api.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Kotlin/lib/jps/kotlin-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Kotlin/lib/kotlin-stdlib.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Kotlin/lib/kotlin-reflect.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Kotlin/lib/kotlin-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Kotlin/lib/android-extensions-ide.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/Kotlin/lib/android-extensions-compiler.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/javaFX/lib/javaFX-jps-plugin.jar:/Applications/IntelliJ IDEA CE.app/Contents/plugins/javaFX/lib/common-javaFX-plugin.jar org.jetbrains.jps.cmdline.BuildMain 127.0.0.1 58192 cb15d722-c706-4bbc-87e2-80e6e2700ba8 /Users/jmcgrath/Library/Caches/IdeaIC2018.3/compile-server
 23429 ttys003    0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn`, nil
 				}
@@ -1178,14 +1176,14 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
 				}
 
 				p.getCmdLineArgs = func(process.Process) (string, error) {
-					// unparseable java executable, insufficient details in cmdLineArgs
+					// unparsable java executable, insufficient details in cmdLineArgs
 					return `/home/duke/jeva HelloWorld -Djava.is.cool`, nil
 				}
 
@@ -1210,13 +1208,13 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
 				}
 				p.cmdExec = func(string, ...string) ([]byte, error) {
-					return []byte(""), errors.New("Duke wuz here")
+					return []byte(""), errors.New("duke wuz here")
 				}
 
 				p.getCmdLineArgs = func(process.Process) (string, error) {
@@ -1246,13 +1244,13 @@ var _ = Describe("JavaJVMVendorsVersions", func() {
 				options = tasks.Options{}
 				p.findProcessByName = func(string) ([]process.Process, error) {
 					return []process.Process{
-						process.Process{
+						{
 							Pid: 1,
 						},
 					}, nil
 				}
 				p.cmdExec = func(string, ...string) ([]byte, error) {
-					return []byte(""), errors.New("Duke wuz here")
+					return []byte(""), errors.New("duke wuz here")
 				}
 
 				p.getCmdLineArgs = func(process.Process) (string, error) {

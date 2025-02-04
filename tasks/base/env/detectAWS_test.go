@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestBaseEnv(t *testing.T) {
@@ -33,7 +33,7 @@ func mockUnsuccessfulRequest400(wrapper httpHelper.RequestWrapper) (*http.Respon
 }
 
 func mockUnSuccessfulRequestErr(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
-	return &http.Response{}, errors.New("Error! This is an error")
+	return &http.Response{}, errors.New("error! This is an error")
 }
 
 var _ = Describe("Base/Env/DetectAWS", func() {

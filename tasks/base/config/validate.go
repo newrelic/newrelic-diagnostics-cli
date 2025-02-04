@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -26,7 +25,7 @@ var quoted = regexp.MustCompile("^['`\"](.*)['`\"]$")
 type BaseConfigValidate struct {
 }
 
-//ValidateElement - the validation that was done against the config
+// ValidateElement - the validation that was done against the config
 type ValidateElement struct {
 	Config       ConfigElement
 	Status       tasks.Status
@@ -35,13 +34,13 @@ type ValidateElement struct {
 }
 
 var (
-	errConfigFileNotParse = errors.New("We cannot parse this file extension for this New Relic config file")
-	errConfigFileNotRead  = errors.New("We ran into an error when trying to read your New Relic config file")
-	errReaderMock         = errors.New("A reader error")
-	errParsingYML         = errors.New("This can mean that you either have incorrect spacing/indentation around this line or that you have a syntax error, such as a missing/invalid character")
+	errConfigFileNotParse = errors.New("we cannot parse this file extension for this New Relic config file")
+	errConfigFileNotRead  = "We ran into an error when trying to read your New Relic config file"
+	errReaderMock         = errors.New("a reader error")
+	errParsingYML         = "This can mean that you either have incorrect spacing/indentation around this line or that you have a syntax error, such as a missing/invalid character"
 )
 
-//MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
+// MarshalJSON - custom JSON marshaling for this task, in this case we ignore the parsed config
 func (el ValidateElement) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		ConfigElement
@@ -155,7 +154,6 @@ func processConfig(config ConfigElement) (ValidateElement, error) {
 
 	//Read file
 	content, err := os.Open(file)
-	defer content.Close()
 	if err != nil {
 		log.Debug("error reading file", err)
 		return ValidateElement{
@@ -164,6 +162,7 @@ func processConfig(config ConfigElement) (ValidateElement, error) {
 			Error:  err.Error(),
 		}, nil
 	}
+	defer content.Close()
 	// initialize variables for data
 	var parsedConfig tasks.ValidateBlob
 
@@ -210,10 +209,10 @@ func processConfig(config ConfigElement) (ValidateElement, error) {
 	}, nil
 }
 
-//ParseYaml - This function reads a yml file to a map that can be searched via the FindString function
+// ParseYaml - This function reads a yml file to a map that can be searched via the FindString function
 func ParseYaml(reader io.Reader) (tasks.ValidateBlob, error) {
 	var t interface{}
-	data, errFile := ioutil.ReadAll(reader)
+	data, errFile := io.ReadAll(reader)
 	if errFile != nil {
 		return tasks.ValidateBlob{}, fmt.Errorf("%v : %v", errConfigFileNotRead, errFile)
 	}
@@ -226,7 +225,7 @@ func ParseYaml(reader io.Reader) (tasks.ValidateBlob, error) {
 }
 
 func parseXML(reader io.Reader) (results tasks.ValidateBlob, err error) {
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return tasks.ValidateBlob{}, fmt.Errorf("%v : %v", errConfigFileNotRead, err)
 	}
@@ -248,7 +247,7 @@ func parseXML(reader io.Reader) (results tasks.ValidateBlob, err error) {
 
 func ParseJSON(reader io.Reader) (result tasks.ValidateBlob, err error) {
 	t := make(map[string]interface{})
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return tasks.ValidateBlob{}, fmt.Errorf("%v : %v", errConfigFileNotRead, err)
 	}
@@ -266,7 +265,7 @@ func ParseJSON(reader io.Reader) (result tasks.ValidateBlob, err error) {
 func ParseJSONarray(reader io.Reader) (result []tasks.ValidateBlob, err error) {
 	var validateBlobs []tasks.ValidateBlob
 	t := []map[string]interface{}{}
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return validateBlobs, fmt.Errorf("%v : %v", errConfigFileNotRead, err)
 	}
@@ -284,58 +283,102 @@ func ParseJSONarray(reader io.Reader) (result []tasks.ValidateBlob, err error) {
 	return validateBlobs, nil
 }
 
-func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
-	tempMap := make(map[string]interface{})
-	//So this function basically reads the newrelic.js and re-constructs the exported json config from the `exports.config=` beyond
-
-	var jsonString []string
-	var isComment bool
-
-	scanner := bufio.NewScanner(reader)
-	scanner.Split(bufio.ScanLines)
-	startComment, _ := regexp.Compile("^[/][*].*$")         // looks for /* at the beginning of lines in the config file to remove lines with comments
-	endComment, _ := regexp.Compile("^.*[*][/]$")           // looks for */ at the end of lines to assist in removal of comments
-	oneLineComment, _ := regexp.Compile("^[/][*].*[*][/]$") // looks for single line comments /* like this */
-	slashComment, _ := regexp.Compile("^[/][/].*$")         // this looks for comments // like this
-
-	for scanner.Scan() {
-		scannerText := strings.TrimSpace(scanner.Text()) // trim leading and trailing whitespace
-		if oneLineComment.MatchString(scannerText) || slashComment.MatchString(scannerText) {
-			// check for one liners first since startComment and endComment both match one liners as well and will mess up the logic below
-			continue
-		}
-		if startComment.MatchString(scannerText) {
-			isComment = true // starts a comment block this and the following lines are ignored until we see */
-			continue
-		}
-		if endComment.MatchString(scannerText) {
-			isComment = false // ends the comment block
-			continue
-		}
-
-		if !isComment {
-			if strings.Contains(scannerText, "use strict") {
-				continue
-			}
-
-			if strings.Contains(scannerText, "=") {
-				t := strings.Split(scannerText, "=")
-				jsonString = append(jsonString, strings.TrimSpace(t[1]))
-				continue
-
-			}
-
-			jsonString = append(jsonString, scannerText)
-
-		}
+// formatJs - Outputs the newrelic.js file into a more parsable format with comments and other non-essential items removed
+func formatJs(jsString string) ([]string, error) {
+	// remove comments that start with //
+	// have to be careful not to remove proxy configs
+	slashCommentRe, err := regexp.Compile(`(?m)(^.*)([/][/].*)$`)
+	if err != nil {
+		return nil, err
 	}
+	quoteRe, err := regexp.Compile("['`\"]")
+	if err != nil {
+		return nil, err
+	}
+	removeSlashComments := slashCommentRe.ReplaceAllFunc([]byte(jsString), func(b []byte) []byte {
+		s := string(b)
+		checkForComment := strings.Split(s, "//")
+		// nothing on the left of the //, whole line is a comment, just remove it
+		if checkForComment[0] == "" {
+			return nil
+		}
+		// check to see if the // is within quotes like 'http://...'
+		quoteCount := len(quoteRe.FindAllStringIndex(checkForComment[0], -1))
+		if quoteCount == 0 || quoteCount%2 == 0 {
+			// not in quotes
+			return []byte(checkForComment[0])
+		}
+		// keep the //, it was in quotes
+		return b
+	})
+	// remove \n and \r
+	removeLineBreaks := strings.ReplaceAll(string(removeSlashComments), "\n", "")
+	removeCarriageReturn := strings.ReplaceAll(removeLineBreaks, "\r", "")
+
+	// remove everything before exports.config =
+	exportObjSplit := strings.Split(removeCarriageReturn, "exports.config =")
+	if len(exportObjSplit) < 2 {
+		return nil, errors.New("failed to parse 'exports.config ='")
+	}
+	exportObj := strings.Split(removeCarriageReturn, "exports.config =")[1]
+
+	// remove /* this type of comment */
+	commentRe, err := regexp.Compile("[/][*].*?[*][/]")
+	if err != nil {
+		return nil, err
+	}
+	removeComments := commentRe.ReplaceAllString(exportObj, "")
+
+	// find start curlies ({) and add a linebreak after it
+	startCurliesRe, err := regexp.Compile("(^{|[^$]{)")
+	if err != nil {
+		return nil, err
+	}
+	fixStartCurlies := startCurliesRe.ReplaceAllString(removeComments, "{\n")
+
+	// fix formatting for arrays, make them multi-line
+	fixStartArrays := strings.ReplaceAll(fixStartCurlies, "[", "[\n")
+	fixEndArrays := strings.ReplaceAll(fixStartArrays, "]", "\n]")
+
+	// add a linebreak after commas
+	fixCommas := strings.ReplaceAll(fixEndArrays, ",", ",\n")
+
+	// create the array and trim whitespace
+	var jsonString []string
+	for _, s := range strings.Split(fixCommas, "\n") {
+		// fix end curlies - only add a line break if { isn't also on the line
+		if strings.Contains(s, "}") && !strings.Contains(s, "{") {
+			fixEndCurlies := strings.ReplaceAll(s, "}", "\n}")
+			splitAgain := strings.Split(fixEndCurlies, "\n")
+			for _, ss := range splitAgain {
+				jsonString = append(jsonString, strings.TrimSpace(ss))
+			}
+			continue
+		}
+		jsonString = append(jsonString, strings.TrimSpace(s))
+	}
+	return jsonString, nil
+}
+
+func parseJs(rawFile io.Reader) (result tasks.ValidateBlob, err error) {
+	jsBytes, err := io.ReadAll(rawFile)
+	if err != nil {
+		return
+	}
+	jsonString, err := formatJs(string(jsBytes))
+	if err != nil {
+		return
+	}
+	log.Debug("Formatted js: ", strings.Join(jsonString, "\n"))
+	tempMap := make(map[string]interface{})
 
 	location := ""
 	arrayLocation := ""
 	var buildarray []string
 
+loop:
 	for lineNum, keyValue := range jsonString {
-		log.Debug("keyvalue", keyValue)
+		log.Debugf("keyValue: `%s`", keyValue)
 		switch keyValue {
 		case "{": //do nothing here
 		case "}", "},":
@@ -351,20 +394,21 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 			buildarray = nil
 
 		case "};":
-			break // end of config, just break the switch
+			break loop // end of config, just break the switch
 
 		case "":
 
 		default:
 			if arrayLocation != "" {
-				log.Debug("creating multi-line array", strings.Replace(keyValue, ",", "", 1))
-				buildarray = append(buildarray, strings.Replace(keyValue, ",", "", 1))
+				log.Debug("creating multi-line array", sanitizeValue(keyValue))
+				buildarray = append(buildarray, sanitizeValue(keyValue))
 				continue // we are in an array, go to next line
 			}
 
 			keyMap := strings.SplitN(keyValue, ":", 2)
-			if len(keyMap) != 2 {
-				log.Debug("Couldn't parse line", lineNum)
+
+			if len(keyMap) != 2 || keyMap[1] == "" {
+				log.Debugf("Couldn't parse line number %d, line text: %v\n", lineNum, keyMap)
 				break
 			}
 
@@ -391,10 +435,8 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 					finalSlice = append(finalSlice, sanitizeValue(value))
 				}
 				tempMap[location+keyMap[0]] = finalSlice
-
 			} else {
 				tempMap[location+keyMap[0]] = sanitizeValue(keyMap[1])
-
 			}
 
 			if strings.TrimSpace(keyMap[1]) == "{" {
@@ -404,7 +446,7 @@ func parseJs(reader io.Reader) (result tasks.ValidateBlob, err error) {
 
 		}
 	}
-	//log.Dump(tempMap)
+
 	return convertToValidateBlob(tempMap), nil
 }
 
@@ -442,13 +484,6 @@ func parseIni(reader io.Reader) (result tasks.ValidateBlob, err error) {
 			t[string(value[1])] = trimQuotes(string(value[3]))
 		}
 	}
-	result = convertToValidateBlob(t)
-	return
-}
-
-func parseGradle(reader io.Reader) (result tasks.ValidateBlob, err error) {
-	t := make(map[string]interface{})
-	log.Debug("Can't parse gradle files yet")
 	result = convertToValidateBlob(t)
 	return
 }
@@ -503,8 +538,6 @@ func iterateMap(parent string, input interface{}) []tasks.ValidateBlob {
 		var b tasks.ValidateBlob
 		b.Key = key
 		b.Path = parent
-
-		log.Debug("value type is ", reflect.TypeOf(value))
 
 		//Add Children if value is a map or slice
 		switch castValue := value.(type) {

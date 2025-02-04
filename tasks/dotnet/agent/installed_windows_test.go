@@ -5,7 +5,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -18,8 +18,8 @@ func mockDllFail(agentPath, profilerPath string) bool {
 
 func successfulUpstream() map[string]tasks.Result {
 	return map[string]tasks.Result{
-		"Base/Config/Validate": tasks.Result{Payload: []config.ValidateElement{
-			config.ValidateElement{
+		"Base/Config/Validate": {Payload: []config.ValidateElement{
+			{
 				Config: config.ConfigElement{FileName: "newrelic.config"},
 			},
 		},
@@ -69,7 +69,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Failure,
 					},
 				}
@@ -89,10 +89,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.yml",
 									FilePath: "",
@@ -117,10 +117,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.config",
 									FilePath: "",
@@ -130,7 +130,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
-					DotNetAgentInstall{
+					{
 						AgentPath:    "fixtures/does_not_exist.dll",
 						ProfilerPath: "fixtures/does_not_exist.dll",
 					},
@@ -151,10 +151,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.config",
 									FilePath: "",
@@ -164,7 +164,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
-					DotNetAgentInstall{
+					{
 						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/does_not_exist.dll",
 					},
@@ -185,10 +185,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.config",
 									FilePath: "",
@@ -198,7 +198,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
-					DotNetAgentInstall{
+					{
 						AgentPath:    "fixtures/does_not_exist.dll",
 						ProfilerPath: "fixtures/file1.dll",
 					},
@@ -219,10 +219,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.config",
 									FilePath: "",
@@ -232,7 +232,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
-					DotNetAgentInstall{
+					{
 						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/file2.dll",
 					},
@@ -253,10 +253,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.config",
 									FilePath: "",
@@ -266,7 +266,7 @@ var _ = Describe("DotNetAgentInstalled", func() {
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
-					DotNetAgentInstall{
+					{
 						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/file2.dll",
 					},
@@ -287,10 +287,10 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic.config",
 									FilePath: "",
@@ -300,11 +300,11 @@ var _ = Describe("DotNetAgentInstalled", func() {
 					},
 				}
 				p.agentInstallPaths = []DotNetAgentInstall{
-					DotNetAgentInstall{ //current agent
+					{ //current agent
 						AgentPath:    "fixtures/file1.dll",
 						ProfilerPath: "fixtures/file1.dll",
 					},
-					DotNetAgentInstall{ //legacy agent
+					{ //legacy agent
 						AgentPath:    "fixtures/file2.dll",
 						ProfilerPath: "fixtures/file2.dll",
 					},

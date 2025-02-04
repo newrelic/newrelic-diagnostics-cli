@@ -3,10 +3,10 @@ package config
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestPHPAgentVersion(t *testing.T) {
@@ -64,7 +64,7 @@ var _ = Describe("PHP/Config/Agent", func() {
 							Key:      "newrelic.enabled",
 							RawValue: "trueskis",
 							Children: []tasks.ValidateBlob{
-								tasks.ValidateBlob{
+								{
 									Key:      "newrelic.license",
 									RawValue: "trueskis",
 								},

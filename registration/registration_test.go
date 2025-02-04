@@ -71,7 +71,7 @@ func TestRegisterAllTasks(t *testing.T) {
 func TestTasksHaveValidExplain(t *testing.T) {
 	for _, regTask := range registeredTasks {
 		explain := regTask.Task.Explain()
-		if (explain == "Explaintory help text displayed for this task" || explain == "This task doesn't go anything") && regTask.Task.Identifier().Category != "Example" {
+		if (explain == "Explanatory help text displayed for this task" || explain == "This task doesn't go anything") && regTask.Task.Identifier().Category != "Example" {
 			t.Error(regTask.Task.Identifier().String(), " still has template Explain() message. Please update with something specific to this task.")
 		}
 	}

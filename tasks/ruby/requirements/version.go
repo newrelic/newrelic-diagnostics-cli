@@ -121,7 +121,7 @@ func sanitizeRubyVersionPayload(rubyVersionPayload string) (string, error) {
 	matchExpression := regexp.MustCompile(`ruby\s([^a-z]+)`)
 	result := matchExpression.FindStringSubmatch(rubyVersionPayload)
 	if len(result) == 0 {
-		return "", errors.New("No found result for Ruby Version when parsing for payload " + rubyVersionPayload)
+		return "", errors.New("no found result for Ruby Version when parsing for payload " + rubyVersionPayload)
 	}
 	rubyVersion := result[1]
 	versionDigits := strings.Split(rubyVersion, ".")
@@ -129,7 +129,7 @@ func sanitizeRubyVersionPayload(rubyVersionPayload string) (string, error) {
 	majorInt, err := strconv.Atoi(versionDigits[0])
 
 	if err != nil {
-		return "", errors.New("No found result for Ruby Version when parsing for payload " + rubyVersionPayload)
+		return "", errors.New("no found result for Ruby Version when parsing for payload " + rubyVersionPayload)
 	}
 
 	if majorInt >= 2 {

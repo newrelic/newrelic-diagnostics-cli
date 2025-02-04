@@ -10,14 +10,20 @@
 		"AutoAttach": false,
 		"ProxySpecified": false,
 		"SkipVersionCheck": false,
+		"Run": false,
+		"ListScripts": false,
 		"Tasks": "",
-		"AttachmentKey": "",
 		"ConfigFile": "",
 		"Override": "",
 		"OutputPath": "",
 		"Filter": "",
 		"BrowserURL": "",
-		"Suites": ""
+		"Suites": "",
+		"APIKey": "",
+		"Include": "",
+		"Region": "",
+		"Script": "",
+		"ScriptFlags": ""
 	},
 	"Results": [
 		{
@@ -41,5 +47,14 @@
 				"Payload": null
 			}
 		}
-	]
+	],
+	"Script": {
+		"Name": "test",
+		"Description": "this is a test",
+		"Output": "test",
+		"OutputFiles": [
+			"/home/test.out"
+		],
+		"OutputTruncated": false
+	}
 }

@@ -6,10 +6,10 @@ import (
 	"errors"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/shirou/gopsutil/process"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 func TestPHPDaemonRunning(t *testing.T) {
@@ -27,27 +27,27 @@ func mockProcessFinderZeroDaemon(name string) ([]process.Process, error) {
 
 func mockProcessFinderOneDaemon(name string) ([]process.Process, error) {
 	return []process.Process{
-		process.Process{Pid: 1},
+		{Pid: 1},
 	}, nil
 }
 
 func mockProcessFinderTwoDaemon(name string) ([]process.Process, error) {
 	return []process.Process{
-		process.Process{Pid: 1},
-		process.Process{Pid: 2},
+		{Pid: 1},
+		{Pid: 2},
 	}, nil
 }
 
 func mockProcessFinderThreeDaemon(name string) ([]process.Process, error) {
 	return []process.Process{
-		process.Process{Pid: 1},
-		process.Process{Pid: 2},
-		process.Process{Pid: 3},
+		{Pid: 1},
+		{Pid: 2},
+		{Pid: 3},
 	}, nil
 }
 
 func mockProcessFinderError(name string) ([]process.Process, error) {
-	return []process.Process{}, errors.New("Couldn't find daemon")
+	return []process.Process{}, errors.New("couldn't find daemon")
 }
 
 func mockFileExistsCheckerTrue(filename string) bool {
@@ -73,7 +73,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -92,7 +92,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 				})
 
 				It("should return an expected Error result summary including error", func() {
-					Expect(result.Summary).To(Equal("Error detecting newrelic-daemon process: Couldn't find daemon"))
+					Expect(result.Summary).To(Equal("Error detecting newrelic-daemon process: couldn't find daemon"))
 				})
 			})
 
@@ -289,7 +289,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -314,7 +314,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Warning,
 					},
 				}
@@ -339,7 +339,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.Error,
 					},
 				}
@@ -364,7 +364,7 @@ var _ = Describe("PHP/Daemon/Running", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"PHP/Config/Agent": tasks.Result{
+					"PHP/Config/Agent": {
 						Status: tasks.None,
 					},
 				}

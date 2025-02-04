@@ -10,7 +10,6 @@ import (
 
 // RubyConfigAgent - This struct defined the sample plugin which can be used as a starting point
 type RubyConfigAgent struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
-	name string
 }
 
 var rubyKeys = []string{

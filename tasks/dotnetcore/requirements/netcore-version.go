@@ -58,10 +58,10 @@ func (t DotNetCoreRequirementsNetCoreVersion) Execute(options tasks.Options, ups
 
 	if len(errorMessage) > 0 {
 		return tasks.Result{
-			Status: tasks.Error,
+			Status:  tasks.Error,
 			Summary: errorMessage,
 		}
-	} 
+	}
 
 	if len(unsupportedVersions) == 0 {
 		return tasks.Result{
@@ -101,5 +101,5 @@ func checkCoreVersionsAreSupported(dotnetCoreInstalledVers []string) ([]string, 
 		//looks like we were unable to parse any version from the slice of strings we received from payload
 		return unsupportedVers, errorMessage
 	}
-	return unsupportedVers, ""//we are going to ignore errorMessage because we were able to parse at least one version from the slice payload
+	return unsupportedVers, "" //we are going to ignore errorMessage because we were able to parse at least one version from the slice payload
 }

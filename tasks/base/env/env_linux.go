@@ -1,4 +1,3 @@
-
 package env
 
 import (
@@ -6,11 +5,16 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-// RegisterWith - will register any plugins in this package
+// RegisterLinuxWith - will register any plugins in this package
 func RegisterLinuxWith(registrationFunc func(tasks.Task, bool)) {
 	log.Debug("Registering Base/Env/*")
 
 	registrationFunc(BaseEnvCheckSELinux{
 		cmdExec: tasks.CmdExecutor,
 	}, true)
+	registrationFunc(BaseEnvRootUser{
+		isUserRoot: tasks.IsUserRoot,
+	}, true)
 }
+
+

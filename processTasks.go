@@ -9,6 +9,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/attach"
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/output"
@@ -18,7 +19,6 @@ import (
 )
 
 func processTasksToRun() {
-
 	log.Debugf("There are %d tasks in this queue\n", len(registration.Work.WorkQueue))
 
 	if config.Flags.Tasks != "" {
@@ -39,7 +39,7 @@ func processTasksToRun() {
 
 		taskIdentifiers := suites.DefaultSuiteManager.FindTasksBySuites(matchedSuites)
 		registration.AddTasksByIdentifiers(taskIdentifiers)
-	} else {
+	} else if !config.Flags.Run { // only run all tasks if not running a script
 		registration.AddAllToQueue()
 	}
 	log.Debugf("There are %d tasks in this queue\n", len(registration.Work.WorkQueue))
@@ -65,7 +65,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 		log.Debug("Running :", task.Identifier())
 		log.Debug("Incoming options are", options)
 
-		// Check for dependancies on the task and include results if dependent
+		// Check for dependencies on the task and include results if dependent
 		dependentResults := make(map[string]tasks.Result)
 		for _, depIdent := range task.Dependencies() {
 			log.Debug("dependency for processing: ", depIdent)
@@ -76,7 +76,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 		for _, value := range overrides {
 			// Initialize the taskOptions object
 			log.Debugf("override %s: %s", value.Identifier, value.value)
-			if strings.ToLower(value.Identifier.String()) == strings.ToLower(task.Identifier().String()) {
+			if strings.EqualFold(value.Identifier.String(), task.Identifier().String()) {
 				log.Debug("Adding override to task namedTaskOptions", value.key, ":", value.value)
 				namedTaskOptions.Options[value.key] = value.value
 			}
@@ -159,7 +159,7 @@ func processFlagsTasks(flagValue string) []string {
 func getLicenseKey(thisResult tasks.Result) ([]string, error) {
 	licenseKeyToSources, ok := thisResult.Payload.(map[string][]string)
 	if !ok {
-		return nil, fmt.Errorf("Unable to retrieve license Key")
+		return nil, fmt.Errorf("unable to retrieve license Key")
 	}
 	log.Debug("Valid License Key(s) provided")
 	validLicenseKeys := []string{}
@@ -171,7 +171,6 @@ func getLicenseKey(thisResult tasks.Result) ([]string, error) {
 }
 
 func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error) {
-
 	suiteIdentifiers := sanitizeAndParseFlagValue(flagValue)
 	sanitizedArgs := sanitizeOSArgs(args)
 
@@ -204,13 +203,7 @@ func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error)
 func processUploads() {
 	log.Debug("processing uploads")
 
-	//if neither attachment flags are provided
-	if config.Flags.AttachmentKey == "" && !config.Flags.AutoAttach {
-		log.Info("No attachment process specified")
-		return
-	}
-
-	//get timestamp to use for both types of attachments
+	//get timestamp to use attachment
 	timestamp := time.Now().UTC().Format(time.RFC3339)
 
 	if config.Flags.YesToAll {
@@ -218,25 +211,24 @@ func processUploads() {
 		return
 	}
 
-	question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
-		"Do you want to upload these to your RPM Account/Support Ticket?"
-	if promptUser(question) {
-		checkAttachmentFlags(timestamp)
+	if config.Flags.APIKey != "" || config.Flags.AutoAttach {
+		question := "We've created nrdiag-output.zip and nrdiag-output.json\n" +
+			"Do you want to upload these to your New Relic account?"
+		if promptUser(question) {
+			checkAttachmentFlags(timestamp)
+		}
 	}
-
 }
 
 func checkAttachmentFlags(timestamp string) {
-
 	var ValidLicenseKeys []string
+	attachDeps := new(attach.AttachDeps)
 
-	//check for ticket attachment key and upload with that key
-	if config.Flags.AttachmentKey != "" {
-		log.Info("Uploading files by Support Ticket Attachment Key...")
-		Upload(config.Flags.AttachmentKey, timestamp)
-	}
-	//check for validated license keys and upload with those keys
-	if config.Flags.AutoAttach {
+	if config.Flags.APIKey != "" {
+		//hit DAS
+		apiKey := config.Flags.APIKey
+		attach.Upload("upload_api", apiKey, timestamp, attachDeps)
+	} else if config.Flags.AutoAttach { //check for validated license keys and upload with those keys
 		for _, taskResult := range registration.Work.Results {
 			if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status == tasks.Success {
 				LicenseKeys, err := getLicenseKey(taskResult.Result)
@@ -248,13 +240,15 @@ func checkAttachmentFlags(timestamp string) {
 				}
 
 			} else if taskResult.Task.Identifier().String() == "Base/Config/ValidateLicenseKey" && taskResult.Result.Status != tasks.Success {
-				log.Info("No valid license keys specified, upload to RPM Account cannot be completed")
+				log.Info("No valid license keys specified, upload to New Relic Account cannot be completed")
 				return
 			}
 		}
 		for _, licenseKey := range ValidLicenseKeys {
-			log.Info("Uploading files by RPM Account ID...")
-			Upload(licenseKey, timestamp)
+			log.Info("Uploading files by Account ID...")
+			attachDeps := new(attach.AttachDeps)
+			attach.Upload("upload_s3", licenseKey, timestamp, attachDeps)
+
 		}
 	}
 }

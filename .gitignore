@@ -19,3 +19,9 @@ replacement.txt
 .git.bfg-report/
 #Rusty hog
 hog.out
+#goenv
+.go-version
+#coverage file
+coverage.out
+# local history 
+.history

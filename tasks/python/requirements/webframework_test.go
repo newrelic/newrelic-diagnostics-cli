@@ -3,9 +3,9 @@ package requirements
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Python/Requirements/Webframework", func() {
@@ -26,8 +26,8 @@ var _ = Describe("Python/Requirements/Webframework", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Check web framework compatibility with New Relic Python agent"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Check web framework compatibility with New Relic Python agent"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -54,7 +54,7 @@ var _ = Describe("Python/Requirements/Webframework", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Python/Env/Dependencies": tasks.Result{
+					"Python/Env/Dependencies": {
 						Status: tasks.Failure,
 					},
 				}
@@ -74,7 +74,7 @@ var _ = Describe("Python/Requirements/Webframework", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Python/Env/Dependencies": tasks.Result{
+					"Python/Env/Dependencies": {
 						Status:  tasks.Info,
 						Payload: []int{1, 2, 3},
 					},

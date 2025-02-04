@@ -3,9 +3,9 @@ package env
 import (
 	"errors"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Node/Env/NpmVersion", func() {
@@ -71,7 +71,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 					},
 				}
@@ -94,12 +94,12 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 					},
 				}
 				p.npmVersionGetter = func(tasks.CmdExecFunc) (string, error) {
-					return "", errors.New("Burrito error")
+					return "", errors.New("burrito error")
 				}
 			})
 
@@ -108,7 +108,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			})
 
 			It("should return an error message", func() {
-				Expect(result.Summary).To(Equal("Unable to execute command: $ npm -v. Error: Burrito error"))
+				Expect(result.Summary).To(Equal("Unable to execute command: $ npm -v. Error: burrito error"))
 			})
 		})
 
@@ -117,7 +117,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Env/Version": tasks.Result{
+					"Node/Env/Version": {
 						Status: tasks.Info,
 					},
 				}
@@ -170,7 +170,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 
 			BeforeEach(func() {
 				mockCommandExecutor = func(name string, arg ...string) ([]byte, error) {
-					return []byte(""), errors.New("Fancy Burrito error")
+					return []byte(""), errors.New("fancy Burrito error")
 				}
 			})
 
@@ -179,7 +179,7 @@ var _ = Describe("Node/Env/NpmVersion", func() {
 			})
 
 			It("Should return expected error", func() {
-				Expect(resultError.Error()).To(Equal("Fancy Burrito error"))
+				Expect(resultError.Error()).To(Equal("fancy Burrito error"))
 			})
 		})
 

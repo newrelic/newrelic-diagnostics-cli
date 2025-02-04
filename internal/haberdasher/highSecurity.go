@@ -7,14 +7,14 @@ type HSMrequest struct {
 
 // HSMresponse is the top-level response body structure from the /tasks/hsm endpoint
 type HSMresponse struct {
-	Success bool               `json:"success"`
-	Data    []HSMresult 	   `json:"data"`
+	Success bool        `json:"success"`
+	Data    []HSMresult `json:"data"`
 }
 
 // HSMresult is the response body -> "data" structure from the /tasks/hsm endpoint
 type HSMresult struct {
-	LicenseKey string   `json:"licenseKey"`
-	IsEnabled    bool   `json:"result"`
+	LicenseKey string `json:"licenseKey"`
+	IsEnabled  bool   `json:"result"`
 }
 
 // CheckHSM will reach out to the Haberdasher API to check the HSM state for the account associated with a license key
@@ -34,4 +34,3 @@ func (s *TasksService) CheckHSM(licenseKeys []string) ([]HSMresult, *Response, e
 
 	return HSMresponse.Data, resp, err
 }
-

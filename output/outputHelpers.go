@@ -3,8 +3,8 @@ package output
 import (
 	"archive/zip"
 	"encoding/json"
+	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,7 +13,9 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -24,19 +26,65 @@ type resultsOutput struct {
 	NRDiagVersion string
 	Configuration interface{}
 	Results       []registration.TaskResult
+	Script        *scriptResultsOutput
 }
+
+type scriptResultsOutput struct {
+	Name            string
+	Description     string
+	Output          string
+	OutputFiles     []string
+	OutputTruncated bool
+}
+
+type (
+	writeFunction func(path string, info os.FileInfo, zipfile *zip.Writer) error
+)
 
 // wee bit of a hack for testing
 var OutputNow = time.Now
+var MaxScriptOutputLen = 20000
 
-//getResultsJSON takes in array of Result structs along with bool for indentation to be users. Outputs JSON of Results array -- if indented is true, output is nicely formatted.
-func getResultsJSON(data []registration.TaskResult) string {
+func getAbsPath(path string) string {
+	scriptOutputAbsPath, err := filepath.Abs(path)
+	if err != nil {
+		return path
+	}
+	return scriptOutputAbsPath
+}
 
+func getTruncatedScriptOutputString(output []byte) (string, bool) {
+	if len(output) < MaxScriptOutputLen {
+		return string(output), false
+	}
+	return string(output[:MaxScriptOutputLen]), true
+}
+
+// getResultsJSON takes in array of Result structs along with bool for indentation to be users. Outputs JSON of Results array -- if indented is true, output is nicely formatted.
+func getResultsJSON(data []registration.TaskResult, scriptResults *scriptrunner.ScriptData) string {
+	var scriptOutput *scriptResultsOutput
+	if scriptResults != nil {
+		scriptOutputString, isTruncated := getTruncatedScriptOutputString(scriptResults.Output)
+		scriptOutputFiles := []string{getAbsPath(scriptResults.OutputPath)}
+		if len(scriptResults.AddtlFiles) > 0 {
+			for _, f := range scriptResults.AddtlFiles {
+				scriptOutputFiles = append(scriptOutputFiles, getAbsPath(f))
+			}
+		}
+		scriptOutput = &scriptResultsOutput{
+			Name:            scriptResults.Name,
+			Description:     scriptResults.Description,
+			Output:          scriptOutputString,
+			OutputTruncated: isTruncated,
+			OutputFiles:     scriptOutputFiles,
+		}
+	}
 	outputData := resultsOutput{
 		RunDate:       OutputNow(),
 		NRDiagVersion: config.Version,
 		Configuration: config.Flags,
 		Results:       data,
+		Script:        scriptOutput,
 	}
 
 	output, err := json.MarshalIndent(outputData, "", "	")
@@ -44,12 +92,6 @@ func getResultsJSON(data []registration.TaskResult) string {
 		log.Info("Couldn't save JSON output: ", err)
 	}
 	return string(output)
-}
-
-//getEpoch returns epoch time (at time of fn call) as an int64
-func getEpoch() int64 {
-	now := time.Now().UTC().UnixNano()
-	return (now / 1000000)
 }
 
 func outputJSON(json string) {
@@ -60,7 +102,7 @@ func outputJSON(json string) {
 		log.Info("Error creating directory", err)
 		log.Info(permissionsError)
 	}
-	ioutil.WriteFile(jsonFile, []byte(json), 0644)
+	_ = os.WriteFile(jsonFile, []byte(json), 0644)
 }
 
 func CreateZip() *zip.Writer {
@@ -96,8 +138,9 @@ func mapContains(set map[string]struct{}, item string) bool {
 
 // CopyFilesToZip - Copies files to the zip archive
 func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
-
 	for _, envelope := range filesToZip {
+		//Add filepath and name to text file
+		addFileToFileList(envelope)
 
 		if envelope.Stream != nil {
 			header := zip.FileHeader{
@@ -107,7 +150,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 			writer, _ := dst.CreateHeader(&header)
 			for s := range envelope.Stream {
-				io.WriteString(writer, s)
+				_, _ = io.WriteString(writer, s)
 			}
 		} else {
 			log.Debug("adding " + envelope.Path + " to zip")
@@ -115,21 +158,20 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			stat, err := os.Stat(envelope.Path)
 			if err != nil {
 				log.Info("Error adding file to Diagnostics CLI zip file: ", err)
-				return
+				continue
 			}
 			// open file handle
 			fileHandle, err := os.Open(envelope.Path)
-			defer fileHandle.Close()
-
 			if err != nil {
 				log.Info("Error opening file handle", err)
-				return
+				continue
 			}
+			defer fileHandle.Close()
 
 			header, err := zip.FileInfoHeader(stat)
 			if err != nil {
 				log.Info("Error copying file", err)
-				return
+				continue
 			}
 			// Setting filename to deduplicated file name
 			header.Name = envelope.StoreName()
@@ -145,7 +187,7 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 
 			if err != nil {
 				log.Info("Error writing results to zip file: ", err)
-				return
+				continue
 			}
 
 			_, err = io.Copy(writer, fileHandle)
@@ -153,9 +195,6 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 				log.Info("Error writing file into zip: ", err)
 			}
 		}
-
-		//Add filepath and name to text file
-		addFileToFileList(envelope)
 	}
 }
 
@@ -173,7 +212,7 @@ func addFileToFileList(file tasks.FileCopyEnvelope) {
 	}
 }
 
-//filteredResult - Checks if a result status (e.g. "Warning") was passed in the -filter flag. Returns a boolean
+// filteredResult - Checks if a result status (e.g. "Warning") was passed in the -filter flag. Returns a boolean
 func filteredResult(result string) bool {
 	lowercaseFilter := strings.Replace(strings.ToLower(config.Flags.Filter), " ", "", -1)
 
@@ -191,7 +230,7 @@ func filteredResult(result string) bool {
 	return false
 }
 
-//filteredToString - Takes an array of ints corresponding to the 5 statuses, with a counter for each: array[status] = status count
+// filteredToString - Takes an array of ints corresponding to the 5 statuses, with a counter for each: array[status] = status count
 // returns a string summary of instances:
 // IN: [3,1,0,0,2]
 // OUT: 3 Success, 1 Warning, 2 None
@@ -203,4 +242,72 @@ func filteredToString(filtered [6]int) string {
 		}
 	}
 	return strings.Join(outputStrings, ", ")
+}
+
+// CreateFileList - Create output file and wipe out if it already exists
+func CreateFileList() error {
+	err := os.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte(""), 0644)
+	if err != nil {
+		return err
+	} else {
+		_ = os.WriteFile(config.Flags.OutputPath+"/nrdiag-filelist.txt", []byte("List of files in zipfile"), 0644)
+	}
+	return nil
+}
+
+func WalkSizeFunction(info os.FileInfo) int64 {
+	return info.Size()
+}
+func WalkCopyFunction(path string, info os.FileInfo, err error, zipfile *zip.Writer, writeToZip writeFunction) error {
+	if err != nil {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
+		return err
+	}
+	if info.IsDir() {
+		return nil
+	}
+	if strings.HasSuffix(info.Name(), ".exe") {
+		log.Infof(color.ColorString(color.Yellow, "Could not add %s to zip.\n"), path)
+		log.Info(color.ColorString(color.Yellow, "Executable files are not allowed to be included in the zip.\n"))
+		return errors.New("cannot add executable files")
+	}
+
+	ok := writeToZip(path, info, zipfile)
+	if ok != nil {
+		return ok
+	}
+
+	log.Infof("Adding file to Diagnostics CLI zip file: %s\n", path)
+	addFileToFileList(tasks.FileCopyEnvelope{
+		Path: path,
+	})
+
+	return nil
+}
+
+func WriteFileToZip(path string, info os.FileInfo, zipfile *zip.Writer) error {
+	file, ok := os.Open(path)
+	if ok != nil {
+		return ok
+	}
+	defer file.Close()
+
+	header, ok := zip.FileInfoHeader(info)
+	if ok != nil {
+		log.Info("Error copying file", ok)
+		return ok
+	}
+
+	header.Name = filepath.ToSlash("nrdiag-output/Include/" + path)
+	header.Method = zip.Deflate
+	writer, ok := zipfile.CreateHeader(header)
+	if ok != nil {
+		log.Info("Error writing results to zip file: ", ok)
+		return ok
+	}
+	_, ok = io.Copy(writer, file)
+	if ok != nil {
+		return ok
+	}
+	return nil
 }

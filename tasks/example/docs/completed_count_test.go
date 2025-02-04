@@ -5,10 +5,10 @@ package docs
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/log"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestBaseLogCount(t *testing.T) {
@@ -34,8 +34,8 @@ var _ = Describe("Base/Log/Count", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Count log files collected."
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Count log files collected."
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -62,7 +62,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status: tasks.Failure,
 					},
 				}
@@ -82,7 +82,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status:  tasks.Success,
 						Payload: "This should be of type []LogElement, but it's a string instead",
 					},
@@ -103,7 +103,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status: tasks.Info,
 						Payload: []log.LogElement{
 							{
@@ -129,7 +129,7 @@ var _ = Describe("Base/Log/Count", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Log/Collect": tasks.Result{
+					"Base/Log/Collect": {
 						Status:  tasks.Info,
 						Payload: []log.LogElement{},
 					},

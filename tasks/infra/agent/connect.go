@@ -3,12 +3,12 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"io"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"golang.org/x/exp/maps"
 )
 
 // InfraAgentConnect - This struct tests the connector to Infrastructure
@@ -16,11 +16,8 @@ type InfraAgentConnect struct {
 	httpGetter requestFunc
 }
 
-type requestFunc func(wrapper httpHelper.RequestWrapper) (*http.Response, error)
-
-//RequestResult - contains HTTP response and error status data, Id is to distinguish requests from many, in this case region
+// RequestResult - contains HTTP response and error status data, Id is to distinguish requests from many, in this case region
 type RequestResult struct {
-	Id         string
 	URL        string
 	Status     string
 	StatusCode int
@@ -49,15 +46,21 @@ func (p InfraAgentConnect) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p InfraAgentConnect) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-
-	regionURLs := map[string]string{
-		"us01": "https://infra-api.newrelic.com",
-		"eu01": "https://infra-api.eu01.nr-data.net",
+	domains := map[string]string{
+		"us01": ".newrelic.com",
+		"eu01": ".eu.newrelic.com",
+	}
+	endpoints := []string{
+		"infra-api",
+		"identity-api",
+		"infrastructure-command-api",
+		"log-api",
+		"metric-api",
 	}
 
 	var result tasks.Result
 	var requestResults map[string]RequestResult
-	requestURLs := make(map[string]string)
+	var requestURLs []string
 
 	if upstream["Infra/Config/Agent"].Status != tasks.Success {
 		result.Status = tasks.None
@@ -68,10 +71,10 @@ func (p InfraAgentConnect) Execute(options tasks.Options, upstream map[string]ta
 	regions, ok := upstream["Base/Config/RegionDetect"].Payload.([]string)
 
 	if (!ok) || len(regions) == 0 {
-		requestURLs = regionURLs
+		requestURLs = buildRequestURLs(endpoints, maps.Values(domains)...)
 	} else {
 		for _, region := range regions {
-			requestURLs[region] = regionURLs[region]
+			requestURLs = append(requestURLs, buildRequestURLs(endpoints, domains[region])...)
 		}
 	}
 
@@ -81,15 +84,26 @@ func (p InfraAgentConnect) Execute(options tasks.Options, upstream map[string]ta
 	return tasks.Result{
 		Status:  status,
 		Summary: summary,
-		URL:     "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks",
+		URL:     "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks/#infrastructure",
 		Payload: requestURLs,
 	}
 }
 
-func makeRequests(urls map[string]string, HTTPagent requestFunc) map[string]RequestResult {
+func buildRequestURLs(endpoints []string, domains ...string) []string {
+	var urls []string
+	for _, domain := range domains {
+		for _, endpoint := range endpoints {
+			url := "https://" + endpoint + domain
+			urls = append(urls, url)
+		}
+	}
+	return urls
+}
+
+func makeRequests(urls []string, HTTPagent requestFunc) map[string]RequestResult {
 	var requestResults = make(map[string]RequestResult)
 
-	for id, url := range urls {
+	for _, url := range urls {
 		var body []byte
 		var status string
 		var statusCode int
@@ -105,16 +119,15 @@ func makeRequests(urls map[string]string, HTTPagent requestFunc) map[string]Requ
 		if err == nil {
 			status = response.Status
 			statusCode = response.StatusCode
-			body, err = ioutil.ReadAll(response.Body)
+			body, err = io.ReadAll(response.Body)
 
 			if err != nil {
-				err = errors.New("Read error - There was an issue reading the body: " + err.Error())
+				err = errors.New("read error - There was an issue reading the body: " + err.Error())
 			}
 			response.Body.Close()
 		}
 
-		requestResults[id] = RequestResult{
-			Id:         id,
+		requestResults[url] = RequestResult{
 			URL:        url,
 			Status:     status,
 			StatusCode: statusCode,
@@ -128,18 +141,18 @@ func makeRequests(urls map[string]string, HTTPagent requestFunc) map[string]Requ
 
 func validateResponses(requestResults map[string]RequestResult) (string, tasks.Status) {
 	var summary string
-	for id, requestResult := range requestResults {
-		log.Debug(id)
+	for url, requestResult := range requestResults {
+		log.Debug(url)
 		if requestResult.Err != nil {
-			summary += "\nThere was an error connecting to " + requestResult.URL
+			summary += "\nThere was an error connecting to " + url
 			summary += "\nPlease check network and proxy settings and try again or see -help for more options."
 			summary += "\nError = " + requestResult.Err.Error()
 			return summary, tasks.Failure
 		} else if requestResult.StatusCode == 404 {
 			log.Debug("Successfully connected")
-			summary += fmt.Sprintf(" Successfully connected to %s Infrastructure API endpoint.", id)
+			summary += fmt.Sprintf(" Successfully connected to %s.", url)
 		} else {
-			summary += fmt.Sprintf(" Was not able to connect to the Infrastructure API endpoint. Unexpected Response: %d %s ", requestResult.StatusCode, requestResult.Status)
+			summary += fmt.Sprintf(" Was not able to connect to %s. Unexpected Response: %d %s ", url, requestResult.StatusCode, requestResult.Status)
 			return summary, tasks.Failure
 		}
 	}

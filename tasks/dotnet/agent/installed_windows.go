@@ -6,17 +6,17 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-// Paths to check for agent DLLs. Order of this slice indicates priority of returned install when multiple 
+// Paths to check for agent DLLs. Order of this slice indicates priority of returned install when multiple
 // agent installs are detected.
-var agentInstallPaths = []DotNetAgentInstall {
+var agentInstallPaths = []DotNetAgentInstall{
 	// DLL paths for .NET agent >= 8.19
-	DotNetAgentInstall{ 
-		AgentPath:  `C:\Program Files\New Relic\.NET Agent\netframework\NewRelic.Agent.Core.dll`, 
+	{
+		AgentPath:    `C:\Program Files\New Relic\.NET Agent\netframework\NewRelic.Agent.Core.dll`,
 		ProfilerPath: `C:\Program Files\New Relic\.NET Agent\netframework\NewRelic.Profiler.dll`,
 	},
 	// DLL paths for .NET agent < 8.19
-	DotNetAgentInstall{ 
-		AgentPath: `C:\Program Files\New Relic\.NET Agent\NewRelic.Agent.Core.dll`, 
+	{
+		AgentPath:    `C:\Program Files\New Relic\.NET Agent\NewRelic.Agent.Core.dll`,
 		ProfilerPath: `C:\Program Files\New Relic\.NET Agent\NewRelic.Profiler.dll`,
 	},
 }
@@ -28,7 +28,7 @@ type DotNetAgentInstalled struct {
 
 // DotNetAgentInstall - Contains information about .NET agent install detected on system.
 type DotNetAgentInstall struct {
-	AgentPath string
+	AgentPath    string
 	ProfilerPath string
 }
 
@@ -60,7 +60,7 @@ func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string
 	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
 	if !ok {
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: tasks.AssertionErrorSummary,
 		}
 	}
@@ -74,20 +74,20 @@ func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string
 		agentInstall, ok := findAgentInstall(p.agentInstallPaths)
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Failure,
+				Status:  tasks.Failure,
 				Summary: "Could NOT find one or more dlls required by the .Net Agent. Either the .NET Agent is not installed or missing essential dlls. Try running the installer to resolve the issue.",
 			}
 		}
 
 		return tasks.Result{
-			Status: tasks.Success,
+			Status:  tasks.Success,
 			Summary: "Found dlls required by the .NET Agent",
 			Payload: agentInstall,
 		}
 	}
 
 	return tasks.Result{
-		Status: tasks.None,
+		Status:  tasks.None,
 		Summary: tasks.NoAgentDetectedSummary,
 	}
 }

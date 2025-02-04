@@ -4,10 +4,10 @@ import (
 	"errors"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestInfraLogCollect(t *testing.T) {
@@ -38,7 +38,7 @@ var _ = Describe("Infra/Log/Collect", func() {
 
 	Describe("Dependencies()", func() {
 		It("Should return expected dependencies", func() {
-			Expect(p.Dependencies()).To(Equal([]string{"Infra/Config/Agent", "Base/Config/Validate"}))
+			Expect(p.Dependencies()).To(Equal([]string{"Infra/Config/Agent", "Base/Config/Validate", "Base/Env/CollectEnvVars"}))
 		})
 	})
 
@@ -56,7 +56,7 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -73,10 +73,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Failure,
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -85,7 +85,7 @@ var _ = Describe("Infra/Log/Collect", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return the correct summary", func() {
-				Expect(result.Summary).To(Equal("Not executing task. Infra config file not found."))
+				Expect(result.Summary).To(Equal("New Relic Infrastructure agent log file path not found in the configuration file or environment variables."))
 			})
 		})
 
@@ -93,21 +93,21 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status:  tasks.Success,
 						Payload: "not []config.ValidateElement like it should be",
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 			})
 
 			It("Should return a none result", func() {
-				Expect(result.Status).To(Equal(tasks.Error))
+				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return the correct summary", func() {
-				Expect(result.Summary).To(Equal(tasks.AssertionErrorSummary))
+				Expect(result.Summary).To(Equal("New Relic Infrastructure agent log file path not found in the configuration file or environment variables."))
 			})
 		})
 
@@ -115,10 +115,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -130,13 +130,13 @@ var _ = Describe("Infra/Log/Collect", func() {
 							},
 						},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 				p.validatePaths = func([]string) []tasks.CollectFileStatus {
 					return []tasks.CollectFileStatus{
-						tasks.CollectFileStatus{
+						{
 							Path:     "/var/log/newrelic-infra/newrelic-infra.log",
 							IsValid:  true,
 							ErrorMsg: nil,
@@ -171,10 +171,10 @@ var _ = Describe("Infra/Log/Collect", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -186,13 +186,13 @@ var _ = Describe("Infra/Log/Collect", func() {
 							},
 						},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 				p.validatePaths = func([]string) []tasks.CollectFileStatus {
 					return []tasks.CollectFileStatus{
-						tasks.CollectFileStatus{
+						{
 							Path:     "/var/log/newrelic-infra/newrelic-infra.log",
 							IsValid:  false,
 							ErrorMsg: errors.New("stat /var/log/newrelic-infra/newrelic-infra.log: no such file or directory"),
@@ -202,8 +202,8 @@ var _ = Describe("Infra/Log/Collect", func() {
 			})
 
 			It("Should return a warning status and message", func() {
-				expectedSummary := `The log file path found in the New Relic config file ("/var/log/newrelic-infra/newrelic-infra.log") did not provide a file that was accessible to us:
-"stat /var/log/newrelic-infra/newrelic-infra.log: no such file or directory"
+				expectedSummary := `The log file path found (/var/log/newrelic-infra/newrelic-infra.log) did not provide a file that was accessible to us:
+stat /var/log/newrelic-infra/newrelic-infra.log: no such file or directory
 If you are working with a support ticket, manually provide your New Relic log file for further troubleshooting`
 				Expect(result.Status).To(Equal(tasks.Warning))
 				Expect(result.Summary).To(Equal(expectedSummary))
@@ -215,10 +215,10 @@ If you are working with a support ticket, manually provide your New Relic log fi
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
-							config.ValidateElement{
+							{
 								Config: config.ConfigElement{
 									FileName: "newrelic-infra.yml",
 									FilePath: "/etc/",
@@ -226,7 +226,7 @@ If you are working with a support ticket, manually provide your New Relic log fi
 							},
 						},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -235,22 +235,23 @@ If you are working with a support ticket, manually provide your New Relic log fi
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("New Relic Infrastructure configuration file did not specify log file path"))
+				Expect(result.Summary).To(Equal("New Relic Infrastructure agent log file path not found in the configuration file or environment variables."))
 			})
 
 		})
 	})
-	Describe("getLogFilePaths()", func() {
+	Describe("getLogFilePaths() with old log file configuration option", func() {
 		var (
 			result            []string
 			parsedConfigFiles []config.ValidateElement
+			envVars           map[string]string
 		)
 		JustBeforeEach(func() {
-			result = getLogFilePaths(parsedConfigFiles)
+			result = p.getLogFilePaths(parsedConfigFiles, envVars)
 		})
 		Context("When given a slice of validate elements containing log file entries", func() {
 			parsedConfigFiles = []config.ValidateElement{
-				config.ValidateElement{
+				{
 					Config: config.ConfigElement{
 						FileName: "newrelic-infra.yml",
 						FilePath: "/etc/",
@@ -263,6 +264,48 @@ If you are working with a support ticket, manually provide your New Relic log fi
 			}
 			It("Should return a slice of log_file paths", func() {
 				expectedResult := []string{"/var/log/messages"}
+				Expect(result).To(Equal(expectedResult))
+			})
+		})
+
+	})
+	Describe("getLogFilePaths() with new log file configuration option", func() {
+		var (
+			result            []string
+			parsedConfigFiles []config.ValidateElement
+			envVars           map[string]string
+		)
+		JustBeforeEach(func() {
+			result = p.getLogFilePaths(parsedConfigFiles, envVars)
+		})
+		Context("When given a slice of validate elements containing log file entries", func() {
+			parsedConfigFiles = []config.ValidateElement{
+				{
+					Config: config.ConfigElement{
+						FileName: "newrelic-infra.yml",
+						FilePath: "/etc/",
+					},
+					ParsedResult: tasks.ValidateBlob{
+						Key:      "log/file",
+						RawValue: "/var/log/newrelic-infra/newrelic-infra.log",
+					},
+				},
+			}
+			p.findFiles = func([]string, []string) []string {
+				return []string{
+					"/var/log/newrelic-infra/newrelic-infra.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_11-12-04.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_12-12-03.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-11_12-12-03.log.gz",
+				}
+			}
+			It("Should return a slice of log_file paths", func() {
+				expectedResult := []string{
+					"/var/log/newrelic-infra/newrelic-infra.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_11-12-04.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-15_12-12-03.log",
+					"/var/log/newrelic-infra/newrelic-infra_2022-07-11_12-12-03.log.gz",
+				}
 				Expect(result).To(Equal(expectedResult))
 			})
 		})

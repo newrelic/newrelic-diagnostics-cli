@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -54,7 +54,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -74,7 +74,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -83,21 +83,21 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 					return []string{"/foo/bar"}
 				}
 				p.getFileVersion = func(string) (string, error) {
-					return "", errors.New("I'm a little teapot")
+					return "", errors.New("i'm a little teapot")
 				}
 			})
 			It("Should return Warning status", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("OWIN dlls detected but unable to confirm OWIN version. See debug logs for more information on error. Version returned I'm a little teapot"))
+				Expect(result.Summary).To(Equal("OWIN dlls detected but unable to confirm OWIN version. See debug logs for more information on error. Version returned i'm a little teapot"))
 			})
 		})
 		Context("With Owin dll present but error validating supported version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -120,7 +120,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}
@@ -143,7 +143,7 @@ var _ = Describe("Dotnet/Requirements/OwinCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{Status: tasks.Success},
+					"DotNet/Agent/Installed": {Status: tasks.Success},
 				}
 				p.getWorkingDirectories = func() []string {
 					return []string{}

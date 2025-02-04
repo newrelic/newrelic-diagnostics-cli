@@ -51,11 +51,11 @@ func (p InfraConfigAgent) Dependencies() []string {
 // Execute - The core work within each task
 func (p InfraConfigAgent) Execute(options tasks.Options, upstream map[string]tasks.Result) (result tasks.Result) { //By default this task is commented out. To see it run go to the tasks/registerTasks.go file and uncomment the w.Register for this task
 
-	if upstream["Base/Config/Validate"].HasPayload(){
+	if upstream["Base/Config/Validate"].HasPayload() {
 		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 		if !ok {
 			return tasks.Result{
-				Status: tasks.Error,
+				Status:  tasks.Error,
 				Summary: tasks.AssertionErrorSummary,
 			}
 		}
@@ -64,7 +64,7 @@ func (p InfraConfigAgent) Execute(options tasks.Options, upstream map[string]tas
 		if checkValidationTrue {
 			log.Debug("Identified Infra from validated config file, setting Infra to true")
 			return tasks.Result{
-				Status: tasks.Success,
+				Status:  tasks.Success,
 				Summary: "Infra agent identified as present on system from validated config file",
 				Payload: infraValidation,
 			}
@@ -94,7 +94,7 @@ func (p InfraConfigAgent) Execute(options tasks.Options, upstream map[string]tas
 				validationResults = append(validationResults, infraItem)
 			}
 			return tasks.Result{
-				Status: tasks.Success,
+				Status:  tasks.Success,
 				Summary: "Infra agent identified as present on system from parsed config file",
 				Payload: validationResults,
 			}
@@ -107,13 +107,13 @@ func (p InfraConfigAgent) Execute(options tasks.Options, upstream map[string]tas
 	if binaryFound {
 		log.Debug("Identified Infra from binary, setting Infra to true")
 		return tasks.Result{
-			Status: tasks.Success,
+			Status:  tasks.Success,
 			Summary: "Infra agent identified as present on system from existence of binary file: " + binaryFilename,
 		}
 	}
 	log.Debug("No Infra agent found on system")
 	return tasks.Result{
-		Status: tasks.None,
+		Status:  tasks.None,
 		Summary: tasks.NoAgentDetectedSummary,
 	}
 }

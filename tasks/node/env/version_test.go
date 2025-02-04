@@ -3,9 +3,9 @@ package env
 import (
 	"errors"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Node/Env/Version", func() {
@@ -48,7 +48,7 @@ var _ = Describe("Node/Env/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -65,7 +65,7 @@ var _ = Describe("Node/Env/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -86,7 +86,7 @@ var _ = Describe("Node/Env/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -106,7 +106,7 @@ var _ = Describe("Node/Env/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -119,14 +119,14 @@ var _ = Describe("Node/Env/Version", func() {
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("An issue occur while parsing node version: Unable to convert  to an integer"))
+				Expect(result.Summary).To(Equal("An issue occur while parsing node version: unable to convert  to an integer"))
 			})
 		})
 		Context("When node -v returns the expected string", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Node/Config/Agent": tasks.Result{
+					"Node/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -138,7 +138,7 @@ var _ = Describe("Node/Env/Version", func() {
 			It("Should return a success status", func() {
 				Expect(result.Status).To(Equal(tasks.Info))
 			})
-			It("Should return a succesful summary", func() {
+			It("Should return a successful summary", func() {
 				Expect(result.Summary).To(Equal("v10.7.0"))
 			})
 

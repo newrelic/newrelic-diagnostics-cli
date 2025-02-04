@@ -2,20 +2,20 @@ package env
 
 import (
 	"context"
-	"strconv"
-	"time"
 	"fmt"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"strconv"
+	"time"
 )
 
 // BaseEnvHostInfo - Gets information on a host
 type BaseEnvHostInfo struct {
-	HostInfoProvider HostInfoProviderFunc
+	HostInfoProvider            HostInfoProviderFunc
 	HostInfoProviderWithContext HostInfoProviderWithContextFunc
 }
 
-//On Windows, you can specify a timeout with '-o Base/Env/HostInfo.timeout=N', where N is a number between 1 and 60. The default timeout is 3 seconds.
+// On Windows, you can specify a timeout with '-o Base/Env/HostInfo.timeout=N', where N is a number between 1 and 60. The default timeout is 3 seconds.
 // set some consts for max, min and default timeout
 const TimeoutMax = 60
 const TimeoutMin = 1
@@ -62,7 +62,6 @@ func (t BaseEnvHostInfo) Execute(options tasks.Options, upstream map[string]task
 	return
 }
 
-
 func (t BaseEnvHostInfo) getInfo(timeout time.Duration) (result tasks.Result) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -70,15 +69,15 @@ func (t BaseEnvHostInfo) getInfo(timeout time.Duration) (result tasks.Result) {
 	hostInfo, err := t.HostInfoProviderWithContext(ctx)
 
 	if err != nil {
-		return tasks.Result {
-			Status: tasks.Warning,
+		return tasks.Result{
+			Status:  tasks.Warning,
 			Summary: fmt.Sprintf("Error collecting complete host information:\n%s", err.Error()),
 			Payload: hostInfo,
 		}
 	}
-	
-	return tasks.Result {
-		Status: tasks.Info,
+
+	return tasks.Result{
+		Status:  tasks.Info,
 		Summary: "Collected host information",
 		Payload: hostInfo,
 	}

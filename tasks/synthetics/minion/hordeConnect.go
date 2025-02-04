@@ -1,7 +1,7 @@
 package minion
 
 import (
-	"io/ioutil"
+	"io"
 	"strconv"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
@@ -17,7 +17,6 @@ type HTTPResponse struct {
 }
 
 type SyntheticsMinionHordeConnect struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
-	name string
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -62,12 +61,12 @@ func (p SyntheticsMinionHordeConnect) Execute(options tasks.Options, upstream ma
 	case 200:
 		if err != nil {
 			result.Status = tasks.Warning
-			result.Summary = "Succesful connection to synthetics-horde.nr-data.net with current settings, but unable to parse response body"
-			result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks#synthetics-private"
+			result.Summary = "Successful connection to synthetics-horde.nr-data.net with current settings, but unable to parse response body"
+			result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 			return result
 		}
 		result.Status = tasks.Success
-		result.Summary = "Succesful connection to synthetics-horde.nr-data.net with current settings"
+		result.Summary = "Successful connection to synthetics-horde.nr-data.net with current settings"
 
 	case 403:
 		if upstream["Synthetics/Minion/ConfigValidate"].Status != tasks.Success {
@@ -82,11 +81,11 @@ func (p SyntheticsMinionHordeConnect) Execute(options tasks.Options, upstream ma
 	case -7:
 		result.Status = tasks.Failure
 		result.Summary = "Unable to complete request to synthetics-horde.nr-data.net: " + err.Error()
-		result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks#synthetics-private"
+		result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 	default:
 		result.Status = tasks.Failure
 		result.Summary = "Expected 200 response. Received: " + strconv.Itoa(hordeResponse.ResponseCode)
-		result.URL = "https://docs.newrelic.com/docs/apm/new-relic-apm/getting-started/networks#synthetics-private"
+		result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks#synthetics-private"
 	}
 
 	return result
@@ -117,7 +116,7 @@ func hordeRequest(privateLocationKey string) (HTTPResponse, error) {
 	defer resp.Body.Close()
 
 	httpResponse.ResponseCode = resp.StatusCode
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	// Check for error parsing response body
 	if err != nil {
 		return httpResponse, err

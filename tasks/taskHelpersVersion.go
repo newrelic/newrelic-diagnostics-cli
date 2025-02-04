@@ -18,20 +18,21 @@ type Ver struct {
 
 // VersionIsCompatibleFunc - allows VersionIsCompatible to be dependency injected
 type VersionIsCompatibleFunc func(string, []string) (bool, error)
+
 // VersionIsCompatible checks a version against a slice of compatibility requirements.
 // It accepts as input a string version (one or more numbers separated by periods) and a slice of compatibility requirements.
 // Individual compatibility requirements can be expressed as a range ("4.0-7.4"), as a single ("8.0"), or a minimum ("4.9+")
 // It returns a boolean indicating compatibility and an error in cases of invalid input.
 func VersionIsCompatible(version string, requirements []string) (bool, error) {
-	
+
 	versionToCheck, err := ParseVersion(version)
 	if err != nil {
-		return false, errors.New("Unable to parse version: " + version)
+		return false, errors.New("unable to parse version: " + version)
 	}
 	return versionToCheck.CheckCompatibility(requirements)
 }
 
-// CheckCompatibility takes a slice of string compatibilty requirements and
+// CheckCompatibility takes a slice of string compatibility requirements and
 // returns a bool indicating whether the receiver is compatible.
 // Any unsupplied version components will default to zero, e.g. "8" becomes "8.0.0.0"
 // Individual compatibility requirements can be expressed as follows:
@@ -42,7 +43,7 @@ func VersionIsCompatible(version string, requirements []string) (bool, error) {
 // Single version only ("7") - Match this version only:  matches "7", "7.0", "7.0.0" but not "7.1" or "7.0.2"
 
 func (v Ver) CheckCompatibility(requirements []string) (bool, error) {
-	
+
 	for _, requirement := range requirements {
 		// Convert plus sign to lower boundary + infinity for upper boundary
 		if strings.Contains(requirement, "+") {
@@ -59,17 +60,17 @@ func (v Ver) CheckCompatibility(requirements []string) (bool, error) {
 		reqsToCheck := strings.Split(requirement, "-")
 		// Handle cases like 5-7.5+ or the ever-possible 3-6-9.4
 		if len(reqsToCheck) > 2 {
-			return false, errors.New("Received a range with too many values: " + requirement)
+			return false, errors.New("received a range with too many values: " + requirement)
 		}
 
 		minReq, err := ParseVersion(reqsToCheck[0])
 		if err != nil {
-			return false, errors.New("Unable to parse version: " + reqsToCheck[0])
+			return false, errors.New("unable to parse version: " + reqsToCheck[0])
 		}
 
 		maxReq, err := ParseVersion(reqsToCheck[1])
 		if err != nil {
-			return false, errors.New("Unable to parse version: " + reqsToCheck[1])
+			return false, errors.New("unable to parse version: " + reqsToCheck[1])
 		}
 		if v.IsGreaterThanEq(minReq) && v.IsLessThanEq(maxReq) {
 			return true, nil
@@ -123,7 +124,7 @@ func (v Ver) IsLessThanEq(max Ver) bool {
 	return false
 }
 
-//String() returns string representation of version struct: Maj.Min.P.B
+// String() returns string representation of version struct: Maj.Min.P.B
 func (v Ver) String() string {
 	return fmt.Sprintf("%d.%d.%d.%d", v.Major, v.Minor, v.Patch, v.Build)
 }
@@ -157,7 +158,7 @@ func ParseVersion(version string) (Ver, error) {
 		} else {
 			intNum, ierr = strconv.Atoi(num)
 			if ierr != nil {
-				return emptyVersion, errors.New("Unable to convert " + num + " to an integer")
+				return emptyVersion, errors.New("unable to convert " + num + " to an integer")
 			}
 		}
 
@@ -175,14 +176,14 @@ func ParseVersion(version string) (Ver, error) {
 	return parsedVersion, nil
 }
 
-// VersionsJoin takes in a slice of Ver structs and delimeter and returns
-// a string of all versions in the slice, joined on that delimeter
-func VersionsJoin(versions []Ver, delimeter string) string {
+// VersionsJoin takes in a slice of Ver structs and delimiter and returns
+// a string of all versions in the slice, joined on that delimiter
+func VersionsJoin(versions []Ver, delimiter string) string {
 	var temp []string
 
 	for _, v := range versions {
 		temp = append(temp, v.String())
 	}
 
-	return strings.Join(temp, delimeter)
+	return strings.Join(temp, delimiter)
 }

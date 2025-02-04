@@ -3,13 +3,14 @@ package env
 import (
 	"strings"
 
-	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/domain/repository"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
 // PythonEnvVersion - The struct defines the Python version.
+
 type PythonEnvVersion struct {
-	cmdExec tasks.CmdExecFunc
+	iPythonEnvVersion repository.IPythonEnvVersion
 }
 
 // Identifier - This returns the Category, Subcategory and Name of this task.
@@ -38,42 +39,64 @@ func (p PythonEnvVersion) Execute(options tasks.Options, upstream map[string]tas
 		result.Summary = "Python Agent not installed. This task didn't run."
 		return result
 	}
-	return p.checkPythonVersion()
+	// pythonDeps := new(PythonDeps)
+	return p.RunPythonCommands()
+
 }
 
-func (p PythonEnvVersion) checkPythonVersion() (result tasks.Result) {
+func (p PythonEnvVersion) RunPythonCommands() tasks.Result {
+	var errorsToReturn []string
+	var successesToReturn []string
+	var payloadToReturn []string
+	result_1 := p.iPythonEnvVersion.CheckPythonVersion("python")
+	if result_1.Status == tasks.Error {
+		errorsToReturn = append(errorsToReturn, result_1.Summary)
+	} else {
+		successesToReturn = append(successesToReturn, result_1.Summary)
+		convertedPayload, pyOk := result_1.Payload.(string)
+		if !pyOk {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: "Error parsing the Python Version.",
+			}
+		}
+		payloadToReturn = append(payloadToReturn, convertedPayload)
 
-	versionRaw, cmdBuildErr := p.cmdExec("python", "--version")
-
-	if cmdBuildErr != nil {
-		result.Status = tasks.Error
-		result.Summary = "Unable to execute command: $ python --version. Error: " + cmdBuildErr.Error()
-		result.URL = "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic"
-		return
 	}
-
-	versionString, isValid := parsePythonVersion(versionRaw)
-	if !isValid {
-		result.Status = tasks.Error
-		result.Summary = "Unable to detect installed Python version. "
-		result.URL = "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic"
-		return
+	result_2 := p.iPythonEnvVersion.CheckPythonVersion("python3")
+	if result_2.Status == tasks.Error {
+		errorsToReturn = append(errorsToReturn, result_2.Summary)
+	} else {
+		successesToReturn = append(successesToReturn, result_2.Summary)
+		convertedPayload, pyOk := result_2.Payload.(string)
+		if !pyOk {
+			return tasks.Result{
+				Status:  tasks.Error,
+				Summary: "Error parsing the Python Version.",
+			}
+		}
+		payloadToReturn = append(payloadToReturn, convertedPayload)
 	}
+	errorStr := strings.Join(errorsToReturn, "\n")
+	successStr := strings.Join(successesToReturn, "\n")
+	if len(errorsToReturn) == 2 {
+		return tasks.Result{
+			Status:  tasks.Error,
+			Summary: errorStr,
+			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+		}
+	} else if len(errorsToReturn) > 0 {
 
-	result.Summary = versionString
-	result.Status = tasks.Info
-	result.Payload = versionString
-
-	return
-}
-
-func parsePythonVersion(versionRaw []byte) (string, bool) {
-	versionString := strings.TrimSpace(string(versionRaw))
-	if strings.HasPrefix(versionString, "Python ") {
-		versionString = strings.TrimPrefix(versionString, "Python ")
-		log.Debug("Python version found. Version is: " + versionString)
-		return versionString, true
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: errorStr + "\n" + successStr,
+			Payload: payloadToReturn,
+			URL:     "https://docs.newrelic.com/docs/agents/python-agent/getting-started/compatibility-requirements-python-agent#basic",
+		}
 	}
-
-	return "", false
+	return tasks.Result{
+		Status:  tasks.Success,
+		Summary: successStr,
+		Payload: payloadToReturn,
+	}
 }

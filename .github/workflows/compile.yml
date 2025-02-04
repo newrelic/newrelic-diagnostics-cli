@@ -2,9 +2,9 @@ name: Compiling
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   # nrdiag binaries must compile on all of our supported OSes
@@ -12,8 +12,7 @@ jobs:
     strategy:
       matrix:
         go-version:
-           - 1.13.x
-          #  - 1.14.x
+           - 1.18.x
         platform:
           - ubuntu-latest
           - macos-latest

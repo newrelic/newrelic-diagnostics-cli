@@ -1,18 +1,39 @@
 package agent
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
+	"time"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
+var (
+	githubAPIReleaseURL   = "https://api.github.com/repos/newrelic/infrastructure-agent/releases/tags/"
+	oldestGithubRelease   = tasks.Ver{Major: 1, Minor: 12, Patch: 0, Build: 0}
+	errUnsupportedVersion = fmt.Errorf("New Relic Infrastructure Agent version unsupported, installed agent was released more than two years ago")
+	errRecommendedUpgrade = fmt.Errorf("New Relic Infrastructure Agent upgrade is recommended, installed agent was released more than one year ago")
+)
+
+type githubReleaseData struct {
+	PublishedAt string `json:"published_at"`
+}
+
 // InfraAgentVersion - This struct defines the Infrastructure agent version task
 type InfraAgentVersion struct {
 	runtimeOS   string
+	httpGetter  requestFunc
+	now         func() time.Time
 	cmdExecutor func(name string, arg ...string) ([]byte, error)
+}
+
+// yearsBetween returns the years between two given dates
+func yearsBetween(firstDate time.Time, secondDate time.Time) int64 {
+	return int64((firstDate.Sub(secondDate).Hours()) / 24 / 365)
 }
 
 // Identifier - This returns the Category, Subcategory and Name of each task
@@ -97,6 +118,19 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
+	err = p.validatePublishDate(ver)
+	if err != nil {
+		urlUpdateTask := tasks.Result{
+			URL:     "https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/update-infrastructure-agent",
+			Summary: err.Error(),
+			Status:  tasks.Warning,
+		}
+		if errors.Is(err, errUnsupportedVersion) {
+			urlUpdateTask.Status = tasks.Failure
+		}
+		return urlUpdateTask
+	}
+
 	return tasks.Result{
 		Status:  tasks.Info,
 		Summary: matches[1],
@@ -117,11 +151,11 @@ func (p InfraAgentVersion) getInfraVersion(binaryPath string) (string, error) {
 
 func (p InfraAgentVersion) getBinaryPath(envVars map[string]string) (string, error) {
 	var binaryPath string
-	//binary path in Windows: C:\Program Files\New Relic\newrelic-infra\newrelic-infra.exe 
+	//binary path in Windows: C:\Program Files\New Relic\newrelic-infra\newrelic-infra.exe
 	if p.runtimeOS == "windows" {
 		sysProgramFiles, ok := envVars["ProgramFiles"]
 		if !ok {
-			return "", errors.New("ProgramFiles environment variable not set")
+			return "", errors.New("environment variable not set: ProgramFiles")
 		}
 		binaryPath = sysProgramFiles + `\New Relic\newrelic-infra\newrelic-infra.exe`
 	} else {
@@ -129,4 +163,49 @@ func (p InfraAgentVersion) getBinaryPath(envVars map[string]string) (string, err
 	}
 
 	return binaryPath, nil
+}
+
+// validatePublishDate returns an error if the version was released more than one year ago
+func (p InfraAgentVersion) validatePublishDate(version tasks.Ver) error {
+	// Github releases started on version 1.12.0
+	if version.IsLessThanEq(oldestGithubRelease) {
+		return errUnsupportedVersion
+	}
+
+	publishData, err := p.getGithubPublishDate(fmt.Sprintf("%d.%d.%d", version.Major, version.Minor, version.Patch))
+	if err != nil {
+		return fmt.Errorf("Unable to get New Relic Infrastructure Agent release date: %w", err)
+	}
+
+	years := yearsBetween(p.now(), publishData)
+	if years >= 2 {
+		return errUnsupportedVersion
+	} else if years == 1 {
+		return errRecommendedUpgrade
+	}
+
+	return nil
+}
+
+func (p InfraAgentVersion) getGithubPublishDate(version string) (time.Time, error) {
+	wrapper := httpHelper.RequestWrapper{
+		Method:         "GET",
+		URL:            githubAPIReleaseURL + version,
+		TimeoutSeconds: 30,
+	}
+
+	response, err := p.httpGetter(wrapper)
+	if err != nil {
+		return time.Time{}, err
+	}
+	defer response.Body.Close()
+
+	var apiData githubReleaseData
+
+	err = json.NewDecoder(response.Body).Decode(&apiData)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return time.Parse(time.RFC3339, apiData.PublishedAt)
 }

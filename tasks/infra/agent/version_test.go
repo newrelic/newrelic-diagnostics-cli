@@ -3,11 +3,16 @@ package agent
 // Tests for Infra/Config/IntegrationsCollect
 
 import (
+	"bytes"
 	"errors"
+	"io/ioutil"
+	"net/http"
+	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -29,8 +34,8 @@ var _ = Describe("Infra/Agent/Version", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Determine version of New Relic Infrastructure agent"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Determine version of New Relic Infrastructure agent"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -57,11 +62,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.None,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -81,11 +86,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: "I should be a map[string]string{}, but I'm a string",
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -105,11 +110,11 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.None,
 					},
 				}
@@ -129,17 +134,23 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 				p.runtimeOS = "darwin"
+				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+					return &http.Response{
+						Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2022-11-17T10:50:43Z"}`))),
+					}, nil
+				}
+				p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
 				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
-					return []byte("New Relic Infrastructure Agent version: 1.5.40"), nil
+					return []byte("New Relic Infrastructure Agent version: 1.14.0"), nil
 				}
 
 			})
@@ -149,7 +160,42 @@ var _ = Describe("Infra/Agent/Version", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("1.5.40"))
+				Expect(result.Summary).To(Equal("1.14.0"))
+			})
+		})
+
+		Context("Infrastructure agent is present and with unsupported version", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Env/CollectEnvVars": {
+						Status:  tasks.Info,
+						Payload: map[string]string{},
+					},
+					"Infra/Config/Agent": {
+						Status: tasks.Success,
+					},
+				}
+				p.runtimeOS = "darwin"
+				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+					return &http.Response{
+						Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2020-11-17T10:50:43Z"}`))),
+					}, nil
+				}
+				p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
+				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
+					return []byte("New Relic Infrastructure Agent version: 1.13.0"), nil
+				}
+
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal(errUnsupportedVersion.Error()))
 			})
 		})
 
@@ -158,17 +204,17 @@ var _ = Describe("Infra/Agent/Version", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
 				p.runtimeOS = "windows"
 				p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
-					return []byte("New Relic Infrastructure Agent version: 1.5.40"), nil
+					return []byte("New Relic Infrastructure Agent version: 1.13.0"), nil
 				}
 
 			})
@@ -178,20 +224,20 @@ var _ = Describe("Infra/Agent/Version", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Unable to determine New Relic Infrastructure binary path: ProgramFiles environment variable not set"))
+				Expect(result.Summary).To(Equal("Unable to determine New Relic Infrastructure binary path: environment variable not set: ProgramFiles"))
 			})
 		})
 
-		Context("Infrastructure agent is present but -version returns unparseable result", func() {
+		Context("Infrastructure agent is present but -version returns unparsable result", func() {
 
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Payload: map[string]string{},
 					},
-					"Infra/Config/Agent": tasks.Result{
+					"Infra/Config/Agent": {
 						Status: tasks.Success,
 					},
 				}
@@ -215,17 +261,17 @@ var _ = Describe("Infra/Agent/Version", func() {
 				BeforeEach(func() {
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Info,
 							Payload: map[string]string{},
 						},
-						"Infra/Config/Agent": tasks.Result{
+						"Infra/Config/Agent": {
 							Status: tasks.Success,
 						},
 					}
 					p.runtimeOS = "linux"
 					p.cmdExecutor = func(a string, b ...string) ([]byte, error) {
-						return []byte(""), errors.New("Fromlet was defrobozticated")
+						return []byte(""), errors.New("fromlet was defrobozticated")
 					}
 
 				})
@@ -235,19 +281,19 @@ var _ = Describe("Infra/Agent/Version", func() {
 				})
 
 				It("should return an expected result summary", func() {
-					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': Fromlet was defrobozticated"))
+					Expect(result.Summary).To(Equal("New Relic Infrastructure Agent version could not be determined because Diagnostics CLI encountered this issue when running the command 'newrelic-infra -version': fromlet was defrobozticated"))
 				})
 			})
-			Context("Infrastructure agent is present but version check returns unparseable version string", func() {
+			Context("Infrastructure agent is present but version check returns unparsable version string", func() {
 
 				BeforeEach(func() {
 					options = tasks.Options{}
 					upstream = map[string]tasks.Result{
-						"Base/Env/CollectEnvVars": tasks.Result{
+						"Base/Env/CollectEnvVars": {
 							Status:  tasks.Info,
 							Payload: map[string]string{},
 						},
-						"Infra/Config/Agent": tasks.Result{
+						"Infra/Config/Agent": {
 							Status: tasks.Success,
 						},
 					}
@@ -300,6 +346,43 @@ var _ = Describe("Infra/Agent/Version", func() {
 
 				It("should expect the newrelic-infra binary to exist in the PATH", func() {
 					Expect(result).To(Equal(`newrelic-infra`))
+				})
+			})
+		})
+
+		Describe("validatePublishDate()", func() {
+
+			var (
+				version tasks.Ver
+				err     error
+			)
+
+			JustBeforeEach(func() {
+				err = p.validatePublishDate(version)
+			})
+			Context("Version prior to 1.12.0", func() {
+				BeforeEach(func() {
+					version = tasks.Ver{Major: 1, Minor: 11, Patch: 0, Build: 0}
+				})
+
+				It("should return unsupported version error", func() {
+					Expect(err).To(Equal(errUnsupportedVersion))
+				})
+			})
+
+			Context("Up-to-date version", func() {
+				BeforeEach(func() {
+					version = tasks.Ver{Major: 1, Minor: 33, Patch: 0, Build: 0}
+					p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+						return &http.Response{
+							Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2021-11-22T10:50:43Z"}`))),
+						}, nil
+					}
+					p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
+				})
+
+				It("should not return an error", func() {
+					Expect(err).To(BeNil())
 				})
 			})
 		})

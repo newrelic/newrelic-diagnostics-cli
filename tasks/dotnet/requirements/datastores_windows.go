@@ -14,9 +14,9 @@ type DotnetRequirementsDatastores struct {
 	getFileVersion        tasks.GetFileVersionFunc
 }
 
-//This data type will store and track info on the different datastores
-//This allows for the logic to be agnostic to the requirements of the
-//individual datastore requrements, only the structs for a database should need to change if requirements change
+// This data type will store and track info on the different datastores
+// This allows for the logic to be agnostic to the requirements of the
+// individual datastore requirements, only the structs for a database should need to change if requirements change
 type dataStore struct {
 	name        string
 	version     string
@@ -26,9 +26,9 @@ type dataStore struct {
 
 //Datastore names and slice defined here for easier updating if agent requirements change and passing between funcs
 
-//Names of dlls to check.
-//No check for MS SQL as it's in the system.data.dll,
-//which can be there even with out MS SQL being used by the app.
+// Names of dlls to check.
+// No check for MS SQL as it's in the system.data.dll,
+// which can be there even with out MS SQL being used by the app.
 var couchBaseName = "CouchbaseNetClient.dll"
 var couchBaseVersion = []string{"2+"}
 var ibmDb2Name = "IBM.Data.DB2.dll"
@@ -115,7 +115,7 @@ func (p DotnetRequirementsDatastores) Execute(options tasks.Options, upstream ma
 	}
 
 	if cntBadVersion == 0 && cntNoVersion == 0 {
-		//sucess
+		//success
 		return tasks.Result{
 			Status:  tasks.Success,
 			Summary: "All datastores detected as compatible, see plugin.json for more details.",
@@ -150,8 +150,8 @@ func (p DotnetRequirementsDatastores) Execute(options tasks.Options, upstream ma
 	}
 }
 
-//Most data stores will add one or more dlls to an apps bin dir
-//Checking for these is a strong indicator that an app is using the db
+// Most data stores will add one or more dlls to an apps bin dir
+// Checking for these is a strong indicator that an app is using the db
 func (p DotnetRequirementsDatastores) findDlls() []string {
 
 	dataStoreNames := []string{
@@ -203,7 +203,7 @@ func (p DotnetRequirementsDatastores) processFoundDatastoreDlls(dllsFound []stri
 
 }
 
-//Define functions to check version below
+// Define functions to check version below
 func checkMongoVer(version string) bool {
 	compatible, _ := tasks.VersionIsCompatible(version, mongoVersion)
 	return compatible

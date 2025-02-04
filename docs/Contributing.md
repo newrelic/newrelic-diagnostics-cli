@@ -32,7 +32,7 @@ For more information about CLAs, please check out Alex Russell’s excellent pos
 
 ## Slack
 
-We host a public Slack with a dedicated channel for contributors and maintainers of open source projects hosted by New Relic.  If you are contributing to this project, you're welcome to request access to the #oss-contributors channel in the newrelicusers.slack.com workspace.  To request access, see https://newrelicusers-signup.herokuapp.com/.
+We host a public Slack with a dedicated channel for contributors and maintainers of open source projects hosted by New Relic.  If you are contributing to this project, you're welcome to request access to the #oss-contributors channel in the newrelicusers.slack.com workspace.  To request access, please use this [link](https://join.slack.com/t/newrelicusers/shared_invite/zt-1ayj69rzm-~go~Eo1whIQGYnu3qi15ng).
 
 ## Developing for the Diagnostics CLI
 
@@ -47,7 +47,7 @@ We host a public Slack with a dedicated channel for contributors and maintainers
 #### Go Version Support
 
 We'll aim to support the latest supported release of Go, along with the
-previous release (this project is using Go 1.14).  This doesn't mean that building with an older version of Go
+previous release (this project is using Go 1.18).  This doesn't mean that building with an older version of Go
 will not work, but we don't intend to support a Go version in this project that
 is not supported by the larger Go community.  Please see the [Go
 releases](https://golang.org/doc/go1.14) page for more details.

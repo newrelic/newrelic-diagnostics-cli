@@ -11,19 +11,19 @@ import (
 var supportedVersions = map[string][]string{
 
 	// any version supported
-	"bottle":   []string{"0+"},
-	"cherrypy": []string{"0+"},
-	"django":   []string{"0+"},
-	"falcon":   []string{"0+"},
-	"flask":    []string{"0+"},
-	"pylons":   []string{"0+"},
-	"pyramid":  []string{"0+"},
-	"sanic":    []string{"0+"},
-	"web2py":   []string{"0+"},
+	"bottle":   {"0+"},
+	"cherrypy": {"0+"},
+	"django":   {"0+"},
+	"falcon":   {"0+"},
+	"flask":    {"0+"},
+	"pylons":   {"0+"},
+	"pyramid":  {"0+"},
+	"sanic":    {"0+"},
+	"web2py":   {"0+"},
 
 	// specific versions supported
-	"tornado": []string{"6.0+"},
-	"aiohttp": []string{"2.2+"},
+	"tornado": {"6.0+"},
+	"aiohttp": {"2.2+"},
 }
 
 // PythonRequirementsWebframework - This struct defines the Webframework requirement.
@@ -90,7 +90,7 @@ func checkWebframework(pipFreezeOutput []string) (result tasks.Result) {
 			if err != nil {
 				log.Debugf("Encountered %s while attempting to parse the framework version.", err)
 			}
-			if v == true {
+			if v {
 				compatibleCustomerFrameworks = append(compatibleCustomerFrameworks, pipFreezeOutputItem)
 
 			}

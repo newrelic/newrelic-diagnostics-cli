@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -46,7 +46,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Failure,
 					},
 				}
@@ -62,12 +62,12 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
 				p.osGetwd = func() (string, error) {
-					return "", errors.New("This is an error")
+					return "", errors.New("this is an error")
 				}
 			})
 			It("should return an expected result status", func() {
@@ -81,7 +81,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -103,7 +103,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -128,7 +128,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -139,7 +139,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 					return []string{"/foo/app.config"}
 				}
 				p.returnStringInFile = func(string, string) ([]string, error) {
-					return nil, errors.New("This is a special news announcement")
+					return nil, errors.New("this is a special news announcement")
 				}
 			})
 			It("should return an expected result status", func() {
@@ -153,7 +153,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -181,7 +181,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -207,7 +207,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -233,7 +233,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -260,7 +260,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -292,7 +292,7 @@ var _ = Describe("Dotnet/Env/TargetVersion", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}

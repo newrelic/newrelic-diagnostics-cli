@@ -198,7 +198,7 @@ func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
 	for _, key := range jmxKeys {
 		foundkey := jmxConfigPair.Configuration.ParsedResult.FindKey(key)
 		if len(foundkey) > 1 {
-			return JmxConfig{}, fmt.Errorf("Multiple key %s found", key)
+			return JmxConfig{}, fmt.Errorf("multiple key %s found", key)
 		}
 
 		for _, fieldValue := range foundkey {
@@ -219,7 +219,7 @@ func processJMXFiles(jmxConfigPair *IntegrationFilePair) (JmxConfig, error) {
 
 	//collection_files is minimum required key for jmx-config.yml
 	if jmxExtractedConfig.CollectionFiles == "" {
-		return JmxConfig{}, errors.New("Invalid configuration found: collection_files not set")
+		return JmxConfig{}, errors.New("invalid configuration found: collection_files not set")
 	}
 
 	return jmxExtractedConfig, nil
@@ -257,7 +257,7 @@ func (p InfraConfigValidateJMX) checkJMXServer(detectedConfig JmxConfig) error {
 	output, err := p.mCmdExecutor(cmd1, cmd2)
 	log.Debug("output", string(output))
 	//nrjmx returns an error exit code (in err) and the meaningful error in output if there is a failure connecting
-	//if nrjmx is not installed, output will be empty and the meaninful msg will be in err
+	//if nrjmx is not installed, output will be empty and the meaningful msg will be in err
 	if err != nil {
 		if len(output) == 0 {
 			return err

@@ -2,15 +2,13 @@ package tasks
 
 import (
 	"errors"
-	"io/ioutil"
-	"log"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"sort"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -20,12 +18,6 @@ func TestTaskHelpers(t *testing.T) {
 }
 
 func TestValidateBlob_FindKeyByPath(t *testing.T) {
-	type fields struct {
-		Key      string
-		Path     string
-		RawValue interface{}
-		Children []ValidateBlob
-	}
 	tests := []struct {
 		name       string
 		fields     ValidateBlob
@@ -35,8 +27,8 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 		{"Find key by exact path match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			"/Production/key2",
 			ValidateBlob{Key: "key2", Path: "/Production"},
@@ -44,12 +36,12 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 		{"Find key by deep path match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+									{Key: "enabled", Path: "/Production/agent_enabled"},
 								}},
 						}},
 				}},
@@ -59,8 +51,8 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 		{"Fail to find key by partial path match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			"/Production/",
 			ValidateBlob{},
@@ -68,8 +60,8 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 		{"Fail to find key by key only ",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			"key2",
 			ValidateBlob{},
@@ -77,8 +69,8 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 		{"Empty result from invalid path",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			"/Production/my_awesome_key",
 			ValidateBlob{},
@@ -104,12 +96,6 @@ func TestValidateBlob_FindKeyByPath(t *testing.T) {
 }
 
 func TestValidateBlob_FindKey(t *testing.T) {
-	type fields struct {
-		Key      string
-		Path     string
-		RawValue interface{}
-		Children []ValidateBlob
-	}
 	tests := []struct {
 		name        string
 		fields      ValidateBlob
@@ -119,49 +105,49 @@ func TestValidateBlob_FindKey(t *testing.T) {
 		{"Find key by exact key match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			"key2",
 			[]ValidateBlob{
-				ValidateBlob{Key: "key2", Path: "/Production"},
+				{Key: "key2", Path: "/Production"},
 			},
 		},
 		{"Find key by deep path match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+									{Key: "enabled", Path: "/Production/agent_enabled"},
 								}},
 						}},
 				}},
 			"enabled",
 			[]ValidateBlob{
-				ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+				{Key: "enabled", Path: "/Production/agent_enabled"},
 			},
 		},
 		{"Find key match with nested object",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{
+					{
 						Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "key1", Path: "/Production"},
-							ValidateBlob{Key: "key2", Path: "/Production"},
+							{Key: "key1", Path: "/Production"},
+							{Key: "key2", Path: "/Production"},
 						},
 					},
 				}},
 			"Production",
 			[]ValidateBlob{
-				ValidateBlob{
+				{
 					Key: "Production", Path: "/",
 					Children: []ValidateBlob{
-						ValidateBlob{Key: "key1", Path: "/Production"},
-						ValidateBlob{Key: "key2", Path: "/Production"},
+						{Key: "key1", Path: "/Production"},
+						{Key: "key2", Path: "/Production"},
 					},
 				},
 			},
@@ -169,8 +155,8 @@ func TestValidateBlob_FindKey(t *testing.T) {
 		{"Empty result from invalid key",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			"my_awesome_key",
 			nil, //This is nil because of how DeepEqual interacts on empty slices
@@ -178,18 +164,18 @@ func TestValidateBlob_FindKey(t *testing.T) {
 		{"Find key by deep path match from map object",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+									{Key: "enabled", Path: "/Production/agent_enabled"},
 								}},
 						}},
 				}},
 			"enabled",
 			[]ValidateBlob{
-				ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+				{Key: "enabled", Path: "/Production/agent_enabled"},
 			},
 		},
 	}
@@ -209,12 +195,6 @@ func TestValidateBlob_FindKey(t *testing.T) {
 }
 
 func TestValidateBlob_UpdateKey(t *testing.T) {
-	type fields struct {
-		Key      string
-		Path     string
-		RawValue interface{}
-		Children []ValidateBlob
-	}
 	type args struct {
 		searchKey        string
 		replacementValue interface{}
@@ -228,37 +208,37 @@ func TestValidateBlob_UpdateKey(t *testing.T) {
 		{"Update key by exact key match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production", RawValue: "teststring1"},
-					ValidateBlob{Key: "key2", Path: "/Production", RawValue: "teststring2"},
+					{Key: "key1", Path: "/Production", RawValue: "teststring1"},
+					{Key: "key2", Path: "/Production", RawValue: "teststring2"},
 				}},
 			args{searchKey: "/Production/key2", replacementValue: "teststringAWESOME"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production", RawValue: "teststring1"},
-					ValidateBlob{Key: "key2", Path: "/Production", RawValue: "teststringAWESOME"},
+					{Key: "key1", Path: "/Production", RawValue: "teststring1"},
+					{Key: "key2", Path: "/Production", RawValue: "teststringAWESOME"},
 				}},
 		},
 		{"Return original ValidateBlob by partial key match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+									{Key: "enabled", Path: "/Production/agent_enabled"},
 								}},
 						}},
 				}},
 			args{searchKey: "enabled", replacementValue: "stuff"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+									{Key: "enabled", Path: "/Production/agent_enabled"},
 								}},
 						}},
 				}},
@@ -266,24 +246,24 @@ func TestValidateBlob_UpdateKey(t *testing.T) {
 		{"Update key with deep nested object",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "initial"},
+									{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "initial"},
 								}},
 						}},
 				}},
 			args{searchKey: "/Production/agent_enabled/enabled", replacementValue: "value1"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "value1", Children: nil},
+									{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "value1", Children: nil},
 								}},
 						}},
 				}},
@@ -291,14 +271,14 @@ func TestValidateBlob_UpdateKey(t *testing.T) {
 		{"Same ValidateBlob from invalid key",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 			args{searchKey: "my_awesome_key", replacementValue: "value1"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "key2", Path: "/Production"},
+					{Key: "key1", Path: "/Production"},
+					{Key: "key2", Path: "/Production"},
 				}},
 		},
 	}
@@ -333,7 +313,7 @@ func TestValidateBlob_InsertKey(t *testing.T) {
 			ValidateBlob{},
 			args{insertKey: "newKey", value: "Value1"},
 			ValidateBlob{Children: []ValidateBlob{
-				ValidateBlob{
+				{
 					Key: "newKey", RawValue: "Value1",
 				},
 			},
@@ -345,7 +325,7 @@ func TestValidateBlob_InsertKey(t *testing.T) {
 			ValidateBlob{
 				Key: "Production",
 				Children: []ValidateBlob{
-					ValidateBlob{
+					{
 						Key: "newKey", RawValue: "Value1",
 					},
 				},
@@ -357,13 +337,13 @@ func TestValidateBlob_InsertKey(t *testing.T) {
 			ValidateBlob{
 				Key: "Production",
 				Children: []ValidateBlob{
-					ValidateBlob{
+					{
 						Key: "transaction_tracer", Path: "/Production",
 						Children: []ValidateBlob{
-							ValidateBlob{
+							{
 								Key: "slow_sql", Path: "/Production/transaction_tracer",
 								Children: []ValidateBlob{
-									ValidateBlob{
+									{
 										Key: "enabled", RawValue: true, Path: "/Production/transaction_tracer/slow_sql",
 									},
 								},
@@ -378,8 +358,8 @@ func TestValidateBlob_InsertKey(t *testing.T) {
 			args{insertKey: "/transaction_tracer/newKey", value: "Value1"},
 			ValidateBlob{
 				Key: "Production", Children: []ValidateBlob{
-					ValidateBlob{Key: "transaction_tracer", Path: "/Production", Children: []ValidateBlob{
-						ValidateBlob{Key: "newKey", Path: "/Production/transaction_tracer", RawValue: "Value1"},
+					{Key: "transaction_tracer", Path: "/Production", Children: []ValidateBlob{
+						{Key: "newKey", Path: "/Production/transaction_tracer", RawValue: "Value1"},
 					}},
 				}},
 		},
@@ -414,7 +394,7 @@ func TestValidateBlob_UpdateOrInsertKey(t *testing.T) {
 			ValidateBlob{},
 			args{key: "newKey", value: "Value1"},
 			ValidateBlob{Children: []ValidateBlob{
-				ValidateBlob{
+				{
 					Key: "newKey", RawValue: "Value1",
 				},
 			},
@@ -426,7 +406,7 @@ func TestValidateBlob_UpdateOrInsertKey(t *testing.T) {
 			ValidateBlob{
 				Key: "Production",
 				Children: []ValidateBlob{
-					ValidateBlob{
+					{
 						Key: "newKey", RawValue: "Value1",
 					},
 				},
@@ -435,37 +415,37 @@ func TestValidateBlob_UpdateOrInsertKey(t *testing.T) {
 		{"Update key by exact key match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production", RawValue: "teststring1"},
-					ValidateBlob{Key: "key2", Path: "/Production", RawValue: "teststring2"},
+					{Key: "key1", Path: "/Production", RawValue: "teststring1"},
+					{Key: "key2", Path: "/Production", RawValue: "teststring2"},
 				}},
 			args{key: "/Production/key2", value: "teststringAWESOME"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production", RawValue: "teststring1"},
-					ValidateBlob{Key: "key2", Path: "/Production", RawValue: "teststringAWESOME"},
+					{Key: "key1", Path: "/Production", RawValue: "teststring1"},
+					{Key: "key2", Path: "/Production", RawValue: "teststringAWESOME"},
 				}},
 		},
 		{"Return original ValidateBlob by partial key match",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled"},
+									{Key: "enabled", Path: "/Production/agent_enabled"},
 								}},
 						}},
 				}},
 			args{key: "enabled", value: "stuff"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "stuff"},
+									{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "stuff"},
 								}},
 						}},
 				}},
@@ -473,24 +453,24 @@ func TestValidateBlob_UpdateOrInsertKey(t *testing.T) {
 		{"Update key with deep nested object",
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "initial"},
+									{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "initial"},
 								}},
 						}},
 				}},
 			args{key: "/Production/agent_enabled/enabled", value: "value1"},
 			ValidateBlob{
 				Children: []ValidateBlob{
-					ValidateBlob{Key: "key1", Path: "/Production"},
-					ValidateBlob{Key: "Production", Path: "/",
+					{Key: "key1", Path: "/Production"},
+					{Key: "Production", Path: "/",
 						Children: []ValidateBlob{
-							ValidateBlob{Key: "agent_enabled", Path: "/Production",
+							{Key: "agent_enabled", Path: "/Production",
 								Children: []ValidateBlob{
-									ValidateBlob{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "value1", Children: nil},
+									{Key: "enabled", Path: "/Production/agent_enabled", RawValue: "value1", Children: nil},
 								}},
 						}},
 				}},
@@ -519,17 +499,17 @@ func TestValidateBlob_String(t *testing.T) {
 	}{
 		{name: "Simple blob", input: ValidateBlob{Key: "key1", RawValue: "value1"}, wantOutput: "/key1: value1\n"},
 		{name: "Simple blob with Child", input: ValidateBlob{Key: "key1", Children: []ValidateBlob{
-			ValidateBlob{Key: "key2", RawValue: "value2", Path: "/key1"},
+			{Key: "key2", RawValue: "value2", Path: "/key1"},
 		}}, wantOutput: "/key1/key2: value2\n"},
 		{name: "Simple blob with multiple Children", input: ValidateBlob{Key: "key1", Children: []ValidateBlob{
-			ValidateBlob{Key: "key2", RawValue: "value2", Path: "/key1"},
-			ValidateBlob{Key: "key3", RawValue: "value3", Path: "/key1"},
+			{Key: "key2", RawValue: "value2", Path: "/key1"},
+			{Key: "key3", RawValue: "value3", Path: "/key1"},
 		}}, wantOutput: "/key1/key2: value2\n/key1/key3: value3\n"},
 		{name: "blob with multiple nested Children", input: ValidateBlob{Key: "key1", Children: []ValidateBlob{
-			ValidateBlob{Key: "key2", RawValue: "value2", Path: "/key1"},
-			ValidateBlob{Key: "key3", Path: "/key1", Children: []ValidateBlob{
-				ValidateBlob{Key: "key4", RawValue: "value4", Path: "/key1/key3"},
-				ValidateBlob{Key: "key5", RawValue: "value5", Path: "/key1/key3"},
+			{Key: "key2", RawValue: "value2", Path: "/key1"},
+			{Key: "key3", Path: "/key1", Children: []ValidateBlob{
+				{Key: "key4", RawValue: "value4", Path: "/key1/key3"},
+				{Key: "key5", RawValue: "value5", Path: "/key1/key3"},
 			}},
 		}}, wantOutput: "/key1/key2: value2\n/key1/key3/key4: value4\n/key1/key3/key5: value5\n"},
 	}
@@ -655,7 +635,7 @@ var _ = Describe("Task Helpers", func() {
 		Context("when os.Getwd returns an error and os.Executable return expected result", func() {
 			BeforeEach(func() {
 				osGetwd = func() (string, error) {
-					return "", errors.New("I am a robot error")
+					return "", errors.New("i am a robot error")
 				}
 				osExecutable = func() (string, error) {
 					return "/bar", nil
@@ -683,10 +663,10 @@ var _ = Describe("Task Helpers", func() {
 		Context("when os.Getwd and os.Executable both return an error", func() {
 			BeforeEach(func() {
 				osGetwd = func() (string, error) {
-					return "", errors.New("I like pandas")
+					return "", errors.New("i like pandas")
 				}
 				osExecutable = func() (string, error) {
-					return "", errors.New("I also like frogs")
+					return "", errors.New("i also like frogs")
 				}
 			})
 			It("should return expected slice", func() {
@@ -779,12 +759,12 @@ var _ = Describe("Task Helpers", func() {
 		Describe("Sort", func() {
 			Context("When sorting", func() {
 				validateBlob := ValidateBlob{Key: "key1", Children: []ValidateBlob{
-					ValidateBlob{Key: "bkey2", RawValue: "value2", Path: "/key1"},
-					ValidateBlob{Key: "akey3", RawValue: "value3", Path: "/key1"},
+					{Key: "bkey2", RawValue: "value2", Path: "/key1"},
+					{Key: "akey3", RawValue: "value3", Path: "/key1"},
 				}}
 				expectedValidateBlob := ValidateBlob{Key: "key1", Children: []ValidateBlob{
-					ValidateBlob{Key: "akey3", RawValue: "value3", Path: "/key1"},
-					ValidateBlob{Key: "bkey2", RawValue: "value2", Path: "/key1"},
+					{Key: "akey3", RawValue: "value3", Path: "/key1"},
+					{Key: "bkey2", RawValue: "value2", Path: "/key1"},
 				}}
 				It("Should organize by children", func() {
 					validateBlob.Sort()
@@ -794,21 +774,21 @@ var _ = Describe("Task Helpers", func() {
 
 			Context("When sorting deeply nested", func() {
 				validateBlob := ValidateBlob{Key: "key1", Children: []ValidateBlob{
-					ValidateBlob{Key: "bkey2", RawValue: "value2", Path: "/key1"},
-					ValidateBlob{Key: "akey3", RawValue: "value3", Path: "/key1"},
-					ValidateBlob{Key: "ckey4", Path: "/key1", Children: []ValidateBlob{
-						ValidateBlob{Key: "zkey6", RawValue: "value6", Path: "/key1/ckey4"},
-						ValidateBlob{Key: "fkey5", RawValue: "value5", Path: "/key1/ckey4"},
+					{Key: "bkey2", RawValue: "value2", Path: "/key1"},
+					{Key: "akey3", RawValue: "value3", Path: "/key1"},
+					{Key: "ckey4", Path: "/key1", Children: []ValidateBlob{
+						{Key: "zkey6", RawValue: "value6", Path: "/key1/ckey4"},
+						{Key: "fkey5", RawValue: "value5", Path: "/key1/ckey4"},
 					},
 					},
 				}}
 				expectedValidateBlob := ValidateBlob{
 					Key: "key1", Children: []ValidateBlob{
-						ValidateBlob{Key: "akey3", RawValue: "value3", Path: "/key1"},
-						ValidateBlob{Key: "bkey2", RawValue: "value2", Path: "/key1"},
-						ValidateBlob{Key: "ckey4", Path: "/key1", Children: []ValidateBlob{
-							ValidateBlob{Key: "fkey5", RawValue: "value5", Path: "/key1/ckey4"},
-							ValidateBlob{Key: "zkey6", RawValue: "value6", Path: "/key1/ckey4"},
+						{Key: "akey3", RawValue: "value3", Path: "/key1"},
+						{Key: "bkey2", RawValue: "value2", Path: "/key1"},
+						{Key: "ckey4", Path: "/key1", Children: []ValidateBlob{
+							{Key: "fkey5", RawValue: "value5", Path: "/key1/ckey4"},
+							{Key: "zkey6", RawValue: "value6", Path: "/key1/ckey4"},
 						},
 						},
 					},
@@ -822,17 +802,3 @@ var _ = Describe("Task Helpers", func() {
 	})
 
 })
-
-func tempFileFromString(input string) string {
-
-	tempFile, err := ioutil.TempFile("", "golang-test")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if _, err := tempFile.Write([]byte(input)); err != nil {
-		log.Fatal(err)
-	}
-	_ = tempFile.Close()
-	return tempFile.Name()
-}

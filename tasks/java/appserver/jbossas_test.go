@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 
 	baseConfig "github.com/newrelic/newrelic-diagnostics-cli/config"
 	tasks "github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -67,8 +67,8 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return []string{}, errors.New("blargs")
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
@@ -86,11 +86,11 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return "jboss.home.dir=/jboss-5.4.0/server"
 				}
 				p.findProcessByName = func(string) ([]process.Process, error) {
-					return []process.Process{process.Process{Pid: 1}}, nil
+					return []process.Process{{Pid: 1}}, nil
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
@@ -111,7 +111,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return `jboss.home.dir=C:\appserver\jboss`
 				}
 				p.findProcessByName = func(string) ([]process.Process, error) {
-					return []process.Process{process.Process{Pid: 1}}, nil
+					return []process.Process{{Pid: 1}}, nil
 				}
 				p.findFiles = func([]string, []string) []string {
 					return []string{"README.txt"}
@@ -134,29 +134,29 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return ""
 				}
 				p.findProcessByName = func(string) ([]process.Process, error) {
-					return []process.Process{}, errors.New("Could not read processes")
+					return []process.Process{}, errors.New("could not read processes")
 				}
 			})
 
 			It("Should return an error result", func() {
-				Expect(result.Summary).To(Equal("Diagnostics CLI was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading from your java process: Could not read processes\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"))
+				Expect(result.Summary).To(Equal("Diagnostics CLI was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading from your java process: could not read processes\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"))
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 		})
 		Context("When error retrieving list of processes", func() {
 			BeforeEach(func() {
 				p.findProcessByName = func(string) ([]process.Process, error) {
-					return []process.Process{}, errors.New("I like sandwiches")
+					return []process.Process{}, errors.New("i like sandwiches")
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
 			})
 			It("Should return result from getAndParseJBossAsReadMeChecker ", func() {
-				Expect(result.Summary).To(Equal("Diagnostics CLI was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading from your java process: I like sandwiches\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"))
+				Expect(result.Summary).To(Equal("Diagnostics CLI was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading from your java process: i like sandwiches\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"))
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 		})
@@ -166,8 +166,8 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 					return []process.Process{}, nil
 				}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{},
-					"Java/Env/Process": tasks.Result{
+					"Base/Env/CollectEnvVars": {},
+					"Java/Env/Process": {
 						Status: tasks.Success,
 					},
 				}
@@ -193,7 +193,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 				}
 			})
 			It("Should return error result", func() {
-				Expect(result.Summary).To(Equal("Diagnostics CLI was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading jboss readme: Error finding JBoss version\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"))
+				Expect(result.Summary).To(Equal("Diagnostics CLI was unable to validate if your JBoss AS version is compatible with New Relic Java agent because it ran into an error when reading jboss readme: error finding JBoss version\nYou can take look at this documentation to verify if your version of JBoss is compatible: https://docs.newrelic.com/docs/agents/java-agent/getting-started/compatibility-requirements-java-agent#app-web-servers"))
 				Expect(result.Status).To(Equal(tasks.Error))
 			})
 		})
@@ -299,7 +299,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 			})
 			It("Should return error result unable to find JBOSS readme", func() {
 				Expect(versionString).To(Equal(""))
-				Expect(err.Error()).To(Equal("Error finding JBoss version"))
+				Expect(err.Error()).To(Equal("error finding JBoss version"))
 			})
 		})
 		Context("When versionStringRaw is less than 1", func() {
@@ -315,7 +315,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 			})
 			It("Should return an error", func() {
 				Expect(versionString).To(Equal(""))
-				Expect(err.Error()).To(Equal("Error finding version string"))
+				Expect(err.Error()).To(Equal("error finding version string"))
 			})
 		})
 		Context("when versionStringRaw returned error", func() {
@@ -330,7 +330,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 			})
 			It("Should return an error", func() {
 				Expect(versionString).To(Equal(""))
-				Expect(err.Error()).To(Equal("Error finding version string"))
+				Expect(err.Error()).To(Equal("error finding version string"))
 			})
 		})
 		Context("versionString didn't contain at least 2 periods", func() {
@@ -345,7 +345,7 @@ var _ = Describe("JavaAppserverJBossAsCheck", func() {
 			})
 			It("Should return an error", func() {
 				Expect(versionString).To(Equal(""))
-				Expect(err.Error()).To(Equal("Error finding version string"))
+				Expect(err.Error()).To(Equal("error finding version string"))
 			})
 		})
 		Context("run checkJBossAsVersion function to get version", func() {

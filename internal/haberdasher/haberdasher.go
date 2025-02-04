@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -18,7 +17,7 @@ const (
 	contentType      = "application/json"
 )
 
-//DefaultClient - Singleton instance of Haberdasher API client
+// DefaultClient - Singleton instance of Haberdasher API client
 var DefaultClient = &Client{}
 
 // Client is the primary data structure that an implementer would interface
@@ -134,14 +133,14 @@ func (c *Client) Do(req *http.Request, respStruct interface{}) (*Response, error
 
 	defer resp.Body.Close() // nolint: errcheck
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading response: %v", err)
+		return nil, fmt.Errorf("error reading response: %v", err)
 	}
 
 	if resp.StatusCode >= 300 {
 		bodyString := string(bodyBytes)
-		return nil, fmt.Errorf("Expected StatusCode < 300 got %d: %v", resp.StatusCode, bodyString)
+		return nil, fmt.Errorf("expected StatusCode < 300 got %d: %v", resp.StatusCode, bodyString)
 	}
 
 	response := newResponse(resp)
@@ -156,7 +155,7 @@ func (c *Client) Do(req *http.Request, respStruct interface{}) (*Response, error
 		}
 
 		if decErr != nil {
-			err = fmt.Errorf("Error unmarshalling to %T: %v", respStruct, decErr)
+			err = fmt.Errorf("error unmarshalling to %T: %v", respStruct, decErr)
 		}
 
 	}

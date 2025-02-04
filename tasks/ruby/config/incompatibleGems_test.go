@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 )
@@ -34,7 +34,7 @@ var _ = Describe("Ruby/Config/IncompatibleGems", func() {
 			})
 			It("Should return a slice containing the bad gemfile and path", func() {
 				expectedOutput := []BadGemAndPath{
-					BadGemAndPath{
+					{
 						GemName:     "db-charmer",
 						GemfilePath: "../../fixtures/ruby/config/badgems_one_Gemfile",
 					},

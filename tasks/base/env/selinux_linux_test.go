@@ -3,9 +3,9 @@ package env
 import (
 	"errors"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Base/Env/SELinux", func() {
@@ -67,7 +67,7 @@ var _ = Describe("Base/Env/SELinux", func() {
 			It("should return in the summary the execution error", func() {
 				Expect(result.Summary).To(Equal("Unable to execute command: sestatus Error: " + "execution error"))
 			})
-			
+
 			It("should return a payload with the SEUnknown SEMode", func() {
 				Expect(result.Payload).To(Equal(SEUnknown))
 			})
@@ -78,7 +78,7 @@ var _ = Describe("Base/Env/SELinux", func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{}
 				p.cmdExec = func(name string, arg ...string) ([]byte, error) {
-					return []byte{}, errors.New("Command 'sestatus' not found")
+					return []byte{}, errors.New("command 'sestatus' not found")
 				}
 			})
 
@@ -87,7 +87,7 @@ var _ = Describe("Base/Env/SELinux", func() {
 			})
 
 			It("should return a summary that reports SELinux is not installed", func() {
-				Expect(result.Summary).To(Equal("SELinux does seem to be installed in this environment: Command 'sestatus' not found"))
+				Expect(result.Summary).To(Equal("SELinux does seem to be installed in this environment: command 'sestatus' not found"))
 			})
 			It("should return an payload of SEMode NotInstalled", func() {
 				Expect(result.Payload).To(Equal(NotInstalled))

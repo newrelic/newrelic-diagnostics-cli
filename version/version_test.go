@@ -24,10 +24,10 @@ func (l loggerMethods) Infof(s string, f ...interface{}) {
 	runningLog += fmt.Sprintf(s, f...) + "\n"
 }
 
-func (l loggerMethods) FixedPrefix(int, string, string) { return }
-func (l loggerMethods) Debug(...interface{})            { return }
-func (l loggerMethods) Debugf(string, ...interface{})   { return }
-func (l loggerMethods) Dump(...interface{})             { return }
+func (l loggerMethods) FixedPrefix(int, string, string) {}
+func (l loggerMethods) Debug(...interface{})            {}
+func (l loggerMethods) Debugf(string, ...interface{})   {}
+func (l loggerMethods) Dump(...interface{})             {}
 
 var logCapture = loggerMethods{}
 

@@ -203,7 +203,7 @@ func (p InfraEnvValidateZookeeperPath) getKafkaBrokersList(zookeeperConfig Zooke
 			return false, fmt.Sprintf("We ran the command - %s - and were unable to locate a list of brokers:\n%s\n%s\nThis might be due to the Zookeeper nodes not being network accessible to where the integration is in place, or Zookeeper is not running, or it could be that the Zookeeper namespace has your broker information kept under a different path other than the default. Keep in mind that an alternative Zookeeper path can be set in the kafka-config.yml: https://docs.newrelic.com/docs/integrations/host-integrations/host-integrations-list/kafka-monitoring-integration#arguments", cmd, cmdErr, string(cmdOutput))
 		}
 		//is not our job to validate those brokers IDs, just to make sure they are accessible
-		return true, fmt.Sprintf("We ran the command %s and succesfully connected to a broker or list of brokers:\n%s", cmd, string(cmdOutput))
+		return true, fmt.Sprintf("We ran the command %s and successfully connected to a broker or list of brokers:\n%s", cmd, string(cmdOutput))
 	}
 	//We found a path set in config file (Example, zookeeper_path: "/kafka-root"), so we'll append it to the brokers argument: zookeeper-shell.sh localhost:2181 ls /kafka-root/brokers/ids
 	customBrokersArg := zookeeperConfig.Path + brokersArg
@@ -221,7 +221,7 @@ func (p InfraEnvValidateZookeeperPath) getKafkaBrokersList(zookeeperConfig Zooke
 		return false, fmt.Sprintf("First we ran the command - %s - using the value found for zookeeper_path in the kafka config file, and this path did not connect us to your list of brokers IDs:\n%s\n%s\nHowever, when we ran the same command using the kafka integration default path for zookeeper - %s -, we were able to connect to your brokers:\n%s\nWe recommend commenting out the zookeeper_path setting and letting the integration automatically connect to the default path.", customCmd, customCmdErr, string(customCmdOutput), defaultCmd, string(defaultCmdOutput))
 	}
 	//Yay, we did not get an error when running the command using the zookeeper_path set in the config file
-	return true, fmt.Sprintf("We ran the command - %s - and succesfully connected to a list of brokers:\n%s", customCmd, customCmdOutput)
+	return true, fmt.Sprintf("We ran the command - %s - and successfully connected to a list of brokers:\n%s", customCmd, customCmdOutput)
 }
 
 func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair) (ZookeeperConfig, error) {
@@ -229,7 +229,7 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 	zookeeperPathBlobs := kafkaConfigPair.Configuration.ParsedResult.FindKey("zookeeper_path")
 
 	if len(zookeeperPathBlobs) > 1 {
-		return ZookeeperConfig{}, fmt.Errorf("Multiple keys found for zookeeper_path")
+		return ZookeeperConfig{}, fmt.Errorf("multiple keys found for zookeeper_path")
 	} else if len(zookeeperPathBlobs) == 1 {
 		zookeeperExtractedConfig.Path = zookeeperPathBlobs[0].Value()
 	}
@@ -237,6 +237,9 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 	zookeeper_hosts: '[{"host": "something10.company.com", "port": 5101},{"host": "something11.company.com", "port": 5101},{"host": "something12.company.com", "port": 5101}]'
 	*/
 	zookeeperHostsBlobs := kafkaConfigPair.Configuration.ParsedResult.FindKey("zookeeper_hosts")
+	if len(zookeeperHostsBlobs) == 0 {
+		return ZookeeperConfig{}, fmt.Errorf("could not find a key for zookeeper_hosts")
+	}
 	var zookeeperHosts []*ZookeeperHost
 	jsonErr := json.Unmarshal([]byte(zookeeperHostsBlobs[0].Value()), &zookeeperHosts)
 	if jsonErr != nil {
@@ -251,8 +254,8 @@ func getZookeeperConfigFromYml(kafkaConfigPair *infraConfig.IntegrationFilePair)
 	return zookeeperExtractedConfig, nil
 }
 
-//not been used currently, though it may come handy later if we encounter bugs:
-//nolint
+// not been used currently, though it may come handy later if we encounter bugs:
+// nolint
 func cmdOutputHasBrokerIds(cmdOutput string) bool {
 	captureGroup := `\[([0-9]|,|\s)+\]`
 	re := regexp.MustCompile(captureGroup)

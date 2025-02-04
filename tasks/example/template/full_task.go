@@ -12,8 +12,8 @@ import (
 type ExampleTemplateFullTask struct { // This defines the task itself and should be named according to the standard CategorySubcategoryTaskname in camelcase
 }
 
-//ExamplePayload - a small struct to store the payload, can be used to hook custom marshaling up as well - optional
-//Set to simplistic names (Key, Value) for this example.
+// ExamplePayload - a small struct to store the payload, can be used to hook custom marshaling up as well - optional
+// Set to simplistic names (Key, Value) for this example.
 type ExamplePayload struct {
 	Key         string
 	Value       string
@@ -24,7 +24,7 @@ type ExamplePayload struct {
 func (el ExamplePayload) MarshalJSON() ([]byte, error) {
 	// This is a custom JSON Marshalling method. This can be useful for renaming or omitting struct elements from a payload
 	// before they're added to the JSON output file.  This is a contrived example - we're omitting SecretValue and renaming
-	// the struct elements which we could also have just named Path and Loglevel in the struct definition.
+	// the struct elements which we could also have just named Path and LogLevel in the struct definition.
 	return json.Marshal(&struct {
 		Path     string
 		LogLevel string
@@ -56,7 +56,7 @@ func (p ExampleTemplateFullTask) Execute(options tasks.Options, upstream map[str
 
 	// This is what we will use to pass the output from this task back to the core and report to the UI
 
-	if !upstream["Base/Config/Validate"].HasPayload(){
+	if !upstream["Base/Config/Validate"].HasPayload() {
 		return tasks.Result{
 			// Base case result - Use the None status if the check didn't have anything to judge
 			Status:  tasks.None,
@@ -67,18 +67,18 @@ func (p ExampleTemplateFullTask) Execute(options tasks.Options, upstream map[str
 	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 
 	if !ok { //!ok means the type assertion failed: no []config.ValidateElement found in upstream payload
-		return tasks.Result {
-			Status: tasks.Error,
+		return tasks.Result{
+			Status:  tasks.Error,
 			Summary: tasks.AssertionErrorSummary,
 		}
 	}
 
 	if len(validations) == 0 { //upstream payload is correct type, but upstream task found no valid config files
 		return tasks.Result{
-			Status: tasks.None,
+			Status:  tasks.None,
 			Summary: "There were no config files from which to pull the log level",
 		}
-	} 
+	}
 
 	payload := []ExamplePayload{}
 	for _, validation := range validations { //Iterate through all my results since I may have more than one result to parse through
@@ -87,7 +87,7 @@ func (p ExampleTemplateFullTask) Execute(options tasks.Options, upstream map[str
 		//This returns a slice of ValidateBlob so I need to walk through them
 		if len(logLevel) == 0 {
 			return tasks.Result{
-				Status: tasks.Failure,
+				Status:  tasks.Failure,
 				Summary: "Config file doesn't contain log_level",
 			}
 		}
@@ -101,21 +101,21 @@ func (p ExampleTemplateFullTask) Execute(options tasks.Options, upstream map[str
 			switch value.Value() {
 			case "finest":
 				return tasks.Result{
-					Status: tasks.Success,
+					Status:  tasks.Success,
 					Summary: "Log level is finest",
 					Payload: payload,
 				}
 			case "info":
 				//Setting a task's status to Warning for things that aren't necessarily bad, but might concern us
 				return tasks.Result{
-					Status: tasks.Warning,
+					Status:  tasks.Warning,
 					Summary: "Log level is info, you may want to consider updating the log level to finest before uploading logs to support",
 					Payload: payload,
 				}
 			default:
 				// User error if something went wrong, but we're not sure if it was our fault or theirs (this isn't the best example)
 				return tasks.Result{
-					Status: tasks.Error,
+					Status:  tasks.Error,
 					Summary: "We were unable to determine the log level",
 					Payload: payload,
 				}
@@ -123,7 +123,7 @@ func (p ExampleTemplateFullTask) Execute(options tasks.Options, upstream map[str
 		}
 	}
 	return tasks.Result{
-		Status: tasks.None,
+		Status:  tasks.None,
 		Summary: "We were unable to determine the log level",
 		Payload: payload,
 	}

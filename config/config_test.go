@@ -22,7 +22,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ProxyUser          string
 		ProxyPassword      string
 		Tasks              string
-		AttachmentKey      string
 		ConfigFile         string
 		Override           string
 		OutputPath         string
@@ -30,6 +29,10 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		BrowserURL         string
 		AttachmentEndpoint string
 		Suites             string
+		Include            string
+		APIKey             string
+		Region             string
+		Script             string
 	}
 
 	sampleFlags := fields{
@@ -46,7 +49,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		ProxyUser:          "string",
 		ProxyPassword:      "",
 		Tasks:              "string",
-		AttachmentKey:      "string",
 		ConfigFile:         "string",
 		Override:           "",
 		OutputPath:         "",
@@ -54,30 +56,36 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		BrowserURL:         "string",
 		AttachmentEndpoint: "string",
 		Suites:             "string",
+		Include:            "string",
+		APIKey:             "string",
+		Region:             "string",
+		Script:             "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
-		ConfigFlag{Name: "verbose", Value: true},
-		ConfigFlag{Name: "interactive", Value: true},
-		ConfigFlag{Name: "quiet", Value: true},
-		ConfigFlag{Name: "veryQuiet", Value: false},
-		ConfigFlag{Name: "help", Value: false},
-		ConfigFlag{Name: "version", Value: true},
-		ConfigFlag{Name: "yesToAll", Value: false},
-		ConfigFlag{Name: "showOverrideHelp", Value: true},
-		ConfigFlag{Name: "autoAttach", Value: true},
-		ConfigFlag{Name: "proxy", Value: true},
-		ConfigFlag{Name: "proxyUser", Value: true},
-		ConfigFlag{Name: "proxyPassword", Value: false},
-		ConfigFlag{Name: "tasks", Value: "string"},
-		ConfigFlag{Name: "attachmentKey", Value: "string"},
-		ConfigFlag{Name: "configFile", Value: true},
-		ConfigFlag{Name: "override", Value: false},
-		ConfigFlag{Name: "outputPath", Value: false},
-		ConfigFlag{Name: "filter", Value: "string"},
-		ConfigFlag{Name: "browserURL", Value: true},
-		ConfigFlag{Name: "attachmentEndpoint", Value: true},
-		ConfigFlag{Name: "suites", Value: "string"},
+		{Name: "verbose", Value: true},
+		{Name: "interactive", Value: true},
+		{Name: "quiet", Value: true},
+		{Name: "veryQuiet", Value: false},
+		{Name: "help", Value: false},
+		{Name: "version", Value: true},
+		{Name: "yesToAll", Value: false},
+		{Name: "showOverrideHelp", Value: true},
+		{Name: "autoAttach", Value: true},
+		{Name: "proxy", Value: true},
+		{Name: "proxyUser", Value: true},
+		{Name: "proxyPassword", Value: false},
+		{Name: "tasks", Value: "string"},
+		{Name: "configFile", Value: true},
+		{Name: "override", Value: false},
+		{Name: "outputPath", Value: false},
+		{Name: "filter", Value: "string"},
+		{Name: "browserURL", Value: true},
+		{Name: "attachmentEndpoint", Value: true},
+		{Name: "suites", Value: "string"},
+		{Name: "include", Value: "string"},
+		{Name: "region", Value: "string"},
+		{Name: "script", Value: "string"},
 	}
 
 	tests := []struct {
@@ -108,7 +116,6 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				ProxyUser:          tt.fields.ProxyUser,
 				ProxyPassword:      tt.fields.ProxyPassword,
 				Tasks:              tt.fields.Tasks,
-				AttachmentKey:      tt.fields.AttachmentKey,
 				ConfigFile:         tt.fields.ConfigFile,
 				Override:           tt.fields.Override,
 				OutputPath:         tt.fields.OutputPath,
@@ -116,6 +123,10 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				BrowserURL:         tt.fields.BrowserURL,
 				AttachmentEndpoint: tt.fields.AttachmentEndpoint,
 				Suites:             tt.fields.Suites,
+				Include:            tt.fields.Include,
+				APIKey:             tt.fields.APIKey,
+				Region:             tt.fields.Region,
+				Script:             tt.fields.Script,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)
@@ -148,6 +159,143 @@ func Test_boolifyFlag(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := boolifyFlag(tt.args.inputFlag); got != tt.want {
 				t.Errorf("boolifyFlag() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_stringToRegion(t *testing.T) {
+	type args struct {
+		region string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Region
+	}{
+		{
+			name: "lower case US string to region type",
+			args: args{
+				region: "us",
+			},
+			want: USRegion,
+		},
+		{
+			name: "upper case US string to region type",
+			args: args{
+				region: "US",
+			},
+			want: USRegion,
+		},
+		{
+			name: "lower case EU string to region type",
+			args: args{
+				region: "eu",
+			},
+			want: EURegion,
+		},
+		{
+			name: "upper case EU string to region type",
+			args: args{
+				region: "EU",
+			},
+			want: EURegion,
+		},
+		{
+			name: "blank region string to region type",
+			args: args{
+				region: "",
+			},
+			want: NoRegion,
+		},
+		{
+			name: "unknown region string to region type",
+			args: args{
+				region: "unknown",
+			},
+			want: NoRegion,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := stringToRegion(tt.args.region); got != tt.want {
+				t.Errorf("stringToRegion() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseRegionFlagAndEnv(t *testing.T) {
+	type args struct {
+		regionFromFlag string
+		regionFromEnv  string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Region
+	}{
+		{
+			name: "Both provided - Flag gets priority",
+			args: args{
+				regionFromFlag: "us",
+				regionFromEnv:  "eu",
+			},
+			want: USRegion,
+		},
+		{
+			name: "Only env provided",
+			args: args{
+				regionFromFlag: "",
+				regionFromEnv:  "eu",
+			},
+			want: EURegion,
+		},
+		{
+			name: "Only flag provided",
+			args: args{
+				regionFromFlag: "eu",
+				regionFromEnv:  "",
+			},
+			want: EURegion,
+		},
+		{
+			name: "Nothing provided - default to US",
+			args: args{
+				regionFromFlag: "",
+				regionFromEnv:  "",
+			},
+			want: USRegion,
+		},
+		{
+			name: "Invalid env provided - use flag",
+			args: args{
+				regionFromFlag: "us",
+				regionFromEnv:  "invalid",
+			},
+			want: USRegion,
+		},
+		{
+			name: "Invalid flag provided - use env",
+			args: args{
+				regionFromFlag: "invalid",
+				regionFromEnv:  "eu",
+			},
+			want: EURegion,
+		},
+		{
+			name: "Invalid flag and env provided - use default US",
+			args: args{
+				regionFromFlag: "invalid",
+				regionFromEnv:  "invalid",
+			},
+			want: USRegion,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := parseRegionFlagAndEnv(tt.args.regionFromFlag, tt.args.regionFromEnv); got != tt.want {
+				t.Errorf("parseRegionFlagAndEnv() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -99,7 +99,7 @@ func parseHeaderFile(headerFilePath string) (string, error) {
 	fileScanner := bufio.NewScanner(fileHandle)
 	for fileScanner.Scan() {
 		if strings.Contains(fileScanner.Text(), lineRef) {
-			return strings.Trim(fileScanner.Text(), lineRef), nil
+			return strings.TrimPrefix(fileScanner.Text(), lineRef), nil
 		}
 	}
 	return "", errors.New("version reference not found within header file")

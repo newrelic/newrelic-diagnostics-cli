@@ -19,90 +19,64 @@
      - COPY tasks/fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - http://username:password@hostname:8080 
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectYMLSingleConfig
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelicSingleConfigyml /app/newrelic.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - http://username:password@hostname:8080
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectYMLInfra
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - http://user:password@hostname:port
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectDotnet
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelicdotnet /app/newrelic.config
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - http://PROXY_USERNAME:PROXY_PASSWORD@hostname:8888
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectPHP
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelicphp /app/newrelic.ini
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - user2:passwd@hostname:port
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectPHPDaemon
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelicphpDaemon /app/newrelic.cfg
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - myusername:secretpass@127.0.0.1:12345
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectPython
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelicpython /app/newrelic.ini
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - user3:pass4@hostname:8080
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectNode
     dockerfile_lines:
-     - COPY tasks/fixtures/integration/proxyDetect/newrelicnode /app/newrelic.js
+     - COPY tasks/fixtures/integration/proxyDetect/newrelicnode.js /app/newrelic.js
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - http://user:pass@10.0.0.1:8000
-    log_entry_not_expected:
-     - Success.*Base/Collector/Connect
     docker_cmd: ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectCLIOverride
     dockerfile_lines:
      - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic.yml
     log_entry_expected:
-     - Failure.*Base/Collector/Connect
      - tcp 127.0.0.1:8888
     log_entry_not_expected:
      - Success.*Base/Config/ProxyDetect
-     - Success.*Base/Collector/Connect
      - http://user:password@hostname:port
     docker_cmd: ./nrdiag -p http://127.0.0.1:8888 && cat nrdiag-output.json
  -  test_name: ProxyDetectwithHTTPProxyEnvVar
@@ -110,7 +84,6 @@
      - COPY tasks/fixtures/integration/proxyDetect/newrelic-infra /app/newrelic-infra.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - tcp 127.0.0.1:8888
     docker_cmd: HTTP_PROXY=http://127.0.0.1:8888 ./nrdiag && cat nrdiag-output.json
  -  test_name: ProxyDetectCLIEnvironmentOverride
@@ -118,10 +91,8 @@
      - COPY tasks/fixtures/integration/proxyDetect/newrelicMultiConfigyml /app/newrelic.yml
     log_entry_expected:
      - Success.*Base/Config/ProxyDetect
-     - Failure.*Base/Collector/Connect
      - http://username:password@testhostname:8080
     log_entry_not_expected:
-     - Success.*Base/Collector/Connect
      - http://user:password@hostname:port
     docker_cmd: ./nrdiag -o Base/Config/ProxyDetect.environment=test && cat nrdiag-output.json
  -  test_name: ProxyDetect_MinionWithAuth

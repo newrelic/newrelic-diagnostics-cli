@@ -33,7 +33,7 @@ func (p BaseEnvCheckWindowsAdmin) Identifier() tasks.Identifier {
 
 // Explain - Returns the help text for each individual task
 func (p BaseEnvCheckWindowsAdmin) Explain() string {
-	return "Detect if running with Administrator priviliges"
+	return "Detect if running with Administrator privileges"
 }
 
 // Dependencies - Returns the dependencies for each task.
@@ -85,7 +85,7 @@ func (p BaseEnvCheckWindowsAdmin) Execute(options tasks.Options, upstream map[st
 			result.Summary += "\n - " + e.Error()
 		}
 	}
-	result.URL = "https://docs.newrelic.com/docs/agents/manage-apm-agents/troubleshooting/new-relic-diagnostics#windows-run"
+	result.URL = "https://docs.newrelic.com/docs/new-relic-solutions/solve-common-issues/diagnostics-cli-nrdiag/run-diagnostics-cli-nrdiag/#windows-run"
 	return result
 }
 

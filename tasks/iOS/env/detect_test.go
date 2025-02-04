@@ -88,7 +88,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 	successfulUpstream["Base/Config/Collect"] = tasks.Result{
 		Status: tasks.Success,
 		Payload: []config.ConfigElement{
-			config.ConfigElement{
+			{
 				FileName: "AppDelegate.swift",
 			},
 		},
@@ -99,7 +99,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 	failedUpstream["Base/Config/Collect"] = tasks.Result{
 		Status: tasks.Success,
 		Payload: []config.ConfigElement{
-			config.ConfigElement{
+			{
 				FileName: "",
 			},
 		},
@@ -109,7 +109,7 @@ func Test_iOSEnvDetect_Execute(t *testing.T) {
 
 	errorUpstream := make(map[string]tasks.Result)
 	errorUpstream["Base/Config/Collect"] = tasks.Result{
-		Status: tasks.Success,
+		Status:  tasks.Success,
 		Payload: []string{""},
 	}
 

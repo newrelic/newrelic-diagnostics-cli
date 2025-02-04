@@ -1,0 +1,5 @@
+name: example-windows
+filename: example-windows.ps1
+description: This is an example script for Windows
+type: powershell
+os: windows

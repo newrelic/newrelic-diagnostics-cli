@@ -5,14 +5,18 @@ import (
 	"flag"
 	"net/url"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
+	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/suites"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	"golang.org/x/exp/slices"
 )
 
 // validateHTTPProxy - basic input validation for the -proxy <proxy> flag argument
@@ -24,7 +28,7 @@ func validateHTTPProxy(proxy string) (bool, error) {
 	}
 	splitURL := strings.Split(proxy, "//")
 	if len(splitURL) != 2 {
-		return false, errors.New("Proxy url expecting exactly one instance of '//'")
+		return false, errors.New("proxy url expecting exactly one instance of '//'")
 	}
 
 	//Also check if go's built in proxy testing throws any errors.
@@ -48,7 +52,7 @@ func processHTTPProxy() (bool, error) {
 		_, err := validateHTTPProxy(config.Flags.Proxy)
 		if err != nil {
 			log.Debug("Error parsing proxy url: " + err.Error())
-			return false, errors.New("Proxy format should be: -proxy http://poxy_host:proxy_port")
+			return false, errors.New("proxy format should be: -proxy http://poxy_host:proxy_port")
 		}
 
 		//Check if there is a proxy user && password, then construct URL. Can you have a user with no pass?
@@ -74,11 +78,11 @@ func processHTTPProxy() (bool, error) {
 		if err != nil {
 			log.Debug("Proxy url is malformed: " + err.Error())
 			log.Debug(envProxy)
-			return false, errors.New("Proxy format should be: -proxy http://poxy_host:proxy_port")
+			return false, errors.New("proxy format should be: -proxy http://poxy_host:proxy_port")
 		}
 
 		if !ProxyParseNSet() {
-			return false, errors.New("Error setting proxy: " + envProxy)
+			return false, errors.New("error setting proxy: " + envProxy)
 		}
 
 		log.Debug("Using proxy address from HTTP_PROXY environment variable:", envProxy)
@@ -109,9 +113,9 @@ func processHelp() {
 //Usage: nrdiag --suites java,infra
 //Troubleshoot New Relic products with the following arguments
 
-//Arguments:
-//java			Java Agent
-//infra			Infrastructure Agent
+// Arguments:
+// java			Java Agent
+// infra			Infrastructure Agent
 func printSuites() {
 	log.Info("\nSuites are a targeted collection of diagnostic tasks.\n")
 	var command string
@@ -137,7 +141,7 @@ func printSuites() {
 	log.Info("\n")
 }
 
-//PrintTasks will output all the tasks that this app can run
+// PrintTasks will output all the tasks that this app can run
 func printTasks() {
 	var allTasks []tasks.Task
 
@@ -148,9 +152,7 @@ func printTasks() {
 		config.Flags.ShowOverrideHelp = true
 		identifiers := strings.Split(os.Args[2], ",")
 		for _, ident := range identifiers {
-			for _, task := range registration.TasksForIdentifierString(ident) {
-				allTasks = append(allTasks, task)
-			}
+			allTasks = append(allTasks, registration.TasksForIdentifierString(ident)...)
 		}
 	}
 
@@ -218,7 +220,7 @@ func printTasks() {
 
 }
 
-//PrintOptions will output all the command line options
+// PrintOptions will output all the command line options
 func printOptions() {
 	flag.PrintDefaults()
 }
@@ -234,12 +236,6 @@ func processOverrides() (tasks.Options, []override) {
 		options.Options["configFile"] = config.Flags.ConfigFile
 	}
 
-	// Pass in AttachmentKey file override value
-	if config.Flags.AttachmentKey != "" {
-		log.Debug("Manually setting attachment to ", config.Flags.AttachmentKey)
-		options.Options["attachmentKey"] = config.Flags.AttachmentKey
-	}
-
 	// Pass in Filter file override value
 	if config.Flags.Filter != "" {
 		log.Debug("Manually setting Filter to ", config.Flags.Filter)
@@ -247,7 +243,7 @@ func processOverrides() (tasks.Options, []override) {
 	}
 
 	// Pass in YesToAll file override value
-	if config.Flags.YesToAll == true {
+	if config.Flags.YesToAll {
 		log.Debug("Manually setting YesToAll to ", config.Flags.YesToAll)
 		options.Options["YesToAll"] = "true"
 	}
@@ -263,11 +259,74 @@ func processOverrides() (tasks.Options, []override) {
 	if config.Flags.Override != "" {
 		//read task's argument
 		log.Debug("read task's argument ", config.Flags.Override)
-		//Split overrides to send them to the approrpriate task. This should be a comma seperated list of key value pairs
+		//Split overrides to send them to the appropriate task. This should be a comma separated list of key value pairs
 		//--override Base/Config/Validate/agentLanguage=java
 		overrides = parseOverrides(config.Flags.Override)
 		log.Debug("processed overrides are:", overrides[0].key)
 	}
 
 	return options, overrides
+}
+
+func processScript(catalog *scriptrunner.Catalog) *scriptrunner.ScriptData {
+	scriptData := &scriptrunner.ScriptData{}
+	cat, err := catalog.GetCatalog()
+	if err != nil {
+		log.Fatalf("Error while downloading script catalog: %s", err.Error())
+	}
+	scriptData.Name = config.Flags.Script
+	scriptData.Flags = config.Flags.ScriptFlags
+	idx := slices.IndexFunc(cat, func(c scriptrunner.CatalogItem) bool { return c.Name == scriptData.Name })
+	if idx < 0 {
+		log.Fatalf("Script does not exist in catalog")
+	}
+	scriptCatalogItem := cat[idx]
+	scriptData.Description = scriptCatalogItem.Description
+	scriptData.Path = filepath.Join(config.Flags.OutputPath, scriptCatalogItem.Filename)
+	scriptContent, err := catalog.GetScript(scriptCatalogItem)
+	if err != nil {
+		log.Fatalf("Error while downloading script: %s", err.Error())
+	}
+	scriptData.Content = scriptContent
+	if len(scriptCatalogItem.OutputFiles) > 0 {
+		for _, of := range scriptCatalogItem.OutputFiles {
+			scriptData.AddtlFilesPatterns = append(
+				scriptData.AddtlFilesPatterns,
+				filepath.Join(config.Flags.OutputPath, of),
+			)
+		}
+
+	}
+	scriptData.OutputPath = filepath.Join(config.Flags.OutputPath, scriptData.Name+".out")
+	return scriptData
+}
+
+func printScriptList(catalogRepo *scriptrunner.Catalog) {
+	catalog, err := catalogRepo.GetCatalog()
+	if err != nil {
+		log.Fatalf("Error while downloading script catalog: %s", err.Error())
+	}
+
+	if !config.Flags.Quiet {
+		log.Info(color.ColorString(color.White, "\nScript catalog\n--------------------------------------------------"))
+	}
+	for _, s := range catalog {
+		if !config.Flags.Quiet {
+			log.Infof(color.ColorString(color.White, "Name: "))
+		}
+		log.Info(s.Name)
+		if !config.Flags.Quiet {
+			log.Infof(color.ColorString(color.White, "Description: "))
+			log.Info(s.Description)
+			log.Infof(color.ColorString(color.White, "Type: "))
+			log.Info(s.Type)
+			log.Infof(color.ColorString(color.White, "OS: "))
+			log.Info(s.OS)
+			if len(s.OutputFiles) > 0 {
+				log.Infof(color.ColorString(color.White, "Output files: "))
+				log.Info("\n  -", strings.Join(s.OutputFiles, "\n  - "))
+			}
+			log.Info()
+		}
+	}
 }

@@ -44,22 +44,24 @@ var (
 
 var logEnvVars = []string{
 	"NRIA_LOG_FILE",                   // Infra agent
-	"NEW_RELIC_LOG",                   //.NET, Java, Node and python agent paths
-	"NEWRELIC_PROFILER_LOG_DIRECTORY", //.NET path\to\agent\directory (not configurable via config file)
+	"NEW_RELIC_LOG",                   // .NET, Java, Node and python agent paths
+	"NEWRELIC_PROFILER_LOG_DIRECTORY", // .NET path\to\agent\directory (not configurable via config file)
+	"NEW_RELIC_LOG_FILE_PATH",         // Ruby agent log path
+	"NEW_RELIC_LOG_FILE_NAME",         // Ruby agent log filename
 }
 
 var keysInConfigFile = map[string][]string{
-	"fullpaths": []string{
+	"fullpaths": {
 		"log_file",                //Python: "tmp/newrelic-python-agent.log" and Infra: /var/log/newrelic-infra/newrelic-infra.log (Linux: If not defined, it logs only in the standard output.)
 		"newrelic.daemon.logfile", //PHP daemon default val: "/var/log/newrelic/newrelic-daemon.log"
 		"newrelic.logfile",        //PHP: "/var/log/newrelic/newrelic-daemon.log",
 		"logging.filepath",        // Node: "node/app/newrelic_agent.log"
 	},
-	"filenames": []string{
+	"filenames": {
 		"log_file_name", //Java and Ruby: "newrelic_agent.log"
 		"-fileName",     //.NET: "FILENAME.log"
 	},
-	"directories": []string{
+	"directories": {
 		"log_file_path", //Java, ruby: "/Users/shuayhuaca/Desktop/"
 		"-directory",    //.NET "PATH\TO\LOG\DIRECTORY"
 	},
@@ -111,16 +113,16 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		paths = append(paths, sysProgramFiles+`\New Relic\newrelic-infra\newrelic-infra.log`) //Windows, agent version 1.0.752 or lower
 		paths = append(paths, sysProgramData+`\New Relic\newrelic-infra\newrelic-infra.log`)  //Windows, agent version 1.0.944 or higher
 
-		//new infra logs (added if statment becasue I am unsure if the envvar will always point to the Roaming folder and not local or localLow )
+		//new infra logs (added if statment because I am unsure if the envvar will always point to the Roaming folder and not local or localLow )
 		//Windows, agent version 1.0.775 to 1.0.944
 		if strings.HasSuffix(sysAppData, "Roaming") {
 			paths = append(paths, sysAppData+`\New Relic\newrelic-infra`)
 		} else if strings.HasSuffix(sysAppData, "Local") {
 
-			paths = append(paths, strings.TrimRight(sysAppData, "Local")+`Roaming\New Relic\newrelic-infra`)
+			paths = append(paths, strings.TrimSuffix(sysAppData, "Local")+`Roaming\New Relic\newrelic-infra`)
 
 		} else if strings.HasSuffix(sysAppData, "LocalLow") {
-			paths = append(paths, strings.TrimRight(sysAppData, "LocalLow")+`Roaming\New Relic\newrelic-infra`)
+			paths = append(paths, strings.TrimSuffix(sysAppData, "LocalLow")+`Roaming\New Relic\newrelic-infra`)
 
 		} else {
 			paths = append(paths, sysAppData+`\Roaming\New Relic\newrelic-infra`)
@@ -135,17 +137,18 @@ func collectFilePaths(envVars map[string]string, configElements []baseConfig.Val
 		paths = append(paths, "/tmp")                                     //For Python Agent log and PHP installation log
 		paths = append(paths, "/var/log")                                 //For Syn Minion and Infra
 		paths = append(paths, "/var/log/newrelic")                        // For PHP agent and daemon log
-		paths = append(paths, "/usr/local/newrelic-netcore20-agent/logs") // for dotnetcore
+		paths = append(paths, "/usr/local/newrelic-netcore20-agent/logs") // for dotnetcore up to v10
+		paths = append(paths, "/usr/local/newrelic-dotnet-agent/logs")    // for dotnetcore v10+
 	}
 	/*
 		Collect log file paths in this order
-		1.Non-new relic log files, such as docker and syslog, by looking in the standard, expected locations
-		2.New Relic log files by looking at the path customized by the user using any of the following configuration options:
+		1. Non-new relic log files, such as docker and syslog, by looking in the standard, expected locations
+		2. New Relic log files by looking at the path customized by the user using any of the following configuration options:
 		env vars
 		system properties
 		settings defined in new relic config files
-		3.New Relic log files by looking at standard locations
-		4.Dedupe if there any repeats of the same path
+		3. New Relic log files by looking at standard locations
+		4. Dedupe if there any repeats of the same path
 	*/
 
 	var logFilesFound []LogElement
@@ -214,8 +217,8 @@ func getLogPathFromUnmatchedKeys(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal
 		logElements := getLogPathsFromCombinedUnmatchedDirFilename(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal)
 		if len(logElements) > 0 {
 			return logElements
-		}	
-	} 
+		}
+	}
 	logElements := getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilenameKeyToVal, currentPath, options)
 	if len(logElements) > 0 {
 		return logElements
@@ -256,8 +259,8 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 				for _, fullPath := range logPaths {
 					dir, fileName := filepath.Split(fullPath)
 					logSourceData := LogSourceData{
-						FoundBy: foundBy,
-						KeyVals: keyVals,
+						FoundBy:  foundBy,
+						KeyVals:  keyVals,
 						FullPath: fullPath,
 					}
 					logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
@@ -340,7 +343,7 @@ func getLogPathsFromStandardLocations(paths []string, options tasks.Options) []L
 			}
 			logElements = append(logElements, setLogElement(fileName, dir, logSourceData, false, true, ""))
 		}
-	} else {
+	} else if len(oldLogFiles) > 0 {
 		mostRecentOldLog := selectMostRecentOldLogs(oldLogFiles)
 		dir, fileName := filepath.Split(mostRecentOldLog)
 		logSourceData := LogSourceData{
@@ -501,7 +504,7 @@ func getLogPathsFromConfigFile(configElements []baseConfig.ValidateElement, unma
 	return logElements
 }
 
-//Similar to tasks.FindFiles except that it does not traverse through sub-directories to find those filenames provided
+// Similar to tasks.FindFiles except that it does not traverse through sub-directories to find those filenames provided
 func findLogFiles(patterns []string, dir string) []string {
 	pathsToFiles := getFilesFromDir(dir)
 	// map to automatically dedupe file matches

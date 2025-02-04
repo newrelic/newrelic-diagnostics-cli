@@ -21,7 +21,7 @@ type TaskResult struct {
 	WasOverride bool
 }
 
-//MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
+// MarshalJSON - custom JSON marshaling for this task, we'll strip out the passphrase to keep it only in memory, not on disk
 func (tr TaskResult) MarshalJSON() ([]byte, error) {
 	//note: this technique can be used to return anything you want, including modified values or nothing at all.
 	//anything that gets returned here ends up in the output json file
@@ -61,12 +61,12 @@ func Register(t tasks.Task, runByDefault bool) {
 	registeredTasks[strings.ToLower(t.Identifier().String())] = registeredTask{Task: t, runByDefault: runByDefault}
 }
 
-//TasksForIdentifierString - this returns the registered task(s) for a given identifier, it can have wildcards
+// TasksForIdentifierString - this returns the registered task(s) for a given identifier, it can have wildcards
 func TasksForIdentifierString(ident string) []tasks.Task {
 	var tasks []tasks.Task
 
 	if strings.Contains(ident, "*") {
-		converter, _ := regexp.Compile("\\*")
+		converter, _ := regexp.Compile(`\*`)
 		matchString := converter.ReplaceAllString(strings.ToLower(ident), ".*")
 		matcher, err := regexp.Compile(matchString)
 		if err != nil {
@@ -97,7 +97,7 @@ func AddAllToQueue() {
 	log.Debugf("Added %d tasks to queue\n", len(Work.WorkQueue))
 }
 
-//AddTasksByIdentifiers - will use an identifier string to add tasks, can have wildcards
+// AddTasksByIdentifiers - will use an identifier string to add tasks, can have wildcards
 func AddTasksByIdentifier(ident string) {
 	log.Debugf("asked to load %s by string\n", ident)
 	tasks := TasksForIdentifierString(ident)
@@ -110,7 +110,7 @@ func AddTasksByIdentifier(ident string) {
 	}
 }
 
-//AddTasksByIdentifiers - takes slice of tasks identifier strings and adds all matching tasks to work queue
+// AddTasksByIdentifiers - takes slice of tasks identifier strings and adds all matching tasks to work queue
 func AddTasksByIdentifiers(idents []string) {
 	for _, ident := range idents {
 		AddTasksByIdentifier(ident)
@@ -140,7 +140,7 @@ func AddTaskToQueue(p tasks.Task) {
 
 	// somewhere in here may be a good place to detect dependency loops...
 	// if this task has dependencies *and* it's already in the  task list we are in an invalid state
-	// since it would be impossible to resolve the dependencies beore it runs
+	// since it would be impossible to resolve the dependencies before it runs
 
 	// if we have already created a key for the results then we aren't in the queue yet
 	log.Debug("Checking queue for ", p.Identifier(), ": ", queuedTasks[p.Identifier()])

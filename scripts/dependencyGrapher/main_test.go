@@ -6,7 +6,7 @@ import (
 	"sort"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -222,13 +222,13 @@ var _ = Describe("Dependency Grapher", func() {
 			})
 
 			It("should return map of only task file info", func() {
-				expectedTwoDepependencyMap := map[string]bool{
+				expectedTwoDependencyMap := map[string]bool{
 					"I/Am/Dependency1": true,
 					"I/Am/Dependency2": true,
 				}
-				expectedNoDepependencyMap := map[string]bool{}
-				Expect(result["Good/TaskFile/TwoDependencies"]).To(Equal(expectedTwoDepependencyMap))
-				Expect(result["Good/TaskFile/NoDependencies"]).To(Equal(expectedNoDepependencyMap))
+				expectedNoDependencyMap := map[string]bool{}
+				Expect(result["Good/TaskFile/TwoDependencies"]).To(Equal(expectedTwoDependencyMap))
+				Expect(result["Good/TaskFile/NoDependencies"]).To(Equal(expectedNoDependencyMap))
 			})
 
 			It("should not return an error", func() {
@@ -249,12 +249,12 @@ var _ = Describe("Dependency Grapher", func() {
 		Context("when given a valid task map", func() {
 			BeforeEach(func() {
 				taskMap = map[string]map[string]bool{
-					"Good/TaskFile/TwoDependencies": map[string]bool{
+					"Good/TaskFile/TwoDependencies": {
 						"I/Am/Dependency1": true,
 						"I/Am/Dependency2": true,
 					},
-					"Good/TaskFile/NoDependencies": map[string]bool{},
-					"Example/Task/IgnoreMe":        map[string]bool{},
+					"Good/TaskFile/NoDependencies": {},
+					"Example/Task/IgnoreMe":        {},
 				}
 
 			})

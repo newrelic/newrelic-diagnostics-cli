@@ -11,16 +11,16 @@ import (
 func TestBaseCollectorConnectEU_prepareEarlyResult(t *testing.T) {
 
 	payloadregionDetectUSEU := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01", "eu01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01", "eu01"}},
 	}
 	payloadregionDetectEmpty := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{}},
+		"Base/Config/RegionDetect": {Payload: []string{}},
 	}
 	payloadregionDetectUS := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01"}},
 	}
 	payloadregionDetectEU := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"eu01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"eu01"}},
 	}
 
 	type fields struct {
@@ -68,7 +68,7 @@ func TestBaseCollectorConnectEU_prepareEarlyResult(t *testing.T) {
 }
 
 func TestBaseCollectorConnectEU_prepareCollectorErrorResult(t *testing.T) {
-	sampleError := errors.New("HTTP Error: this is an error")
+	sampleError := errors.New("received HTTP Error: this is an error")
 	type fields struct {
 		upstream map[string]tasks.Result
 	}
@@ -169,16 +169,16 @@ func TestBaseCollectorConnectEU_prepareResult(t *testing.T) {
 		want   tasks.Status
 	}{
 		{
-			name: "should return a Success result given '200' status code",
+			name: "should return a Success result given '404' status code",
 			args: args{
-				body:       "mongrel ==> up (true)",
-				statusCode: "200",
+				body:       "{}",
+				statusCode: "404",
 			},
 			fields: fields{},
 			want:   tasks.Success,
 		},
 		{
-			name: "should return a Warning result given a non '200' status code",
+			name: "should return a Warning result given a non '404' status code",
 			args: args{
 				body:       "Document has moved permanently",
 				statusCode: "301",
@@ -203,15 +203,15 @@ func TestBaseCollectorConnectEU_prepareResult(t *testing.T) {
 func TestBaseCollectorConnectEU_Execute(t *testing.T) {
 
 	payloadregionDetectUSEU := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01", "eu01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01", "eu01"}},
 	}
 
 	payloadregionDetectUS := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{"us01"}},
+		"Base/Config/RegionDetect": {Payload: []string{"us01"}},
 	}
 
 	payloadregionDetectEmpty := map[string]tasks.Result{
-		"Base/Config/RegionDetect": tasks.Result{Payload: []string{}},
+		"Base/Config/RegionDetect": {Payload: []string{}},
 	}
 	type fields struct {
 		upstream   map[string]tasks.Result

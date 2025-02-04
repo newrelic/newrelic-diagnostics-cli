@@ -9,7 +9,7 @@ configuration = nconf
 exports.config = {
     app_name: [`${configuration.get('service').name}: ${configuration.get('service').environment}`],
     agent_enabled: configuration.get('monitoring').newrelic && configuration.get('monitoring').newrelic.enabled,
-    license_key: configuration.get('monitoring').newrelic.licence,
+    license_key: configuration.get('monitoring').newrelic.license,
     logging: {
         level: 'info'
     }

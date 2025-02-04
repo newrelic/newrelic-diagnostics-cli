@@ -1,9 +1,9 @@
 package env
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Base/Env/DetectAzure", func() {
@@ -49,7 +49,7 @@ var _ = Describe("Base/Env/DetectAzure", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Warning,
 						Summary: "Unable to gather any Environment Variables from the current shell.",
 					},
@@ -67,7 +67,7 @@ var _ = Describe("Base/Env/DetectAzure", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Summary: "Gathered Environment variables of current shell.",
 						Payload: map[string]string{
@@ -91,7 +91,7 @@ var _ = Describe("Base/Env/DetectAzure", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Env/CollectEnvVars": tasks.Result{
+					"Base/Env/CollectEnvVars": {
 						Status:  tasks.Info,
 						Summary: "Gathered Environment variables of current shell.",
 						Payload: map[string]string{

@@ -84,18 +84,16 @@ func (s SuiteManager) CaptureOutOfPlaceArgs(osArgs []string, suiteFlagArgs []str
 	return argsMatchedToSuitesIdentifiers
 }
 
-//FindTasksBySuites - When given a slice of Suite structs, it will return a slice of task identifier strings included in those suites.
+// FindTasksBySuites - When given a slice of Suite structs, it will return a slice of task identifier strings included in those suites.
 func (s SuiteManager) FindTasksBySuites(suites []Suite) []string {
 	var tasks []string
 	for _, suite := range suites {
-		for _, task := range suite.Tasks {
-			tasks = append(tasks, task)
-		}
+		tasks = append(tasks, suite.Tasks...)
 	}
 	return tasks
 }
 
-//DefaultSuiteManager - Eventually we'll want to move this to an app dependency struct
+// DefaultSuiteManager - Eventually we'll want to move this to an app dependency struct
 var DefaultSuiteManager = NewSuiteManager(suiteDefinitions)
 
 func NewSuiteManager(suites []Suite) *SuiteManager {
@@ -103,13 +101,4 @@ func NewSuiteManager(suites []Suite) *SuiteManager {
 	return &SuiteManager{
 		Suites: suites,
 	}
-}
-
-func isArgInSuiteSlice(arg string, suites []string) bool {
-	for _, suite := range suites {
-		if arg == suite {
-			return true
-		}
-	}
-	return false
 }

@@ -81,7 +81,7 @@ func (p NodeEnvNpmPackage) Execute(options tasks.Options, upstream map[string]ta
 		filesToCopy = append(filesToCopy, tasks.FileCopyEnvelope{Path: file})
 	}
 
-	resultSummary := "We have succesfully retrieved the following file(s):"
+	resultSummary := "We have successfully retrieved the following file(s):"
 
 	for _, file := range pje {
 		resultSummary += "\n" + file.FileName
@@ -95,7 +95,7 @@ func (p NodeEnvNpmPackage) Execute(options tasks.Options, upstream map[string]ta
 	}
 }
 
-//Recursively find package*.json files, skipping those in node_modules
+// Recursively find package*.json files, skipping those in node_modules
 func (p NodeEnvNpmPackage) findPackageFiles() ([]string, error) {
 	var packageFiles []string
 

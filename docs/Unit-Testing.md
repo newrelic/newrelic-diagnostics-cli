@@ -36,9 +36,9 @@ You should read the following article before moving forward with this readme:
 
 You can install Ginkgo by running the following commands in your terminal:
 
-```
-$ go get github.com/onsi/ginkgo/ginkgo
-$ go get github.com/onsi/gomega/...
+```sh
+$ go install github.com/onsi/ginkgo/v2/ginkgo@latest
+$ go install github.com/onsi/gomega/...
 ```
 
 # Writing unit tests
@@ -50,11 +50,11 @@ Let's walk through real world example writing unit tests, where we will:
 
 --------
 
-## Section 1: Getting started with TDD to test Identifer()
+## Section 1: Getting started with TDD to test Identifier()
 
 First let's copy over an example template into the directory where our task will live in `tasks/base/log/`.
 
-```
+```sh
 $ cp tasks/example/template/minimal_task.go tasks/base/log/count.go
 ```
 
@@ -90,7 +90,7 @@ package log
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -119,13 +119,13 @@ Within that, let's write **our first test!**. This is done by using Ginkgo's `It
 
 ```go
 It("Should return correct identifier", func() {
-  ...
+    ...
 })
 ```
 
 `It()` functions are the tests themselves and describe the behavior we expect from the function we're testing. 
 
-Let's create an expected result that looks like the value our task's `Identifier()` method should return. Then let's write an `Expect()` call to compare the expected result, with the actual result returned from `p.Identifer()`. Remember, `p` is the instance of our task that all tests will be using.
+Let's create an expected result that looks like the value our task's `Identifier()` method should return. Then let's write an `Expect()` call to compare the expected result, with the actual result returned from `p.Identifier()`. Remember, `p` is the instance of our task that all tests will be using.
 
 The finished test should look like:
 
@@ -161,7 +161,7 @@ Expect(p.Identifier()).To(Equal(expectedIdentifier))
 
 ### **Next step: let's run our test!**
 
-```
+```sh
 $ cd tasks/base/log
 $ go test
 ```
@@ -194,7 +194,7 @@ func (p BaseLogCount) Identifier() tasks.Identifier {
 ```
 Running our tests again:
 
-```
+```sh
 $ go test
 ```
 
@@ -220,7 +220,7 @@ Here is an example of what our `Execute()` function might return if it were succ
 
 ```go
 tasks.Result{
-	Status: tasks.Succcess,
+	Status: tasks.Success,
 	Summary: "4 log files collected"
 	Payload: 4
 }
@@ -301,7 +301,7 @@ Now let's modify the execute function in our task (`tasks/base/log/count.go`) to
 func (p BaseLogCount) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
 	var result tasks.Result
 
-	// Check if upstream depedency task status is a failure
+	// Check if upstream dependency task status is a failure
 	if upstream["Base/Log/Collect"].Status == tasks.Failure {
 		result = tasks.Result{
 			Status:  tasks.None,

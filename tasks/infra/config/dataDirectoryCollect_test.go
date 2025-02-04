@@ -67,11 +67,11 @@ func TestInfraConfigDataDirectoryCollect_Dependencies(t *testing.T) {
 func TestInfraConfigDataDirectoryCollect_Execute(t *testing.T) {
 	var mockDataDir = func([]string) ([]tasks.FileCopyEnvelope, error) {
 		return []tasks.FileCopyEnvelope{
-			tasks.FileCopyEnvelope{Path: "/var/db/newrelic-infra/data", Identifier: "Infra/Config/DataDirectoryCollect"},
+			{Path: "/var/db/newrelic-infra/data", Identifier: "Infra/Config/DataDirectoryCollect"},
 		}, nil
 	}
 	var mockDataDirError = func([]string) ([]tasks.FileCopyEnvelope, error) {
-		return []tasks.FileCopyEnvelope{}, errors.New("No data directory detected")
+		return []tasks.FileCopyEnvelope{}, errors.New("no data directory detected")
 	}
 	var mockDataPath = func(string) []string {
 		return []string{}
@@ -88,21 +88,21 @@ func TestInfraConfigDataDirectoryCollect_Execute(t *testing.T) {
 	}{
 		{name: "It should return a None status if no Infrastructure agent detected", p: InfraConfigDataDirectoryCollect{}, args: args{}, want: tasks.Result{Summary: "No New Relic Infrastructure agent detected"}}, {name: "It should return a None status if no Infrastructure agent detected", p: InfraConfigDataDirectoryCollect{}, args: args{}, want: tasks.Result{Summary: "No New Relic Infrastructure agent detected"}},
 		{name: "It should return the Infrastructure data directory", p: InfraConfigDataDirectoryCollect{dataDirectoryGetter: mockDataDir, dataDirectoryPathGetter: mockDataPath}, args: args{
-			upstream: map[string]tasks.Result{"Infra/Config/Agent": tasks.Result{Status: tasks.Success}},
+			upstream: map[string]tasks.Result{"Infra/Config/Agent": {Status: tasks.Success}},
 		},
 			want: tasks.Result{
 				Status:  tasks.Success,
 				Summary: "New Relic Infrastructure data directory found",
 				FilesToCopy: []tasks.FileCopyEnvelope{
-					tasks.FileCopyEnvelope{Path: "/var/db/newrelic-infra/data", Identifier: "Infra/Config/DataDirectoryCollect"},
+					{Path: "/var/db/newrelic-infra/data", Identifier: "Infra/Config/DataDirectoryCollect"},
 				},
 			}},
 		{name: "It should return an Error result if there is an error retrieving the data directory", p: InfraConfigDataDirectoryCollect{dataDirectoryGetter: mockDataDirError, dataDirectoryPathGetter: mockDataPath}, args: args{
-			upstream: map[string]tasks.Result{"Infra/Config/Agent": tasks.Result{Status: tasks.Success}},
+			upstream: map[string]tasks.Result{"Infra/Config/Agent": {Status: tasks.Success}},
 		},
 			want: tasks.Result{
 				Status:  tasks.Error,
-				Summary: "Unable to get Infrastructure data directory: No data directory detected",
+				Summary: "Unable to get Infrastructure data directory: no data directory detected",
 			}},
 	}
 	for _, tt := range tests {
@@ -144,21 +144,20 @@ func Test_getDataDir(t *testing.T) {
 		{name: "it should return all the files in a directory",
 			args: args{[]string{"fixtures/level1dir"}},
 			want: []tasks.FileCopyEnvelope{
-				tasks.FileCopyEnvelope{
+				{
 					Path:       filepath.FromSlash("fixtures/level1dir/level2dir/test2"),
 					Identifier: "Infra/Config/DataDirectoryCollect"},
-				tasks.FileCopyEnvelope{
+				{
 					Path:       filepath.FromSlash("fixtures/level1dir/level2dir/test1"),
 					Identifier: "Infra/Config/DataDirectoryCollect"},
-				tasks.FileCopyEnvelope{
+				{
 					Path:       filepath.FromSlash("fixtures/level1dir/level2dir/test3"),
 					Identifier: "Infra/Config/DataDirectoryCollect"},
-				tasks.FileCopyEnvelope{
+				{
 					Path:       filepath.FromSlash("fixtures/level1dir/test1"),
 					Identifier: "Infra/Config/DataDirectoryCollect"},
 			},
 		},
-		
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

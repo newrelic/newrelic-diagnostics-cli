@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -28,7 +28,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Failure,
 					},
 				}
@@ -47,7 +47,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -70,7 +70,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -96,7 +96,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -127,7 +127,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -158,7 +158,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -195,7 +195,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -229,7 +229,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -263,7 +263,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -295,7 +295,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -327,7 +327,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -341,7 +341,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 					return "5.0", nil
 				}
 				p.versionIsCompatible = func(string, []string) (bool, error) {
-					return false, errors.New("Tostadas are supreme")
+					return false, errors.New("tostadas are supreme")
 				}
 
 			})
@@ -351,7 +351,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 
 			It("should return an expected result summary", func() {
-				Expect(result.Summary).To(Equal("Error parsing NServiceBus DLL version. Error was: Tostadas are supreme"))
+				Expect(result.Summary).To(Equal("Error parsing NServiceBus DLL version. Error was: tostadas are supreme"))
 			})
 		})
 		Context("when version couldn't be determined for some messagingService", func() {
@@ -359,7 +359,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"DotNet/Agent/Installed": tasks.Result{
+					"DotNet/Agent/Installed": {
 						Status: tasks.Success,
 					},
 				}
@@ -454,7 +454,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 					return "", nil
 				}
 				p.versionIsCompatible = func(string, []string) (bool, error) {
-					return false, errors.New("I like Bananas")
+					return false, errors.New("i like Bananas")
 				}
 				expectedMessagingService = messagingService{
 					name:        "",
@@ -469,7 +469,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 
 			It("should return a expected error", func() {
-				Expect(resultErr.Error()).To(Equal("I like Bananas"))
+				Expect(resultErr.Error()).To(Equal("i like Bananas"))
 			})
 		})
 	})
@@ -540,7 +540,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 					return "", nil
 				}
 				p.versionIsCompatible = func(string, []string) (bool, error) {
-					return false, errors.New("I like Bananas")
+					return false, errors.New("i like Bananas")
 				}
 				expectedMessagingService = messagingService{
 					name:        "",
@@ -555,7 +555,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 
 			It("should return a expected error", func() {
-				Expect(resultErr.Error()).To(Equal("I like Bananas"))
+				Expect(resultErr.Error()).To(Equal("i like Bananas"))
 			})
 		})
 	})
@@ -599,7 +599,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 
 			BeforeEach(func() {
 				p.getFileVersion = func(string) (string, error) {
-					return "", errors.New("I like Bananas")
+					return "", errors.New("i like Bananas")
 				}
 				expectedMessagingService = messagingService{
 					name:        "",
@@ -614,7 +614,7 @@ var _ = Describe("Dotnet/Requirements/MessagingServicesCheck", func() {
 			})
 
 			It("should return a expected error", func() {
-				Expect(resultErr.Error()).To(Equal("I like Bananas"))
+				Expect(resultErr.Error()).To(Equal("i like Bananas"))
 			})
 		})
 	})

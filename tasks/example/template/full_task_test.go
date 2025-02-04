@@ -1,10 +1,10 @@
 package template
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Example/Template/FullTask", func() {
@@ -52,8 +52,8 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
-						Status: tasks.Success,
+					"Base/Config/Validate": {
+						Status:  tasks.Success,
 						Payload: []config.ValidateElement{},
 					},
 				}
@@ -76,8 +76,8 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
-						Status: tasks.Warning,
+					"Base/Config/Validate": {
+						Status:  tasks.Warning,
 						Payload: "I should be a slice of validate elements, but I'm not",
 					},
 				}
@@ -99,7 +99,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -129,7 +129,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -159,7 +159,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{
@@ -189,7 +189,7 @@ var _ = Describe("Example/Template/FullTask", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Base/Config/Validate": tasks.Result{
+					"Base/Config/Validate": {
 						Status: tasks.Success,
 						Payload: []config.ValidateElement{
 							{

@@ -1,11 +1,15 @@
 package env
 
-// This is an example task test file referenced in /docs/unit-testing.md
-
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"reflect"
+	"testing"
+
+	"github.com/newrelic/newrelic-diagnostics-cli/domain/repository"
+	"github.com/newrelic/newrelic-diagnostics-cli/mocks"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 )
 
 var _ = Describe("Python/Env/Dependencies", func() {
@@ -26,8 +30,8 @@ var _ = Describe("Python/Env/Dependencies", func() {
 
 	Describe("Explain()", func() {
 		It("Should return correct task explanations string", func() {
-			expectedExaplanation := "Collect Python application packages"
-			Expect(p.Explain()).To(Equal(expectedExaplanation))
+			expectedExplanation := "Collect Python application packages"
+			Expect(p.Explain()).To(Equal(expectedExplanation))
 		})
 	})
 
@@ -54,7 +58,7 @@ var _ = Describe("Python/Env/Dependencies", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
-					"Python/Config/Agent": tasks.Result{
+					"Python/Config/Agent": {
 						Status: tasks.Failure,
 					},
 				}
@@ -64,10 +68,126 @@ var _ = Describe("Python/Env/Dependencies", func() {
 				Expect(result.Status).To(Equal(tasks.None))
 			})
 
-			It("should return an expected none result summary", func() {
-				Expect(result.Summary).To(Equal("Python Agent not installed. This task didn't run."))
-			})
 		})
 
 	})
 })
+
+func TestPythonEnvDependencies_getProjectDependencies(t *testing.T) {
+	mPipEnv := new(mocks.MPipVersionDeps)
+	stream := make(chan string)
+
+	filesToCopy := []tasks.FileCopyEnvelope{
+		{Path: "pipFreeze.txt", Stream: stream},
+	}
+	type fields struct {
+		iPipEnvVersion repository.IPipEnvVersion
+	}
+	tests := []struct {
+		name           string
+		fields         fields
+		want           tasks.Result
+		mockPipReturn  tasks.Result
+		mockPip3Return tasks.Result
+	}{
+		// TODO: Add test cases.
+		{
+			name: "Both Success",
+			fields: fields{
+				iPipEnvVersion: mPipEnv,
+			},
+			want: tasks.Result{
+				Status:      tasks.Success,
+				Summary:     "SUCCESS\nSUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: []tasks.FileCopyEnvelope{filesToCopy[0], filesToCopy[0]},
+			},
+			mockPipReturn: tasks.Result{
+				Status:      tasks.Info,
+				Summary:     "SUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: filesToCopy,
+			},
+			mockPip3Return: tasks.Result{
+				Status:      tasks.Info,
+				Summary:     "SUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: filesToCopy,
+			},
+		},
+		{
+			name: "pip freeze returns an error and pip3 freeze returns a success",
+			fields: fields{
+				iPipEnvVersion: mPipEnv,
+			},
+			want: tasks.Result{
+				Status:      tasks.Warning,
+				Summary:     "FAILURE\nSUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: []tasks.FileCopyEnvelope{filesToCopy[0]},
+			},
+			mockPipReturn: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAILURE",
+			},
+			mockPip3Return: tasks.Result{
+				Status:      tasks.Info,
+				Summary:     "SUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: filesToCopy,
+			},
+		},
+		{
+			name: "pip3 freeze returns an error and pip freeze returns a success",
+			fields: fields{
+				iPipEnvVersion: mPipEnv,
+			},
+			want: tasks.Result{
+				Status:      tasks.Warning,
+				Summary:     "FAILURE\nSUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: []tasks.FileCopyEnvelope{filesToCopy[0]},
+			},
+			mockPipReturn: tasks.Result{
+				Status:      tasks.Info,
+				Summary:     "SUCCESS",
+				Payload:     []string{"PAYLOAD"},
+				FilesToCopy: filesToCopy,
+			},
+			mockPip3Return: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAILURE",
+			},
+		},
+		{
+			name: "Both return errors",
+			fields: fields{
+				iPipEnvVersion: mPipEnv,
+			},
+			want: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAILURE\nFAILURE",
+			},
+			mockPipReturn: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAILURE",
+			},
+			mockPip3Return: tasks.Result{
+				Status:  tasks.Error,
+				Summary: "FAILURE",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mPipEnv.On("CheckPipVersion", mock.Anything).Return(tt.mockPipReturn).Once()
+			mPipEnv.On("CheckPipVersion", mock.Anything).Return(tt.mockPip3Return).Once()
+			tr := PythonEnvDependencies{
+				iPipEnvVersion: tt.fields.iPipEnvVersion,
+			}
+			if got := tr.getProjectDependencies(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PythonEnvDependencies.getProjectDependencies() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

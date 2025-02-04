@@ -6,7 +6,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	dependencies "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -53,7 +53,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 		Context("when Node/Env/Dependencies did not return an Info status", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.None,
 					},
 				}
@@ -68,7 +68,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 		Context("when using React, Babel and Next framework", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.Info,
 						Payload: []dependencies.NodeModuleVersion{
 							{
@@ -109,7 +109,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 		Context("when we do not find a supported framework among their node modules and their are using problematic modules as well", func() {
 			BeforeEach(func() {
 				upstream = map[string]tasks.Result{
-					"Node/Env/Dependencies": tasks.Result{
+					"Node/Env/Dependencies": {
 						Status: tasks.Info,
 						Payload: []dependencies.NodeModuleVersion{
 							{
@@ -132,7 +132,7 @@ var _ = Describe("Node/Requirements/ProblematicModules", func() {
 				Expect(result.Status).To(Equal(tasks.Warning))
 			})
 			It("should return an expected summary", func() {
-				fmt.Println("MY SUMARY: ", result.Summary)
+				fmt.Println("MY SUMMARY: ", result.Summary)
 				Expect(result.Summary).To(Equal("- You are not using a supported framework by the Node Agent. In order to get monitoring data, you'll have to apply manual instrumentation using our APIs. For more information: https://docs.newrelic.com/docs/agents/nodejs-agent/supported-features/nodejs-custom-instrumentation\n- We have detected the following unsupported module(s) in your application: @babel/node, @babel/core. This may cause instrumentation issues and inconsistency of data for the Node Agent.\n- Keep in mind that if you are looking for additional Node.js runtime level statistics, you'll need to install our optional module: @newrelic/native-metrics. For more information: https://docs.newrelic.com/docs/agents/nodejs-agent/supported-features/nodejs-vm-measurements\n"))
 			})
 		})
