@@ -23,7 +23,8 @@
 		"Include": "",
 		"Region": "",
 		"Script": "",
-		"ScriptFlags": ""
+		"ScriptFlags": "",
+		"K8sNamespace": ""
 	},
 	"Results": [
 		{

@@ -1,13 +1,11 @@
 $EXENAME="newrelic-diagnostics-cli"
-echo "Running go get -t ./..."
-go get -t ./...
-go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@latest
-go get github.com/onsi/ginkgo/v2/ginkgo@v2.12.1
 
+go mod download
+go mod tidy
 go build
-echo "Running unit tests"
+
 #this runs all test in any directory that has a *_test.go file
-ginkgo -r --keep-going --no-color
+go run github.com/onsi/ginkgo/v2/ginkgo -r --keep-going --no-color
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }

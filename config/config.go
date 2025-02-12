@@ -57,6 +57,7 @@ type userFlags struct {
 	Region             string
 	Script             string
 	ScriptFlags        string
+	K8sNamespace       string
 	InNewRelicCLI      bool
 }
 
@@ -95,6 +96,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Region           string
 		Script           string
 		ScriptFlags      string
+		K8sNamespace     string
 	}{
 		Verbose:          f.Verbose,
 		Quiet:            f.Quiet,
@@ -118,6 +120,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		Region:           f.Region,
 		Script:           f.Script,
 		ScriptFlags:      f.ScriptFlags,
+		K8sNamespace:     f.K8sNamespace,
 	})
 }
 
@@ -214,6 +217,8 @@ func ParseFlags() {
 
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
+	flag.StringVar(&Flags.K8sNamespace, "k8s-namespace", defaultString, "Specify a namespace to use when executing the kubectl command")
+
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
 	flag.StringVar(&Flags.Include, "include", defaultString, "Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
@@ -253,6 +258,14 @@ func ParseFlags() {
 	if Flags.BrowserURL != "" {
 		Flags.Override = "Browser/Agent/GetSource.url=" + Flags.BrowserURL + "," + Flags.Override
 		Flags.Tasks = "Browser/Agent/Detect," + Flags.Tasks
+	}
+
+	if Flags.K8sNamespace != "" {
+		Flags.Override = "K8s/Infra/Config.namespace=" + Flags.K8sNamespace + "," + Flags.Override
+		Flags.Override = "K8s/Infra/Daemonset.namespace=" + Flags.K8sNamespace + "," + Flags.Override
+		Flags.Override = "K8s/Infra/Deploy.namespace=" + Flags.K8sNamespace + "," + Flags.Override
+		Flags.Override = "K8s/Infra/Logs.namespace=" + Flags.K8sNamespace + "," + Flags.Override
+		Flags.Override = "K8s/Infra/Pods.namespace=" + Flags.K8sNamespace + "," + Flags.Override
 	}
 
 	// Set the endpoints based on region
@@ -303,6 +316,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "include", Value: f.Include},
 		{Name: "region", Value: f.Region},
 		{Name: "script", Value: f.Script},
+		{Name: "k8sNamespace", Value: f.K8sNamespace},
 	}
 }
 

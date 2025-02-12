@@ -33,6 +33,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		APIKey             string
 		Region             string
 		Script             string
+		K8sNamespace       string
 	}
 
 	sampleFlags := fields{
@@ -60,6 +61,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		APIKey:             "string",
 		Region:             "string",
 		Script:             "string",
+		K8sNamespace:       "string",
 	}
 
 	samplePreparedConfig := []ConfigFlag{
@@ -86,6 +88,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		{Name: "include", Value: "string"},
 		{Name: "region", Value: "string"},
 		{Name: "script", Value: "string"},
+		{Name: "k8sNamespace", Value: "string"},
 	}
 
 	tests := []struct {
@@ -127,6 +130,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				APIKey:             tt.fields.APIKey,
 				Region:             tt.fields.Region,
 				Script:             tt.fields.Script,
+				K8sNamespace:       tt.fields.K8sNamespace,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)

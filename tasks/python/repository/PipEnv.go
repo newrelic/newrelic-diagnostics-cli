@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"bufio"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -39,7 +38,7 @@ func (p PipEnv) CheckPipVersion(pipCmd string) (result tasks.Result) {
 	// stream payload to zip file to allow troubleshooting with the parsed config as needed
 	stream := make(chan string)
 
-	go streamBlob(pipFreezeOutputString, stream)
+	go tasks.StreamBlob(pipFreezeOutputString, stream)
 
 	log.Debug("Result of running 'pip freeze': ")
 	log.Debug(pipFreezeOutputString)
@@ -51,18 +50,6 @@ func (p PipEnv) CheckPipVersion(pipCmd string) (result tasks.Result) {
 		Status:      tasks.Info,
 		Payload:     pipFreezeOutputSlice,
 		FilesToCopy: []tasks.FileCopyEnvelope{{Path: "pipFreeze.txt", Stream: stream}},
-	}
-}
-
-func streamBlob(input string, ch chan string) {
-	defer close(ch)
-
-	scanner := bufio.NewScanner(strings.NewReader(input))
-
-	scanner.Split(bufio.ScanLines)
-
-	for scanner.Scan() {
-		ch <- scanner.Text() + "\n"
 	}
 }
 
