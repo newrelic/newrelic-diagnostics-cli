@@ -1,8 +1,6 @@
 package infra
 
 import (
-	"strings"
-
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -34,28 +32,11 @@ func (p K8sDaemonset) Execute(options tasks.Options, upstream map[string]tasks.R
 	)
 
 	namespace := options.Options["namespace"]
-	if namespace != "" {
-		res, err = p.runCommand(namespace)
-	} else {
-		res, err = p.runCommand("")
-	}
-
+	res, err = p.runCommand(namespace)
 	if err != nil {
 		return tasks.Result{
 			Summary: "Error retrieving daemonset details: " + err.Error(),
 			Status:  tasks.Error,
-		}
-	}
-
-	if namespace == "" &&
-		(strings.TrimSpace(string(res)) == "No resources found in default namespace." ||
-			strings.TrimSpace(string(res)) == "apiVersion: v1\nitems: []\nkind: List\nmetadata:\n  resourceVersion: \"\"") {
-		res, err = p.runCommand("newrelic")
-		if err != nil {
-			return tasks.Result{
-				Summary: "Error retrieving daemonset details: " + err.Error(),
-				Status:  tasks.Error,
-			}
 		}
 	}
 

@@ -1,9 +1,6 @@
 package infra
 
 import (
-	"strings"
-
-	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -35,29 +32,11 @@ func (p K8sDeployment) Execute(options tasks.Options, upstream map[string]tasks.
 	)
 
 	namespace := options.Options["namespace"]
-	logger.Debugf("k8s namespace: %s\n", namespace)
-	if namespace != "" {
-		res, err = p.runCommand(namespace)
-	} else {
-		res, err = p.runCommand("")
-	}
-
+	res, err = p.runCommand(namespace)
 	if err != nil {
 		return tasks.Result{
 			Summary: "Error retrieving deployment details: " + err.Error(),
 			Status:  tasks.Error,
-		}
-	}
-
-	if namespace == "" &&
-		(strings.TrimSpace(string(res)) == "No resources found in default namespace." ||
-			strings.TrimSpace(string(res)) == "apiVersion: v1\nitems: []\nkind: List\nmetadata:\n  resourceVersion: \"\"") {
-		res, err = p.runCommand("newrelic")
-		if err != nil {
-			return tasks.Result{
-				Summary: "Error retrieving deployment details: " + err.Error(),
-				Status:  tasks.Error,
-			}
 		}
 	}
 
