@@ -1054,3 +1054,13 @@ func IsUserRoot() (bool, error) {
 	currentUser, err := user.Current()
 	return currentUser.Username == "root", err
 }
+
+// StreamBlob - streams output to a channel to be streamed to a file in the zip
+func StreamBlob(input string, ch chan string) {
+	defer close(ch)
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		ch <- scanner.Text() + "\n"
+	}
+}

@@ -39,6 +39,8 @@ import (
 	javaEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/java/env"
 	javaJvm "github.com/newrelic/newrelic-diagnostics-cli/tasks/java/jvm"
 	javaLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/java/log"
+	k8sEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/k8s/env"
+	k8sInfra "github.com/newrelic/newrelic-diagnostics-cli/tasks/k8s/infra"
 	nodeAgent "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/agent"
 	nodeConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/config"
 	nodeEnv "github.com/newrelic/newrelic-diagnostics-cli/tasks/node/env"
@@ -63,7 +65,6 @@ import (
 )
 
 func init() {
-
 	env.RegisterWith(Register)
 	config.RegisterWith(Register)
 	collector.RegisterWith(Register)
@@ -120,6 +121,8 @@ func init() {
 	baseAgent.RegisterWith(Register)
 	nodeRequirements.RegisterWith(Register)
 	rubyRequirements.RegisterWith(Register)
+	k8sInfra.RegisterWith(Register)
+	k8sEnv.RegisterWith(Register)
 
 	//example stuff, doesn't need to "ship" because binary gets name after directory with `go build` cmd
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {

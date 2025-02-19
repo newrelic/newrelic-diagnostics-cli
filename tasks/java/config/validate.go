@@ -1,7 +1,6 @@
 package config
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -129,23 +128,12 @@ func (t JavaConfigValidate) Execute(options tasks.Options, upstream map[string]t
 		output += "CurrentWorkingDir: " + javaConfig.CurrentWorkingDir + "\n"
 		output += "WorkingConfig: \n" + javaConfig.ParsedResult.String()
 
-		go streamBlob(output, stream)
+		go tasks.StreamBlob(output, stream)
 
 		result.FilesToCopy = append(result.FilesToCopy, tasks.FileCopyEnvelope{Path: fmt.Sprintf("Config_%d.txt", javaConfig.Proc.Pid), Stream: stream})
 	}
 
 	return result
-}
-
-func streamBlob(input string, ch chan string) {
-	defer close(ch)
-
-	scanner := bufio.NewScanner(strings.NewReader(input))
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		ch <- scanner.Text() + "\n"
-	}
-
 }
 
 func matchConfigFile(processWorkingDir string, validations []config.ValidateElement, processCmdLineArgs []string) (configPath string, parsedResult tasks.ValidateBlob) {

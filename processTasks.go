@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -75,7 +76,7 @@ func processTasks(options tasks.Options, overrides []override, wg *sync.WaitGrou
 		//Parse overrides to detect which task we are running
 		for _, value := range overrides {
 			// Initialize the taskOptions object
-			log.Debugf("override %s: %s", value.Identifier, value.value)
+			log.Debugf("override %s: %s\n", value.Identifier, value.value)
 			if strings.EqualFold(value.Identifier.String(), task.Identifier().String()) {
 				log.Debug("Adding override to task namedTaskOptions", value.key, ":", value.value)
 				namedTaskOptions.Options[value.key] = value.value
@@ -193,7 +194,7 @@ func processFlagsSuites(flagValue string, args []string) ([]suites.Suite, error)
 
 	if len(errorMsg) > 1 {
 		errorMsg += "\nPlease use the `--help suites` to check for available suites and proper formatting \n"
-		return matchedSuites, fmt.Errorf(errorMsg)
+		return matchedSuites, errors.New(errorMsg)
 	}
 
 	return matchedSuites, nil

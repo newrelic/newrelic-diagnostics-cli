@@ -312,18 +312,15 @@ func printScriptList(catalogRepo *scriptrunner.Catalog) {
 	}
 	for _, s := range catalog {
 		if !config.Flags.Quiet {
-			log.Infof(color.ColorString(color.White, "Name: "))
+			log.Infof("%s", color.ColorString(color.White, "Name: "))
 		}
 		log.Info(s.Name)
 		if !config.Flags.Quiet {
-			log.Infof(color.ColorString(color.White, "Description: "))
-			log.Info(s.Description)
-			log.Infof(color.ColorString(color.White, "Type: "))
-			log.Info(s.Type)
-			log.Infof(color.ColorString(color.White, "OS: "))
-			log.Info(s.OS)
+			log.Infof("%s %s\n", color.ColorString(color.White, "Description: "), s.Description)
+			log.Infof("%s %s\n", color.ColorString(color.White, "Type: "), s.Type)
+			log.Infof("%s %s\n", color.ColorString(color.White, "OS: "), s.OS)
 			if len(s.OutputFiles) > 0 {
-				log.Infof(color.ColorString(color.White, "Output files: "))
+				log.Infof("%s", color.ColorString(color.White, "Output files: "))
 				log.Info("\n  -", strings.Join(s.OutputFiles, "\n  - "))
 			}
 			log.Info()

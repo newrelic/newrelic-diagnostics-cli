@@ -9,6 +9,9 @@ import (
 
 // IsExecutable - checks if a file is an executable file
 func (e FileCopyEnvelope) IsExecutable() (bool, error) {
+	if e.Stream != nil {
+		return false, nil
+	}
 	f, err := os.Open(e.Path)
 	if err != nil {
 		return false, err
