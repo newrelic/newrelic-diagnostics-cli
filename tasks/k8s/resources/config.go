@@ -1,4 +1,4 @@
-package infra
+package resources
 
 import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -11,12 +11,12 @@ type K8sConfigs struct {
 
 // Identifier - This returns the Category, Subcategory and Name of each task
 func (p K8sConfigs) Identifier() tasks.Identifier {
-	return tasks.IdentifierFromString("K8s/Infra/Config")
+	return tasks.IdentifierFromString("K8s/Resources/Config")
 }
 
 // Explain - Returns the help text for each individual task
 func (p K8sConfigs) Explain() string {
-	return "Collects K8s configMaps for newrelic-infrastructure in YAML format."
+	return "Collects K8s configMaps for the given namespace in YAML format."
 }
 
 // Dependencies - Returns the dependencies for each task.
@@ -31,11 +31,11 @@ func (p K8sConfigs) Execute(options tasks.Options, upstream map[string]tasks.Res
 		err error
 	)
 
-	namespace := options.Options["namespace"]
+	namespace := options.Options["k8sNamespace"]
 	res, err = p.runCommand(namespace)
 	if err != nil {
 		return tasks.Result{
-			Summary: "Error retrieving newrelic-infrastructure configMaps: " + err.Error(),
+			Summary: "Error retrieving configMaps: " + err.Error(),
 			Status:  tasks.Error,
 		}
 	}
@@ -44,9 +44,9 @@ func (p K8sConfigs) Execute(options tasks.Options, upstream map[string]tasks.Res
 	go tasks.StreamBlob(string(res), stream)
 
 	return tasks.Result{
-		Summary:     "Successfully collected K8s newrelic-infrastructure configMaps ",
+		Summary:     "Successfully collected K8s configMaps ",
 		Status:      tasks.Info,
-		FilesToCopy: []tasks.FileCopyEnvelope{{Path: "k8sInfraConfigMaps.txt", Stream: stream}},
+		FilesToCopy: []tasks.FileCopyEnvelope{{Path: "k8sConfigMaps.txt", Stream: stream}},
 	}
 }
 
@@ -56,8 +56,6 @@ func (p K8sConfigs) runCommand(namespace string) ([]byte, error) {
 			kubectlBin,
 			"get",
 			"configMaps",
-			"-l",
-			"app.kubernetes.io/name=newrelic-infrastructure",
 			"-o",
 			"yaml",
 		)
@@ -68,8 +66,6 @@ func (p K8sConfigs) runCommand(namespace string) ([]byte, error) {
 		"configMaps",
 		"-n",
 		namespace,
-		"-l",
-		"app.kubernetes.io/name=newrelic-infrastructure",
 		"-o",
 		"yaml",
 	)

@@ -1,4 +1,4 @@
-package infra
+package resources
 
 import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -11,12 +11,12 @@ type K8sDeployment struct {
 
 // Identifier - This returns the Category, Subcategory and Name of each task
 func (p K8sDeployment) Identifier() tasks.Identifier {
-	return tasks.IdentifierFromString("K8s/Infra/Deploy")
+	return tasks.IdentifierFromString("K8s/Resources/Deploy")
 }
 
 // Explain - Returns the help text for each individual task
 func (p K8sDeployment) Explain() string {
-	return "Collects newrelic-infrastructure deployment information."
+	return "Collects K8s deployments information for the given namespace in YAML format."
 }
 
 // Dependencies - Returns the dependencies for each task.
@@ -31,7 +31,7 @@ func (p K8sDeployment) Execute(options tasks.Options, upstream map[string]tasks.
 		err error
 	)
 
-	namespace := options.Options["namespace"]
+	namespace := options.Options["k8sNamespace"]
 	res, err = p.runCommand(namespace)
 	if err != nil {
 		return tasks.Result{
@@ -46,7 +46,7 @@ func (p K8sDeployment) Execute(options tasks.Options, upstream map[string]tasks.
 	return tasks.Result{
 		Summary:     "Successfully collected K8s newrelic-infrastructure deployment",
 		Status:      tasks.Info,
-		FilesToCopy: []tasks.FileCopyEnvelope{{Path: "k8sInfraDeployment.txt", Stream: stream}},
+		FilesToCopy: []tasks.FileCopyEnvelope{{Path: "k8sDeployment.txt", Stream: stream}},
 	}
 }
 
@@ -56,8 +56,6 @@ func (p K8sDeployment) runCommand(namespace string) ([]byte, error) {
 			kubectlBin,
 			"describe",
 			"deployment",
-			"-l",
-			"app.kubernetes.io/name=newrelic-infrastructure",
 		)
 	}
 	return p.cmdExec(
@@ -66,7 +64,5 @@ func (p K8sDeployment) runCommand(namespace string) ([]byte, error) {
 		"deployment",
 		"-n",
 		namespace,
-		"-l",
-		"app.kubernetes.io/name=newrelic-infrastructure",
 	)
 }
