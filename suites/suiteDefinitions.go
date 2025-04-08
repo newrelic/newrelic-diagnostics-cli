@@ -120,6 +120,23 @@ var suiteDefinitions = []Suite{
 		},
 	},
 	{
+		Identifier:  "k8s",
+		DisplayName: "Kubernetes",
+		Description: "Gather information about the resources and helm releases in a K8s namespace",
+		Tasks: []string{
+			"K8s/Helm/*",
+			"K8s/Resources/*",
+		},
+	},
+	{
+		Identifier:  "k8s-agent-control",
+		DisplayName: "Agent Control on Kubernetes",
+		Description: "Gather information about agent-control logs, flux and Resources in a K8s namespace",
+		Tasks: []string{
+			"K8s/*",
+		},
+	},
+	{
 		Identifier:  "all",
 		DisplayName: "All New Relic Products",
 		Description: "We only recommend this option if you are unsure of the NR product you are troubleshooting.",

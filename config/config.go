@@ -260,14 +260,6 @@ func ParseFlags() {
 		Flags.Tasks = "Browser/Agent/Detect," + Flags.Tasks
 	}
 
-	if Flags.K8sNamespace != "" {
-		Flags.Override = "K8s/Infra/Config.namespace=" + Flags.K8sNamespace + "," + Flags.Override
-		Flags.Override = "K8s/Infra/Daemonset.namespace=" + Flags.K8sNamespace + "," + Flags.Override
-		Flags.Override = "K8s/Infra/Deploy.namespace=" + Flags.K8sNamespace + "," + Flags.Override
-		Flags.Override = "K8s/Infra/Logs.namespace=" + Flags.K8sNamespace + "," + Flags.Override
-		Flags.Override = "K8s/Infra/Pods.namespace=" + Flags.K8sNamespace + "," + Flags.Override
-	}
-
 	// Set the endpoints based on region
 	switch parseRegionFlagAndEnv(Flags.Region, os.Getenv("NEW_RELIC_REGION")) {
 	case EURegion:
