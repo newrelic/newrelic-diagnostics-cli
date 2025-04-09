@@ -25,4 +25,9 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		appName:       "agent-control",
 		labelSelector: "app.kubernetes.io/name=agent-control",
 	}, true)
+	registrationFunc(K8sAgentControlStatusServer{
+		cmdExec:       tasks.CmdExecutor,
+		appName:       "agent-control",
+		labelSelector: "app.kubernetes.io/name=agent-control",
+	}, true)
 }
