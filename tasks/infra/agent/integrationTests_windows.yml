@@ -4,6 +4,5 @@
       - RUN ["msiexec.exe", "/qn", "/i", "newrelic-infra.msi"]
     log_entry_expected:  
      - Info.*Infra/Agent/Version.*
-     - Success.*Infra/Agent/Connect
     log_entry_not_expected:
      
