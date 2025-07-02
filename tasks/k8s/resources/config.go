@@ -16,7 +16,7 @@ func (p K8sConfigs) Identifier() tasks.Identifier {
 
 // Explain - Returns the help text for each individual task
 func (p K8sConfigs) Explain() string {
-	return "Collects K8s configMaps for the given namespace in YAML format."
+	return "Collects K8s configMaps for the given namespaces in YAML format."
 }
 
 // Dependencies - Returns the dependencies for each task.
@@ -26,13 +26,9 @@ func (p K8sConfigs) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p K8sConfigs) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var (
-		res []byte
-		err error
-	)
+	stream := make(chan string)
 
-	namespace := options.Options["k8sNamespace"]
-	res, err = p.runCommand(namespace)
+	result, err := getResources(options, p.runCommand)
 	if err != nil {
 		return tasks.Result{
 			Summary: "Error retrieving configMaps: " + err.Error(),
@@ -40,8 +36,7 @@ func (p K8sConfigs) Execute(options tasks.Options, upstream map[string]tasks.Res
 		}
 	}
 
-	stream := make(chan string)
-	go tasks.StreamBlob(string(res), stream)
+	go tasks.StreamBlob(string(result), stream)
 
 	return tasks.Result{
 		Summary:     "Successfully collected K8s configMaps ",

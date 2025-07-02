@@ -11,7 +11,7 @@ const (
 
 // RegisterWith - will register any plugins in this package
 func RegisterWith(registrationFunc func(tasks.Task, bool)) {
-	log.Debug("Registering K8s/Helm/*")
+	log.Debug("Registering K8s/Flux/*")
 	registrationFunc(FluxCharts{
 		cmdExec: tasks.CmdExecutor,
 	}, true)

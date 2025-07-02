@@ -26,22 +26,17 @@ func (p K8sPods) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p K8sPods) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var (
-		res []byte
-		err error
-	)
+	stream := make(chan string)
 
-	namespace := options.Options["k8sNamespace"]
-	res, err = p.runCommand(namespace)
+	result, err := getResources(options, p.runCommand)
 	if err != nil {
 		return tasks.Result{
-			Summary: "Error retrieving pods: " + err.Error(),
+			Summary: "Error retrieving pods details: " + err.Error(),
 			Status:  tasks.Error,
 		}
 	}
 
-	stream := make(chan string)
-	go tasks.StreamBlob(string(res), stream)
+	go tasks.StreamBlob(string(result), stream)
 
 	return tasks.Result{
 		Summary:     "Successfully collected K8s newrelic-infrastructure pods",

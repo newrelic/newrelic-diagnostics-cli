@@ -24,7 +24,8 @@
 		"Region": "",
 		"Script": "",
 		"ScriptFlags": "",
-		"K8sNamespace": ""
+		"K8sNamespace": "",
+		"ACAgentsNamespace": ""
 	},
 	"Results": [
 		{
