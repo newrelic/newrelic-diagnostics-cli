@@ -47,7 +47,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	}
 
 	baseWindowsDockerFrom := []string{
-		"FROM mcr.microsoft.com/windows/servercore:ltsc2025",
+		"FROM mcr.microsoft.com/windows/servercore:ltsc2022",
 		`SHELL ["powershell"]`,
 		"RUN NET USER nrdiagadmin /add",
 		"RUN NET LOCALGROUP administrators /add nrdiagadmin",
