@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: ./scripts/integrationTest.sh
   windows:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
