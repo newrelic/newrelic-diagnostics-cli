@@ -38,6 +38,9 @@ VERSION=$(cat releaseVersion.txt | awk -F'majorMinor=' '{printf$2}')
 BUILD_TIMESTAMP=$(date -u '+%Y-%m-%d_%I:%M:%S%p')
 LDFLAGS="-s -w -X ${CONFIG_PATH}.Version=${VERSION}.${VERSION_NUMBER} -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.USUsageEndpoint=${US_USAGE_ENDPOINT} -X ${CONFIG_PATH}.USAttachmentEndpoint=${US_ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.USHaberdasherURL=${US_HABERDASHER_URL} -X ${CONFIG_PATH}.EUUsageEndpoint=${EU_USAGE_ENDPOINT} -X ${CONFIG_PATH}.EUAttachmentEndpoint=${EU_ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.EUHaberdasherURL=${EU_HABERDASHER_URL}"
 
+# Disable CGO to ensure we're using pure go and to fix 'version `GLIBC_2.34' not found' errors
+CGO_ENABLED=0
+
 # Set version based on version.txt file and auto version number
 echo "Build version is $VERSION.$VERSION_NUMBER"
 echo "Buildstamp is $BUILD_TIMESTAMP"
