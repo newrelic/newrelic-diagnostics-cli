@@ -58,6 +58,7 @@ type userFlags struct {
 	Script             string
 	ScriptFlags        string
 	K8sNamespace       string
+	ACAgentsNamespace  string
 	InNewRelicCLI      bool
 }
 
@@ -74,53 +75,55 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(&struct {
-		Verbose          bool
-		Quiet            bool
-		VeryQuiet        bool
-		YesToAll         bool
-		ShowOverrideHelp bool
-		AutoAttach       bool
-		ProxySpecified   bool
-		SkipVersionCheck bool
-		Run              bool
-		ListScripts      bool
-		Tasks            string
-		ConfigFile       string
-		Override         string
-		OutputPath       string
-		Filter           string
-		BrowserURL       string
-		Suites           string
-		APIKey           string
-		Include          string
-		Region           string
-		Script           string
-		ScriptFlags      string
-		K8sNamespace     string
+		Verbose           bool
+		Quiet             bool
+		VeryQuiet         bool
+		YesToAll          bool
+		ShowOverrideHelp  bool
+		AutoAttach        bool
+		ProxySpecified    bool
+		SkipVersionCheck  bool
+		Run               bool
+		ListScripts       bool
+		Tasks             string
+		ConfigFile        string
+		Override          string
+		OutputPath        string
+		Filter            string
+		BrowserURL        string
+		Suites            string
+		APIKey            string
+		Include           string
+		Region            string
+		Script            string
+		ScriptFlags       string
+		K8sNamespace      string
+		ACAgentsNamespace string
 	}{
-		Verbose:          f.Verbose,
-		Quiet:            f.Quiet,
-		VeryQuiet:        f.VeryQuiet,
-		YesToAll:         f.YesToAll,
-		ShowOverrideHelp: f.ShowOverrideHelp,
-		AutoAttach:       f.AutoAttach,
-		ProxySpecified:   proxySpecified,
-		SkipVersionCheck: f.SkipVersionCheck,
-		Run:              f.Run,
-		ListScripts:      f.ListScripts,
-		Tasks:            f.Tasks,
-		ConfigFile:       f.ConfigFile,
-		Override:         f.Override,
-		OutputPath:       f.OutputPath,
-		Filter:           f.Filter,
-		BrowserURL:       f.BrowserURL,
-		Suites:           f.Suites,
-		Include:          f.Include,
-		APIKey:           f.APIKey,
-		Region:           f.Region,
-		Script:           f.Script,
-		ScriptFlags:      f.ScriptFlags,
-		K8sNamespace:     f.K8sNamespace,
+		Verbose:           f.Verbose,
+		Quiet:             f.Quiet,
+		VeryQuiet:         f.VeryQuiet,
+		YesToAll:          f.YesToAll,
+		ShowOverrideHelp:  f.ShowOverrideHelp,
+		AutoAttach:        f.AutoAttach,
+		ProxySpecified:    proxySpecified,
+		SkipVersionCheck:  f.SkipVersionCheck,
+		Run:               f.Run,
+		ListScripts:       f.ListScripts,
+		Tasks:             f.Tasks,
+		ConfigFile:        f.ConfigFile,
+		Override:          f.Override,
+		OutputPath:        f.OutputPath,
+		Filter:            f.Filter,
+		BrowserURL:        f.BrowserURL,
+		Suites:            f.Suites,
+		Include:           f.Include,
+		APIKey:            f.APIKey,
+		Region:            f.Region,
+		Script:            f.Script,
+		ScriptFlags:       f.ScriptFlags,
+		K8sNamespace:      f.K8sNamespace,
+		ACAgentsNamespace: f.ACAgentsNamespace,
 	})
 }
 
@@ -217,7 +220,9 @@ func ParseFlags() {
 
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
-	flag.StringVar(&Flags.K8sNamespace, "k8s-namespace", defaultString, "Specify a namespace to use when executing the kubectl command")
+	flag.StringVar(&Flags.K8sNamespace, "k8s-namespace", defaultString, "Specify the namespace from where to scrape the New Relic resources. If you are using Agent-control, you can also set the '-ac-agents-namespace' flag to specify the namespace where Agent-control Agents are running.")
+
+	flag.StringVar(&Flags.ACAgentsNamespace, "ac-agents-namespace", defaultString, "Specify the namespace from where to scrape the Agent-control running agents.")
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
@@ -309,6 +314,7 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "region", Value: f.Region},
 		{Name: "script", Value: f.Script},
 		{Name: "k8sNamespace", Value: f.K8sNamespace},
+		{Name: "aCAgentsNamespace", Value: f.ACAgentsNamespace},
 	}
 }
 

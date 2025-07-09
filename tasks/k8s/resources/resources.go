@@ -23,3 +23,27 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 		cmdExec: tasks.CmdExecutor,
 	}, true)
 }
+
+func getResources(
+	options tasks.Options,
+	runCommand func(namespace string) ([]byte, error),
+) ([]byte, error) {
+	namespace := options.Options["k8sNamespace"]
+	namespaces := []string{namespace}
+
+	agentsNamespace := options.Options["ACAgentsNamespace"]
+	if agentsNamespace != "" && agentsNamespace != namespace {
+		namespaces = append(namespaces, agentsNamespace)
+	}
+
+	var result []byte
+	for _, ns := range namespaces {
+		res, err := runCommand(ns)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, res...)
+	}
+
+	return result, nil
+}

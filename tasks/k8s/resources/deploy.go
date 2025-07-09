@@ -26,22 +26,17 @@ func (p K8sDeployment) Dependencies() []string {
 
 // Execute - The core work within each task
 func (p K8sDeployment) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	var (
-		res []byte
-		err error
-	)
+	stream := make(chan string)
 
-	namespace := options.Options["k8sNamespace"]
-	res, err = p.runCommand(namespace)
+	result, err := getResources(options, p.runCommand)
 	if err != nil {
 		return tasks.Result{
-			Summary: "Error retrieving deployment details: " + err.Error(),
+			Summary: "Error retrieving deployments details: " + err.Error(),
 			Status:  tasks.Error,
 		}
 	}
 
-	stream := make(chan string)
-	go tasks.StreamBlob(string(res), stream)
+	go tasks.StreamBlob(string(result), stream)
 
 	return tasks.Result{
 		Summary:     "Successfully collected K8s newrelic-infrastructure deployment",

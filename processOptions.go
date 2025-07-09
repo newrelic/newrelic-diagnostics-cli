@@ -253,6 +253,11 @@ func processOverrides() (tasks.Options, []override) {
 		options.Options["k8sNamespace"] = config.Flags.K8sNamespace
 	}
 
+	if config.Flags.ACAgentsNamespace != "" {
+		log.Debug("Manually setting ACAgentsNamespace to ", config.Flags.ACAgentsNamespace)
+		options.Options["ACAgentsNamespace"] = config.Flags.ACAgentsNamespace
+	}
+
 	// Pass in Proxy file override value
 	if config.Flags.Proxy != "" {
 		log.Debug("Manually setting Proxy to ", config.Flags.Proxy)
