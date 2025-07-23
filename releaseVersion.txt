@@ -1,4 +1,4 @@
 majorMinor=3.4
-buildNumber=0
-currentReleaseVersion=3.4.0
-prevReleaseVersion=3.3.0
+buildNumber=1
+currentReleaseVersion=3.4.1
+prevReleaseVersion=3.4.0
