@@ -43,12 +43,12 @@ func TestVersionCheckJboss(t *testing.T) {
 		version string
 		want    tasks.Status
 	}{
-		{version: "7.0", want: tasks.Failure},
+		{version: "8.0", want: tasks.Success},
 		{version: "6.2", want: tasks.Success},
 		{version: "5.2", want: tasks.Failure},
 		{version: "2.11", want: tasks.Failure},
 		{version: "not valid version", want: tasks.Error},
-		{version: "7.11.2.GA", want: tasks.Failure},
+		{version: "5.11.2.GA", want: tasks.Success},
 		{version: "6.1.2.GA", want: tasks.Success},
 	}
 
