@@ -224,7 +224,7 @@ func (p JavaAppserverJbossEapCheck) getJbossFileLinux() (string, error) {
 }
 
 func versionCheckJboss(version string) (status tasks.Status, summary string) {
-	compatibilityRequirements := []string{"6-6.*"}
+	compatibilityRequirements := []string{"6+"}
 	versionSplit := strings.Split(version, ".")
 	var err error
 	isCompatible := false
