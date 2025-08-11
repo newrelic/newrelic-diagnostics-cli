@@ -36,10 +36,7 @@ fi
 VERSION=$(cat releaseVersion.txt | awk -F'majorMinor=' '{printf$2}')
 
 BUILD_TIMESTAMP=$(date -u '+%Y-%m-%d_%I:%M:%S%p')
-LDFLAGS="-s -w -X ${CONFIG_PATH}.Version=${VERSION}.${VERSION_NUMBER} -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.USUsageEndpoint=${US_USAGE_ENDPOINT} -X ${CONFIG_PATH}.USAttachmentEndpoint=${US_ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.USHaberdasherURL=${US_HABERDASHER_URL} -X ${CONFIG_PATH}.EUUsageEndpoint=${EU_USAGE_ENDPOINT} -X ${CONFIG_PATH}.EUAttachmentEndpoint=${EU_ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.EUHaberdasherURL=${EU_HABERDASHER_URL}"
-
-# Disable CGO to ensure we're using pure go and to fix 'version `GLIBC_2.34' not found' errors
-CGO_ENABLED=0
+LDFLAGS="-s -w -extldflags '-static' -X ${CONFIG_PATH}.Version=${VERSION}.${VERSION_NUMBER} -X ${CONFIG_PATH}.BuildTimestamp=${BUILD_TIMESTAMP} -X ${CONFIG_PATH}.USUsageEndpoint=${US_USAGE_ENDPOINT} -X ${CONFIG_PATH}.USAttachmentEndpoint=${US_ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.USHaberdasherURL=${US_HABERDASHER_URL} -X ${CONFIG_PATH}.EUUsageEndpoint=${EU_USAGE_ENDPOINT} -X ${CONFIG_PATH}.EUAttachmentEndpoint=${EU_ATTACHMENT_ENDPOINT} -X ${CONFIG_PATH}.EUHaberdasherURL=${EU_HABERDASHER_URL}"
 
 # Set version based on version.txt file and auto version number
 echo "Build version is $VERSION.$VERSION_NUMBER"
@@ -52,29 +49,29 @@ echo "running GOOS=windows go get -t ./..."
 $(GOOS=windows go get -t ./...)
 
 echo "Building Mac x64 $EXENAME"
-GOOS=darwin GOARCH=amd64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/mac/${EXENAME}_x64")
 
 echo "Building Mac arm64 $EXENAME"
-GOOS=darwin GOARCH=arm64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/mac/${EXENAME}_arm64")
 
 echo "Building Linux x64"
-GOOS=linux GOARCH=amd64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/linux/${EXENAME}_x64")
 
 echo "Building Linux arm64"
-GOOS=linux GOARCH=arm64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/linux/${EXENAME}_arm64")
 
 echo "Building Windows 386"
-GOOS=windows GOARCH=386 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=windows GOARCH=386 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/win/$EXENAME.exe")
 
 echo "Building Windows x64"
-GOOS=windows GOARCH=amd64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/win/${EXENAME}_x64.exe")
 
 echo "Building Windows arm64"
-GOOS=windows GOARCH=arm64 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
+GOOS=windows GOARCH=arm64 CGO_ENABLED=0 go build -o "$TEMPNAME" -ldflags "$LDFLAGS"
 $(mv "$TEMPNAME" "bin/win/${EXENAME}_arm64.exe")
