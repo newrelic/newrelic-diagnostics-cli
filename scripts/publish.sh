@@ -3,7 +3,7 @@
 set -e
 
 echo "Running build script"
-CGO_ENABLED=0 ./scripts/build.sh
+./scripts/build.sh
 
 VERSION_NUMBER=$BUILD_NUMBER
 
