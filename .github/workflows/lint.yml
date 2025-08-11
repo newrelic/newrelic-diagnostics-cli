@@ -19,6 +19,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: Check for Cgo dependencies
+        shell: bash
         run: |
           echo "Searching for packages that require Cgo..."
           CGO_PACKAGES=$(go list -f '{{if .CgoFiles}}{{.ImportPath}}{{end}}' -tags cgo ./...)
