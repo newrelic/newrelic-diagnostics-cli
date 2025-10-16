@@ -379,6 +379,66 @@ func TestValidateBlob_InsertKey(t *testing.T) {
 	}
 }
 
+// TestValidateBlob_InsertKey_PanicRegression tests that insertChildKey doesn't panic
+// when the depth exceeds the split array length. This is a regression test for an
+// index out of bounds panic that occurred in the original implementation.
+func TestValidateBlob_InsertKey_PanicRegression(t *testing.T) {
+	t.Run("deeply nested insert should not panic", func(t *testing.T) {
+		// Create a ValidateBlob with a starting structure
+		v := ValidateBlob{
+			Key:  "root",
+			Path: "/",
+		}
+
+		// Insert a deeply nested key path - this would have caused a panic before the fix
+		// The issue occurred when the recursive depth counter exceeded the length of the split path
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("InsertKey() panicked with: %v", r)
+			}
+		}()
+
+		result := v.InsertKey("/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o", "test_value")
+
+		// Verify that we got a result back (not a panic)
+		if result.Key != "root" {
+			t.Errorf("Expected root key, got %v", result.Key)
+		}
+
+		// Verify the result has children (something was inserted)
+		if len(result.Children) == 0 {
+			t.Errorf("Expected children to be populated, got empty")
+		}
+	})
+
+	t.Run("UpdateOrInsertKey with excessive depth should not panic", func(t *testing.T) {
+		// Test the same scenario through UpdateOrInsertKey, which is what the
+		// Java config validation code actually calls (based on the stack trace)
+		v := ValidateBlob{
+			Key:  "common",
+			Path: "/",
+			Children: []ValidateBlob{
+				{Key: "license_key", Path: "/common", RawValue: "existing"},
+			},
+		}
+
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("UpdateOrInsertKey() panicked with: %v", r)
+			}
+		}()
+
+		// This simulates what happens in Java config validation when system properties
+		// create deeply nested paths
+		result := v.UpdateOrInsertKey("log_file_path/nested/very/deep/path/that/exceeds/normal/depth", "log.txt")
+
+		// Verify we got a result
+		if result.Key != "common" {
+			t.Errorf("Expected common key, got %v", result.Key)
+		}
+	})
+}
+
 func TestValidateBlob_UpdateOrInsertKey(t *testing.T) {
 	type args struct {
 		key   string

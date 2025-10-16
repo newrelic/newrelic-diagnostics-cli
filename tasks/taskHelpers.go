@@ -434,15 +434,28 @@ func (v ValidateBlob) InsertKey(insertKey string, value interface{}) ValidateBlo
 }
 
 func (v ValidateBlob) insertChildKey(insertKey string, value interface{}) (output []ValidateBlob) {
-	// walk the tree
+	if insertKey == "" {
+		log.Debug("insertKey is empty, returning children unchanged")
+		return v.Children
+	}
 
+	// walk the tree
 	depth := strings.Count(v.PathAndKey(), "/")
 
 	//split up the key to have the actual key
 	split := strings.Split(insertKey, "/") //Skip the first / here to ignore the preceding / when calculating
+	if len(split) == 0 {
+		log.Debug("split resulted in empty slice, returning children unchanged")
+		return v.Children
+	}
 	key := split[len(split)-1]
 	if split[0] == "" {
 		split = split[1:] // drop first element to ignore the preceding /
+	}
+	// Additional safety check after dropping first element
+	if len(split) == 0 {
+		log.Debug("split is empty after dropping leading slash, returning children unchanged")
+		return v.Children
 	}
 	newSplit := split[:len(split)-1] // drop last element of the slice to build the path
 	path := ""
@@ -468,7 +481,9 @@ func (v ValidateBlob) insertChildKey(insertKey string, value interface{}) (outpu
 	}
 	if matches == 0 {
 		log.Debug("failed to find path to node, adding partial node to existing", v)
-		if len(split)+1 == depth {
+		// Ensure depth-1 is a valid index before accessing split[depth-1]
+		if depth > len(split) {
+			log.Debug("depth exceeds split length", "depth:", depth, "split length:", len(split))
 			return //depth of node reached, stop searching to avoid panics
 		}
 		node := ValidateBlob{Key: split[depth-1], Path: v.PathAndKey()}
@@ -914,11 +929,12 @@ func BytesToPrettyJSONBytes(bytes []byte) ([]byte, error) {
 
 	firstByte := string(bytes[0])
 
-	if firstByte == "[" {
+	switch firstByte {
+	case "[":
 		unmarshaled = []interface{}{}
-	} else if firstByte == "{" {
+	case "{":
 		unmarshaled = make(map[string]interface{})
-	} else {
+	default:
 		return bytes, errors.New("invalid JSON: First character is " + string(firstByte))
 	}
 
