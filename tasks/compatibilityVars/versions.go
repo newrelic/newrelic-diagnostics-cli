@@ -2,6 +2,8 @@ package compatibilityVars
 
 var RubyVersionAgentSupportability = map[string][]string{
 	//the keys are the ruby version and the values are the agent versions that support that specific version
+	"3.4":   {"9.17.0+"},
+	"3.3":   {"9.7.0+"},
 	"3.2":   {"8.15.0+"},
 	"3.1":   {"8.3.0+"},
 	"3.0":   {"6.15.0+"},
@@ -20,16 +22,18 @@ var RubyVersionAgentSupportability = map[string][]string{
 
 var PythonVersionAgentSupportability = map[string]string{
 	//the keys are the python version and the values are the agent versions that support that specific version
+	"3.13": "10.1.0+",
+	"3.12": "9.3.0+",
 	"3.11": "8.3.0+",
 	"3.10": "7.2.0.167+",
 	"3.9":  "5.20.1.150+",
 	"3.8":  "5.2.3.131+",
-	"3.7":  "3.4.0.95+",
+	"3.7":  "3.4.0.95-10.17.0",
 	"3.6":  "2.80.0.60-7.16.0.178",
-	"3.5":  "2.78.0.57+",
+	"3.5":  "2.78.0.57-5.24.0.153",
 	"3.4":  "2.42.0.35-4.20.0.120",
 	"3.3":  "2.42.0.35-3.4.0.95",
-	"2.7":  "2.42.0.35+",
+	"2.7":  "2.42.0.35-9.13.0",
 	"2.6":  "2.42.0.35-3.4.0.95",
 }
 
@@ -71,7 +75,13 @@ var SupportedForJavaAgentLegacy = map[string][]string{
 }
 
 var NodeSupportedVersions = map[string][]string{
-	"12": {"6.0.0+"},
+	"24": {"12.23.0+"},
+	"22": {"11.22.0+"},
+	"20": {"11.0.0+"},
+	"18": {"9.0.0-13.0.0"},
+	"16": {"8.0.0-12.0.0"},
+	"14": {"7.0.0-11.0.0"},
+	"12": {"6.0.0-9.0.0"},
 	"10": {"4.6.0-7.*"},
 }
 
@@ -94,6 +104,9 @@ var DotnetFrameworkOldVersions = map[string][]string{
 //.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
 
 var DotnetCoreSupportedVersions = map[string][]string{
+	"9.0": {"10.0.0+"},
+	"8.0": {"10.0.0+"},
+	"7.0": {"10.0.0+"},
 	"6.0": {"9.2.0+"},
 	"5.0": {"8.35.0+"},
 	"3.1": {"8.21.34.0+"},
