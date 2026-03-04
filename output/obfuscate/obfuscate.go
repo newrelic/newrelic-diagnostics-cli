@@ -1,11 +1,7 @@
 package obfuscate
 
 import (
-	"archive/zip"
 	"encoding/json"
-	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -132,41 +128,4 @@ func (o ObfuscatedMap) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(obfuscated)
-}
-
-func WriteObfuscatedConfigFileToZip(path string, storeName string, dst *zip.Writer) error {
-	stat, err := os.Stat(path)
-	if err != nil {
-		return fmt.Errorf("failed to stat config file: %w", err)
-	}
-
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("failed to read config file: %w", err)
-	}
-
-	obfuscatedContent, err := ObfuscateConfigContent(path, content)
-	if err != nil {
-		return fmt.Errorf("failed to obfuscate config file: %w", err)
-	}
-
-	header, err := zip.FileInfoHeader(stat)
-	if err != nil {
-		return fmt.Errorf("failed to create zip header: %w", err)
-	}
-
-	header.Name = filepath.ToSlash("nrdiag-output/" + storeName)
-	header.Method = zip.Deflate
-
-	writer, err := dst.CreateHeader(header)
-	if err != nil {
-		return fmt.Errorf("failed to create zip entry: %w", err)
-	}
-
-	_, err = writer.Write(obfuscatedContent)
-	if err != nil {
-		return fmt.Errorf("failed to write obfuscated content: %w", err)
-	}
-
-	return nil
 }
