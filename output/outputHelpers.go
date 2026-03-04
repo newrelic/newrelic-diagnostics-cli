@@ -13,10 +13,12 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	taskconfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 const permissionsError = "\n------Error creating output files.------\nEnsure you have rights for creating files in the local directory or specify a different output directory with -output-path\nA 'permission denied' error may be solved by re-running this program prefixed by the command 'sudo -E'. The '-E' option will help preserve the environment variables needed for running this program."
@@ -87,6 +89,12 @@ func getResultsJSON(data []registration.TaskResult, scriptResults *scriptrunner.
 		Script:        scriptOutput,
 	}
 
+	for i := range data {
+		if obfuscator, ok := data[i].Task.(tasks.PayloadObfuscator); ok {
+			data[i].Result.Payload = obfuscator.ObfuscatePayload(data[i].Result.Payload)
+		}
+	}
+
 	output, err := json.MarshalIndent(outputData, "", "	")
 	if err != nil {
 		log.Info("Couldn't save JSON output: ", err)
@@ -154,6 +162,15 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			}
 		} else {
 			log.Debug("adding " + envelope.Path + " to zip")
+
+			if taskconfig.IsNewRelicConfigFile(envelope.Path) {
+				err := obfuscate.WriteObfuscatedConfigFileToZip(envelope.Path, envelope.StoreName(), dst)
+				if err != nil {
+					log.Debug("Failed to write obfuscated config file: ", envelope.Path, " error: ", err)
+				}
+				continue
+			}
+
 			// Get file info from file
 			stat, err := os.Stat(envelope.Path)
 			if err != nil {

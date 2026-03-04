@@ -13,6 +13,6 @@
 /attributes.exclude/9: response.headers.x*
 /attributes.include/0: request.include.something
 /attributes.include/1: response.include.something*
-/license_key: license-key-val-node
+/license_key: licens**************
 /logging: {
 /logging.level: trace

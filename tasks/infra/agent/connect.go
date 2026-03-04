@@ -148,7 +148,7 @@ func validateResponses(requestResults map[string]RequestResult) (string, tasks.S
 			summary += "\nPlease check network and proxy settings and try again or see -help for more options."
 			summary += "\nError = " + requestResult.Err.Error()
 			return summary, tasks.Failure
-		} else if requestResult.StatusCode == 404 {
+		} else if requestResult.StatusCode == 404 || requestResult.StatusCode == 200 {
 			log.Debug("Successfully connected")
 			summary += fmt.Sprintf(" Successfully connected to %s.", url)
 		} else {

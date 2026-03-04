@@ -14,7 +14,7 @@
 /common/error_collector/ignore_status_codes: 404
 /common/high_security: false
 /common/labels/label_name: label_value
-/common/license_key: license-key-val-java
+/common/license_key: licens**************
 /common/log_daily: false
 /common/log_file_count: 1
 /common/log_file_name: newrelic_agent.log
@@ -49,7 +49,7 @@
 /development/error_collector/ignore_status_codes: 404
 /development/high_security: false
 /development/labels/label_name: label_value
-/development/license_key: license-key-val-java
+/development/license_key: licens**************
 /development/log_daily: false
 /development/log_file_count: 1
 /development/log_file_name: newrelic_agent.log
@@ -84,7 +84,7 @@
 /production/error_collector/ignore_status_codes: 404
 /production/high_security: false
 /production/labels/label_name: label_value
-/production/license_key: license-key-val-java
+/production/license_key: licens**************
 /production/log_daily: false
 /production/log_file_count: 1
 /production/log_file_name: newrelic_agent.log
@@ -119,7 +119,7 @@
 /staging/error_collector/ignore_status_codes: 404
 /staging/high_security: false
 /staging/labels/label_name: label_value
-/staging/license_key: license-key-val-java
+/staging/license_key: licens**************
 /staging/log_daily: false
 /staging/log_file_count: 1
 /staging/log_file_name: newrelic_agent.log
@@ -154,7 +154,7 @@
 /test/error_collector/ignore_status_codes: 404
 /test/high_security: false
 /test/labels/label_name: label_value
-/test/license_key: license-key-val-java
+/test/license_key: licens**************
 /test/log_daily: false
 /test/log_file_count: 1
 /test/log_file_name: newrelic_agent.log

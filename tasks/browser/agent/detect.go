@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -113,7 +114,7 @@ func getBrowserKey(scripts []string) string {
 
 	for _, loader := range scripts {
 		for _, value := range regex.FindAllStringSubmatch(loader, -1) {
-			log.Debug("browser license key found", value[1])
+			log.Debug("browser license key found", obfuscate.ObfuscateSensitiveValue(value[1]))
 			return value[1]
 		}
 

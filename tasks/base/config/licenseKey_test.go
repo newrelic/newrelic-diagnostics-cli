@@ -352,7 +352,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 
 			expectedResult := tasks.Result{
 				Status:  tasks.Success,
-				Summary: "1 unique New Relic license key(s) found.\n     'Schnauzer12' from '-Dnewrelic.config.license_key' will be used by New Relic APM Agents",
+				Summary: "1 unique New Relic license key(s) found.\n     'Schnau*****' from '-Dnewrelic.config.license_key' will be used by New Relic APM Agents",
 				Payload: []LicenseKey{
 					{
 						Value:  "Schnauzer12",
@@ -430,7 +430,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 
 			expectedResult := tasks.Result{
 				Status:  tasks.Success,
-				Summary: "1 unique New Relic license key(s) found.\n     'Schnauzer12' from 'NEW_RELIC_LICENSE_KEY' will be used by New Relic APM Agents",
+				Summary: "1 unique New Relic license key(s) found.\n     'Schnau*****' from 'NEW_RELIC_LICENSE_KEY' will be used by New Relic APM Agents",
 				Payload: []LicenseKey{
 					{
 						Value:  "Schnauzer12",
@@ -540,7 +540,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 			})
 
 			It("Should return a summary reporting unique license keys", func() {
-				Expect(result.Summary).To(ContainSubstring("'mylicensekey' from 'NEW_RELIC_LICENSE_KEY' will be used by New Relic APM Agents"))
+				Expect(result.Summary).To(ContainSubstring("'mylice******' from 'NEW_RELIC_LICENSE_KEY' will be used by New Relic APM Agents"))
 			})
 
 			It("Should have a payload of found LicenseKeys", func() {
@@ -601,7 +601,7 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 			})
 
 			It("Should return a summary reporting unique license keys count along with each unique key", func() {
-				Expect(result.Summary).To(ContainSubstring("'mylicensekey' from '-Dnewrelic.config.license_key'"))
+				Expect(result.Summary).To(ContainSubstring("'mylice******' from '-Dnewrelic.config.license_key'"))
 				// Expect(result.Summary).To(ContainSubstring("'mylicensekey' from -Dnewrelic.config.license_key will be used by New Relic APM Agents"))
 			})
 
@@ -685,9 +685,9 @@ var _ = Describe("BaseConfigLicenseKey", func() {
 
 			It("Should return a summary reporting unique license keys count along with each unique key", func() {
 				Expect(result.Summary).To(ContainSubstring("Multiple license keys detected:"))
-				Expect(result.Summary).To(ContainSubstring("'Schnauzer13' from '/etc/newrelic.yml'"))
-				Expect(result.Summary).To(ContainSubstring("'Schnauzer12' from '/etc/newrelic.yml'"))
-				Expect(result.Summary).To(ContainSubstring("'Banana' from '/app/newrelic.ini'"))
+				Expect(result.Summary).To(ContainSubstring("'Schnau*****' from '/etc/newrelic.yml'"))
+				Expect(result.Summary).To(ContainSubstring("'Schnau*****' from '/etc/newrelic.yml'"))
+				Expect(result.Summary).To(ContainSubstring("'******' from '/app/newrelic.ini'"))
 			})
 
 			It("Should have a payload of found LicenseKeys", func() {
