@@ -3,6 +3,8 @@ package config
 import (
 	"reflect"
 	"testing"
+
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 )
 
 func Test_userFlags_UsagePayload(t *testing.T) {
@@ -342,8 +344,8 @@ func Test_obfuscateAPIKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := obfuscateAPIKey(tt.args.apiKey); got != tt.want {
-				t.Errorf("obfuscateAPIKey() = %v, want %v", got, tt.want)
+			if got := obfuscate.ObfuscateSensitiveValue(tt.args.apiKey); got != tt.want {
+				t.Errorf("obfuscate.ObfuscateSensitiveValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}

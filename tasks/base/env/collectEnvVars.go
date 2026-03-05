@@ -2,6 +2,7 @@ package env
 
 import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -43,4 +44,19 @@ func (t BaseEnvCollectEnvVars) Execute(options tasks.Options, upstream map[strin
 	result.Summary = "Gathered Environment variables of current shell."
 
 	return result
+}
+
+// ObfuscatePayload implements tasks.PayloadObfuscator interface
+func (t BaseEnvCollectEnvVars) ObfuscatePayload(payload interface{}) interface{} {
+	envVars, ok := payload.(map[string]string)
+	if !ok {
+		return payload
+	}
+
+	converted := make(map[string][]string)
+	for k, v := range envVars {
+		converted[k] = []string{v}
+	}
+
+	return obfuscate.NewObfuscatedMap(converted, false)
 }

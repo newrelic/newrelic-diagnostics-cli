@@ -78,6 +78,22 @@ type Task interface {
 	Execute(Options, map[string]Result) Result
 }
 
+// PayloadObfuscator is an optional interface that tasks can implement
+// to obfuscate sensitive data in their payload before JSON marshaling.
+// The output layer will call this method if the task implements it.
+//
+// Example implementation:
+//
+//	func (t MyTask) ObfuscatePayload(payload interface{}) interface{} {
+//	    if data, ok := payload.(MyDataType); ok {
+//	        return obfuscate.NewObfuscatedMap(data, false)
+//	    }
+//	    return payload
+//	}
+type PayloadObfuscator interface {
+	ObfuscatePayload(payload interface{}) interface{}
+}
+
 // ByIdentifier is a sort helper to sort an array of tasks by their identifiers
 type ByIdentifier []Task
 

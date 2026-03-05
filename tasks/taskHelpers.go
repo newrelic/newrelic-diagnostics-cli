@@ -21,7 +21,13 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/helpers/httpHelper"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/shirou/gopsutil/v3/process"
+)
+
+var (
+	sensitiveKeyPattern = regexp.MustCompile("(?i)(license|api).*key")
+	codePatternInValue  = regexp.MustCompile(`[().'"\$]`)
 )
 
 // OsFunc - for dependency injecting osGetwd
@@ -539,7 +545,13 @@ func (v ValidateBlob) UpdateOrInsertKey(key string, value interface{}) ValidateB
 func (v ValidateBlob) String() (output string) {
 
 	if v.IsLeaf() {
-		output = fmt.Sprintf(v.PathAndKey() + ": " + v.Value() + "\n")
+		value := v.Value()
+
+		if sensitiveKeyPattern.MatchString(v.Key) && !codePatternInValue.MatchString(value) {
+			value = obfuscate.ObfuscateSensitiveValue(value)
+		}
+
+		output = v.PathAndKey() + ": " + value + "\n"
 	} else {
 		sort.Sort(ByChild(v.Children))
 		for _, child := range v.Children {

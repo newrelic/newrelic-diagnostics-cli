@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,10 +14,12 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/config"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/newrelic/newrelic-diagnostics-cli/output/color"
 	"github.com/newrelic/newrelic-diagnostics-cli/registration"
 	"github.com/newrelic/newrelic-diagnostics-cli/scriptrunner"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	taskconfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 )
 
 const permissionsError = "\n------Error creating output files.------\nEnsure you have rights for creating files in the local directory or specify a different output directory with -output-path\nA 'permission denied' error may be solved by re-running this program prefixed by the command 'sudo -E'. The '-E' option will help preserve the environment variables needed for running this program."
@@ -87,6 +90,12 @@ func getResultsJSON(data []registration.TaskResult, scriptResults *scriptrunner.
 		Script:        scriptOutput,
 	}
 
+	for i := range data {
+		if obfuscator, ok := data[i].Task.(tasks.PayloadObfuscator); ok {
+			data[i].Result.Payload = obfuscator.ObfuscatePayload(data[i].Result.Payload)
+		}
+	}
+
 	output, err := json.MarshalIndent(outputData, "", "	")
 	if err != nil {
 		log.Info("Couldn't save JSON output: ", err)
@@ -136,6 +145,43 @@ func mapContains(set map[string]struct{}, item string) bool {
 	return ok
 }
 
+func writeConfigFileWithObfuscation(path string, storeName string, dst *zip.Writer) error {
+	stat, err := os.Stat(path)
+	if err != nil {
+		return fmt.Errorf("failed to stat config file: %w", err)
+	}
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	obfuscatedContent, err := obfuscate.ObfuscateConfigContent(path, content)
+	if err != nil {
+		return fmt.Errorf("failed to obfuscate config file: %w", err)
+	}
+
+	header, err := zip.FileInfoHeader(stat)
+	if err != nil {
+		return fmt.Errorf("failed to create zip header: %w", err)
+	}
+
+	header.Name = filepath.ToSlash("nrdiag-output/" + storeName)
+	header.Method = zip.Deflate
+
+	writer, err := dst.CreateHeader(header)
+	if err != nil {
+		return fmt.Errorf("failed to create zip entry: %w", err)
+	}
+
+	_, err = writer.Write(obfuscatedContent)
+	if err != nil {
+		return fmt.Errorf("failed to write obfuscated content: %w", err)
+	}
+
+	return nil
+}
+
 // CopyFilesToZip - Copies files to the zip archive
 func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 	for _, envelope := range filesToZip {
@@ -154,6 +200,15 @@ func copyFilesToZip(dst *zip.Writer, filesToZip []tasks.FileCopyEnvelope) {
 			}
 		} else {
 			log.Debug("adding " + envelope.Path + " to zip")
+
+			if taskconfig.IsNewRelicConfigFile(envelope.Path) {
+				err := writeConfigFileWithObfuscation(envelope.Path, envelope.StoreName(), dst)
+				if err != nil {
+					log.Debug("Failed to write obfuscated config file: ", envelope.Path, " error: ", err)
+				}
+				continue
+			}
+
 			// Get file info from file
 			stat, err := os.Stat(envelope.Path)
 			if err != nil {

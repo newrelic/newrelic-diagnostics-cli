@@ -9,7 +9,7 @@
 /configuration/errorCollector/ignoreStatusCodes/code/0: 401
 /configuration/errorCollector/ignoreStatusCodes/code/1: 404
 /configuration/log/-level: info/
-/configuration/service/-licenseKey: REPLACE_WITH_LICENSE_KEY
+/configuration/service/-licenseKey: REPLAC******************
 /configuration/service/-ssl: true
 /configuration/threadProfiling/ignoreMethod/0: System.Threading.WaitHandle:InternalWaitOne
 /configuration/threadProfiling/ignoreMethod/1: System.Threading.WaitHandle:WaitAny

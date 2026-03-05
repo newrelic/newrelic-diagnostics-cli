@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 )
 
 // Verbosity is the current log level
@@ -118,7 +120,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		BrowserURL:        f.BrowserURL,
 		Suites:            f.Suites,
 		Include:           f.Include,
-		APIKey:            obfuscateAPIKey(f.APIKey),
+		APIKey:            obfuscate.ObfuscateSensitiveValue(f.APIKey),
 		Region:            f.Region,
 		Script:            f.Script,
 		ScriptFlags:       f.ScriptFlags,
@@ -377,15 +379,3 @@ func stringToRegion(region string) Region {
 	return NoRegion
 }
 
-// obfuscateAPIKey - returns an obfuscated version of an API key showing only the first 6 characters
-func obfuscateAPIKey(apiKey string) string {
-	if apiKey == "" {
-		return ""
-	}
-	keyLen := len(apiKey)
-	if keyLen <= 6 {
-		return strings.Repeat("*", keyLen)
-	}
-
-	return apiKey[:6] + strings.Repeat("*", keyLen-6)
-}

@@ -27,6 +27,36 @@ func isFileWithNETAgentConfigPath(filename string) bool {
 	return false
 }
 
+var compiledConfigPatterns []*regexp.Regexp
+
+func init() {
+	allPatterns := append([]string{}, patterns...)
+	allPatterns = append(allPatterns, secureFilePatterns...)
+
+	for _, pattern := range allPatterns {
+		compiledConfigPatterns = append(compiledConfigPatterns, regexp.MustCompile(pattern))
+	}
+}
+
+func IsNewRelicConfigFile(filepath string) bool {
+	filename := filepath
+	if idx := len(filepath) - 1; idx >= 0 {
+		for i := idx; i >= 0; i-- {
+			if filepath[i] == '/' || filepath[i] == '\\' {
+				filename = filepath[i+1:]
+				break
+			}
+		}
+	}
+
+	for _, regex := range compiledConfigPatterns {
+		if regex.MatchString(filename) {
+			return true
+		}
+	}
+	return false
+}
+
 // getAgentConfigPathFromFile - Parse app.config/web.config files for custom path to
 // New Relic .NET Agent config file, if it is set.
 // Example: <add key = "NewRelic.ConfigFile" value="C:\Path-to-alternate-config-dir\newrelic.config" />

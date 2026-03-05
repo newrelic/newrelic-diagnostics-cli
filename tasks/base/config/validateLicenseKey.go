@@ -8,6 +8,7 @@ import (
 
 	"github.com/newrelic/newrelic-diagnostics-cli/internal/haberdasher"
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -94,20 +95,26 @@ func (p BaseConfigValidateLicenseKey) Execute(options tasks.Options, upstream ma
 
 		if err != nil {
 			for lk, sources := range validFormatLKToSources {
-				warningSummary += fmt.Sprintf("The license key found in\n%s\nhas a valid New Relic format: %s\nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n", strings.Join(sources, "\n"), lk, err.Error())
+				obfuscatedKey := obfuscate.ObfuscateSensitiveValue(lk)
+				obfuscatedKey = strings.ReplaceAll(obfuscatedKey, "%", "%%")
+				warningSummary += fmt.Sprintf("The license key found in\n%s\nhas a valid New Relic format: %s\nThough we ran into an error (%s) while trying to validate against your account. Only if your agent is reporting an 'Invalid license key' log entry, reach out to New Relic Support.\n", strings.Join(sources, "\n"), obfuscatedKey, err.Error())
 			}
 			resultsPayload = validFormatLKToSources
 		}
 
 		if len(invalidAccountLKToSources) > 0 {
 			for lk, sources := range invalidAccountLKToSources {
-				warningSummary += fmt.Sprintf("The license key found in %s did not match the one assigned to your account:\n%s\nIf you are not using the account's original license key, you can ignore this warning. The Diagnostics CLI only validates the account's original license key. Read more about license keys - https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key\n\n", strings.Join(sources, ",\n "), lk)
+				obfuscatedKey := obfuscate.ObfuscateSensitiveValue(lk)
+				obfuscatedKey = strings.ReplaceAll(obfuscatedKey, "%", "%%")
+				warningSummary += fmt.Sprintf("The license key found in %s did not match the one assigned to your account:\n%s\nIf you are not using the account's original license key, you can ignore this warning. The Diagnostics CLI only validates the account's original license key. Read more about license keys - https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/#license-key\n\n", strings.Join(sources, ",\n "), obfuscatedKey)
 			}
 		}
 
 		if len(validAccountLKToSources) > 0 {
 			for lk, sources := range validAccountLKToSources {
-				successSummary += fmt.Sprintf("The license key found in %s passed our validation check when verifying against your account:\n %s"+"\n", strings.Join(sources, ",\n "), lk)
+				obfuscatedKey := obfuscate.ObfuscateSensitiveValue(lk)
+				obfuscatedKey = strings.ReplaceAll(obfuscatedKey, "%", "%%")
+				successSummary += fmt.Sprintf("The license key found in %s passed our validation check when verifying against your account:\n %s"+"\n", strings.Join(sources, ",\n "), obfuscatedKey)
 				if isRegionEU(lk) {
 					successSummary += fmt.Sprintf(`Note: If your agent is reporting an 'Invalid license key' log entry for this valid License key, please verify that your agent version is compatible with New Relic license keys that are 'region aware': https://docs.newrelic.com/docs/using-new-relic/welcome-new-relic/get-started/our-eu-us-region-data-centers. Reach out to Support if this is not the issue.` + "\n")
 				} else {
@@ -147,7 +154,9 @@ func checkEnvVarFormat(licenseKey LicenseKey) (bool, string) {
 	if isFormatValid(strings.TrimSpace(licenseKey.Value)) {
 		return true, ""
 	}
-	errMsg := fmt.Sprintf("The license key found in %s does not have a valid format: %s. \nThe NR license key is 40 alphanumeric characters. \nReview this documentation to make sure that you have the proper format of a New Relic Personal API key: \nhttps://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys\n\n", licenseKey.Source, licenseKey.Value)
+	obfuscatedValue := obfuscate.ObfuscateSensitiveValue(licenseKey.Value)
+	obfuscatedValue = strings.ReplaceAll(obfuscatedValue, "%", "%%")
+	errMsg := fmt.Sprintf("The license key found in %s does not have a valid format: %s. \nThe NR license key is 40 alphanumeric characters. \nReview this documentation to make sure that you have the proper format of a New Relic Personal API key: \nhttps://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys\n\n", licenseKey.Source, obfuscatedValue)
 	return false, errMsg
 }
 
@@ -156,7 +165,9 @@ func checkConfigFormat(licenseKey string, sources []string) (bool, string) {
 	if isFormatValid(sanitizedLicenseKey) {
 		return true, ""
 	}
-	errMsg := fmt.Sprintf("The license key found in %s does not have a valid format: %s. \nThe NR license key is 40 alphanumeric characters. \nReview this documentation to make sure that you have the proper format of a New Relic Personal API key: \nhttps://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys\n\n", strings.Join(sources, ",\n "), sanitizedLicenseKey)
+	obfuscatedKey := obfuscate.ObfuscateSensitiveValue(sanitizedLicenseKey)
+	obfuscatedKey = strings.ReplaceAll(obfuscatedKey, "%", "%%")
+	errMsg := fmt.Sprintf("The license key found in %s does not have a valid format: %s. \nThe NR license key is 40 alphanumeric characters. \nReview this documentation to make sure that you have the proper format of a New Relic Personal API key: \nhttps://docs.newrelic.com/docs/apis/get-started/intro-apis/types-new-relic-api-keys\n\n", strings.Join(sources, ",\n "), obfuscatedKey)
 	return false, errMsg
 }
 
@@ -250,4 +261,14 @@ func dedupeLicenseKeys(licenseKeys []LicenseKey) map[string][]string {
 		uniqueLicenseKeys[lk.Value] = []string{lk.Source}
 	}
 	return uniqueLicenseKeys
+}
+
+// ObfuscatePayload implements tasks.PayloadObfuscator interface
+func (p BaseConfigValidateLicenseKey) ObfuscatePayload(payload interface{}) interface{} {
+	lkMap, ok := payload.(map[string][]string)
+	if !ok {
+		return payload
+	}
+
+	return obfuscate.NewObfuscatedMap(lkMap, true)
 }

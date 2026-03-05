@@ -1,12 +1,14 @@
 package config
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"regexp"
 	"strconv"
 
+	"github.com/newrelic/newrelic-diagnostics-cli/output/obfuscate"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -27,6 +29,16 @@ var licenseKeySysProp = "-Dnewrelic.config.license_key"
 type LicenseKey struct {
 	Value  string
 	Source string
+}
+
+func (lk LicenseKey) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Value  string `json:"Value"`
+		Source string `json:"Source"`
+	}{
+		Value:  obfuscate.ObfuscateSensitiveValue(lk.Value),
+		Source: lk.Source,
+	})
 }
 
 // BaseConfigLicenseKey - Struct for task definition
@@ -116,12 +128,13 @@ func envOverrideMessage(licenseKeys []LicenseKey) string {
 	sysPropMessage := ""
 
 	for _, licenseKey := range licenseKeys {
+		obfuscatedValue := obfuscate.ObfuscateSensitiveValue(licenseKey.Value)
 		if licenseKey.Source == "NRIA_LICENSE_KEY" {
-			envMessage = envMessage + fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic Infrastructure Agent", licenseKey.Value, licenseKey.Source)
+			envMessage = envMessage + fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic Infrastructure Agent", obfuscatedValue, licenseKey.Source)
 		} else if licenseKey.Source == "NEW_RELIC_LICENSE_KEY" {
-			envMessage = envMessage + fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic APM Agents", licenseKey.Value, licenseKey.Source)
+			envMessage = envMessage + fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic APM Agents", obfuscatedValue, licenseKey.Source)
 		} else if licenseKey.Source == "-Dnewrelic.config.license_key" {
-			sysPropMessage = fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic APM Agents", licenseKey.Value, licenseKey.Source)
+			sysPropMessage = fmt.Sprintf("\n     '%s' from '%s' will be used by New Relic APM Agents", obfuscatedValue, licenseKey.Source)
 		}
 	}
 
@@ -240,7 +253,8 @@ func summarizeLicenseKeySources(licenseKeys []LicenseKey) string {
 	summary := ""
 
 	for _, licenseKey := range licenseKeys {
-		summary = summary + fmt.Sprintf("     '%s' from '%s'\n", licenseKey.Value, licenseKey.Source)
+		obfuscatedValue := obfuscate.ObfuscateSensitiveValue(licenseKey.Value)
+		summary = summary + fmt.Sprintf("     '%s' from '%s'\n", obfuscatedValue, licenseKey.Source)
 	}
 
 	return summary
