@@ -25,6 +25,7 @@ type Region string
 const (
 	USRegion Region = "us"
 	EURegion Region = "eu"
+	JPRegion Region = "jp"
 	NoRegion Region = "none"
 )
 
@@ -162,6 +163,15 @@ var USHaberdasherURL string
 // EUHaberdasherURL is the base url for the Haberdasher service in the EU
 var EUHaberdasherURL string
 
+// JPUsageEndpoint is the haberdasher endpoint to which usage statistics are sent for JP accounts
+var JPUsageEndpoint string
+
+// JPAttachmentEndpoint is the haberdasher endpoint to which attachments are sent for JP accounts
+var JPAttachmentEndpoint string
+
+// JPHaberdasherURL is the base url for the Haberdasher service in JP
+var JPHaberdasherURL string
+
 // HaberdasherURL is the base url for the Haberdasher service
 var HaberdasherURL string
 
@@ -231,7 +241,7 @@ func ParseFlags() {
 	flag.StringVar(&Flags.Include, "include", defaultString, "Include a file or directory (including subdirectories) in the nrdiag-output.zip. Limit 4GB. To upload the results to New Relic also use the '-a' flag.")
 
 	flag.StringVar(&Flags.Region, "r", defaultString, "alias for -region")
-	flag.StringVar(&Flags.Region, "region", defaultString, "The region your New Relic account is in. Accepted values: EU or US. Case insensitive. (Default: US)")
+	flag.StringVar(&Flags.Region, "region", defaultString, "The region your New Relic account is in. Accepted values: EU, JP, or US. Case insensitive. (Default: US)")
 
 	flag.BoolVar(&Flags.ListScripts, "list-scripts", false, "List available scripts")
 
@@ -276,6 +286,12 @@ func ParseFlags() {
 			AttachmentEndpoint = EUAttachmentEndpoint
 		}
 		HaberdasherURL = EUHaberdasherURL
+	case JPRegion:
+		UsageEndpoint = JPUsageEndpoint
+		if Flags.AttachmentEndpoint == "" {
+			AttachmentEndpoint = JPAttachmentEndpoint
+		}
+		HaberdasherURL = JPHaberdasherURL
 	default:
 		UsageEndpoint = USUsageEndpoint
 		if Flags.AttachmentEndpoint == "" {
@@ -372,6 +388,9 @@ func stringToRegion(region string) Region {
 	r := strings.TrimSpace(strings.ToLower(region))
 	if r == "eu" {
 		return EURegion
+	}
+	if r == "jp" {
+		return JPRegion
 	}
 	if r == "us" {
 		return USRegion

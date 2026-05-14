@@ -212,6 +212,20 @@ func Test_stringToRegion(t *testing.T) {
 			want: EURegion,
 		},
 		{
+			name: "lower case JP string to region type",
+			args: args{
+				region: "jp",
+			},
+			want: JPRegion,
+		},
+		{
+			name: "upper case JP string to region type",
+			args: args{
+				region: "JP",
+			},
+			want: JPRegion,
+		},
+		{
 			name: "blank region string to region type",
 			args: args{
 				region: "",
@@ -268,6 +282,22 @@ func Test_parseRegionFlagAndEnv(t *testing.T) {
 				regionFromEnv:  "",
 			},
 			want: EURegion,
+		},
+		{
+			name: "JP via flag",
+			args: args{
+				regionFromFlag: "jp",
+				regionFromEnv:  "",
+			},
+			want: JPRegion,
+		},
+		{
+			name: "JP via env",
+			args: args{
+				regionFromFlag: "",
+				regionFromEnv:  "jp",
+			},
+			want: JPRegion,
 		},
 		{
 			name: "Nothing provided - default to US",
