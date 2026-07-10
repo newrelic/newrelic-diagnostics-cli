@@ -1,12 +1,26 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
+	"time"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 )
+
+const (
+	dockerBuildTimeout = 10 * time.Minute
+	dockerRunTimeout   = 10 * time.Minute
+)
+
+var dockerBuildRetryPatterns = []string{
+	"hcs::CreateComputeSystem",
+	"failed to connect to the docker API",
+	"docker_engine",
+}
 
 func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, dockerLines []string) error {
 
@@ -19,16 +33,72 @@ func CreateDockerImage(imageName string, dockerFROM string, docker_cmd string, d
 
 	log.Debug("Running docker build -f integrationDockerfile -t ", imageName, " .")
 
-	cmdBuild := exec.Command("docker", "build", "-f", dockerfile, "-t", imageName, ".")
+	const maxAttempts = 3
+	var output []byte
+	var cmdBuildErr error
+	var timedOut bool
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		ctx, cancel := context.WithTimeout(context.Background(), dockerBuildTimeout)
+		cmdBuild := exec.CommandContext(ctx, "docker", "build", "-f", dockerfile, "-t", imageName, ".")
+		output, cmdBuildErr = cmdBuild.CombinedOutput()
+		timedOut = ctx.Err() == context.DeadlineExceeded
+		cancel()
 
-	output, cmdBuildErr := cmdBuild.CombinedOutput()
+		if cmdBuildErr == nil {
+			break
+		}
+		if timedOut {
+			log.Info("Docker build TIMED OUT for ", imageName, " after ", dockerBuildTimeout, " (attempt ", attempt, " of ", maxAttempts, ")")
+			log.Info("Partial build output for ", imageName, ":\n", string(output))
+			logDockerDiagnostics(imageName)
+		}
+		if attempt == maxAttempts || !isTransientDockerError(string(output)) {
+			break
+		}
+		log.Info("Transient docker build error for ", imageName, " (attempt ", attempt, " of ", maxAttempts, "), retrying in ", attempt*5, "s")
+		time.Sleep(time.Duration(attempt*5) * time.Second)
+	}
 
 	if cmdBuildErr != nil {
 		log.Info("Error running docker build -", cmdBuildErr)
 		log.Info("Error was ", string(output))
 		return cmdBuildErr
 	}
+	log.Info("Docker build output for ", imageName, ":\n", string(output))
 	return nil
+}
+
+func isTransientDockerError(output string) bool {
+	for _, pattern := range dockerBuildRetryPatterns {
+		if strings.Contains(output, pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+func logDockerDiagnostics(imageName string) {
+	log.Info("=== Docker diagnostics for ", imageName, " ===")
+
+	psCtx, psCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	psOut, psErr := exec.CommandContext(psCtx, "docker", "ps", "-a").CombinedOutput()
+	psCancel()
+	if psErr != nil {
+		log.Info("docker ps -a failed: ", psErr, " output: ", string(psOut))
+	} else {
+		log.Info("docker ps -a:\n", string(psOut))
+	}
+
+	infoCtx, infoCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	infoOut, infoErr := exec.CommandContext(infoCtx, "docker", "info").CombinedOutput()
+	infoCancel()
+	if infoErr != nil {
+		log.Info("docker info failed: ", infoErr, " output: ", string(infoOut))
+	} else {
+		log.Info("docker info:\n", string(infoOut))
+	}
+
+	log.Info("=== End docker diagnostics for ", imageName, " ===")
 }
 
 // CreateDockerfile - This builds the raw Dockerfile from the slice of tests
@@ -47,7 +117,7 @@ func CreateDockerfile(imageName string, dockerFROM string, dockerCMD string, doc
 	}
 
 	baseWindowsDockerFrom := []string{
-		"FROM mcr.microsoft.com/windows/servercore:ltsc2022",
+		"FROM mcr.microsoft.com/windows/servercore:ltsc2025",
 		`SHELL ["powershell"]`,
 		"RUN NET USER nrdiagadmin /add",
 		"RUN NET LOCALGROUP administrators /add nrdiagadmin",
@@ -120,10 +190,18 @@ func RunDockerContainer(imageName string, hostsAdditions []string) (string, erro
 		}
 	}
 	args = append(args, imageName)
-	cmd := exec.Command("docker", args...)
+
+	ctx, cancel := context.WithTimeout(context.Background(), dockerRunTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "docker", args...)
 
 	out, cmdErr := cmd.CombinedOutput()
 	if cmdErr != nil {
+		if ctx.Err() == context.DeadlineExceeded {
+			log.Info("Docker run TIMED OUT for ", imageName, " after ", dockerRunTimeout)
+			log.Info("Partial run output for ", imageName, ":\n", string(out))
+			logDockerDiagnostics(imageName)
+		}
 		// Docker daemon returns exit code 125 in jenkins but runs normally otherwise
 		if cmdErr.Error() == "exit status 125" {
 			return string(out[:]), nil

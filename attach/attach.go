@@ -73,7 +73,7 @@ func Upload(endpoint string, identifyingKey string, timestamp string, dependenci
 		if !printedUrls[url] {
 			infoStr := fmt.Sprintf("\t%v\n", url)
 			filteredOutput := color.ColorString(color.LightBlue, infoStr)
-			log.Infof(filteredOutput)
+			log.Infof("%s", filteredOutput)
 		}
 		printedUrls[url] = true
 	}
