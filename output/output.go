@@ -318,7 +318,7 @@ func WriteLineResults() []registration.TaskResult {
 		log.Info(filteredOutput)
 	}
 	if len(hsmPayload) > 0 {
-		log.Infof(hsmResult.Summary)
+		log.Infof("%s", hsmResult.Summary)
 		if config.Flags.AutoAttach || config.Flags.APIKey != "" {
 			log.Info("See your uploaded results to validate High Security Mode settings.\n")
 		} else {
