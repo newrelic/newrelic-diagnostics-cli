@@ -5,7 +5,7 @@ package agent
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -145,7 +145,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 				p.runtimeOS = "darwin"
 				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 					return &http.Response{
-						Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2022-11-17T10:50:43Z"}`))),
+						Body: io.NopCloser(bytes.NewReader([]byte(`{"published_at": "2022-11-17T10:50:43Z"}`))),
 					}, nil
 				}
 				p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
@@ -180,7 +180,7 @@ var _ = Describe("Infra/Agent/Version", func() {
 				p.runtimeOS = "darwin"
 				p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 					return &http.Response{
-						Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2020-11-17T10:50:43Z"}`))),
+						Body: io.NopCloser(bytes.NewReader([]byte(`{"published_at": "2020-11-17T10:50:43Z"}`))),
 					}, nil
 				}
 				p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
@@ -355,13 +355,15 @@ var _ = Describe("Infra/Agent/Version", func() {
 			var (
 				version tasks.Ver
 				err     error
+				options tasks.Options
 			)
 
 			JustBeforeEach(func() {
-				err = p.validatePublishDate(version)
+				err = p.validatePublishDate(version, options)
 			})
 			Context("Version prior to 1.12.0", func() {
 				BeforeEach(func() {
+					options = tasks.Options{}
 					version = tasks.Ver{Major: 1, Minor: 11, Patch: 0, Build: 0}
 				})
 
@@ -372,16 +374,50 @@ var _ = Describe("Infra/Agent/Version", func() {
 
 			Context("Up-to-date version", func() {
 				BeforeEach(func() {
+					options = tasks.Options{}
 					version = tasks.Ver{Major: 1, Minor: 33, Patch: 0, Build: 0}
 					p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
 						return &http.Response{
-							Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"published_at": "2021-11-22T10:50:43Z"}`))),
+							Body: io.NopCloser(bytes.NewReader([]byte(`{"published_at": "2021-11-22T10:50:43Z"}`))),
 						}, nil
 					}
 					p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
 				})
 
 				It("should not return an error", func() {
+					Expect(err).To(BeNil())
+				})
+			})
+
+			Context("releaseDateOverride option is provided", func() {
+				BeforeEach(func() {
+					version = tasks.Ver{Major: 1, Minor: 77, Patch: 1, Build: 0}
+					options = tasks.Options{Options: map[string]string{releaseDateOverrideKey: "2026-07-13T18:04:00Z"}}
+					p.now = func() time.Time { return time.Date(2026, time.Month(7), 13, 18, 5, 0, 0, time.UTC) }
+					p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+						Fail("httpGetter must not be called when releaseDateOverride is set")
+						return nil, nil
+					}
+				})
+
+				It("should not return an error and should not hit the network", func() {
+					Expect(err).To(BeNil())
+				})
+			})
+
+			Context("releaseDateOverride option is empty", func() {
+				BeforeEach(func() {
+					version = tasks.Ver{Major: 1, Minor: 33, Patch: 0, Build: 0}
+					options = tasks.Options{Options: map[string]string{releaseDateOverrideKey: ""}}
+					p.httpGetter = func(wrapper httpHelper.RequestWrapper) (*http.Response, error) {
+						return &http.Response{
+							Body: io.NopCloser(bytes.NewReader([]byte(`{"published_at": "2021-11-22T10:50:43Z"}`))),
+						}, nil
+					}
+					p.now = func() time.Time { return time.Date(2022, time.Month(11), 21, 1, 10, 30, 0, time.UTC) }
+				})
+
+				It("should fall back to the GitHub API path", func() {
 					Expect(err).To(BeNil())
 				})
 			})

@@ -3,7 +3,8 @@
       - ADD https://download.newrelic.com/infrastructure_agent/binaries/windows/amd64/newrelic-infra-amd64.1.77.1.zip C:/nra.zip
       - RUN Expand-Archive -Path 'C:\nra.zip' -DestinationPath 'C:\' -Force; Write-Host '=== EXTRACTED CONTENTS ==='; Get-ChildItem 'C:\Program Files\New Relic\newrelic-infra\' | Select-Object FullName
       - COPY ["tasks/infra/config/fixtures/minimal_infra_config/newrelic-infra.yml", "C:/Program Files/New Relic/newrelic-infra/newrelic-infra.yml"]
-    docker_cmd: ./nrdiag_x64.exe -y -filter all
+      - RUN (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ') | Out-File -FilePath C:/app/release_date.txt -Encoding ascii -NoNewline
+    docker_cmd: $d = Get-Content C:/app/release_date.txt; ./nrdiag_x64.exe -y -filter all -o Infra/Agent/Version.releaseDateOverride=$d
     log_entry_expected:
      - Info.*Infra/Agent/Version.*
     log_entry_not_expected:

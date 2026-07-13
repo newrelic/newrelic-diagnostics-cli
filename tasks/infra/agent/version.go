@@ -19,6 +19,8 @@ var (
 	errRecommendedUpgrade = fmt.Errorf("New Relic Infrastructure Agent upgrade is recommended, installed agent was released more than one year ago")
 )
 
+const releaseDateOverrideKey = "releaseDateOverride"
+
 type githubReleaseData struct {
 	PublishedAt string `json:"published_at"`
 }
@@ -118,7 +120,7 @@ func (p InfraAgentVersion) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
-	err = p.validatePublishDate(ver)
+	err = p.validatePublishDate(ver, options)
 	if err != nil {
 		urlUpdateTask := tasks.Result{
 			URL:     "https://docs.newrelic.com/docs/infrastructure/new-relic-infrastructure/installation/update-infrastructure-agent",
@@ -166,13 +168,13 @@ func (p InfraAgentVersion) getBinaryPath(envVars map[string]string) (string, err
 }
 
 // validatePublishDate returns an error if the version was released more than one year ago
-func (p InfraAgentVersion) validatePublishDate(version tasks.Ver) error {
+func (p InfraAgentVersion) validatePublishDate(version tasks.Ver, options tasks.Options) error {
 	// Github releases started on version 1.12.0
 	if version.IsLessThanEq(oldestGithubRelease) {
 		return errUnsupportedVersion
 	}
 
-	publishData, err := p.getGithubPublishDate(fmt.Sprintf("%d.%d.%d", version.Major, version.Minor, version.Patch))
+	publishData, err := p.getGithubPublishDate(fmt.Sprintf("%d.%d.%d", version.Major, version.Minor, version.Patch), options)
 	if err != nil {
 		return fmt.Errorf("Unable to get New Relic Infrastructure Agent release date: %w", err)
 	}
@@ -187,7 +189,12 @@ func (p InfraAgentVersion) validatePublishDate(version tasks.Ver) error {
 	return nil
 }
 
-func (p InfraAgentVersion) getGithubPublishDate(version string) (time.Time, error) {
+func (p InfraAgentVersion) getGithubPublishDate(version string, options tasks.Options) (time.Time, error) {
+	if override := options.Options[releaseDateOverrideKey]; override != "" {
+		log.Debug("Infra/Agent/Version - using releaseDateOverride, skipping GitHub API call")
+		return time.Parse(time.RFC3339, override)
+	}
+
 	wrapper := httpHelper.RequestWrapper{
 		Method:         "GET",
 		URL:            githubAPIReleaseURL + version,
