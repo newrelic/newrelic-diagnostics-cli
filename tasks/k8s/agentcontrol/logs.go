@@ -62,6 +62,7 @@ func (p K8sAgentControlLogs) runCommand(namespace string) ([]byte, error) {
 			p.labelSelector,
 			"--all-containers",
 			"--prefix",
+			"--tail=-1",
 		)
 	}
 	return p.cmdExec(
@@ -73,5 +74,6 @@ func (p K8sAgentControlLogs) runCommand(namespace string) ([]byte, error) {
 		p.labelSelector,
 		"--all-containers",
 		"--prefix",
+		"--tail=-1",
 	)
 }
