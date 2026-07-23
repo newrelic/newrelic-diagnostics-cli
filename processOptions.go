@@ -127,7 +127,7 @@ func printSuites() {
 	}
 	log.Infof("Usage: \n\t%s --suites [suite arguments] \nExamples:\n\t%[1]s --suites java,infra\n\t%[1]s --suites python\n", command)
 	log.Info("\nUse the following arguments to select task suite(s) to run:\n")
-	log.Infof("%-18s%s\n\n", "Arguments:", "Diagnostics for:")
+	log.Infof("%-25s%s\n\n", "Arguments:", "Diagnostics for:")
 
 	for _, suite := range suites.DefaultSuiteManager.Suites {
 
@@ -136,7 +136,7 @@ func printSuites() {
 			description = suite.DisplayName
 		}
 
-		log.Infof("%-18s%s\n", suite.Identifier, description)
+		log.Infof("%-25s%s\n", suite.Identifier, description)
 	}
 	log.Info("\n")
 }

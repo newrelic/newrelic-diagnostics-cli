@@ -137,6 +137,15 @@ var suiteDefinitions = []Suite{
 		},
 	},
 	{
+		Identifier:  "onhost-agent-control",
+		DisplayName: "Agent Control on Host",
+		Description: "Gather information about agent-control logs, status, connectivity and resources on the host",
+		Tasks: []string{
+			"AgentControl/Agent/*",
+			"AgentControl/Config/*",
+		},
+	},
+	{
 		Identifier:  "all",
 		DisplayName: "All New Relic Products",
 		Description: "We only recommend this option if you are unsure of the NR product you are troubleshooting.",

@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
+	agentControlAgent "github.com/newrelic/newrelic-diagnostics-cli/tasks/agentcontrol/agent"
+	agentControlConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/agentcontrol/config"
 	androidAgent "github.com/newrelic/newrelic-diagnostics-cli/tasks/android/agent"
 	androidConfig "github.com/newrelic/newrelic-diagnostics-cli/tasks/android/config"
 	androidLog "github.com/newrelic/newrelic-diagnostics-cli/tasks/android/log"
@@ -129,6 +131,8 @@ func init() {
 	k8sAgentControl.RegisterWith(Register)
 	flux.RegisterWith(Register)
 	K8sHelm.RegisterWith(Register)
+	agentControlAgent.RegisterWith(Register)
+	agentControlConfig.RegisterWith(Register)
 
 	//example stuff, doesn't need to "ship" because binary gets name after directory with `go build` cmd
 	if strings.Contains(os.Args[0], "newrelic-diagnostics-cli") {
