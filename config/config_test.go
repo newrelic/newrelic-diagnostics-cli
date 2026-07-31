@@ -37,6 +37,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Script             string
 		K8sNamespace       string
 		ACAgentsNamespace  string
+		AgentControl       bool
 	}
 
 	sampleFlags := fields{
@@ -66,6 +67,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		Script:             "string",
 		K8sNamespace:       "string",
 		ACAgentsNamespace:  "string",
+		AgentControl:       true,
 	}
 
 	samplePreparedConfig := []ConfigFlag{
@@ -94,6 +96,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 		{Name: "script", Value: "string"},
 		{Name: "k8sNamespace", Value: "string"},
 		{Name: "aCAgentsNamespace", Value: "string"},
+		{Name: "agentControl", Value: true},
 	}
 
 	tests := []struct {
@@ -137,6 +140,7 @@ func Test_userFlags_UsagePayload(t *testing.T) {
 				Script:             tt.fields.Script,
 				K8sNamespace:       tt.fields.K8sNamespace,
 				ACAgentsNamespace:  tt.fields.ACAgentsNamespace,
+				AgentControl:       tt.fields.AgentControl,
 			}
 			if got := f.UsagePayload(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("userFlags.UsagePayload() = %v, want %v", got, tt.want)
@@ -336,6 +340,92 @@ func Test_parseRegionFlagAndEnv(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := parseRegionFlagAndEnv(tt.args.regionFromFlag, tt.args.regionFromEnv); got != tt.want {
 				t.Errorf("parseRegionFlagAndEnv() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_applyAgentControlDefaults(t *testing.T) {
+	type args struct {
+		agentControl      bool
+		k8sNamespace      string
+		acAgentsNamespace string
+	}
+	tests := []struct {
+		name                  string
+		args                  args
+		wantK8sNamespace      string
+		wantACAgentsNamespace string
+	}{
+		{
+			name: "agent-control off - leaves both namespaces untouched",
+			args: args{
+				agentControl:      false,
+				k8sNamespace:      "",
+				acAgentsNamespace: "",
+			},
+			wantK8sNamespace:      "",
+			wantACAgentsNamespace: "",
+		},
+		{
+			name: "agent-control off - leaves explicit values untouched",
+			args: args{
+				agentControl:      false,
+				k8sNamespace:      "custom-k8s",
+				acAgentsNamespace: "custom-agents",
+			},
+			wantK8sNamespace:      "custom-k8s",
+			wantACAgentsNamespace: "custom-agents",
+		},
+		{
+			name: "agent-control on with both namespaces empty - fills in defaults",
+			args: args{
+				agentControl:      true,
+				k8sNamespace:      "",
+				acAgentsNamespace: "",
+			},
+			wantK8sNamespace:      "newrelic-agent-control",
+			wantACAgentsNamespace: "newrelic",
+		},
+		{
+			name: "agent-control on with k8s-namespace overridden - override wins",
+			args: args{
+				agentControl:      true,
+				k8sNamespace:      "custom-k8s",
+				acAgentsNamespace: "",
+			},
+			wantK8sNamespace:      "custom-k8s",
+			wantACAgentsNamespace: "newrelic",
+		},
+		{
+			name: "agent-control on with ac-agents-namespace overridden - override wins",
+			args: args{
+				agentControl:      true,
+				k8sNamespace:      "",
+				acAgentsNamespace: "custom-agents",
+			},
+			wantK8sNamespace:      "newrelic-agent-control",
+			wantACAgentsNamespace: "custom-agents",
+		},
+		{
+			name: "agent-control on with both namespaces overridden - both overrides win",
+			args: args{
+				agentControl:      true,
+				k8sNamespace:      "custom-k8s",
+				acAgentsNamespace: "custom-agents",
+			},
+			wantK8sNamespace:      "custom-k8s",
+			wantACAgentsNamespace: "custom-agents",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotK8sNamespace, gotACAgentsNamespace := applyAgentControlDefaults(tt.args.agentControl, tt.args.k8sNamespace, tt.args.acAgentsNamespace)
+			if gotK8sNamespace != tt.wantK8sNamespace {
+				t.Errorf("applyAgentControlDefaults() k8sNamespace = %v, want %v", gotK8sNamespace, tt.wantK8sNamespace)
+			}
+			if gotACAgentsNamespace != tt.wantACAgentsNamespace {
+				t.Errorf("applyAgentControlDefaults() acAgentsNamespace = %v, want %v", gotACAgentsNamespace, tt.wantACAgentsNamespace)
 			}
 		})
 	}

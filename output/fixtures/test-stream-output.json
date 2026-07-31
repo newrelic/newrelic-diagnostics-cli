@@ -25,7 +25,8 @@
 		"Script": "",
 		"ScriptFlags": "",
 		"K8sNamespace": "",
-		"ACAgentsNamespace": ""
+		"ACAgentsNamespace": "",
+		"AgentControl": false
 	},
 	"Results": [
 		{
