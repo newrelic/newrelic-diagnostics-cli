@@ -62,8 +62,16 @@ type userFlags struct {
 	ScriptFlags        string
 	K8sNamespace       string
 	ACAgentsNamespace  string
+	AgentControl       bool
 	InNewRelicCLI      bool
 }
+
+// Default namespaces used by an Agent-control Kubernetes installation, applied
+// when the -agent-control flag is set and not overridden individually.
+const (
+	agentControlK8sNamespaceDefault      = "newrelic-agent-control"
+	agentControlACAgentsNamespaceDefault = "newrelic"
+)
 
 type ConfigFlag struct {
 	Name  string      `json:"name"`
@@ -102,6 +110,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		ScriptFlags       string
 		K8sNamespace      string
 		ACAgentsNamespace string
+		AgentControl      bool
 	}{
 		Verbose:           f.Verbose,
 		Quiet:             f.Quiet,
@@ -127,6 +136,7 @@ func (f userFlags) MarshalJSON() ([]byte, error) {
 		ScriptFlags:       f.ScriptFlags,
 		K8sNamespace:      f.K8sNamespace,
 		ACAgentsNamespace: f.ACAgentsNamespace,
+		AgentControl:      f.AgentControl,
 	})
 }
 
@@ -232,9 +242,11 @@ func ParseFlags() {
 
 	flag.StringVar(&Flags.BrowserURL, "browser-url", defaultString, "Specify a URL to check for the presence of a New Relic Browser agent")
 
-	flag.StringVar(&Flags.K8sNamespace, "k8s-namespace", defaultString, "Specify the namespace from where to scrape the New Relic resources. If you are using Agent-control, you can also set the '-ac-agents-namespace' flag to specify the namespace where Agent-control Agents are running.")
+	flag.BoolVar(&Flags.AgentControl, "agent-control", false, "Assume a default Agent-control Kubernetes installation: sets '-k8s-namespace' to '"+agentControlK8sNamespaceDefault+"' and '-ac-agents-namespace' to '"+agentControlACAgentsNamespaceDefault+"'. Only affects the k8s-agent-control suite/tasks and has no effect outside Kubernetes. Ignored for either namespace that is set explicitly via '-k8s-namespace' or '-ac-agents-namespace'.")
 
-	flag.StringVar(&Flags.ACAgentsNamespace, "ac-agents-namespace", defaultString, "Specify the namespace from where to scrape the Agent-control running agents.")
+	flag.StringVar(&Flags.K8sNamespace, "k8s-namespace", defaultString, "Specify the namespace from where to scrape the New Relic resources. If you are using a default Agent-control installation, use '-agent-control' instead. You can also set the '-ac-agents-namespace' flag to specify the namespace where Agent-control Agents are running.")
+
+	flag.StringVar(&Flags.ACAgentsNamespace, "ac-agents-namespace", defaultString, "Specify the namespace from where to scrape the Agent-control running agents. If you are using a default Agent-control installation, use '-agent-control' instead.")
 
 	flag.BoolVar(&Flags.UsageOptOut, "usage-opt-out", false, "Decline to send anonymous New Relic Diagnostic tool usage data to New Relic for this run")
 
@@ -257,6 +269,8 @@ func ParseFlags() {
 	}
 
 	flag.Parse()
+
+	Flags.K8sNamespace, Flags.ACAgentsNamespace = applyAgentControlDefaults(Flags.AgentControl, Flags.K8sNamespace, Flags.ACAgentsNamespace)
 
 	if Flags.VeryQuiet {
 		Flags.Quiet = true
@@ -333,12 +347,29 @@ func (f userFlags) UsagePayload() []ConfigFlag {
 		{Name: "script", Value: f.Script},
 		{Name: "k8sNamespace", Value: f.K8sNamespace},
 		{Name: "aCAgentsNamespace", Value: f.ACAgentsNamespace},
+		{Name: "agentControl", Value: f.AgentControl},
 	}
 }
 
 // boolifyFlag is a helper function for falsey/truthy conversion of UserFlag strings
 func boolifyFlag(inputFlag string) bool {
 	return inputFlag != ""
+}
+
+// applyAgentControlDefaults fills in the default namespaces for a default Agent-control
+// Kubernetes installation when agentControl is set, unless the individual namespace flags
+// were already set explicitly, in which case those take precedence.
+func applyAgentControlDefaults(agentControl bool, k8sNamespace string, acAgentsNamespace string) (string, string) {
+	if !agentControl {
+		return k8sNamespace, acAgentsNamespace
+	}
+	if k8sNamespace == "" {
+		k8sNamespace = agentControlK8sNamespaceDefault
+	}
+	if acAgentsNamespace == "" {
+		acAgentsNamespace = agentControlACAgentsNamespaceDefault
+	}
+	return k8sNamespace, acAgentsNamespace
 }
 
 // IsForcedTask returns true if the supplied task (identifier) was supplied in the
@@ -397,4 +428,3 @@ func stringToRegion(region string) Region {
 	}
 	return NoRegion
 }
-
