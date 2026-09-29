@@ -1,9 +1,9 @@
 package output
 
 import (
+	"encoding/json"
 	"os"
 	"reflect"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -30,10 +30,7 @@ func Test_GetResultsJSON(t *testing.T) {
 		Output:      []byte("test"),
 	}
 
-	expected := readFile("fixtures/test-output.json")
-	if runtime.GOOS == "windows" {
-		expected = readFile("fixtures/test-output_windows.json")
-	}
+	expected := readExpectedOutput("fixtures/test-output.json", fakeScriptResults.OutputPath)
 	observed := getResultsJSON(fakeResults, fakeScriptResults)
 
 	//if you intended to make changes to the output JSON:
@@ -77,10 +74,7 @@ func Test_StreamDataOutput(t *testing.T) {
 
 	go streamData(dataChannel)
 
-	expected := readFile("fixtures/test-stream-output.json")
-	if runtime.GOOS == "windows" {
-		expected = readFile("fixtures/test-stream-output_windows.json")
-	}
+	expected := readExpectedOutput("fixtures/test-stream-output.json", fakeScriptResults.OutputPath)
 	observed := getResultsJSON(fakeResults, fakeScriptResults)
 
 	//if you intended to make changes to the output JSON:
@@ -168,4 +162,12 @@ func readFile(file string) string {
 	//This is to fix line ending in Windows
 	replaced := strings.Replace(string(content), "\r\n", "\n", -1)
 	return replaced
+}
+
+// Script output paths are made absolute at runtime, so on Windows they gain the
+// current drive letter. Substitute the runtime value into the fixture.
+func readExpectedOutput(file string, scriptOutputPath string) string {
+	fixturePath, _ := json.Marshal(scriptOutputPath)
+	absPath, _ := json.Marshal(getAbsPath(scriptOutputPath))
+	return strings.Replace(readFile(file), string(fixturePath), string(absPath), 1)
 }
