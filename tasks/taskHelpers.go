@@ -614,7 +614,7 @@ var defaultEnvVarFilter = []string{
 	"^DOTNET_INSTALL_PATH$",
 	"^COR_PROFILER$",
 	"^COR_PROFILER_PATH$",
-	"^COR_ENABLE_PROFILER$",
+	"^COR_ENABLE_PROFILING$",
 	"^CORECLR_ENABLE_PROFILING$",
 	"^CORECLR_PROFILER$",
 	"^CORECLR_PROFILER_PATH$",
@@ -719,15 +719,7 @@ func GetProcessEnvVars(pid int32) (envVars EnvironmentVariables, retErr error) {
 			return
 		}
 		envVarString := string(environFile)
-		lines := strings.Split(envVarString, "\x00")
-		for _, line := range lines {
-			split := strings.Split(line, "=")
-			if len(split) > 1 {
-				name := split[0]
-				val := split[1]
-				envVars.All[name] = val
-			}
-		}
+		envVars.All = ParseEnvVarPairs(strings.Split(envVarString, "\x00"))
 	default:
 		errorString := "GetProcessEnvVars is not implemented for " + runtime.GOOS
 		log.Debug(errorString)
@@ -740,13 +732,8 @@ func GetProcessEnvVars(pid int32) (envVars EnvironmentVariables, retErr error) {
 
 // GetShellEnvVars - gathers a given process's Env Vars
 func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
-	envVars.All = make(map[string]string)
 	envVars.Scope = Shell
-
-	for _, e := range os.Environ() {
-		pair := strings.Split(e, "=")
-		envVars.All[pair[0]] = pair[1]
-	}
+	envVars.All = ParseEnvVarPairs(os.Environ())
 
 	if len(envVars.All) == 0 {
 		log.Debug("Env vars slice is 0, assuming there was an error collecting them")
@@ -755,6 +742,20 @@ func GetShellEnvVars() (envVars EnvironmentVariables, retErr error) {
 	}
 
 	return
+}
+
+// ParseEnvVarPairs - converts KEY=value strings into a map. Only the first '=' separates
+// the key from the value, so values may themselves contain '='. Entries without '=' are skipped.
+func ParseEnvVarPairs(pairs []string) map[string]string {
+	envVars := make(map[string]string)
+	for _, pair := range pairs {
+		keyVal := strings.SplitN(pair, "=", 2)
+		if len(keyVal) != 2 {
+			continue
+		}
+		envVars[keyVal[0]] = keyVal[1]
+	}
+	return envVars
 }
 
 // GetCmdLineArgs is a wrapper for Process.Cmdline

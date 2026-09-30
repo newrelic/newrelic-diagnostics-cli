@@ -8,7 +8,6 @@ import (
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 	"golang.org/x/sys/windows/registry"
-	"strings"
 )
 
 var w3svcRegPath = `SYSTEM\CurrentControlSet\Services\W3SVC\`
@@ -76,15 +75,7 @@ func validateW3svcInstrumentationRegKeys() (result tasks.Result) {
 		}
 	}
 
-	foundRegKeys := make(map[string]string)
-
-	for _, regVal := range regValues {
-		kvPair := strings.Split(regVal, "=")
-		if len(kvPair) != 2 {
-			continue
-		}
-		foundRegKeys[kvPair[0]] = kvPair[1]
-	}
+	foundRegKeys := tasks.ParseEnvVarPairs(regValues)
 
 	regKeyErrors := []string{}
 	for k, v := range expectedRegKeyWithVals {
