@@ -2,11 +2,13 @@ package tasks
 
 import (
 	"errors"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"sort"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -665,6 +667,94 @@ func TestStringInSlice(t *testing.T) {
 				t.Errorf("StringInSlice() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestParseEnvVarPairs(t *testing.T) {
+	tests := []struct {
+		name  string
+		pairs []string
+		want  map[string]string
+	}{
+		{
+			name:  "It parses simple pairs",
+			pairs: []string{"COR_ENABLE_PROFILING=1", "NEW_RELIC_APP_NAME=MyApp"},
+			want:  map[string]string{"COR_ENABLE_PROFILING": "1", "NEW_RELIC_APP_NAME": "MyApp"},
+		},
+		{
+			name:  "It keeps '=' characters in the value",
+			pairs: []string{"NEW_RELIC_LABELS=env=prod;team=dotnet", "TOKEN=abc=="},
+			want:  map[string]string{"NEW_RELIC_LABELS": "env=prod;team=dotnet", "TOKEN": "abc=="},
+		},
+		{
+			name:  "It keeps empty values",
+			pairs: []string{"NEW_RELIC_LOG="},
+			want:  map[string]string{"NEW_RELIC_LOG": ""},
+		},
+		{
+			name:  "It skips entries without '='",
+			pairs: []string{"", "NOT_A_PAIR", "COR_PROFILER={71DA0A04-7777-4EC6-9643-7D28B46A8A41}"},
+			want:  map[string]string{"COR_PROFILER": "{71DA0A04-7777-4EC6-9643-7D28B46A8A41}"},
+		},
+		{
+			name:  "It handles Windows hidden per-drive entries",
+			pairs: []string{`=C:=C:\workspace`},
+			want:  map[string]string{"": `C:=C:\workspace`},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ParseEnvVarPairs(tt.pairs); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseEnvVarPairs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetShellEnvVars_ValueContainingEquals(t *testing.T) {
+	t.Setenv("NRDIAG_TEST_ENV_VAR", "env=prod;team=dotnet")
+
+	envVars, err := GetShellEnvVars()
+	if err != nil {
+		t.Fatalf("GetShellEnvVars() returned error: %v", err)
+	}
+
+	if got := envVars.All["NRDIAG_TEST_ENV_VAR"]; got != "env=prod;team=dotnet" {
+		t.Errorf("GetShellEnvVars() NRDIAG_TEST_ENV_VAR = %q, want %q", got, "env=prod;team=dotnet")
+	}
+}
+
+func TestGetProcessEnvVars_ValueContainingEquals(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("GetProcessEnvVars is only implemented on linux")
+	}
+
+	cmd := exec.Command("sleep", "10")
+	cmd.Env = []string{"NRDIAG_TEST_ENV_VAR=env=prod;team=dotnet"}
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("unable to start child process: %v", err)
+	}
+	defer func() {
+		_ = cmd.Process.Kill()
+		_ = cmd.Wait()
+	}()
+
+	// Until the forked child execs, /proc/<pid>/environ still reflects the parent's environment, so poll briefly
+	var got string
+	deadline := time.Now().Add(2 * time.Second)
+	for time.Now().Before(deadline) {
+		envVars, err := GetProcessEnvVars(int32(cmd.Process.Pid))
+		if err != nil {
+			t.Fatalf("GetProcessEnvVars() returned error: %v", err)
+		}
+		if got = envVars.All["NRDIAG_TEST_ENV_VAR"]; got != "" {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	if got != "env=prod;team=dotnet" {
+		t.Errorf("GetProcessEnvVars() NRDIAG_TEST_ENV_VAR = %q, want %q", got, "env=prod;team=dotnet")
 	}
 }
 
