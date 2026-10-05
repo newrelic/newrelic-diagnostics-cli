@@ -81,7 +81,7 @@ func TestGetPEFileVersion_TruncatedFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 	rsrc := parsed.Section(".rsrc")
-	parsed.Close()
+	_ = parsed.Close()
 	if rsrc == nil {
 		t.Fatalf("%s has no .rsrc section", source)
 	}
