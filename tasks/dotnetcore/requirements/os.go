@@ -48,11 +48,15 @@ func (t DotNetCoreRequirementsOS) Execute(options tasks.Options, upstream map[st
 	return
 }
 
+const osRequirementsURL = "https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-compatibility-requirements/#operating-system-core"
+
+const architectureRequirementsURL = "https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-compatibility-requirements/#architecture-core"
+
 func checkOS(hostInfo env.HostInfo) (result tasks.Result) {
 	if len(hostInfo.PlatformVersion) < 1 {
 		result.Status = tasks.Warning
 		result.Summary = "Could not detect OS version to check compatibility."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+		result.URL = osRequirementsURL
 		return
 	}
 
@@ -60,7 +64,7 @@ func checkOS(hostInfo env.HostInfo) (result tasks.Result) {
 	case "darwin":
 		result.Status = tasks.Failure
 		result.Summary = "MacOS is not supported by the .NET Core agent."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+		result.URL = osRequirementsURL
 		return
 	case "linux":
 		result = checkLinux(hostInfo.Platform, hostInfo.PlatformVersion)
@@ -73,7 +77,7 @@ func checkOS(hostInfo env.HostInfo) (result tasks.Result) {
 	log.Debug("Unable to determine OS.")
 	result.Status = tasks.Warning
 	result.Summary = "Could not detect OS to check compatibility."
-	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+	result.URL = osRequirementsURL
 	return
 }
 
@@ -85,195 +89,54 @@ func checkWindows(osVersion string) (result tasks.Result) {
 	if osVerMaj >= 6 && osVerMaj <= 10 {
 		result.Status = tasks.Success
 		result.Summary = "OS detected as meeting requirements. See HostInfo task Payload for more info on OS."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+		result.URL = osRequirementsURL
 		return
 	}
 
 	if osVerMaj == -1 {
 		result.Status = tasks.Error
 		result.Summary = "Unable to get full OS version to check compatibility."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+		result.URL = osRequirementsURL
 		return
 	}
 
 	result.Status = tasks.Failure
 	result.Summary = "OS not detected as compatible with the .Net Core Agent."
-	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+	result.URL = osRequirementsURL
 
 	return
+}
+
+// knownLinuxPlatforms - distributions (as reported by HostInfo) that .NET supports.
+// The agent supports any Linux distribution that .NET supports, so we no longer check distribution versions:
+// https://learn.microsoft.com/en-us/dotnet/core/install/linux
+var knownLinuxPlatforms = map[string]bool{
+	"ubuntu":    true,
+	"debian":    true,
+	"linuxmint": true,
+	"opensuse":  true,
+	"suse":      true,
+	"redhat":    true,
+	"fedora":    true,
+	"centos":    true,
+	"oracle":    true,
+	"alpine":    true,
+	"amazon":    true,
+	"rocky":     true,
+	"almalinux": true,
 }
 
 func checkLinux(osPlatform string, osVersion string) (result tasks.Result) {
-	checkPassed := false
-	osVerMaj, osVerMin, _, _ := tasks.GetVersionSplit(osVersion)
-
-	if osVerMaj == -1 {
-		result.Status = tasks.Error
-		result.Summary = "Unable to get full OS version to check compatibility."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
-		return
-	}
-
-	switch osPlatform {
-	case "ubuntu":
-		checkPassed = checkUbuntu(osVerMaj, osVerMin)
-	case "debian":
-		checkPassed = checkDebian(osVerMaj, osVerMin)
-	case "linuxmint":
-		checkPassed = checkMint(osVerMaj)
-	case "opensuse":
-		checkPassed = checkOpenSuse(osVerMaj, osVerMin)
-	case "suse":
-		checkPassed = checkSles(osVerMaj)
-	case "redhat":
-		checkPassed = checkRhel(osVerMaj)
-	case "fedora":
-		checkPassed = checkFedora(osVerMaj)
-	case "centos":
-		checkPassed = checkCentOs(osVerMaj)
-	case "oracle":
-		checkPassed = checkOracle(osVerMaj)
-	default:
+	if !knownLinuxPlatforms[osPlatform] {
 		log.Debug("Unknown Linux Platform '" + osPlatform + "'")
-		result.Status = tasks.Warning
-		result.Summary = "Unknown Linux Platform '" + osPlatform + "'. Unable to check compatibility."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
-		return
-	}
-	//https://docs.microsoft.com/en-us/dotnet/core/install/linux
-	if checkPassed {
-		result.Status = tasks.Success
-		result.Summary = "OS detected as meeting requirements. See HostInfo task Payload for more info on OS."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
+		result.Status = tasks.Info
+		result.Summary = "Unrecognized Linux platform '" + osPlatform + " " + osVersion + "'. The .NET agent supports any Linux distribution that is supported by .NET; verify that yours is."
+		result.URL = osRequirementsURL
 		return
 	}
 
-	result.Status = tasks.Failure
-	result.Summary = "OS not detected as compatible with the .Net Core Agent. See HostInfo task Payload for more info on OS: " + osPlatform + " " + osVersion
-	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#operating-system"
-	return
-}
-
-/*
-	supported versions: Comment last updated: 3/1/2018
-	- https://github.com/dotnet/core/blob/master/release-notes/2.0/2.0-supported-os.md#linux
-	- Ubuntu: 17.10, 16.04, 14.04
-	- Mint: 18, 17
-	- Debian: 9, 8.7+
-	- openSUSE: 42.2+
-	- SLES: 	12
-	- Red Hat Enterprise Linux: 7
-	- CentOS: 7
-	- Oracle Linux: 7
-	- Fedora: 26, 27
-*/
-
-func checkUbuntu(osVerMaj int, osVerMin int) (retVal bool) {
-	// Ubuntu: 17.10, 16.04, 20.10, 20.04, 18.04
-	if osVerMaj == 16 || osVerMaj == 18 || osVerMaj == 20 {
-		if osVerMin == 04 {
-			retVal = true
-			return
-		}
-	}
-	if osVerMaj == 17 || osVerMaj == 20 {
-		if osVerMin == 10 {
-			retVal = true
-			return
-		}
-	}
-	retVal = false
-	return
-}
-
-func checkDebian(osVerMaj int, osVerMin int) (retVal bool) {
-	// Debian: 9, 8.7+
-	if osVerMaj == 9 {
-		retVal = true
-		return
-	}
-	if osVerMaj == 8 {
-		if osVerMin >= 7 {
-			retVal = true
-			return
-		}
-	}
-
-	retVal = false
-	return
-}
-
-func checkMint(osVerMaj int) (retVal bool) {
-	// Mint: 18, 17
-	if osVerMaj == 18 || osVerMaj == 17 {
-		retVal = true
-		return
-	}
-
-	retVal = false
-	return
-}
-
-func checkOpenSuse(osVerMaj int, osVerMin int) (retVal bool) {
-	// openSUSE: 42.2+
-	if osVerMaj == 42 {
-		if osVerMin >= 2 {
-			retVal = true
-			return
-		}
-	}
-
-	retVal = false
-	return
-}
-
-func checkSles(osVerMaj int) (retVal bool) {
-	// SLES: 12
-	if osVerMaj == 12 {
-		retVal = true
-		return
-	}
-
-	retVal = false
-	return
-}
-
-func checkRhel(osVerMaj int) (retVal bool) {
-	// Red Hat Enterprise Linux: 7
-	if osVerMaj == 7 {
-		retVal = true
-		return
-	}
-	retVal = false
-	return
-}
-
-func checkCentOs(osVerMaj int) (retVal bool) {
-	// CentOS: 7
-	if osVerMaj == 7 {
-		retVal = true
-		return
-	}
-	retVal = false
-	return
-}
-
-func checkOracle(osVerMaj int) (retVal bool) {
-	// Oracle Linux: 7
-	if osVerMaj == 7 {
-		retVal = true
-		return
-	}
-	retVal = false
-	return
-}
-
-func checkFedora(osVerMaj int) (retVal bool) {
-	// Fedora: 26, 27
-	if osVerMaj == 26 || osVerMaj == 27 {
-		retVal = true
-		return
-	}
-	retVal = false
+	result.Status = tasks.Success
+	result.Summary = "OS detected as meeting requirements. See HostInfo task Payload for more info on OS."
+	result.URL = osRequirementsURL
 	return
 }

@@ -56,7 +56,7 @@ func getType() (result tasks.Result) {
 		log.Debug("Error while getting Processor type", err.Error())
 		result.Status = tasks.Error
 		result.Summary = "Error while getting Processor type, see debug logs for more details."
-		result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#architecture"
+		result.URL = architectureRequirementsURL
 		return
 	}
 
@@ -77,6 +77,6 @@ func getType() (result tasks.Result) {
 
 	result.Status = tasks.Failure
 	result.Summary = "Processor not detected as x86 or x64. .NET Core Agent only supports x86 and x64 processors on Windows."
-	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#architecture"
+	result.URL = architectureRequirementsURL
 	return
 }

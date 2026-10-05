@@ -33,12 +33,12 @@ func TestCheckOs(t *testing.T) {
 		},
 		{
 			hostInfo: env.HostInfo{
-				PlatformVersion: "17.04",
+				PlatformVersion: "24.04",
 				PlatformFamily:  "debian",
 				OS:              "linux",
 				Platform:        "ubuntu",
 			},
-			want: tasks.Failure,
+			want: tasks.Success,
 		},
 		{
 			hostInfo: env.HostInfo{
@@ -47,7 +47,43 @@ func TestCheckOs(t *testing.T) {
 				OS:              "linux",
 				Platform:        "opensuse",
 			},
-			want: tasks.Failure,
+			want: tasks.Success,
+		},
+		{
+			hostInfo: env.HostInfo{
+				PlatformVersion: "3.20.3",
+				PlatformFamily:  "alpine",
+				OS:              "linux",
+				Platform:        "alpine",
+			},
+			want: tasks.Success,
+		},
+		{
+			hostInfo: env.HostInfo{
+				PlatformVersion: "2023",
+				PlatformFamily:  "rhel",
+				OS:              "linux",
+				Platform:        "amazon",
+			},
+			want: tasks.Success,
+		},
+		{
+			hostInfo: env.HostInfo{
+				PlatformVersion: "2024.1",
+				PlatformFamily:  "",
+				OS:              "linux",
+				Platform:        "someobscuredistro",
+			},
+			want: tasks.Info,
+		},
+		{
+			hostInfo: env.HostInfo{
+				PlatformVersion: "unknown",
+				PlatformFamily:  "debian",
+				OS:              "linux",
+				Platform:        "ubuntu",
+			},
+			want: tasks.Success,
 		},
 		{
 			hostInfo: env.HostInfo{

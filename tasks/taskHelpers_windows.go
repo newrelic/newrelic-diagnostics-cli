@@ -53,8 +53,6 @@ var (
 // Returns: string - value of full internal version number.
 //
 //	error  - any error message encountered. `nil` if none.
-type GetFileVersionFunc func(string) (string, error)
-
 func GetFileVersion(file string) (string, error) {
 	if !FileExists(file) {
 		return "", errors.New("file does not exist")

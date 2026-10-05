@@ -2,6 +2,7 @@ package requirements
 
 import (
 	"fmt"
+	"strings"
 
 	log "github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -55,14 +56,14 @@ func (p DotnetRequirementsProcessorType) Execute(options tasks.Options, upstream
 
 	}
 
-	if procType == "x86" {
+	if strings.EqualFold(procType, "x86") {
 		result.Status = tasks.Success
 		result.Summary = "Processor detected as x86"
 		return result
 
 	}
 
-	if procType == "AMD64" {
+	if strings.EqualFold(procType, "AMD64") {
 		result.Status = tasks.Success
 		result.Summary = "Processor detected as x64"
 		return result
@@ -71,7 +72,7 @@ func (p DotnetRequirementsProcessorType) Execute(options tasks.Options, upstream
 
 	result.Status = tasks.Failure
 	result.Summary = fmt.Sprintf("Processor detected as %v. .Net Framework Agent only supports x86 and x64 processors", procType)
-	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-framework-agent#architecture"
+	result.URL = "https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-compatibility-requirements/#architecture-framework"
 	return result
 
 }

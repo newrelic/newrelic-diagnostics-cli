@@ -29,6 +29,6 @@ func (t DotNetCoreRequirementsProcessorType) Dependencies() []string {
 func (t DotNetCoreRequirementsProcessorType) Execute(options tasks.Options, upstream map[string]tasks.Result) (result tasks.Result) {
 	result.Status = tasks.None
 	result.Summary = "Did not pass OS check, skipping this task."
-	result.URL = "https://docs.newrelic.com/docs/agents/net-agent/getting-started/compatibility-requirements-net-core-20-agent#architecture"
+	result.URL = architectureRequirementsURL
 	return
 }

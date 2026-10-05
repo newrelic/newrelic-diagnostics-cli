@@ -60,8 +60,8 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 		}
 	}
 
-	//truncate framework versions to only use two digits (if they happen to be more than two) because both our map and documentation ignores any patch version to assess if it is supported
-	truncatedFrameworkVersions, err := removePatchBuildDigits(frameworkVersions)
+	//normalize framework versions to match the keys in our map, e.g. 4.8.0.0 -> 4.8 and 4.7.2 -> 4.7.2
+	normalizedFrameworkVersions, err := normalizeFrameworkVersions(frameworkVersions)
 
 	if err != nil {
 		return tasks.Result{
@@ -73,7 +73,7 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 	var unsupportedFrameworkVersions []string
 	var incompatibleFrameworkVersions []string
 
-	for _, frameworkVer := range truncatedFrameworkVersions {
+	for _, frameworkVer := range normalizedFrameworkVersions {
 		isFrameworkVerSupported, requiredAgentVersions := checkFrameworkVerIsSupported(frameworkVer)
 		if !isFrameworkVerSupported {
 			unsupportedFrameworkVersions = append(unsupportedFrameworkVersions, frameworkVer)
@@ -100,8 +100,8 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 		failureSummary += fmt.Sprintf("We found that your New Relic .NET agent version %s is not compatible with the following Target .NET version(s): %s", agentVersion, strings.Join(incompatibleFrameworkVersions, ", "))
 	}
 
-	legacyDocURL := "https://docs.newrelic.com/docs/agents/net-agent/troubleshooting/technical-support-net-framework-40-or-lower"
-	requirementsDocURL := "https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework"
+	legacyDocURL := "https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/technical-support-net-framework-40-or-lower/"
+	requirementsDocURL := "https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-compatibility-requirements/#net-version-framework"
 
 	if len(failureSummary) > 0 {
 		return tasks.Result{
@@ -118,19 +118,20 @@ func (t DotnetRequirementsNetTargetAgentVerValidate) Execute(options tasks.Optio
 
 }
 
-func removePatchBuildDigits(frameworkVersions []string) ([]string, error) {
-	var truncatedVersions []string
+func normalizeFrameworkVersions(frameworkVersions []string) ([]string, error) {
+	var normalizedVersions []string
 	for _, version := range frameworkVersions {
 		v, err := tasks.ParseVersion(version)
 		if err != nil {
-			return truncatedVersions, err
+			return normalizedVersions, err
 		}
-		truncatedVersion := strconv.Itoa(v.Major) + "." + strconv.Itoa(v.Minor)
-		truncatedVersions = append(truncatedVersions, truncatedVersion)
-
+		normalizedVersion := strconv.Itoa(v.Major) + "." + strconv.Itoa(v.Minor)
+		if v.Patch != 0 {
+			normalizedVersion += "." + strconv.Itoa(v.Patch)
+		}
+		normalizedVersions = append(normalizedVersions, normalizedVersion)
 	}
-	return truncatedVersions, nil
-
+	return normalizedVersions, nil
 }
 
 func checkCompatibilityWithAgentVer(requiredAgentVersions []string, agentVersion string) (bool, error) {
