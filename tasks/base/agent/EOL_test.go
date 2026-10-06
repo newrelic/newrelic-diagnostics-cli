@@ -52,6 +52,7 @@ var _ = Describe("Base/Agent/EOL", func() {
 		if runtime.GOOS == "windows" {
 			defaultDependencies = append(defaultDependencies, "DotNet/Agent/Version")
 		}
+		defaultDependencies = append(defaultDependencies, "DotNetCore/Agent/Version")
 		Context("When one agent suite is selected", func() {
 			JustBeforeEach(func() {
 				p.suiteManager = &suites.SuiteManager{
@@ -75,6 +76,18 @@ var _ = Describe("Base/Agent/EOL", func() {
 			})
 			It("Should expected slice of dependencies", func() {
 				Expect(p.Dependencies()).To(Equal([]string{"Node/Agent/Version", "PHP/Agent/Version"}))
+			})
+		})
+		Context("When the dotnetcore suite is selected", func() {
+			JustBeforeEach(func() {
+				p.suiteManager = &suites.SuiteManager{
+					SelectedSuites: []suites.Suite{
+						{Identifier: "dotnetcore"},
+					},
+				}
+			})
+			It("Should expected slice of dependencies", func() {
+				Expect(p.Dependencies()).To(Equal([]string{"DotNetCore/Agent/Version"}))
 			})
 		})
 		Context("When then 'all' suite is selected", func() {
@@ -131,7 +144,10 @@ var _ = Describe("Base/Agent/EOL", func() {
 					"PHP/Agent/Version": {
 						Status: tasks.Error,
 					},
-					"Dotnet/Agent/Version": {
+					"DotNet/Agent/Version": {
+						Status: tasks.None,
+					},
+					"DotNetCore/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -177,9 +193,13 @@ var _ = Describe("Base/Agent/EOL", func() {
 							Patch: 212,
 						},
 					},
-					"Dotnet/Agent/Version": {
+					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
-						Payload: "3.0",
+						Payload: "6.27.0.0",
+					},
+					"DotNetCore/Agent/Version": {
+						Status:  tasks.Info,
+						Payload: "10.45.0.0",
 					},
 				}
 
@@ -191,8 +211,8 @@ var _ = Describe("Base/Agent/EOL", func() {
 
 			It("should return an expected success result summary", func() {
 				expectedSummary := []string{
-					"We detected 6 New Relic agent(s) running on your system:",
-					"6 New Relic agent(s) whose version is within the scope of support",
+					"We detected 7 New Relic agent(s) running on your system:",
+					"7 New Relic agent(s) whose version is within the scope of support",
 				}
 				Expect(result.Summary).To(Equal(strings.Join(expectedSummary, "\n")))
 			})
@@ -250,7 +270,10 @@ var _ = Describe("Base/Agent/EOL", func() {
 					"PHP/Agent/Version": {
 						Status: tasks.Error,
 					},
-					"Dotnet/Agent/Version": {
+					"DotNet/Agent/Version": {
+						Status: tasks.None,
+					},
+					"DotNetCore/Agent/Version": {
 						Status: tasks.None,
 					},
 				}
@@ -328,9 +351,13 @@ var _ = Describe("Base/Agent/EOL", func() {
 							Patch: 212,
 						},
 					},
-					"Dotnet/Agent/Version": {
+					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
-						Payload: "3.0",
+						Payload: "5.1.0.0",
+					},
+					"DotNetCore/Agent/Version": {
+						Status:  tasks.Info,
+						Payload: "10.44.0.0",
 					},
 				}
 
@@ -340,13 +367,19 @@ var _ = Describe("Base/Agent/EOL", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 
+			It("should link to the .NET agent EOL policy", func() {
+				Expect(result.URL).To(Equal(dotnetEOLURL))
+			})
+
 			It("should return an expected success result summary", func() {
 				expectedSummary := []string{
-					"We detected 6 New Relic agent(s) running on your system:",
-					"4 New Relic agent(s) whose version is within the scope of support",
-					"2 New Relic agent(s) whose version has reached EOL:",
+					"We detected 7 New Relic agent(s) running on your system:",
+					"3 New Relic agent(s) whose version is within the scope of support",
+					"4 New Relic agent(s) whose version has reached EOL:",
 					"\tNode agent 1.0",
 					"\tPython agent 1.0.5",
+					"\tDotNet agent 5.1.0.0",
+					"\tDotNetCore agent 10.44.0.0",
 				}
 
 				sort.Strings(expectedSummary)
@@ -375,6 +408,10 @@ var _ = Describe("Base/Agent/EOL", func() {
 
 			It("should return a failure status", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+
+			It("should link to the general EOL announcement", func() {
+				Expect(result.URL).To(Equal(eolURL))
 			})
 
 			It("should return an expected failure result summary", func() {
@@ -453,6 +490,46 @@ var _ = Describe("Base/Agent/EOL", func() {
 				agentName = "PHP"
 			})
 			It("Should return supported", func() {
+				Expect(isItUnsupported).To(BeTrue())
+				Expect(err).To(BeNil())
+			})
+		})
+		Context("With supported .NET agent version 10.45.0.0", func() {
+			BeforeEach(func() {
+				version = "10.45.0.0"
+				agentName = "DotNetCore"
+			})
+			It("Should return supported", func() {
+				Expect(isItUnsupported).To(BeFalse())
+				Expect(err).To(BeNil())
+			})
+		})
+		Context("With unsupported .NET agent version 10.44.1.0", func() {
+			BeforeEach(func() {
+				version = "10.44.1.0"
+				agentName = "DotNet"
+			})
+			It("Should return unsupported", func() {
+				Expect(isItUnsupported).To(BeTrue())
+				Expect(err).To(BeNil())
+			})
+		})
+		Context("With supported legacy .NET Framework agent version 6.26.0.0", func() {
+			BeforeEach(func() {
+				version = "6.26.0.0"
+				agentName = "DotNet"
+			})
+			It("Should return supported", func() {
+				Expect(isItUnsupported).To(BeFalse())
+				Expect(err).To(BeNil())
+			})
+		})
+		Context("With unsupported legacy .NET Framework agent version 6.25.0.0", func() {
+			BeforeEach(func() {
+				version = "6.25.0.0"
+				agentName = "DotNet"
+			})
+			It("Should return unsupported", func() {
 				Expect(isItUnsupported).To(BeTrue())
 				Expect(err).To(BeNil())
 			})

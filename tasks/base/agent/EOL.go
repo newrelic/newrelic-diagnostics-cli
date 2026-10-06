@@ -11,16 +11,26 @@ import (
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
-// EOLVersions prior to: Node 1.14.1, Java 3.6.0 (except 2.21.7), .NET 5.1, PHP 5.0.0.115, Python 2.42.0, Ruby 3.9.6
+// EOLVersions prior to: Node 1.14.1, Java 3.6.0 (except 2.21.7), PHP 5.0.0.115, Python 2.42.0, Ruby 3.9.6
 // To satisfy these requirements, here we're specifying the last version released prior the versions listed above
+// .NET versions follow https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-eol-policy/ as of 2026-09-30:
+// 10.45.0 and later are supported, along with 6.26 and 6.27 for .NET Framework 4.0 and lower. The 10.x cutoff moves as new versions ship.
 var EOLVersions = map[string][]string{
-	"Node":   {"1.0.0-1.14.0"},
-	"Java":   {"1.3.0-2.21.4", "3.0.0-3.5.1"},
-	"Python": {"1.0.2.130-2.40.0.34"},
-	"Ruby":   {"3.0.0-3.9.5.251"},
-	"PHP":    {"2.0.2.65-4.23.4.113"},
-	"DotNet": {"2.0.6-5.0.136.0"},
+	"Node":       {"1.0.0-1.14.0"},
+	"Java":       {"1.3.0-2.21.4", "3.0.0-3.5.1"},
+	"Python":     {"1.0.2.130-2.40.0.34"},
+	"Ruby":       {"3.0.0-3.9.5.251"},
+	"PHP":        {"2.0.2.65-4.23.4.113"},
+	"DotNet":     dotnetEOLVersions,
+	"DotNetCore": dotnetEOLVersions,
 }
+
+var dotnetEOLVersions = []string{"0.0.0-6.25.*", "7.0.0-10.44.*"}
+
+const (
+	eolURL       = "https://discuss.newrelic.com/t/important-upcoming-changes-to-supported-agent-versions/72280"
+	dotnetEOLURL = "https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-eol-policy/"
+)
 
 type agentVersion struct {
 	name    string
@@ -57,6 +67,7 @@ func (p BaseAgentEOL) Dependencies() []string {
 	if runtime.GOOS == "windows" {
 		defaultDependencies = append(defaultDependencies, "DotNet/Agent/Version")
 	}
+	defaultDependencies = append(defaultDependencies, "DotNetCore/Agent/Version")
 
 	if len(p.suiteManager.SelectedSuites) < 1 {
 		return defaultDependencies
@@ -79,6 +90,8 @@ func (p BaseAgentEOL) Dependencies() []string {
 			if runtime.GOOS == "windows" {
 				suiteDependencies = append(suiteDependencies, "DotNet/Agent/Version")
 			}
+		case "dotnetcore":
+			suiteDependencies = append(suiteDependencies, "DotNetCore/Agent/Version")
 		case "all":
 			return defaultDependencies
 		}
@@ -132,8 +145,18 @@ func (p BaseAgentEOL) Execute(options tasks.Options, upstream map[string]tasks.R
 	return tasks.Result{
 		Status:  taskStatus,
 		Summary: taskSummary,
-		URL:     "https://discuss.newrelic.com/t/important-upcoming-changes-to-supported-agent-versions/72280",
+		URL:     getEOLURL(failures),
 	}
+}
+
+// getEOLURL points at the .NET agent EOL policy when a .NET agent has reached EOL, and the general announcement otherwise
+func getEOLURL(failures []agentVersion) string {
+	for _, a := range failures {
+		if a.name == "DotNet" || a.name == "DotNetCore" {
+			return dotnetEOLURL
+		}
+	}
+	return eolURL
 }
 
 func isItEOL(version string, agentName string) (bool, error) {

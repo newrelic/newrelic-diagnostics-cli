@@ -115,28 +115,40 @@ func checkNetAbove4() string {
 
 		return ""
 	}
-	if value >= 460798 {
-		return "4.7 or later"
-	}
-	if value >= 394802 {
-		return "4.6.2"
-	}
-	if value >= 394254 {
-		return "4.6.1"
-	}
-	if value >= 393295 {
-		return "4.6"
-	}
-	if value >= 379893 {
-		return "4.5.2"
-	}
-	if value >= 378675 {
-		return "4.5.1"
-	}
-	if value >= 378389 {
-		return "4.5"
-	} else {
-		return ""
-	}
+	return releaseKeyToVersion(value)
+}
 
+// Minimum Release key for each .NET Framework 4.5+ version, highest first.
+// https://learn.microsoft.com/en-us/dotnet/framework/install/how-to-determine-which-versions-are-installed#minimum-version
+var frameworkReleaseKeys = []struct {
+	minRelease uint64
+	version    string
+}{
+	{533320, "4.8.1"},
+	{528040, "4.8"},
+	{461808, "4.7.2"},
+	{461308, "4.7.1"},
+	{460798, "4.7"},
+	{394802, "4.6.2"},
+	{394254, "4.6.1"},
+	{393295, "4.6"},
+	{379893, "4.5.2"},
+	{378675, "4.5.1"},
+	{378389, "4.5"},
+}
+
+// highestKnownReleaseKey - the highest Release value shipped with 4.8.1; anything above it is a newer, unknown version
+const highestKnownReleaseKey = 533325
+
+// releaseKeyToVersion translates the v4\Full Release registry value into a .NET Framework version
+func releaseKeyToVersion(release uint64) string {
+	if release > highestKnownReleaseKey {
+		return "4.8.1 or later"
+	}
+	for _, key := range frameworkReleaseKeys {
+		if release >= key.minRelease {
+			return key.version
+		}
+	}
+	return ""
 }

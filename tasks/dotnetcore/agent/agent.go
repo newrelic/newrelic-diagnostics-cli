@@ -10,4 +10,5 @@ func RegisterWith(registrationFunc func(tasks.Task, bool)) {
 	log.Debug("Registering DotNetCore/Agent/*")
 
 	registrationFunc(DotNetCoreAgentInstalled{}, true)
+	registrationFunc(DotNetCoreAgentVersion{getFileVersion: tasks.GetPEFileVersion}, true)
 }

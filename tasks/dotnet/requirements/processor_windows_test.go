@@ -102,6 +102,23 @@ var _ = Describe("Dotnet/Requirements/ProcessorType", func() {
 				Expect(result.Summary).To(Equal("Processor detected as x64"))
 			})
 		})
+		Context("With supported processor type in lowercase", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+				}
+				p.getProcessorArch = func() (string, error) {
+					return "amd64", nil
+				}
+			})
+			It("Should return Success status", func() {
+				Expect(result.Status).To(Equal(tasks.Success))
+			})
+			It("Should return expected summary", func() {
+				Expect(result.Summary).To(Equal("Processor detected as x64"))
+			})
+		})
 
 		Context("With unsupported processor type", func() {
 			BeforeEach(func() {

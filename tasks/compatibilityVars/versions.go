@@ -85,13 +85,17 @@ var NodeSupportedVersions = map[string][]string{
 	"10": {"4.6.0-7.*"},
 }
 
-// https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework#net-version
-// .NET framework as keys and .NET agent as values
+// https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-compatibility-requirements/#net-version-framework
+// .NET framework as keys and .NET agent as values. Keys are "major.minor" when the patch is 0, otherwise "major.minor.patch".
+// To instrument applications running on .NET Framework 4.6.2 or higher, you must run the New Relic .NET agent 10.0 or higher.
+// .NET Framework 4.5.x, 4.6 and 4.6.1 are no longer supported by the agent.
 var DotnetFrameworkSupportedVersions = map[string][]string{
-	"4.8": {"7.0.0+"},
-	"4.7": {"7.0.0+"},
-	"4.6": {"7.0.0+"}, //should be inclusive of version such as 4.6.1
-	"4.5": {"7.0.0+"},
+	"4.8.1": {"10.0.0+"},
+	"4.8":   {"10.0.0+"},
+	"4.7.2": {"10.0.0+"},
+	"4.7.1": {"10.0.0+"},
+	"4.7":   {"10.0.0+"},
+	"4.6.2": {"10.0.0+"},
 }
 
 var DotnetFrameworkOldVersions = map[string][]string{
@@ -101,19 +105,18 @@ var DotnetFrameworkOldVersions = map[string][]string{
 	//Doc says .NET Framework 3.0 and 2.0 are no longer supported as September 2020:https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-framework
 }
 
-//.NET Core 2.0 or higher is supported by the New Relic .NET agent version 6.19 or higher
-
+// https://docs.newrelic.com/docs/apm/agents/net-agent/getting-started/net-agent-compatibility-requirements/#net-version-core
+// .NET (Core) runtime major.minor as keys and the minimum .NET agent version as values
 var DotnetCoreSupportedVersions = map[string][]string{
-	"9.0": {"10.0.0+"},
-	"8.0": {"10.0.0+"},
-	"7.0": {"10.0.0+"},
-	"6.0": {"9.2.0+"},
-	"5.0": {"8.35.0+"},
-	"3.1": {"8.21.34.0+"},
-	"3.0": {"8.21.34.0+"},
-	"2.2": {"8.19.353.0+"},
-	"2.1": {"8.19.353.0+"},
-	"2.0": {"8.19.353.0+"},
+	"10.0": {"10.0.0+"},
+	"9.0":  {"10.0.0+"},
+	"8.0":  {"10.0.0+"},
+	"7.0":  {"10.0.0+"},
+	"6.0":  {"9.2.0+"},
+	"5.0":  {"8.35.0+"},
+	"3.1":  {"8.21.34.0+"},
+	"3.0":  {"8.21.34.0+"},
+	"2.2":  {"8.19.353.0+"},
+	"2.1":  {"8.19.353.0+"},
+	"2.0":  {"8.19.353.0+"},
 }
-
-//https://docs.newrelic.com/docs/agents/net-agent/getting-started/net-agent-compatibility-requirements-net-core#net-version

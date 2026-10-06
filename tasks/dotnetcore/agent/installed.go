@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"path/filepath"
+
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
 )
 
@@ -45,7 +47,7 @@ func (p DotNetCoreAgentInstalled) Execute(options tasks.Options, upstream map[st
 // checks for NewRelic.Agent.Core.dll in directory.
 func checkForAgentDll() (string, bool) {
 	for _, path := range DotNetCoreAgentPaths {
-		if tasks.FileExists(path + coreAgentDllFilename) {
+		if tasks.FileExists(filepath.Join(path, coreAgentDllFilename)) {
 			return path, true
 		}
 	}

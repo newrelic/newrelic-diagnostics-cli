@@ -118,33 +118,33 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 					"DotNet/Agent/Installed": {Status: tasks.Success},
 					"DotNet/Env/TargetVersion": {
 						Status:  tasks.Info,
-						Payload: []string{"4.5", "4.0"},
+						Payload: []string{"4.8", "4.0"},
 					},
 					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
-						Payload: "7.0.2.0",
+						Payload: "10.45.0.0",
 					},
 				}
 			})
-			It("Should return Warning status", func() {
+			It("Should return Failure status", func() {
 				Expect(result.Status).To(Equal(tasks.Failure))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("We found that your New Relic .NET agent version 7.0.2.0 is not compatible with the following Target .NET version(s): 4.0"))
+				Expect(result.Summary).To(Equal("We found that your New Relic .NET agent version 10.45.0.0 is not compatible with the following Target .NET version(s): 4.0"))
 			})
 		})
-		Context("With success for one target framework version", func() {
+		Context("With multiple supported target framework versions", func() {
 			BeforeEach(func() {
 				options = tasks.Options{}
 				upstream = map[string]tasks.Result{
 					"DotNet/Agent/Installed": {Status: tasks.Success},
 					"DotNet/Env/TargetVersion": {
 						Status:  tasks.Info,
-						Payload: []string{"4.5", "4.6"},
+						Payload: []string{"4.6.2", "4.8"},
 					},
 					"DotNet/Agent/Version": {
 						Status:  tasks.Info,
-						Payload: "7.0.2.0",
+						Payload: "10.45.0.0",
 					},
 				}
 			})
@@ -152,7 +152,70 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 				Expect(result.Status).To(Equal(tasks.Success))
 			})
 			It("Should return expected summary", func() {
-				Expect(result.Summary).To(Equal("Your .NET agent version 7.0.2.0 is fully compatible with the following found Target .NET version(s): 4.5, 4.6"))
+				Expect(result.Summary).To(Equal("Your .NET agent version 10.45.0.0 is fully compatible with the following found Target .NET version(s): 4.6.2, 4.8"))
+			})
+		})
+		Context("With .NET Framework 4.8.1 and a compatible agent", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
+						Status:  tasks.Info,
+						Payload: []string{"4.8.1"},
+					},
+					"DotNet/Agent/Version": {
+						Status:  tasks.Info,
+						Payload: "10.45.0.0",
+					},
+				}
+			})
+			It("Should return Success status", func() {
+				Expect(result.Status).To(Equal(tasks.Success))
+			})
+		})
+		Context("With .NET Framework 4.6.1, which is no longer supported", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
+						Status:  tasks.Info,
+						Payload: []string{"4.6.1"},
+					},
+					"DotNet/Agent/Version": {
+						Status:  tasks.Info,
+						Payload: "10.45.0.0",
+					},
+				}
+			})
+			It("Should return Failure status", func() {
+				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+			It("Should return expected summary", func() {
+				Expect(result.Summary).To(Equal("We found a Target Framework version(s) that is not supported by the New Relic .NET agent: 4.6.1"))
+			})
+		})
+		Context("With .NET Framework 4.7.2 and an agent older than 10.0", func() {
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"DotNet/Agent/Installed": {Status: tasks.Success},
+					"DotNet/Env/TargetVersion": {
+						Status:  tasks.Info,
+						Payload: []string{"4.7.2"},
+					},
+					"DotNet/Agent/Version": {
+						Status:  tasks.Info,
+						Payload: "9.9.0.0",
+					},
+				}
+			})
+			It("Should return Failure status", func() {
+				Expect(result.Status).To(Equal(tasks.Failure))
+			})
+			It("Should return expected summary", func() {
+				Expect(result.Summary).To(Equal("We found that your New Relic .NET agent version 9.9.0.0 is not compatible with the following Target .NET version(s): 4.7.2"))
 			})
 		})
 
@@ -179,5 +242,16 @@ var _ = Describe("Dotnet/Requirements/NetTargetAgentVerValidate", func() {
 			})
 		})
 
+	})
+	Describe("normalizeFrameworkVersions()", func() {
+		It("Should drop a zero patch and keep a non-zero patch", func() {
+			normalized, err := normalizeFrameworkVersions([]string{"4.8", "4.8.0.0", "4.7.2", "4.6.2.0", "4.0"})
+			Expect(err).To(BeNil())
+			Expect(normalized).To(Equal([]string{"4.8", "4.8", "4.7.2", "4.6.2", "4.0"}))
+		})
+		It("Should return an error for an unparseable version", func() {
+			_, err := normalizeFrameworkVersions([]string{"not-a-version"})
+			Expect(err).ToNot(BeNil())
+		})
 	})
 })
