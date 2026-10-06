@@ -16,12 +16,13 @@ var tlsRegKeyPath = `SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL
 type ValidateKeys struct {
 }
 
+// ValidateSchUseStrongCryptoKeys returns the SchUseStrongCrypto value at path, or nil with no error if the key or value
+// isn't set, in which case the .NET Framework default applies.
 func (v ValidateKeys) ValidateSchUseStrongCryptoKeys(path string) (*int, error) {
 	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, path, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 	if err != nil {
-		log.Debug("SchUseStrongCrypto Registry Key Check. Error opening SchUseStrongCrypto Registry Key. Error = ", err.Error())
-		return nil, errors.New("schUseStrongCrypto Parent Key does not exist. Consult these docs to enable SchUseStrongCrypto https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry")
-
+		log.Debug("SchUseStrongCrypto Registry Key Check. Unable to open parent key, treating SchUseStrongCrypto as not set. Error = ", err.Error())
+		return nil, nil
 	}
 	defer regKey.Close()
 
@@ -31,7 +32,8 @@ func (v ValidateKeys) ValidateSchUseStrongCryptoKeys(path string) (*int, error) 
 	}
 	valueCount := stat.ValueCount
 	if valueCount == 0 {
-		return nil, errors.New("unable to find values for SchUseStrongCrypto Registry Key. Consult these docs to enable TLS 1.2 https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry")
+		log.Debug("SchUseStrongCrypto Registry Key Check. Key has no values, treating SchUseStrongCrypto as not set.")
+		return nil, nil
 	}
 	valueNames, read_Err := regKey.ReadValueNames(int(valueCount))
 	if read_Err != nil {
@@ -47,12 +49,13 @@ func (v ValidateKeys) ValidateSchUseStrongCryptoKeys(path string) (*int, error) 
 	}
 
 	if !found {
-		return nil, errors.New("unable to find values for SchUseStrongCrypto Registry Key. Consult these docs to enable TLS 1.2 https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry")
+		log.Debug("SchUseStrongCrypto Registry Key Check. Value not present, treating SchUseStrongCrypto as not set.")
+		return nil, nil
 	}
 
 	schUseStrongCrypto, _, eErr := regKey.GetIntegerValue("SchUseStrongCrypto")
 	if eErr != nil {
-		return nil, err
+		return nil, eErr
 	}
 	n := int(schUseStrongCrypto)
 	return &n, nil
