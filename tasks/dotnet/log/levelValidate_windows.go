@@ -2,6 +2,7 @@ package log
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -93,7 +94,7 @@ func logLevelValidate(logLevels map[string]string) (result tasks.Result) {
 	// loop through configs and see if there is a valid level set in each
 	for configFullPath, levelFound := range logLevels {
 		numConfigs++
-		if _, ok := possibleLevels[levelFound]; ok { // this should be faster than looping through all the levels
+		if _, ok := possibleLevels[strings.ToLower(strings.TrimSpace(levelFound))]; ok { // the agent treats levels case-insensitively
 			validLevelsFound[configFullPath] = levelFound
 			logger.Debug("The log level is", levelFound, " in", configFullPath)
 			continue
