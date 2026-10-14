@@ -251,7 +251,7 @@ func getLogPathsFromCurrentDirOrNamePatters(unmatchedDirKeyToVal, unmatchedFilen
 		for dirKey, dirVal := range unmatchedDirKeyToVal {
 			logPaths := findLogFiles(logFilenamePatterns, dirVal)
 			lastModifiedDate := getLastModifiedDate(options)
-			recentLogFiles, oldLogFiles := determineFilesDate(logPaths, lastModifiedDate)
+			recentLogFiles, oldLogFiles := determineFilesDate(logPaths, lastModifiedDate, getProfilerLastModifiedDate(options))
 			foundBy := fmt.Sprintf("Found by looking for standard New Relic log file names in the provided directory value (%s) for the key %s", dirVal, dirKey)
 			keyVals := map[string]string{
 				dirKey: dirVal,
@@ -333,7 +333,7 @@ func getLogPathsFromStandardLocations(paths []string, options tasks.Options) []L
 	fileLocations := tasks.FindFiles(logFilenamePatterns, paths)
 	// assess how old those files are
 	lastModifiedDate := getLastModifiedDate(options)
-	recentLogFiles, oldLogFiles := determineFilesDate(fileLocations, lastModifiedDate)
+	recentLogFiles, oldLogFiles := determineFilesDate(fileLocations, lastModifiedDate, getProfilerLastModifiedDate(options))
 
 	if len(recentLogFiles) > 0 {
 		for _, fileLocation := range recentLogFiles {

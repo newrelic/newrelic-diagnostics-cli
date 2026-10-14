@@ -27,6 +27,13 @@ func isFileWithNETAgentConfigPath(filename string) bool {
 	return false
 }
 
+var appSettingsJSONRegex = regexp.MustCompile(AppSettingsJSONPattern)
+
+// IsAppSettingsJSON - determine if filename is appsettings.json or an environment-specific appsettings.{Environment}.json
+func IsAppSettingsJSON(filename string) bool {
+	return appSettingsJSONRegex.MatchString(filename)
+}
+
 var compiledConfigPatterns []*regexp.Regexp
 
 func init() {

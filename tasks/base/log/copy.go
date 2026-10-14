@@ -230,16 +230,18 @@ func searchForLogPaths(options tasks.Options, upstream map[string]tasks.Result) 
 	return logFilesFound, nil
 }
 
-func determineFilesDate(logFilePaths []string, lastModifiedDate time.Time) ([]string, []string) {
+// determineFilesDate splits log files into recent and old ones. .NET profiler logs use profilerLastModifiedDate as
+// their cutoff because the profiler writes a log per process; every other log uses lastModifiedDate.
+func determineFilesDate(logFilePaths []string, lastModifiedDate time.Time, profilerLastModifiedDate time.Time) ([]string, []string) {
 	var recentLogFilePaths []string
 	var oldLogFilePaths []string
 	profilerRgx := regexp.MustCompile(profilerLogName)
 	for _, logFilePath := range logFilePaths {
-		//overwrite lastModifiedDate for .NET profiler logs because it produces too many files. We'll only collect profiler logs produced in the last 1 day instead of 7.
+		cutoff := lastModifiedDate
 		if profilerRgx.MatchString(logFilePath) {
-			lastModifiedDate = time.Now().AddDate(0, 0, -profilerMaxNumDays)
+			cutoff = profilerLastModifiedDate
 		}
-		if isLogFileRecent(logFilePath, lastModifiedDate) {
+		if isLogFileRecent(logFilePath, cutoff) {
 			recentLogFilePaths = append(recentLogFilePaths, logFilePath)
 		} else {
 			oldLogFilePaths = append(oldLogFilePaths, logFilePath)
@@ -263,6 +265,15 @@ func getLastModifiedDate(options tasks.Options) time.Time {
 	}
 	return lastModifiedDate
 
+}
+
+// getProfilerLastModifiedDate returns the cutoff for .NET profiler logs: the lastModifiedDate override when one is
+// given, otherwise profilerMaxNumDays ago.
+func getProfilerLastModifiedDate(options tasks.Options) time.Time {
+	if options.Options["lastModifiedDate"] != "" {
+		return getLastModifiedDate(options)
+	}
+	return time.Now().AddDate(0, 0, -profilerMaxNumDays)
 }
 
 func isLogFileRecent(inputFilePath string, minimumModTime time.Time) bool {

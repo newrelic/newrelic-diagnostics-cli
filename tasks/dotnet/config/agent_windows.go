@@ -59,7 +59,15 @@ func (p DotNetConfigAgent) Execute(options tasks.Options, upstream map[string]ta
 		}
 	}
 
-	// get all the config files and elements to check them. No need to verify if this task succeeded because we already checked this on the upstream task DotNet/Agent/Installed
+	// DotNet/Agent/Installed succeeds when the agent DLLs are present even if no config files were collected
+	if !upstream["Base/Config/Validate"].HasPayload() {
+		return tasks.Result{
+			Status:  tasks.Warning,
+			Summary: `The .NET agent is installed, but no newrelic.config file was found. Check that the global newrelic.config exists in C:\ProgramData\New Relic\.NET Agent\, or that the application has a local newrelic.config.`,
+			URL:     "https://docs.newrelic.com/docs/apm/agents/net-agent/configuration/net-agent-configuration/",
+		}
+	}
+
 	configFiles, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement) //This is a type assertion to cast my upstream results back into data I know the structure of and can now work with. In this case, I'm casting it back to the []validateElements{} I know it should return
 	if !ok {
 		return tasks.Result{

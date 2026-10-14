@@ -28,6 +28,10 @@ var configEnvVarKeys = []string{
 
 var noConfigEnvVar = "NEW_RELIC_NO_CONFIG_FILE"
 
+// AppSettingsJSONPattern matches appsettings.json and the environment-specific appsettings.{Environment}.json files
+// that the .NET agent also reads.
+const AppSettingsJSONPattern = "(?i)^appsettings([.][^.]+)?[.]json$"
+
 var patterns = []string{
 	"newrelic[.]yml",
 	"newrelic[.]xml",
@@ -59,7 +63,7 @@ var secureFilePatterns = []string{
 	"^(?i)(web|app)[.]config$",
 	"(?i).+[.]exe[.]config$", //  app.config files are almost always app-me.exe.config. filter NewRelicStatusMonitor.exe.config later
 	"(.+).csproj$",           //project file use to configure NET app
-	"(?i)appSettings[.]json$",
+	AppSettingsJSONPattern,
 }
 
 var warningSummaryFmt = "The " + tasks.ThisProgramFullName + " cannot collect New Relic config files from the provided path (%s):\n%s\nIf you are working with a support ticket, manually provide your New Relic config file for further troubleshooting\n"

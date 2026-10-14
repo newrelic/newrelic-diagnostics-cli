@@ -105,10 +105,10 @@ func checkConfigs(configFiles []config.ValidateElement) ([]config.ValidateElemen
 		// check filename, set up keysToCheck variable
 		if strings.EqualFold(configFile.Config.FileName, "newrelic.config") {
 			keysToCheck = newrelicConfigKeys
-		} else if tasks.CaseInsensitiveStringContains(configFile.Config.FileName, "appSettings.json") {
+		} else if config.IsAppSettingsJSON(configFile.Config.FileName) {
 			keysToCheck = appSettingsJsonKeys
 		} else { // name doesn't match anything, skip it
-			logger.Debug("Filename does not match newrelic.config or *appSettings.json. Ignoring file:", fullPath)
+			logger.Debug("Filename does not match newrelic.config or appsettings*.json. Ignoring file:", fullPath)
 			continue
 		}
 
