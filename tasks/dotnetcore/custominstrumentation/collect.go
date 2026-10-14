@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strings"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/logger"
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -27,6 +28,7 @@ func (p DotNetCoreCustomInstrumentationCollect) Explain() string {
 func (p DotNetCoreCustomInstrumentationCollect) Dependencies() []string {
 	return []string{
 		"DotNetCore/Agent/Installed",
+		"Base/Env/CollectEnvVars",
 	}
 }
 
@@ -42,7 +44,6 @@ func (p DotNetCoreCustomInstrumentationCollect) Execute(options tasks.Options, u
 
 	results := []CustomInstrumentationElement{}
 	filesToCopy := []tasks.FileCopyEnvelope{}
-	extensionsPath := ""
 
 	// check if the agent is installed
 	checkInstalled := upstream["DotNetCore/Agent/Installed"].Status
@@ -62,13 +63,14 @@ func (p DotNetCoreCustomInstrumentationCollect) Execute(options tasks.Options, u
 		return result
 	}
 
-	// set up path to custom instrumentation xml files
-	if runtime.GOOS == "windows" {
-		extensionsPath = filepath.Join(installPath, "Extensions")
-	} else {
-		extensionsPath = filepath.Join(installPath, "extensions")
+	envVars, ok := upstream["Base/Env/CollectEnvVars"].Payload.(map[string]string)
+	if !ok {
+		logger.Debug("Error gathering Environment Variables from upstream. Resolving the New Relic home directory without them.")
+		envVars = map[string]string{}
 	}
-	custInstXMLPath := []string{extensionsPath}
+
+	// the profiler loads instrumentation from <New Relic home>/extensions and <New Relic home>/extensions/netcore
+	extensionsPath := filepath.Join(resolveNewRelicHome(runtime.GOOS, installPath, envVars), "extensions")
 
 	logger.Debug("Searching for custom instrumentation xml files in:", extensionsPath)
 
@@ -76,7 +78,7 @@ func (p DotNetCoreCustomInstrumentationCollect) Execute(options tasks.Options, u
 	searchPattern := []string{"^(?i).+[.]xml"}
 
 	// Gather the files
-	allInstrumentationFiles := tasks.FindFiles(searchPattern, custInstXMLPath)
+	allInstrumentationFiles := filterToLoadedDirectories(tasks.FindFiles(searchPattern, []string{extensionsPath}), extensionsPath)
 
 	// filter out built in instrumentation files
 	customInstrumentationFiles := getCustomInstrumentationFiles(allInstrumentationFiles)
@@ -106,6 +108,50 @@ func (p DotNetCoreCustomInstrumentationCollect) Execute(options tasks.Options, u
 	}
 
 	return result
+}
+
+// resolveNewRelicHome mirrors how the profiler finds its home directory for CoreCLR: the CORECLR_NEW_RELIC_HOME
+// environment variable (or its legacy CORECLR_NEWRELIC_HOME name), then on Windows the NewRelicHome the MSI writes
+// to the registry, which is the ProgramData directory. Without either, the agent install path is the best guess.
+func resolveNewRelicHome(goos string, installPath string, envVars map[string]string) string {
+	for _, name := range []string{"CORECLR_NEW_RELIC_HOME", "CORECLR_NEWRELIC_HOME"} {
+		if home := envVars[name]; home != "" {
+			return home
+		}
+	}
+
+	if goos == "windows" {
+		programData := envVars["ProgramData"]
+		if programData == "" {
+			programData = `C:\ProgramData`
+		}
+		return filepath.Join(programData, "New Relic", ".NET Agent")
+	}
+
+	return installPath
+}
+
+// filterToLoadedDirectories keeps only the files the profiler loads: those directly in the extensions directory or in
+// its netcore subdirectory.
+func filterToLoadedDirectories(files []string, extensionsPath string) []string {
+	// FindFiles resolves symlinks (and Windows short names) in the search path, so the paths it returns must be
+	// compared against the resolved path
+	if resolved, err := filepath.EvalSymlinks(extensionsPath); err == nil {
+		extensionsPath = resolved
+	}
+	loadedDirs := []string{filepath.Clean(extensionsPath), filepath.Join(extensionsPath, "netcore")}
+
+	var filtered []string
+	for _, file := range files {
+		dir := filepath.Dir(file)
+		for _, loadedDir := range loadedDirs {
+			if strings.EqualFold(dir, loadedDir) {
+				filtered = append(filtered, file)
+				break
+			}
+		}
+	}
+	return filtered
 }
 
 func getCustomInstrumentationFiles(allFiles []string) []string {
