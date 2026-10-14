@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"strings"
+
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks/base/config"
 
 	"github.com/newrelic/newrelic-diagnostics-cli/tasks"
@@ -50,35 +52,22 @@ func (p DotNetAgentInstalled) Dependencies() []string {
 }
 
 func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string]tasks.Result) tasks.Result {
-	if !upstream["Base/Config/Validate"].HasPayload() {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: tasks.NoAgentDetectedSummary,
-		}
-	}
-
-	validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
-	if !ok {
-		return tasks.Result{
-			Status:  tasks.None,
-			Summary: tasks.AssertionErrorSummary,
-		}
-	}
-
-	for _, validation := range validations {
-
-		if (validation.Config.FileName) != "newrelic.config" {
-			continue
-		}
-
-		agentInstall, ok := findAgentInstall(p.agentInstallPaths)
+	configFound := false
+	if upstream["Base/Config/Validate"].HasPayload() {
+		validations, ok := upstream["Base/Config/Validate"].Payload.([]config.ValidateElement)
 		if !ok {
 			return tasks.Result{
-				Status:  tasks.Failure,
-				Summary: "Could NOT find one or more dlls required by the .Net Agent. Either the .NET Agent is not installed or missing essential dlls. Try running the installer to resolve the issue.",
+				Status:  tasks.None,
+				Summary: tasks.AssertionErrorSummary,
 			}
 		}
+		configFound = hasNewRelicConfig(validations)
+	}
 
+	// The DLLs are checked even without a newrelic.config, so a broken or partial install still gets reported
+	agentInstall, dllsFound := findAgentInstall(p.agentInstallPaths)
+
+	if dllsFound && configFound {
 		return tasks.Result{
 			Status:  tasks.Success,
 			Summary: "Found dlls required by the .NET Agent",
@@ -86,10 +75,34 @@ func (p DotNetAgentInstalled) Execute(options tasks.Options, upstream map[string
 		}
 	}
 
+	if dllsFound {
+		return tasks.Result{
+			Status:  tasks.Success,
+			Summary: "Found dlls required by the .NET Agent, but no newrelic.config file was found",
+			Payload: agentInstall,
+		}
+	}
+
+	if configFound {
+		return tasks.Result{
+			Status:  tasks.Failure,
+			Summary: "Could NOT find one or more dlls required by the .Net Agent. Either the .NET Agent is not installed or missing essential dlls. Try running the installer to resolve the issue.",
+		}
+	}
+
 	return tasks.Result{
 		Status:  tasks.None,
 		Summary: tasks.NoAgentDetectedSummary,
 	}
+}
+
+func hasNewRelicConfig(validations []config.ValidateElement) bool {
+	for _, validation := range validations {
+		if strings.EqualFold(validation.Config.FileName, "newrelic.config") {
+			return true
+		}
+	}
+	return false
 }
 
 // findAgentInstall will return the first DotNetAgentInstall where both paths point to files that exist.

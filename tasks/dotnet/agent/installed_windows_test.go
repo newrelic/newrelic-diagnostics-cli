@@ -282,6 +282,127 @@ var _ = Describe("DotNetAgentInstalled", func() {
 			})
 		})
 
+		Context("When no config files are collected, but agent and profiler dlls are found", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Config/Validate": {
+						Status: tasks.None,
+					},
+				}
+				p.agentInstallPaths = []DotNetAgentInstall{
+					{
+						AgentPath:    "fixtures/file1.dll",
+						ProfilerPath: "fixtures/file2.dll",
+					},
+				}
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Success))
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal("Found dlls required by the .NET Agent, but no newrelic.config file was found"))
+			})
+
+			It("should return the install in the payload", func() {
+				resultPayload, _ := result.Payload.(DotNetAgentInstall)
+				Expect(resultPayload.AgentPath).To(Equal("fixtures/file1.dll"))
+			})
+		})
+
+		Context("When only non-.NET config files are collected, but agent and profiler dlls are found", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Config/Validate": {
+						Status: tasks.Success,
+						Payload: []config.ValidateElement{
+							{
+								Config: config.ConfigElement{
+									FileName: "newrelic.yml",
+									FilePath: "",
+								},
+							},
+						},
+					},
+				}
+				p.agentInstallPaths = []DotNetAgentInstall{
+					{
+						AgentPath:    "fixtures/file1.dll",
+						ProfilerPath: "fixtures/file2.dll",
+					},
+				}
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.Success))
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal("Found dlls required by the .NET Agent, but no newrelic.config file was found"))
+			})
+		})
+
+		Context("When no config files are collected and no agent dlls are found", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Config/Validate": {
+						Status: tasks.None,
+					},
+				}
+				p.agentInstallPaths = []DotNetAgentInstall{
+					{
+						AgentPath:    "fixtures/does_not_exist.dll",
+						ProfilerPath: "fixtures/does_not_exist.dll",
+					},
+				}
+			})
+
+			It("should return an expected result status", func() {
+				Expect(result.Status).To(Equal(tasks.None))
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal(tasks.NoAgentDetectedSummary))
+			})
+		})
+
+		Context("When the config file name differs in case from newrelic.config", func() {
+
+			BeforeEach(func() {
+				options = tasks.Options{}
+				upstream = map[string]tasks.Result{
+					"Base/Config/Validate": {
+						Status: tasks.Success,
+						Payload: []config.ValidateElement{
+							{
+								Config: config.ConfigElement{
+									FileName: "NewRelic.config",
+									FilePath: "",
+								},
+							},
+						},
+					},
+				}
+				p.agentInstallPaths = []DotNetAgentInstall{
+					{
+						AgentPath:    "fixtures/file1.dll",
+						ProfilerPath: "fixtures/file2.dll",
+					},
+				}
+			})
+
+			It("should return an expected result summary", func() {
+				Expect(result.Summary).To(Equal("Found dlls required by the .NET Agent"))
+			})
+		})
+
 		Context("When .NET config files and agent and profile dlls are found for both current and legacy agents", func() {
 
 			BeforeEach(func() {
