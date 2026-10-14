@@ -58,7 +58,9 @@ func (p DotNetTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Res
 			Summary: schErr_2.Error(),
 		}
 	}
-	if *schCryptoKey_1 != 1 || *schCryptoKey_2 != 1 {
+	// A nil value means SchUseStrongCrypto isn't set, so the .NET Framework default applies (strong crypto for the
+	// 4.6+ framework versions the agent supports). Only an explicit value other than 1 disables it.
+	if isSchUseStrongCryptoDisabled(schCryptoKey_1) || isSchUseStrongCryptoDisabled(schCryptoKey_2) {
 		return tasks.Result{
 			Status:  tasks.Failure,
 			Summary: "SchUseStrongCrypto must be enabled.  See more in these docs https://docs.newrelic.com/docs/apm/agents/net-agent/troubleshooting/no-data-appears-after-disabling-tls-10/#windows-registry",
@@ -72,6 +74,10 @@ func (p DotNetTLSRegKey) Execute(op tasks.Options, upstream map[string]tasks.Res
 		}
 	}
 	return p.compareTLSRegKeys(tlsRegKeys)
+}
+
+func isSchUseStrongCryptoDisabled(value *int) bool {
+	return value != nil && *value != 1
 }
 
 func (p DotNetTLSRegKey) compareTLSRegKeys(tlsRegKeys *entity.TLSRegKey) tasks.Result {

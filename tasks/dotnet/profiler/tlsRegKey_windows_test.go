@@ -207,3 +207,43 @@ func TestDotNetTLSRegKey_Execute(t *testing.T) {
 		})
 	}
 }
+
+func TestDotNetTLSRegKey_Execute_SchUseStrongCryptoNotSet(t *testing.T) {
+	installed := map[string]tasks.Result{
+		"DotNet/Agent/Installed": {Status: tasks.Success, Summary: "Regular Summary"},
+	}
+	enabled := 1
+	disabled := 0
+	tlsEnabled := &entity.TLSRegKey{Enabled: 1, DisabledByDefault: 0}
+
+	tests := []struct {
+		name       string
+		firstKey   *int
+		secondKey  *int
+		wantStatus tasks.Status
+	}{
+		{name: "both keys unset uses the OS default", firstKey: nil, secondKey: nil, wantStatus: tasks.Success},
+		{name: "first key unset, second enabled", firstKey: nil, secondKey: &enabled, wantStatus: tasks.Success},
+		{name: "first key enabled, second unset", firstKey: &enabled, secondKey: nil, wantStatus: tasks.Success},
+		{name: "first key unset, second explicitly disabled", firstKey: nil, secondKey: &disabled, wantStatus: tasks.Failure},
+		{name: "first key explicitly disabled, second unset", firstKey: &disabled, secondKey: nil, wantStatus: tasks.Failure},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			validateKeysMock := new(mocks.MockDotNetTLSRegKey)
+			validateKeysMock.On("ValidateSchUseStrongCryptoKeys", mock.Anything).Return(tt.firstKey, nil).Once()
+			validateKeysMock.On("ValidateSchUseStrongCryptoKeys", mock.Anything).Return(tt.secondKey, nil).Once()
+			validateKeysMock.On("ValidateTLSRegKeys", mock.Anything).Return(tlsEnabled, nil).Maybe()
+			p := DotNetTLSRegKey{name: "Reg key", validateKeys: validateKeysMock}
+
+			// Act
+			got := p.Execute(tasks.Options{}, installed)
+
+			// Assert
+			if got.Status != tt.wantStatus {
+				t.Errorf("Execute() status = %v, want %v (summary: %s)", got.Status, tt.wantStatus, got.Summary)
+			}
+		})
+	}
+}
